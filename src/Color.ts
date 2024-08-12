@@ -67,7 +67,7 @@ export const computeColor = (color: TColor) => {
 }
 
 // const generateColorPallette = () => {
-// ...
+// ... ...
 //   console.log("---")
 //   const colors = ["4E4073", "57BAAF", "D7444F", "3E63DD", "F8685B", "3A835B", "F59613", "D9364C", "333333", "FFFFFF"]
 //   colors.forEach(c => {

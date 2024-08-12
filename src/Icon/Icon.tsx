@@ -9,7 +9,7 @@ const calculateFontVariantSettings = (size: ESize, weight: EWeight) => {
 
   switch (weight) {
     case EWeight.Light:
-      w = "200"
+      w = '200'
       break
 
     case EWeight.Heavy:
