@@ -16,13 +16,13 @@ const Container = styled.div<TContainerProperties>(p => ({
 const ContentStart = styled.div<Pick<TLayoutSplit, "direction" | "contentStartWidth">>(p => ({
   display: "flex",
   flexDirection: "column",
-  width: p.direction === EDirection.Horizontal ? (p.contentStartWidth ?? "50%") : "100%",
+  width: p.direction === EDirection.Horizontal ? p.contentStartWidth || "50%" : "100%",
 }))
 
 const ContentEnd = styled.div<Pick<TLayoutSplit, "direction" | "contentEndWidth">>(p => ({
   display: "flex",
   flexDirection: "column",
-  width: p.direction === EDirection.Horizontal ? (p.contentEndWidth ?? "50%") : "100%",
+  width: p.direction === EDirection.Horizontal ? p.contentEndWidth || "50%" : "100%",
 }))
 
 export type TLayoutSplit = TLayoutBase & {
