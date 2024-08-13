@@ -1,0 +1,15 @@
+name: On push, eslint
+
+on:
+  push:
+
+jobs:
+  "CODE-ANALYSIS":
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - uses: actions/setup-node@v2
+      - name: "Run ESLint on diff against branch: master"
+        run: |
+          yarn
+          yarn run eslint src/
