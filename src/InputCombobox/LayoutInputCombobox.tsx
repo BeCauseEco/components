@@ -19,8 +19,8 @@ const Bottom = styled.div({
   display: "flex",
   flexDirection: "column",
   maxHeight: "var(--radix-popover-content-available-height)",
-  overflowY: "auto",
 
+  overflowY: "auto",
   scrollBehavior: "smooth",
   scrollbarWidth: "thin",
   scrollbarColor: "rgba(0, 0, 0, 0.5) rgba(0, 0, 0, 0.1)",

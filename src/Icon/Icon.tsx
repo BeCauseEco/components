@@ -5,11 +5,12 @@ import { EWeight } from "@new/EWeight"
 
 const calculateFontVariantSettings = (size: ESize, weight: EWeight) => {
   let w = [ESize.Large, ESize.Huge].includes(size) ? "700" : "600"
+
   const g = [ESize.Large, ESize.Huge].includes(size) ? "0" : "-25"
 
   switch (weight) {
     case EWeight.Light:
-      w = '200'
+      w = "200"
       break
 
     case EWeight.Heavy:
