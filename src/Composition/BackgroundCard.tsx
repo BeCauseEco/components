@@ -10,7 +10,7 @@ const Container = styled.div<TBackgroundCard>(p => ({
   flexGrow: 1,
   outlineOffset: "-1px",
   boxShadow: p.shadow ? p.shadow : "none",
-  borderRadius: p.borderRadius ? p.borderRadius : 0,
+  borderRadius: p.borderRadius ? (p.borderRadius as any) : 0,
   transition: "background-color 0.025s ease-in",
 
   // ...(p.stacked && {
