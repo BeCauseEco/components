@@ -26,6 +26,12 @@ const Overlay = styled(RadixDialog.Overlay)({
   zIndex: 1,
 })
 
+const RadixDialogClose = styled(RadixDialog.Close)({
+  display: "flex",
+  transform: "translateX(var(--BU))",
+  height: "fit-content",
+})
+
 type TDialogContentProperties = Pick<TDialog, "size">
 
 const Content = styled(RadixDialog.Content)<TDialogContentProperties>(p => ({
@@ -109,11 +115,11 @@ export const Dialog = ({
                 </>
               }
               buttonClose={
-                <RadixDialog.Close asChild>
-                  <InputButton size={ESize.Medium} variant={EInputButtonVariant.Transparent} color={EColor.White}>
+                <RadixDialogClose asChild>
+                  <InputButton size={ESize.Medium} variant={EInputButtonVariant.Transparent} color={EColor.Black}>
                     <Icon name="close" size={ESize.Large} color={[EColor.Black, 700]} />
                   </InputButton>
-                </RadixDialog.Close>
+                </RadixDialogClose>
               }
             />
           </Composition>

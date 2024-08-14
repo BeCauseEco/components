@@ -10,6 +10,7 @@ import { BackgroundCard } from "@new/Composition/BackgroundCard"
 import { LayoutInputButton } from "./LayoutInputButton"
 import Link from "next/link"
 import { LinkProps } from "next/dist/client/link"
+import React from "react"
 
 const Output = styled.output<Pick<TInputButton, "loading" | "variant">>(p => ({
   display: "flex",
@@ -89,6 +90,8 @@ export const InputButton = forwardRef<HTMLButtonElement | HTMLAnchorElement, Pro
       children,
     } = props
 
+    const childIconOnly = React.Children.toArray(children)[0]["type"]["name"] === "Icon"
+
     let background
 
     switch (variant) {
@@ -117,7 +120,7 @@ export const InputButton = forwardRef<HTMLButtonElement | HTMLAnchorElement, Pro
         break
     }
 
-    const Layout = <LayoutInputButton content={children} size={size} />
+    const Layout = <LayoutInputButton childIconOnly={childIconOnly} content={children} size={size} />
 
     return (
       <Output
