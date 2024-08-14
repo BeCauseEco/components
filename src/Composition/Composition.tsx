@@ -15,6 +15,7 @@ const Container = styled.div<Pick<TComposition, "loading">>(p => ({
   width: "100%",
   opacity: p.loading ? 0.5 : 1,
   cursor: p.loading ? "loading" : "auto",
+  backgroundColor: "blue",
 }))
 
 const Background = styled.div({
