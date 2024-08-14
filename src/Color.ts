@@ -40,26 +40,30 @@ export const computeColor = (color: TColor) => {
   if (baseColor === EColor.Transparent) {
     return baseColor
   } else {
-    const colorsLighter = samples(18)
+    const colorsLight = samples(28)
       .map(interpolate<"oklab">(["#ffffff", baseColor]))
       .map(formatHex)
 
-    const colorsDarker = samples(8)
+    const colorsMedium = samples(18)
+      .map(interpolate<"oklab">(["#ffffff", baseColor]))
+      .map(formatHex)
+
+    const colorsDark = samples(8)
       .map(interpolate<"oklab">([baseColor, "#000000"]))
       .map(formatHex)
 
     const combined = [
-      colorsLighter[2],
-      colorsLighter[3],
-      colorsLighter[5],
-      colorsLighter[8],
-      colorsLighter[10],
-      colorsLighter[12],
-      colorsLighter[14],
-      colorsLighter[17],
-      colorsDarker[1],
-      colorsDarker[2],
-      colorsDarker[3],
+      colorsLight[1],
+      colorsMedium[2],
+      colorsMedium[6],
+      colorsMedium[8],
+      colorsMedium[10],
+      colorsMedium[12],
+      colorsMedium[14],
+      colorsMedium[17],
+      colorsDark[1],
+      colorsDark[2],
+      colorsDark[3],
     ]
 
     return combined[lightness === 50 ? 0 : lightness / 100]
@@ -67,7 +71,6 @@ export const computeColor = (color: TColor) => {
 }
 
 // const generateColorPallette = () => {
-// ... ...
 //   console.log("---")
 //   const colors = ["4E4073", "57BAAF", "D7444F", "3E63DD", "F8685B", "3A835B", "F59613", "D9364C", "333333", "FFFFFF"]
 //   colors.forEach(c => {

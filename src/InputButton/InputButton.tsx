@@ -9,6 +9,8 @@ import { Composition } from "@new/Composition/Composition"
 import { BackgroundCard } from "@new/Composition/BackgroundCard"
 import { LayoutInputButton } from "./LayoutInputButton"
 import Link from "next/link"
+import { LinkProps } from "next/dist/client/link"
+import React from "react"
 
 const Output = styled.output<Pick<TInputButton, "loading" | "variant">>(p => ({
   display: "flex",
@@ -60,9 +62,13 @@ type TInputButtonBase = {
   children: ReactElement<TText | TIcon | TKeyValuePair>
 }
 
-type TInputButtonVariantLink = TInputButtonBase & {
+type TInputButtonVariantLinkHref = TInputButtonBase & {
   variant: EInputButtonVariant.Link
-  href?: string
+  href?: LinkProps["href"]
+}
+
+type TInputButtonVariantLinkOnClick = TInputButtonBase & {
+  variant: EInputButtonVariant.Link
 }
 
 type TInputButtonVariantOthers = TInputButtonBase & {
@@ -70,7 +76,7 @@ type TInputButtonVariantOthers = TInputButtonBase & {
   color: EColor
 }
 
-export type TInputButton = TInputButtonVariantLink | TInputButtonVariantOthers
+export type TInputButton = TInputButtonVariantLinkHref | TInputButtonVariantLinkOnClick | TInputButtonVariantOthers
 
 export const InputButton = forwardRef<HTMLButtonElement | HTMLAnchorElement, PropsWithChildren<TInputButton>>(
   (props, ref) => {
@@ -83,6 +89,8 @@ export const InputButton = forwardRef<HTMLButtonElement | HTMLAnchorElement, Pro
       href,
       children,
     } = props
+
+    const childIconOnly = React.Children.toArray(children)[0]["type"]["name"] === "Icon"
 
     let background
 
@@ -101,18 +109,18 @@ export const InputButton = forwardRef<HTMLButtonElement | HTMLAnchorElement, Pro
         background = (
           <BackgroundCard
             colorOutline={[props.color, 700]}
-            colorBackgroundHover={[props.color, 200]}
+            colorBackgroundHover={[props.color, 100]}
             borderRadius={ESize.Tiny}
           />
         )
         break
 
       case EInputButtonVariant.Transparent:
-        background = <BackgroundCard borderRadius={ESize.Tiny} colorBackgroundHover={[props.color, 200]} />
+        background = <BackgroundCard borderRadius={ESize.Tiny} colorBackgroundHover={[props.color, 100]} />
         break
     }
 
-    const Layout = <LayoutInputButton content={children} size={size} />
+    const Layout = <LayoutInputButton childIconOnly={childIconOnly} content={children} size={size} />
 
     return (
       <Output

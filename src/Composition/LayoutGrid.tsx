@@ -11,7 +11,7 @@ const Container = styled.div<Pick<TLayoutGrid, "rows" | "columns">>(p => ({
 
 export type TLayoutGrid = TLayoutBase & {
   content: ReactNode | ReactNode[]
-  columns: "1fr 1fr" | "1fr 1fr 1fr" | "1fr 1fr 1fr 1fr"
+  columns: "1fr" | "1fr 1fr" | "1fr 1fr 1fr" | "1fr 1fr 1fr 1fr"
   rows: "auto"
 }
 

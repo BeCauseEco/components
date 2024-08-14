@@ -28,7 +28,7 @@ export const InputRadioGroup = ({
   const key = useId()
 
   return (
-    <KeyValuePair direction={EDirection.Vertical} spacing={ESize.Tiny}>
+    <KeyValuePair direction={EDirection.Vertical} spacing={ESize.Xsmall}>
       <label htmlFor={key}>{label}</label>
 
       <Root id={key} defaultValue={defaultValue} value={value} onValueChange={onChange}>
