@@ -37,6 +37,8 @@ const Content = styled(RadixDialog.Content)<TDialogContentProperties>(p => ({
   width: p.size === ESize.Medium ? "calc(var(--BU) * 40))" : "calc(100vw - calc(var(--BU) * 10))",
   height: p.size === ESize.Medium ? "auto" : `calc(100vh - ${offsetTop} - calc(var(--BU) * 10))`,
   zIndex: 2,
+  maxHeight: `calc(100vh - ${offsetTop} - calc(var(--BU) * 10))`,
+  overflowY: "auto",
 }))
 
 export type TDialog = {
@@ -46,7 +48,7 @@ export type TDialog = {
   onOpenChange: (open: boolean) => void
   title?: ReactElement<TText>
   description?: ReactElement<TText>
-  buttonPrimary: ReactElement<TInputButton>
+  buttonPrimary?: ReactElement<TInputButton>
   buttonSecondary?: ReactElement<TInputButton>
   buttonTertiary?: ReactElement<TInputButton>
 }
@@ -66,7 +68,7 @@ export const Dialog = ({
 
   if (title || description) {
     contentStart = (
-      <KeyValuePair direction={EDirection.Horizontal} spacing={ESize.Tiny}>
+      <KeyValuePair direction={EDirection.Vertical} spacing={ESize.Xsmall}>
         {title}
         {description}
       </KeyValuePair>
@@ -87,23 +89,23 @@ export const Dialog = ({
               contentMiddle={content}
               contentEnd={
                 <>
-                  {buttonTertiary && (
-                    <>
-                      {buttonTertiary}
-
-                      <Spacer size={ESize.Small} />
-                    </>
-                  )}
+                  {buttonTertiary && buttonTertiary}
 
                   {buttonSecondary && (
                     <>
-                      {buttonSecondary}
-
                       <Spacer size={ESize.Small} />
+
+                      {buttonSecondary}
                     </>
                   )}
 
-                  {buttonPrimary}
+                  {buttonPrimary && (
+                    <>
+                      <Spacer size={ESize.Small} />
+
+                      {buttonPrimary}
+                    </>
+                  )}
                 </>
               }
               buttonClose={
