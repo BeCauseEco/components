@@ -62,7 +62,7 @@ type TInputButtonBase = {
 
 type TInputButtonVariantLink = TInputButtonBase & {
   variant: EInputButtonVariant.Link
-  href?: LinkProps["href"]
+  href?: Pick<LinkProps, "href">
 }
 
 type TInputButtonVariantOthers = TInputButtonBase & {
