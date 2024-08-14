@@ -21,6 +21,7 @@ const StyleSizeLarge = childIconOnly => ({
 const Container = styled.div<Pick<TLayoutInputButton, "size" | "childIconOnly">>(p => ({
   display: "flex",
   width: "100%",
+  cursor: "pointer",
 
   ...(p.size === ESize.Small && StyleSizeSmall(p.childIconOnly)),
   ...(p.size === ESize.Medium && StyleSizeMedium(p.childIconOnly)),
