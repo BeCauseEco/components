@@ -4,7 +4,7 @@ import { TLayoutBase } from "@new/Composition/TLayoutBase"
 
 const Container = styled.div({
   display: "flex",
-  padding: "calc(var(--BU) * 0.5) calc(var(--BU) * 2)",
+  padding: "calc(var(--BU) * 1) calc(var(--BU) * 1.5)",
 })
 
 export type TLayoutChip = TLayoutBase & {

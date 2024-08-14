@@ -9,19 +9,19 @@ import { ESize } from "@new/ESize"
 const Output = styled.output<Omit<TInputText, "id"> & { rows: number }>(p => ({
   display: "flex",
   width: "100%",
-  height: p.rows === 1 ? "calc(var(--BU) * 8)" : `calc(var(--BU) * 8 * ${p.rows - 1} + calc(var(--BU) * 3))`,
+  height: p.rows === 1 ? "calc(var(--BU) * 7)" : `calc(var(--BU) * 7 * ${p.rows - 1} + calc(var(--BU) * 3))`,
   padding: p.rows === 1 ? "0 calc(var(--BU) * 2)" : "calc(var(--BU) * 2)",
   resize: "none",
   borderRadius: "var(--BU)",
   color: computeColor([p.color, 700]),
   border: "none",
   outline: "none",
-  boxShadow: `inset 0 0 0 1px ${computeColor([p.color, 300])}`,
+  boxShadow: `inset 0 0 0 1px ${computeColor([p.color, 700])}`,
   ...StyleFontFamily,
   ...StyleBodyXsmall,
 
   "&:focus": {
-    boxShadow: `inset 0 0 0 1px ${computeColor([p.color, 700])}`,
+    backgroundColor: `${computeColor([p.color, 100])}`,
   },
 
   "&::selection": {

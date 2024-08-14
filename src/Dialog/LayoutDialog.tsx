@@ -14,7 +14,7 @@ const ContentStart = styled.div({
   flexDirection: "row",
   justifyContent: "space-between",
   padding: "calc(var(--BU) * 4)",
-  borderBottom: `solid 1px ${computeColor([EColor.Black, 50])}`,
+  borderBottom: `solid 1px ${computeColor([EColor.Black, 100])}`,
 })
 
 const ContentStartContent = styled.div({
@@ -33,7 +33,7 @@ const ContentEnd = styled.div({
   display: "flex",
   flexDirection: "row",
   padding: "calc(var(--BU) * 4)",
-  borderTop: `solid 1px ${computeColor([EColor.Black, 50])}`,
+  borderTop: `solid 1px ${computeColor([EColor.Black, 100])}`,
   justifyContent: "flex-end",
 })
 
