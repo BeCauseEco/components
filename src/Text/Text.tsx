@@ -23,7 +23,7 @@ const computeAlignment = (alignment?: EAlignment) => {
 }
 
 export const StyleMonospace = {
-  fontFamily: `"Inconsolata", monospace`,
+  fontFamily: "monospace",
   fontOpticalSizing: "auto",
   fontWeight: 500,
   fontStyle: "normal",

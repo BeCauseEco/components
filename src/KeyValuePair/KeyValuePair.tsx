@@ -12,6 +12,8 @@ const Container = styled.div<TConatinerProperties>(p => ({
   alignItems: p.direction === EDirection.Horizontal ? "center" : "normal",
   flexDirection: p.direction === EDirection.Horizontal ? "row" : "column",
   justifyContent: p.itemDistribution ? p.itemDistribution : "normal",
+  width: "100%",
+  pointerEvents: "none",
 }))
 
 const Content = styled.div({
@@ -19,6 +21,10 @@ const Content = styled.div({
   height: "100%",
   lineHeight: "inherit",
   alignItems: "center",
+
+  "& *": {
+    pointerEvents: "all",
+  },
 })
 
 export type TKeyValuePair = {
