@@ -8,8 +8,7 @@ import { TKeyValuePair } from "@new/KeyValuePair/KeyValuePair"
 import { Composition } from "@new/Composition/Composition"
 import { BackgroundCard } from "@new/Composition/BackgroundCard"
 import { LayoutInputButton } from "./LayoutInputButton"
-import Link from "next/link"
-import { LinkProps } from "next/dist/client/link";
+import Link, { LinkProps } from "next/link"
 
 const Output = styled.output<Pick<TInputButton, "loading" | "variant">>(p => ({
   display: "flex",
