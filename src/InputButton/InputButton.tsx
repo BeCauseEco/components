@@ -8,8 +8,7 @@ import { TKeyValuePair } from "@new/KeyValuePair/KeyValuePair"
 import { Composition } from "@new/Composition/Composition"
 import { BackgroundCard } from "@new/Composition/BackgroundCard"
 import { LayoutInputButton } from "./LayoutInputButton"
-import Link from "next/link"
-import { LinkProps } from "next/dist/client/link"
+import Link, { LinkProps } from "next/link"
 import React from "react"
 
 const Output = styled.output<Pick<TInputButton, "loading" | "variant">>(p => ({
@@ -62,13 +61,11 @@ type TInputButtonBase = {
   children: ReactElement<TText | TIcon | TKeyValuePair>
 }
 
-type TInputButtonVariantLinkHref = TInputButtonBase & {
-  variant: EInputButtonVariant.Link
-  href?: LinkProps["href"]
-}
+type TNextLinkHref = LinkProps["href"]
 
-type TInputButtonVariantLinkOnClick = TInputButtonBase & {
+type TInputButtonVariantLink = TInputButtonBase & {
   variant: EInputButtonVariant.Link
+  href?: TNextLinkHref
 }
 
 type TInputButtonVariantOthers = TInputButtonBase & {
@@ -76,7 +73,7 @@ type TInputButtonVariantOthers = TInputButtonBase & {
   color: EColor
 }
 
-export type TInputButton = TInputButtonVariantLinkHref | TInputButtonVariantLinkOnClick | TInputButtonVariantOthers
+export type TInputButton = TInputButtonVariantLink | TInputButtonVariantOthers | TInputButtonVariantOthers
 
 export const InputButton = forwardRef<HTMLButtonElement | HTMLAnchorElement, PropsWithChildren<TInputButton>>(
   (props, ref) => {
