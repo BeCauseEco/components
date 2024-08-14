@@ -60,9 +60,11 @@ type TInputButtonBase = {
   children: ReactElement<TText | TIcon | TKeyValuePair>
 }
 
+type TNextLink = LinkProps["href"]
+
 type TInputButtonVariantLink = TInputButtonBase & {
   variant: EInputButtonVariant.Link
-  href?: Pick<LinkProps, "href">
+  href?: TNextLink
 }
 
 type TInputButtonVariantOthers = TInputButtonBase & {
