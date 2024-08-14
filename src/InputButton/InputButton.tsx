@@ -9,6 +9,7 @@ import { Composition } from "@new/Composition/Composition"
 import { BackgroundCard } from "@new/Composition/BackgroundCard"
 import { LayoutInputButton } from "./LayoutInputButton"
 import Link from "next/link"
+import { LinkProps } from "next/dist/client/link";
 
 const Output = styled.output<Pick<TInputButton, "loading" | "variant">>(p => ({
   display: "flex",
@@ -62,7 +63,7 @@ type TInputButtonBase = {
 
 type TInputButtonVariantLink = TInputButtonBase & {
   variant: EInputButtonVariant.Link
-  href?: string
+  href?: LinkProps["href"]
 }
 
 type TInputButtonVariantOthers = TInputButtonBase & {
