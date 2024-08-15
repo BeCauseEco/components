@@ -163,7 +163,7 @@ export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<TInput
 
       return selectedItems.length > 0 ? label : textNoSelection
     } else {
-      return items.findLast(item => (item.value as string).toLowerCase() === value)?.label || textNoSelection
+      return items.findLast(item => (item.value as string) === value)?.label || textNoSelection
     }
   }
 
