@@ -13,17 +13,38 @@ const Container = styled.div<TContainerProperties>(p => ({
   gap: p.spacing || "calc(var(--BU) * 4)",
 }))
 
-const ContentStart = styled.div<Pick<TLayoutSplit, "direction" | "contentStartWidth">>(p => ({
+const Content = styled.div<Pick<TLayoutSplit, "direction" | "collapse">>({
   display: "flex",
   flexDirection: "column",
-  width: p.direction === EDirection.Horizontal ? p.contentStartWidth || "50%" : "100%",
+  flexWrap: "wrap",
+})
+
+const calculateWidth = (element: "start" | "end", direction: EDirection, collapse?: ELayoutSplitCollapse) => {
+  let r = direction === EDirection.Vertical ? "100%" : "50%"
+
+  if (direction === EDirection.Horizontal) {
+    if (element === collapse) {
+      r = "fit-content"
+    } else {
+      r = "100%"
+    }
+  }
+
+  return r
+}
+
+const ContentStart = styled(Content)(p => ({
+  width: calculateWidth("start", p.direction, p.collapse),
 }))
 
-const ContentEnd = styled.div<Pick<TLayoutSplit, "direction" | "contentEndWidth">>(p => ({
-  display: "flex",
-  flexDirection: "column",
-  width: p.direction === EDirection.Horizontal ? p.contentEndWidth || "50%" : "100%",
+const ContentEnd = styled(Content)(p => ({
+  width: calculateWidth("end", p.direction, p.collapse),
 }))
+
+export enum ELayoutSplitCollapse {
+  ContentStart = "start",
+  ContentEnd = "end",
+}
 
 export type TLayoutSplit = TLayoutBase & {
   contentStart: ReactNode | ReactNode[]
@@ -31,8 +52,7 @@ export type TLayoutSplit = TLayoutBase & {
   direction: EDirection
   omitPadding?: boolean
   spacing?: ESize
-  contentStartWidth?: string
-  contentEndWidth?: string
+  collapse?: ELayoutSplitCollapse
 }
 
 export const LayoutSplit = ({
@@ -41,16 +61,15 @@ export const LayoutSplit = ({
   direction,
   omitPadding = false,
   spacing,
-  contentStartWidth,
-  contentEndWidth,
+  collapse,
 }: TLayoutSplit) => {
   return (
     <Container omitPadding={omitPadding} direction={direction} spacing={spacing}>
-      <ContentStart className="layout-container" direction={direction} contentStartWidth={contentStartWidth}>
+      <ContentStart className="layout-container" direction={direction} collapse={collapse}>
         {contentStart}
       </ContentStart>
 
-      <ContentEnd className="layout-container" direction={direction} contentEndWidth={contentEndWidth}>
+      <ContentEnd className="layout-container" direction={direction} collapse={collapse}>
         {contentEnd}
       </ContentEnd>
     </Container>
