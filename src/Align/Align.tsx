@@ -1,5 +1,6 @@
 import { JSXElementConstructor, ReactElement, ReactNode } from "react"
 import styled from "@emotion/styled"
+import { ESize } from "@new/ESize"
 
 const computeAlignment = (
   column = false,
@@ -13,6 +14,7 @@ const computeAlignment = (
 ) => {
   const r = {
     justifyContent: "normal",
+    alignContent: "normal",
     alignItems: "normal",
   }
 
@@ -22,10 +24,12 @@ const computeAlignment = (
     }
 
     if (center) {
+      r.alignContent = "center"
       r.alignItems = "center"
     }
 
     if (end) {
+      r.alignContent = "flex-end"
       r.alignItems = "flex-end"
     }
 
@@ -54,14 +58,17 @@ const computeAlignment = (
     }
 
     if (top) {
+      r.alignContent = "flex-start"
       r.alignItems = "flex-start"
     }
 
     if (middle) {
+      r.alignContent = "center"
       r.alignItems = "center"
     }
 
     if (bottom) {
+      r.alignContent = "flex-end"
       r.alignItems = "flex-end"
     }
   }
@@ -71,15 +78,19 @@ const computeAlignment = (
 
 const Container = styled.div<TAlign>(p => ({
   display: "flex",
+  flexWrap: "inherit",
   // @ts-expect-error TypeScript is not smart enough to accept discriminating unions in this case
   flexDirection: p.column ? "column" : "row",
   width: "100%",
   height: "100%",
   // @ts-expect-error see first ignore
   ...computeAlignment(p.column, p.row, p.start, p.center, p.end, p.top, p.middle, p.bottom),
+  gap: p.spacing || 0,
 }))
 
 type TAlignBase = {
+  spacing?: ESize
+
   /** Horizontal axis, align start  */
   start?: boolean
 
@@ -120,6 +131,7 @@ export const Align = ({
   column,
   // @ts-expect-error see first ignore
   row,
+  spacing,
   start = false,
   center = false,
   end = false,
@@ -137,6 +149,7 @@ export const Align = ({
     top={top}
     middle={middle}
     bottom={bottom}
+    spacing={spacing}
   >
     {children}
   </Container>
