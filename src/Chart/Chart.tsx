@@ -2,9 +2,9 @@ import { ComponentType, PropsWithChildren, ReactElement } from "react"
 import styled from "@emotion/styled"
 
 import dynamic from "next/dynamic"
-import { TChartBase } from "./TChartBase"
-import { TChartBar } from "./_ChartBar"
-import { TChartLine } from "./_ChartLine"
+import { TChartBase } from "./internal/TChartBase"
+import { TChartBar } from "./internal/ChartBar"
+import { TChartLine } from "./internal/ChartLine"
 import { TChartItem } from "./ChartItem"
 import React from "react"
 
@@ -34,13 +34,13 @@ export const Chart = ({ type, direction, xAxis, yAxis, data, height, children }:
   })
 
   if (type === EChartType.Bar) {
-    Chart = dynamic(() => import("./_ChartBar"), {
+    Chart = dynamic(() => import("./internal/ChartBar"), {
       ssr: false,
     })
   }
 
   if (type === EChartType.Line) {
-    Chart = dynamic(() => import("./_ChartLine"), {
+    Chart = dynamic(() => import("./internal/ChartLine"), {
       ssr: false,
     })
   }

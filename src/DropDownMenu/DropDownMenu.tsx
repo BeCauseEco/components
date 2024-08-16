@@ -9,7 +9,7 @@ import { TDropDownMenuItem } from "./DrownDownMenuItem"
 import { TDropDownMenuSeparator } from "./DrownDownMenuSeparator"
 import { ESize } from "@new/ESize"
 import { EShadow } from "@new/EShadow"
-import { LayoutDropDownMenu } from "./LayoutDropDownMenu"
+import { LayoutDropDownMenu } from "./internal/LayoutDropDownMenu"
 
 const Content = styled(RadixDropDownMenu.Content)({
   zIndex: 1,

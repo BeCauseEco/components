@@ -7,7 +7,7 @@ import { ESize } from "@new/ESize"
 import { TKeyValuePair } from "@new/KeyValuePair/KeyValuePair"
 import { Composition } from "@new/Composition/Composition"
 import { BackgroundCard } from "@new/Composition/BackgroundCard"
-import { LayoutInputButton } from "./LayoutInputButton"
+import { LayoutInputButton } from "./internal/LayoutInputButton"
 import Link, { LinkProps } from "next/link"
 import React from "react"
 
