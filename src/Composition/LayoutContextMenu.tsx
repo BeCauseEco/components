@@ -7,6 +7,7 @@ const Container = styled.div<Omit<TLayoutContextMenu, "content">>(p => ({
   display: "flex",
   flexDirection: p.direction === EDirection.Horizontal ? "row" : "column",
   padding: "calc(var(--BU) * 2)",
+  height: "inherit",
 
   "& > *": {
     width: "100%",
