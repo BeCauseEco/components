@@ -8,6 +8,7 @@ import { computeColor, EColor } from "@new/Color"
 const Root = styled(RadixTabs.Root)({
   display: "flex",
   flexDirection: "column",
+  height: "inherit",
 })
 
 const List = styled(RadixTabs.List)({

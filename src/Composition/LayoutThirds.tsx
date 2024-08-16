@@ -9,6 +9,7 @@ const Container = styled.div<Pick<TLayoutThirds, "direction" | "omitPadding" | "
   flexDirection: p.direction === EDirection.Horizontal ? "row" : "column",
   padding: p.omitPadding ? 0 : "calc(var(--BU) * 4)",
   gap: p.spacing || "calc(var(--BU) * 4)",
+  height: "inherit",
 }))
 
 const Content = styled.div<Pick<TLayoutThirds, "direction">>(p => ({

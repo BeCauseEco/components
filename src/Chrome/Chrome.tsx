@@ -1,7 +1,7 @@
 import styled from "@emotion/styled"
 import { Composition } from "@new/Composition/Composition"
 import { PropsWithChildren } from "react"
-import { LayoutChrome } from "./LayoutChrome"
+import { LayoutChrome } from "./internal/LayoutChrome"
 import { EColor } from "@new/Color"
 import { EInputButtonVariant, InputButton } from "@new/InputButton/InputButton"
 import { ESize } from "@new/ESize"

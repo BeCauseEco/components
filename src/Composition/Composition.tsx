@@ -7,14 +7,16 @@ import { TLayoutThirds } from "@new/Composition/LayoutThirds"
 import { TLayoutGrid } from "@new/Composition/LayoutGrid"
 import { TLayoutBase } from "./TLayoutBase"
 
-const Container = styled.div<Pick<TComposition, "loading">>(p => ({
+const Container = styled.div<Pick<TComposition, "loading" | "explodeHeight" | "overflowHidden">>(p => ({
   display: "flex",
   flexDirection: "column",
   position: "relative",
   borderRadius: "inherit",
   width: "100%",
+  height: p.explodeHeight ? "100%" : "auto",
   opacity: p.loading ? 0.5 : 1,
   cursor: p.loading ? "loading" : "auto",
+  overflow: p.overflowHidden ? "hidden" : "auto",
 }))
 
 const Background = styled.div({
@@ -31,6 +33,7 @@ const Layout = styled.div<Pick<TComposition, "loading">>(p => ({
   flexDirection: "column",
   zIndex: 1,
   width: "100%",
+  height: "inherit",
 
   ...(p.loading
     ? {
@@ -47,22 +50,36 @@ type TAllowedLayouts = TLayoutSingle | TLayoutSplit | TLayoutThirds | TLayoutGri
 export type TComposition = {
   children: ReactElement<TAllowedLayouts> | [ReactElement<AllowedBackgrounds>, ReactElement<TAllowedLayouts>]
   loading?: boolean
+  explodeHeight?: boolean
+  overflowHidden?: boolean
 }
 
 export const Composition = forwardRef<HTMLDivElement, PropsWithChildren<TComposition>>((props, ref) => {
-  const { children, loading = false } = props
+  const { children, loading = false, explodeHeight = false, overflowHidden = false } = props
 
   const childrenArray = React.Children.toArray(children)
 
   if (childrenArray.length === 1) {
     return (
-      <Container ref={ref} loading={loading} className="component-composition component-composition-reset">
+      <Container
+        ref={ref}
+        loading={loading}
+        explodeHeight={explodeHeight}
+        overflowHidden={overflowHidden}
+        className="component-composition component-composition-reset"
+      >
         <Layout className="component-composition-layout">{childrenArray[0]}</Layout>
       </Container>
     )
   } else {
     return (
-      <Container ref={ref} loading={loading} className="component-composition component-composition-reset">
+      <Container
+        ref={ref}
+        loading={loading}
+        explodeHeight={explodeHeight}
+        overflowHidden={overflowHidden}
+        className="component-composition component-composition-reset"
+      >
         <Background className="component-composition-background">{childrenArray[0]}</Background>
 
         <Layout className="component-composition-layout">{childrenArray[1]}</Layout>

@@ -1,6 +1,8 @@
 import * as Tabs from "@radix-ui/react-tabs"
 import { PropsWithChildren, ReactElement, RefAttributes, forwardRef } from "react"
 import { TComposition } from "@new/Composition/Composition"
+import { ESize } from "@new/ESize"
+import { Spacer } from "@new/Spacer/Spacer"
 
 export type TTabsContentItem = {
   contentTargetId: string
@@ -15,7 +17,11 @@ export const TabsContentItem = forwardRef<
 
   return (
     <Tabs.Content key={`tabscontent${contentTargetId}`} ref={ref} value={contentTargetId} {...(props as any)} asChild>
-      {children}
+      <>
+        <Spacer size={ESize.Small} />
+
+        {children}
+      </>
     </Tabs.Content>
   )
 })

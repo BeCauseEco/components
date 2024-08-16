@@ -4,12 +4,12 @@ import { PropsWithChildren, ReactElement, forwardRef } from "react"
 import { EColor } from "@new/Color"
 import { TText } from "@new/Text/Text"
 import { ESize } from "@new/ESize"
-import { TKeyValuePair } from "@new/KeyValuePair/KeyValuePair"
 import { Composition } from "@new/Composition/Composition"
 import { BackgroundCard } from "@new/Composition/BackgroundCard"
-import { LayoutInputButton } from "./LayoutInputButton"
+import { LayoutInputButton } from "./internal/LayoutInputButton"
 import Link, { LinkProps } from "next/link"
 import React from "react"
+import { TSpacer } from "@new/Spacer/Spacer"
 
 const Output = styled.output<Pick<TInputButton, "loading" | "variant">>(p => ({
   display: "flex",
@@ -58,7 +58,10 @@ type TInputButtonBase = {
   size: ESize.Small | ESize.Medium | ESize.Large
   onClick?: () => void
   loading?: boolean
-  children: ReactElement<TText | TIcon | TKeyValuePair>
+  children:
+    | ReactElement<TText | TIcon>
+    | [ReactElement<TText>, ReactElement<TSpacer>, ReactElement<TIcon>]
+    | [ReactElement<TIcon>, ReactElement<TSpacer>, ReactElement<TText>]
 }
 
 type TNextLinkHref = LinkProps["href"]

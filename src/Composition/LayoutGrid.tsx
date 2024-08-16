@@ -7,6 +7,7 @@ const Container = styled.div<Pick<TLayoutGrid, "rows" | "columns">>(p => ({
   gap: "calc(var(--BU) * 4)",
   gridTemplateColumns: p.columns,
   gridTemplateRows: p.rows,
+  height: "inherit",
 }))
 
 export type TLayoutGrid = TLayoutBase & {

@@ -9,6 +9,7 @@ const Container = styled.div<TContainerProperties>(p => ({
   display: "flex",
   flexDirection: p.direction === EDirection.Horizontal ? "row" : "column",
   padding: p.omitPadding ? 0 : "calc(var(--BU) * 4)",
+  height: "inherit",
 }))
 
 export type TLayoutSingle = TLayoutBase & {

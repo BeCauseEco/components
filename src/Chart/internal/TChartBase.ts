@@ -1,5 +1,5 @@
 import { EDirection } from "@new/EDirection"
-import { TChartItem } from "./ChartItem"
+import { TChartItem } from "../ChartItem"
 import { ReactElement, SVGProps } from "react"
 
 export type AxisConfiguration = {
