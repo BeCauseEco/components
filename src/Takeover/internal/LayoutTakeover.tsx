@@ -11,28 +11,24 @@ const Container = styled.div({
 
 const ContentStart = styled.div({
   display: "flex",
-  position: "relative",
   flexDirection: "row",
-  paddingTop: "calc(var(--BU) * 3)",
 })
 
 const ContentCloseButton = styled.div({
   display: "flex",
   flexDirection: "row",
+  justifyContent: "center",
+  alignItems: "center",
 })
 
 const ContentTitle = styled.div({
   display: "flex",
   flexDirection: "row",
-  position: "absolute",
-  top: 0,
-  right: 0,
-  bottom: 0,
-  left: 0,
+  width: "100%",
+  height: "100%",
+  padding: "calc(var(--BU) * 4)",
   justifyContent: "center",
   alignItems: "center",
-  paddingTop: "calc(var(--BU) * 3)",
-  width: "100%",
 })
 
 const ContentMiddle = styled.div({
@@ -49,6 +45,7 @@ const ContentEnd = styled.div({
   padding: "calc(var(--BU) * 4)",
   borderTop: `solid 1px ${computeColor([EColor.Black, 100])}`,
   justifyContent: "flex-end",
+  alignItems: "center",
 })
 
 export type TLayoutTakeover = TLayoutBase & {

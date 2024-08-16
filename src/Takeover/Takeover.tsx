@@ -12,19 +12,12 @@ import { TText } from "@new/Text/Text"
 
 const offsetTop = "64px"
 const offsetLeft = "76px"
+const offsetLeftSmall = "40px"
 
 const RadixDialogClose = styled(RadixDialog.Close)({
   display: "flex",
   transform: "translateX(var(--BU))",
   height: "fit-content",
-})
-
-const Overlay = styled(RadixDialog.Overlay)({
-  display: "flex",
-  position: "fixed",
-  inset: 0,
-  opacity: 0,
-  zIndex: 1,
 })
 
 const RadixDialogContent = styled(RadixDialog.Content)({
@@ -35,10 +28,14 @@ const RadixDialogContent = styled(RadixDialog.Content)({
   width: `calc(100vw - ${offsetLeft})`,
   height: `calc(100vh - ${offsetTop})`,
   zIndex: 2,
-  maxHeight: `calc(100vh - ${offsetTop}`,
+  maxHeight: `calc(100vh - ${offsetTop})`,
   overflowY: "auto",
   backgroundColor: "red",
-  outline: "solid 1px blue",
+
+  "@media (max-width: 900px)": {
+    left: offsetLeftSmall,
+    width: `calc(100vw - ${offsetLeftSmall})`,
+  },
 })
 
 export type TTakeover = {
@@ -67,8 +64,6 @@ export const Takeover = ({
   return (
     <RadixDialog.Root open={open} onOpenChange={onOpenChange} modal={false}>
       <RadixDialog.Portal>
-        <Overlay />
-
         <RadixDialogContent>
           <Composition explodeHeight>
             <BackgroundCard colorBackground={[EColor.White]} />
@@ -78,15 +73,15 @@ export const Takeover = ({
               contentMiddle={content}
               contentEnd={
                 <>
-                  {status && status}
-
-                  {buttonTertiary && (
+                  {status && (
                     <>
-                      <Spacer size={ESize.Small} />
+                      {status}
 
-                      {buttonTertiary}
+                      <Spacer size={ESize.Large} />
                     </>
                   )}
+
+                  {buttonTertiary && <>{buttonTertiary}</>}
 
                   {buttonSecondary && (
                     <>
