@@ -41,7 +41,7 @@ const Label = styled.label({
 })
 
 export type TInputCheckBox = {
-  value: boolean
+  value: boolean | "indeterminate"
   onChange: (value: boolean) => void
   colorBackground: EColor
   colorForeground: EColor
@@ -63,7 +63,13 @@ export const InputCheckbox = ({ value, onChange, colorBackground, colorForegroun
             content={
               <Root id={key} checked={value} onCheckedChange={checked => onChange(checked === true)}>
                 <RadixCheckbox.Indicator>
-                  <Icon name="check" size={ESize.Small} color={[colorForeground, 700]} weight={EWeight.Heavy} />
+                  {value === "indeterminate" && (
+                    <Icon name="remove" size={ESize.Small} color={[colorForeground, 700]} weight={EWeight.Heavy} />
+                  )}
+
+                  {value === true && (
+                    <Icon name="check" size={ESize.Small} color={[colorForeground, 700]} weight={EWeight.Heavy} />
+                  )}
                 </RadixCheckbox.Indicator>
               </Root>
             }
