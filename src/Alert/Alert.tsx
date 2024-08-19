@@ -72,11 +72,11 @@ export const Alert = ({
             }
             contentEnd={
               <>
-                <RadixAlertDialog.Action asChild>{buttonPrimary}</RadixAlertDialog.Action>
+                <RadixAlertDialog.Cancel asChild>{buttonSecondary}</RadixAlertDialog.Cancel>
 
                 <Spacer size={ESize.Small} />
 
-                <RadixAlertDialog.Cancel asChild>{buttonSecondary}</RadixAlertDialog.Cancel>
+                <RadixAlertDialog.Action asChild>{buttonPrimary}</RadixAlertDialog.Action>
               </>
             }
           />
