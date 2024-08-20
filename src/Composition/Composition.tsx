@@ -16,7 +16,7 @@ const Container = styled.div<Pick<TComposition, "loading" | "explodeHeight" | "o
   height: p.explodeHeight ? "100%" : "auto",
   opacity: p.loading ? 0.5 : 1,
   cursor: p.loading ? "loading" : "auto",
-  overflow: p.overflowHidden ? "hidden" : "auto",
+  overflow: p.overflowHidden ? "hidden" : "visible",
 }))
 
 const Background = styled.div({
@@ -57,16 +57,7 @@ export type TComposition = {
 export const Composition = forwardRef<HTMLDivElement, PropsWithChildren<TComposition>>((props, ref) => {
   const { children, loading = false, explodeHeight = false, overflowHidden = false } = props
 
-  const childrenArray = React.Children.toArray(children)
-
-  let background = childrenArray[0]
-  let layout = childrenArray[1]
-
-  // @ts-expect-error type.name is available - it's just not exposed through type: React.ReactNode
-  if (background?.type?.name?.lastIndexOf("Background") === -1) {
-    layout = childrenArray[0]
-    background = <></>
-  }
+  const c = React.Children.toArray(children)
 
   return (
     <Container
@@ -76,9 +67,17 @@ export const Composition = forwardRef<HTMLDivElement, PropsWithChildren<TComposi
       overflowHidden={overflowHidden}
       className="component-composition component-composition-reset"
     >
-      {background && <Background className="component-composition-background">{background}</Background>}
+      {c.length === 1 ? (
+        <>
+          <Layout className="component-composition-layout">{c[0]}</Layout>
+        </>
+      ) : (
+        <>
+          <Background className="component-composition-background">{c[0]}</Background>
 
-      {layout && <Layout className="component-composition-layout">{layout}</Layout>}
+          <Layout className="component-composition-layout">{c[1]}</Layout>
+        </>
+      )}
     </Container>
   )
 })
