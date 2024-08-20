@@ -13,14 +13,14 @@ const ContentTop = styled.div({
   display: "flex",
   flexDirection: "row",
   justifyContent: "space-between",
-  padding: "4rem",
+  padding: "calc(var(--BU) * 4)",
   paddingBottom: 0,
 })
 
 const ContentMiddle = styled.div({
   display: "flex",
   flexDirection: "column",
-  padding: "4rem",
+  padding: "calc(var(--BU) * 4)",
 })
 
 type TContentEndProperties = {
@@ -32,7 +32,7 @@ type TContentEndProperties = {
 const ContentEnd = styled.div<TContentEndProperties>(p => ({
   display: "flex",
   flexDirection: "row",
-  padding: "4rem",
+  padding: "calc(var(--BU) * 4)",
   backgroundColor: computeColor(p.colorBackground),
   borderTop:
     p.baseColor === EColor.White

@@ -5,7 +5,7 @@ import { ESize } from "@new/ESize"
 import { EColor } from "@new/Color"
 import React from "react"
 import { Composition } from "@new/Composition/Composition"
-import { LayoutBreadcrumb } from "./LayoutBreadcrumb"
+import { LayoutBreadcrumb } from "./internal/LayoutBreadcrumb"
 import { TText } from "@new/Text/Text"
 
 export type TBreadcrumb = {
@@ -25,6 +25,9 @@ export const Breadcrumb = ({ omitPadding, children }: PropsWithChildren<TBreadcr
   })
 
   items.pop()
+
+  // TO-DO: @cllpse: a little hacky, but stops content shift.
+  items.push(<Icon name="chevron_forward" size={ESize.Medium} color={[EColor.Transparent]} />)
 
   return (
     <Composition>

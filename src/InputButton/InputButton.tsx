@@ -58,6 +58,7 @@ type TInputButtonBase = {
   size: ESize.Small | ESize.Medium | ESize.Large
   onClick?: () => void
   loading?: boolean
+  omitPadding?: boolean
   children:
     | ReactElement<TText | TIcon>
     | [ReactElement<TText>, ReactElement<TSpacer>, ReactElement<TIcon>]
@@ -83,6 +84,7 @@ export const InputButton = forwardRef<HTMLButtonElement | HTMLAnchorElement, Pro
     const {
       variant,
       loading = false,
+      omitPadding = false,
       size,
       onClick,
       // @ts-expect-error TypeScript is not smart enough to accept discriminating unions in this case
@@ -120,7 +122,9 @@ export const InputButton = forwardRef<HTMLButtonElement | HTMLAnchorElement, Pro
         break
     }
 
-    const Layout = <LayoutInputButton childIconOnly={childIconOnly} content={children} size={size} />
+    const Layout = (
+      <LayoutInputButton childIconOnly={childIconOnly} content={children} size={size} omitPadding={omitPadding} />
+    )
 
     return (
       <Output

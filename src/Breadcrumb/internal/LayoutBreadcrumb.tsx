@@ -13,8 +13,7 @@ const Container = styled.div<TLayoutBreadcrumb>(p => ({
   },
 
   "& i": {
-    marginLeft: "calc(var(--BU) * 2)",
-    marginRight: "calc(var(--BU) * 1.5)",
+    marginLeft: "calc(var(--BU) * 0.5)",
   },
 }))
 

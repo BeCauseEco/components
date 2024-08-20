@@ -18,7 +18,7 @@ const StyleSizeLarge = childIconOnly => ({
   borderRadius: "var(--BU)",
 })
 
-const Container = styled.div<Pick<TLayoutInputButton, "size" | "childIconOnly">>(p => ({
+const Container = styled.div<Pick<TLayoutInputButton, "size" | "childIconOnly" | "omitPadding">>(p => ({
   display: "flex",
   width: "100%",
   cursor: "pointer",
@@ -26,17 +26,20 @@ const Container = styled.div<Pick<TLayoutInputButton, "size" | "childIconOnly">>
   ...(p.size === ESize.Small && StyleSizeSmall(p.childIconOnly)),
   ...(p.size === ESize.Medium && StyleSizeMedium(p.childIconOnly)),
   ...(p.size === ESize.Large && StyleSizeLarge(p.childIconOnly)),
+
+  ...(p.omitPadding && { padding: 0 }),
 }))
 
 export type TLayoutInputButton = TLayoutBase & {
   content: ReactNode
   size: ESize
   childIconOnly: boolean
+  omitPadding: boolean
 }
 
-export const LayoutInputButton = ({ content, size, childIconOnly }: TLayoutInputButton) => {
+export const LayoutInputButton = ({ content, size, childIconOnly, omitPadding }: TLayoutInputButton) => {
   return (
-    <Container className="layout-container" size={size} childIconOnly={childIconOnly}>
+    <Container className="layout-container" size={size} childIconOnly={childIconOnly} omitPadding={omitPadding}>
       {content}
     </Container>
   )

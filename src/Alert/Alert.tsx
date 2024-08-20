@@ -10,7 +10,7 @@ import { LayoutAlert } from "./internal/LayoutAlert"
 import { ESize } from "@new/ESize"
 import { Spacer } from "@new/Spacer/Spacer"
 import { EShadow } from "@new/EShadow"
-import { Text } from "@new/Text/Text"
+import { TText } from "@new/Text/Text"
 
 const Overlay = styled(RadixAlertDialog.Overlay)({
   display: "flex",
@@ -27,13 +27,12 @@ const Content = styled(RadixAlertDialog.Content)({
   top: "50%",
   left: "50%",
   transform: "translate(-50%, -50%)",
-  width: "calc(820px / 2)",
   zIndex: 2,
 })
 
 export type TAlertDialog = {
-  title: string
-  description: string
+  title?: ReactElement<TText>
+  description?: ReactElement<TText>
   colorBackground: EColor
   buttonTrigger: ReactElement<TInputButton>
   buttonPrimary: ReactElement<TInputButton>
@@ -60,16 +59,8 @@ export const Alert = ({
 
           <LayoutAlert
             colorBackground={colorBackground}
-            contentTop={
-              <Text size={ESize.Small} color={[EColor.Black, 700]} wrap>
-                {title}
-              </Text>
-            }
-            contentMiddle={
-              <Text size={ESize.Medium} color={[EColor.Black, 700]} wrap>
-                {description}
-              </Text>
-            }
+            contentTop={title}
+            contentMiddle={description}
             contentEnd={
               <>
                 <RadixAlertDialog.Cancel asChild>{buttonSecondary}</RadixAlertDialog.Cancel>
