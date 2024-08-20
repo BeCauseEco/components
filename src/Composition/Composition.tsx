@@ -59,31 +59,26 @@ export const Composition = forwardRef<HTMLDivElement, PropsWithChildren<TComposi
 
   const childrenArray = React.Children.toArray(children)
 
-  if (childrenArray.length === 1) {
-    return (
-      <Container
-        ref={ref}
-        loading={loading}
-        explodeHeight={explodeHeight}
-        overflowHidden={overflowHidden}
-        className="component-composition component-composition-reset"
-      >
-        <Layout className="component-composition-layout">{childrenArray[0]}</Layout>
-      </Container>
-    )
-  } else {
-    return (
-      <Container
-        ref={ref}
-        loading={loading}
-        explodeHeight={explodeHeight}
-        overflowHidden={overflowHidden}
-        className="component-composition component-composition-reset"
-      >
-        <Background className="component-composition-background">{childrenArray[0]}</Background>
+  let background = childrenArray[0]
+  let layout = childrenArray[1]
 
-        <Layout className="component-composition-layout">{childrenArray[1]}</Layout>
-      </Container>
-    )
+  // @ts-expect-error type.name is available - it's just not exposed through type: React.ReactNode
+  if (background?.type?.name?.lastIndexOf("Background") === -1) {
+    layout = childrenArray[0]
+    background = <></>
   }
+
+  return (
+    <Container
+      ref={ref}
+      loading={loading}
+      explodeHeight={explodeHeight}
+      overflowHidden={overflowHidden}
+      className="component-composition component-composition-reset"
+    >
+      {background && <Background className="component-composition-background">{background}</Background>}
+
+      {layout && <Layout className="component-composition-layout">{layout}</Layout>}
+    </Container>
+  )
 })
