@@ -79,6 +79,14 @@ const Label = styled.label({
   cursor: "pointer",
 })
 
+const TextWithOverflow = styled(Text)<Pick<TInputCombobox, "width">>(p => ({
+  width: p.width === ESize.Small ? "150px" : "300px",
+  overflowX: "hidden",
+  textOverflow: "ellipsis",
+  textWrap: "nowrap",
+  display: "block",
+}))
+
 export type TInputComboBoxFilterOptions = {
   textFilterNoResults: string
   textFilterPlaceholder: string
@@ -92,6 +100,7 @@ type TInputCombobox = {
   colorPopOverBackground: EColor
   colorPopOverForeground: EColor
   textNoSelection: string
+  width: ESize.Small | ESize.Medium
 
   /** Enables filtering, if supplied. */
   filterOptions?: TInputComboBoxFilterOptions
@@ -123,6 +132,7 @@ export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<TInput
     colorPopOverBackground,
     colorPopOverForeground,
     textNoSelection,
+    width,
     filterOptions,
     label,
     value,
@@ -153,13 +163,7 @@ export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<TInput
     if (multiple) {
       const selectedItems = items.filter(item => item.value === true).flatMap(item => item.label)
 
-      let label
-
-      if (selectedItems.length > 3) {
-        label = [selectedItems[0], selectedItems[1], selectedItems[2], "..."].join(", ")
-      } else {
-        label = selectedItems.join(", ")
-      }
+      const label = selectedItems.join(", ")
 
       return selectedItems.length > 0 ? label : textNoSelection
     } else {
@@ -206,9 +210,14 @@ export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<TInput
 
             <InputButton size={ESize.Medium} variant={EInputButtonVariant.Outlined} color={colorButtonBackground}>
               <KeyValuePair direction={EDirection.Horizontal} spacing={ESize.Tiny}>
-                <Text color={[colorButtonForeground, 700]} size={ESize.Xsmall}>
+                <TextWithOverflow
+                  color={[colorButtonForeground, 700]}
+                  size={ESize.Xsmall}
+                  alignment={EAlignment.Start}
+                  width={width}
+                >
                   {generateCurrentValueLabel(multiple)}
-                </Text>
+                </TextWithOverflow>
 
                 <Icon
                   name={open ? "keyboard_arrow_up" : "keyboard_arrow_down"}
