@@ -1,4 +1,4 @@
-import { ReactElement } from "react"
+import { ReactElement, useEffect } from "react"
 import * as RadixDialog from "@radix-ui/react-dialog"
 import { TInputButton } from "@new/InputButton/InputButton"
 import { Composition, TComposition } from "@new/Composition/Composition"
@@ -61,6 +61,14 @@ export const Takeover = ({
   buttonSecondary,
   buttonTertiary,
 }: TTakeover) => {
+  useEffect(() => {
+    if (open) {
+      document.querySelectorAll("body")[0].style.overflowY = "hidden"
+    } else {
+      document.querySelectorAll("body")[0].style.overflowY = "visible"
+    }
+  }, [open])
+
   return (
     <RadixDialog.Root open={open} onOpenChange={onOpenChange} modal={false}>
       <RadixDialog.Portal>
