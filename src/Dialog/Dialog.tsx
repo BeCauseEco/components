@@ -23,7 +23,7 @@ const Overlay = styled(RadixDialog.Overlay)({
   inset: 0,
   backgroundColor: EColor.Black,
   opacity: EOpacity.Heavy,
-  zIndex: 1,
+  zIndex: 3,
 })
 
 const RadixDialogClose = styled(RadixDialog.Close)({
@@ -42,7 +42,7 @@ const Content = styled(RadixDialog.Content)<TDialogContentProperties>(p => ({
   transform: "translate(-50%, -50%)",
   width: p.size === ESize.Medium ? "calc(var(--BU) * 40))" : "calc(100vw - calc(var(--BU) * 10))",
   height: p.size === ESize.Medium ? "auto" : `calc(100vh - ${offsetTop} - calc(var(--BU) * 10))`,
-  zIndex: 2,
+  zIndex: 3,
   maxHeight: `calc(100vh - ${offsetTop} - calc(var(--BU) * 10))`,
   overflowY: "auto",
 }))

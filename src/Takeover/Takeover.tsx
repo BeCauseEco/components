@@ -27,7 +27,7 @@ const RadixDialogContent = styled(RadixDialog.Content)({
   left: offsetLeft,
   width: `calc(100vw - ${offsetLeft})`,
   height: `calc(100vh - ${offsetTop})`,
-  zIndex: 2,
+  zIndex: 1,
   maxHeight: `calc(100vh - ${offsetTop})`,
   overflowY: "auto",
   backgroundColor: "red",
