@@ -67,6 +67,10 @@ export const Takeover = ({
     } else {
       document.querySelectorAll("body")[0].style.overflowY = "visible"
     }
+
+    return () => {
+      document.querySelectorAll("body")[0].style.overflowY = "visible"
+    }
   }, [open])
 
   return (
