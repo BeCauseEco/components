@@ -82,6 +82,7 @@ const Label = styled.label({
 const TextWithOverflow = styled(Text)<Pick<TInputCombobox, "width">>(p => ({
   width: p.width === ESize.Small ? "150px" : "300px",
   overflowX: "hidden",
+  overflowY: "hidden",
   textOverflow: "ellipsis",
   textWrap: "nowrap",
   display: "block",
