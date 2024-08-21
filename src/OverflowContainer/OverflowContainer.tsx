@@ -5,7 +5,7 @@ import { PropsWithChildren, ReactElement } from "react"
 const Container = styled.div<Pick<TOverflowContainer, "maxHeight">>(p => ({
   display: "flex",
   flexDirection: "inherit",
-  width: "inherit",
+  width: "100%",
   height: "inherit",
   ...(p.maxHeight && { maxHeight: p.maxHeight }),
 
