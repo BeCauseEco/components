@@ -12,7 +12,7 @@ import { BackgroundCard } from "@new/Composition/BackgroundCard"
 import { KeyValuePair } from "@new/KeyValuePair/KeyValuePair"
 import { LayoutSingle } from "@new/Composition/LayoutSingle"
 
-const Container = styled.div({
+const Container = styled.div<{ hasBorder?: boolean }>(({ hasBorder }) => ({
   display: "flex",
   height: `calc(var(--BU) * 4)`,
 
@@ -23,8 +23,10 @@ const Container = styled.div({
     justifyContent: "center",
     width: `calc(var(--BU) * 4)`,
     height: `calc(var(--BU) * 4)`,
+    border: hasBorder ? "1px solid #C1C5CD" : "none",
+    borderRadius: "3px",
   },
-})
+}))
 
 const Root = styled(RadixCheckbox.Root)({
   display: "flex",
@@ -52,7 +54,7 @@ export const InputCheckbox = ({ value, onChange, colorBackground, colorForegroun
   const key = useId()
 
   return (
-    <Container>
+    <Container hasBorder={!value}>
       <KeyValuePair direction={EDirection.Horizontal} spacing={ESize.Xsmall}>
         <Composition>
           <BackgroundCard colorBackground={[colorBackground, 700]} borderRadius={ESize.Tiny} />
