@@ -13,7 +13,7 @@ import { EShadow } from "@new/EShadow"
 import { TText } from "@new/Text/Text"
 import { Icon } from "@new/Icon/Icon"
 
-const offsetTop = "64px"
+const offsetTop = "128px"
 
 const Overlay = styled(RadixDialog.Overlay)({
   display: "flex",
