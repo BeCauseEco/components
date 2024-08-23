@@ -24,9 +24,9 @@ export enum EColor {
   SDG15 = "#4DB85A",
   SDG16 = "#0A6294",
   SDG17 = "#1D4072",
-  Success = "#32704E",
-  Warning = "#D28110",
-  Error = "#BA2E41",
+  Success = "#5AB884",
+  Warning = "#F3B359",
+  Error = "#DF5052",
 }
 
 export type TLightness = 50 | 100 | 200 | 300 | 400 | 500 | 600 | 700 | 800 | 900 | 1000

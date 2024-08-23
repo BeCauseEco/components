@@ -69,24 +69,6 @@ const Main = styled.div({
   display: "flex",
   flexDirection: "column",
   overflow: "auto",
-  scrollBehavior: "smooth",
-
-  scrollbarWidth: "thin",
-  scrollbarColor: "rgba(0, 0, 0, 0.5) rgba(0, 0, 0, 0.1)",
-
-  "&::-webkit-scrollbar": {
-    width: "11px",
-  },
-
-  "::-webkit-scrollbar-track": {
-    background: "rgba(0, 0, 0, 0.1)",
-  },
-
-  "&::-webkit-scrollbar-thumb": {
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
-    borderRadius: "6px",
-    border: "3px solid rgba(0, 0, 0, 0.1)",
-  },
 })
 
 export type TLayoutChrome = TLayoutBase & {
