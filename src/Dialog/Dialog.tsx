@@ -48,7 +48,6 @@ const Content = styled(RadixDialog.Content)<TDialogContentProperties>(p => ({
 const TitleAndDescription = styled.div({
   display: "flex",
   flexDirection: "column",
-  outline: "solid 1px red",
 })
 
 export type TDialog = {
