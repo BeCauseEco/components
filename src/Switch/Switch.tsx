@@ -18,10 +18,9 @@ const Container = styled.div({
 const SwitchRoot = styled(RadixSwitch.Root)<Pick<TSwitch, "colorBackground" | "colorValueTrue">>(p => ({
   display: "flex",
   position: "relative",
-  width: "calc(var(--BU) * 10)",
-  height: "calc(var(--BU) * 6)",
-  outline: `solid 2px ${computeColor([p.colorBackground, 700])}`,
-  outlineOffset: "-2px",
+  width: "calc(var(--BU) * 8)",
+  height: "calc(var(--BU) * 5)",
+  border: 0,
   backgroundColor: computeColor([p.colorBackground, 700]),
   borderRadius: "9999px",
   cursor: "pointer",
@@ -37,16 +36,16 @@ const SwitchRoot = styled(RadixSwitch.Root)<Pick<TSwitch, "colorBackground" | "c
 
 const SwitchThumb = styled(RadixSwitch.Thumb)<Pick<TSwitch, "colorForeground">>(p => ({
   display: "flex",
-  width: "calc(var(--BU) * 6 - 4px)",
-  height: "calc(var(--BU) * 6 - 4px)",
+  width: "calc(var(--BU) * 5 - 2px)",
+  height: "calc(var(--BU) * 5 - 2px)",
   backgroundColor: computeColor([p.colorForeground, 700]),
   borderRadius: "9999px",
   transition: "transform 100ms",
-  transform: "translateX(0)",
+  transform: "translateX(1px) translateY(1px)",
   willChange: "transform",
 
   "&[data-state='checked']": {
-    transform: "translateX(calc(var(--BU) * 4))",
+    transform: "translateX(calc(var(--BU) * 3 + 1px)) translateY(1px)",
   },
 }))
 

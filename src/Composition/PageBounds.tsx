@@ -7,6 +7,7 @@ const Container = styled.div({
   flexDirection: "column",
   width: "100%",
   maxWidth: "1024px",
+  margin: "0 auto",
 })
 
 export type TPageBounds = {

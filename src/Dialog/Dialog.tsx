@@ -8,14 +8,12 @@ import { EColor } from "@new/Color"
 import { LayoutDialog } from "./internal/LayoutDialog"
 import styled from "@emotion/styled"
 import { EOpacity } from "@new/Opacity"
-import { Spacer } from "@new/Spacer/Spacer"
-import { EDirection } from "@new/EDirection"
+import { Spacer, TSpacer } from "@new/Spacer/Spacer"
 import { EShadow } from "@new/EShadow"
 import { TText } from "@new/Text/Text"
-import { KeyValuePair } from "@new/KeyValuePair/KeyValuePair"
 import { Icon } from "@new/Icon/Icon"
 
-const offsetTop = "64px"
+const offsetTop = "128px"
 
 const Overlay = styled(RadixDialog.Overlay)({
   display: "flex",
@@ -47,13 +45,19 @@ const Content = styled(RadixDialog.Content)<TDialogContentProperties>(p => ({
   overflowY: "auto",
 }))
 
+const TitleAndDescription = styled.div({
+  display: "flex",
+  flexDirection: "column",
+  outline: "solid 1px red",
+})
+
 export type TDialog = {
   size: ESize.Medium | ESize.Huge
   content: ReactElement<TComposition>
   open: boolean
   onOpenChange: (open: boolean) => void
   title?: ReactElement<TText>
-  description?: ReactElement<TText>
+  description?: ReactElement<TText> | ReactElement<TText | TSpacer>[]
   buttonPrimary?: ReactElement<TInputButton>
   buttonSecondary?: ReactElement<TInputButton>
   buttonTertiary?: ReactElement<TInputButton>
@@ -70,17 +74,6 @@ export const Dialog = ({
   buttonSecondary,
   buttonTertiary,
 }: TDialog) => {
-  let contentStart: ReactElement | null = null
-
-  if (title || description) {
-    contentStart = (
-      <KeyValuePair direction={EDirection.Vertical} spacing={ESize.Xsmall}>
-        {title}
-        {description}
-      </KeyValuePair>
-    )
-  }
-
   return (
     <RadixDialog.Root open={open} onOpenChange={onOpenChange}>
       <RadixDialog.Portal>
@@ -91,7 +84,15 @@ export const Dialog = ({
             <BackgroundCard colorBackground={[EColor.White]} borderRadius={ESize.Tiny} shadow={EShadow.Large} />
 
             <LayoutDialog
-              contentStart={contentStart}
+              contentStart={
+                <TitleAndDescription>
+                  {title}
+
+                  {description && <Spacer size={ESize.Medium} />}
+
+                  {description}
+                </TitleAndDescription>
+              }
               contentMiddle={content}
               contentEnd={
                 <>

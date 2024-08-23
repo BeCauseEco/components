@@ -88,6 +88,15 @@ const Container = styled.p<TContainerProperties>(p => ({
   textAlign: computeAlignment(p.alignment),
   alignItems: "inherit",
 
+  "& a": {
+    color: "inherit",
+  },
+
+  "& abbr": {
+    textDecoration: "dotted 1px inherit",
+    cursor: "help",
+  },
+
   "::selection": {
     background: "rgba(0, 0, 0, 0.2)",
     // filter: "brightness(0.8)",
