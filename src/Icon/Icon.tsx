@@ -2,7 +2,6 @@ import { ESize } from "@new/ESize"
 import { TColor, computeColor } from "@new/Color"
 import styled from "@emotion/styled"
 import { EWeight } from "@new/EWeight"
-import { MouseEventHandler } from "react"
 
 const calculateFontVariantSettings = (size: ESize, weight: EWeight) => {
   let w = [ESize.Large, ESize.Huge].includes(size) ? "700" : "600"
