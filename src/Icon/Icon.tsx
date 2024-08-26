@@ -2,6 +2,7 @@ import { ESize } from "@new/ESize"
 import { TColor, computeColor } from "@new/Color"
 import styled from "@emotion/styled"
 import { EWeight } from "@new/EWeight"
+import { MouseEventHandler } from "react"
 
 const calculateFontVariantSettings = (size: ESize, weight: EWeight) => {
   let w = [ESize.Large, ESize.Huge].includes(size) ? "700" : "600"
@@ -34,15 +35,16 @@ const Container = styled.i<Omit<TIcon, "name"> & { color: TColor; weight: EWeigh
 }))
 
 export type TIcon = {
+  onClick?: () => void
   name: string | "blank"
   size: ESize
   color: TColor
   weight?: EWeight
 }
 
-export const Icon = ({ name, size, color, weight = EWeight.Normal }: TIcon) => {
+export const Icon = ({ onClick, name, size, color, weight = EWeight.Normal }: TIcon) => {
   return (
-    <Container size={size} weight={weight} color={color as any} className="material-symbols-rounded">
+    <Container onClick={onClick} size={size} weight={weight} color={color as any} className="material-symbols-rounded">
       {name === "blank" ? null : name}
     </Container>
   )
