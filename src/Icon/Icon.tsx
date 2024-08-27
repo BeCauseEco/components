@@ -34,16 +34,24 @@ const Container = styled.i<Omit<TIcon, "name"> & { color: TColor; weight: EWeigh
 }))
 
 export type TIcon = {
-  onClick?: () => void
   name: string | "blank"
   size: ESize
   color: TColor
   weight?: EWeight
+  onClick?: any
 }
 
-export const Icon = ({ onClick, name, size, color, weight = EWeight.Normal }: TIcon) => {
+export const Icon = ({ name, size, color, weight = EWeight.Normal, onClick = undefined }: TIcon) => {
+  const noop = () => {}
+
   return (
-    <Container onClick={onClick} size={size} weight={weight} color={color as any} className="material-symbols-rounded">
+    <Container
+      size={size}
+      weight={weight}
+      color={color as any}
+      className="material-symbols-rounded"
+      onClick={onClick || noop}
+    >
       {name === "blank" ? null : name}
     </Container>
   )
