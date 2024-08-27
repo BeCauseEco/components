@@ -13,7 +13,7 @@ export const Breadcrumbs = () => {
   const breadcrumbs = [{ id: "", pageUrl: "", menuTitle: "" }]
 
   return (
-    <Breadcrumb>
+    <Breadcrumb color={EColor.Black}>
       {breadcrumbs.map(breadcrumb => (
         <InputButton
           key={breadcrumb.id}
