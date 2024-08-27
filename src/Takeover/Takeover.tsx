@@ -10,9 +10,9 @@ import styled from "@emotion/styled"
 import { Spacer } from "@new/Spacer/Spacer"
 import { TText } from "@new/Text/Text"
 
-const defaultOffsetTop = "64px"
-const defaultOffsetLeft = "76px"
-const defaultOffsetLeftSmall = "40px"
+const offsetTop = "64px"
+const offsetLeft = "76px"
+const offsetLeftSmall = "40px"
 
 const RadixDialogContent = styled(RadixDialog.Content)<
   Pick<TTakeover, "offsetTopOverride" | "offsetLeftOverride" | "offsetLeftSmallOverride">
@@ -65,9 +65,9 @@ export const Takeover = ({
   buttonPrimary,
   buttonSecondary,
   buttonTertiary,
-  offsetTopOverride = defaultOffsetTop,
-  offsetLeftOverride = defaultOffsetLeft,
-  offsetLeftSmallOverride = defaultOffsetLeftSmall,
+  offsetTopOverride = offsetTop,
+  offsetLeftOverride = offsetLeft,
+  offsetLeftSmallOverride = offsetLeftSmall,
 }: TTakeover) => {
   useEffect(() => {
     if (open) {
