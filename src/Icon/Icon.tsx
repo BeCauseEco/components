@@ -38,11 +38,20 @@ export type TIcon = {
   size: ESize
   color: TColor
   weight?: EWeight
+  onClick?: any
 }
 
-export const Icon = ({ name, size, color, weight = EWeight.Normal }: TIcon) => {
+export const Icon = ({ name, size, color, weight = EWeight.Normal, onClick = undefined }: TIcon) => {
+  const noop = () => {}
+
   return (
-    <Container size={size} weight={weight} color={color as any} className="material-symbols-rounded">
+    <Container
+      size={size}
+      weight={weight}
+      color={color as any}
+      className="material-symbols-rounded"
+      onClick={onClick || noop}
+    >
       {name === "blank" ? null : name}
     </Container>
   )
