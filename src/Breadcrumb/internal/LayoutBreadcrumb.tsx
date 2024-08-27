@@ -9,11 +9,12 @@ const Container = styled.div<TLayoutBreadcrumb>(p => ({
   alignItems: "center",
 
   "& button > div, & a > div": {
-    padding: 0,
+    padding: "0",
   },
 
   "& i": {
-    marginLeft: "calc(var(--BU) * 0.5)",
+    marginLeft: "calc(var(--BU) * 1.5)",
+    marginRight: "calc(var(--BU) * 1)",
   },
 }))
 

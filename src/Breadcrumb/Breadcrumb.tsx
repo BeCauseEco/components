@@ -9,18 +9,19 @@ import { LayoutBreadcrumb } from "./internal/LayoutBreadcrumb"
 import { TText } from "@new/Text/Text"
 
 export type TBreadcrumb = {
+  color: EColor
   omitPadding?: boolean
   children: ReactElement<TInputButton | TText> | ReactElement<TInputButton | TText>[]
 }
 
-export const Breadcrumb = ({ omitPadding, children }: PropsWithChildren<TBreadcrumb>) => {
+export const Breadcrumb = ({ color, omitPadding, children }: PropsWithChildren<TBreadcrumb>) => {
   const items: ReactElement[] = []
 
   React.Children.forEach(children, child => {
     if (React.isValidElement(child)) {
       items.push(child)
 
-      items.push(<Icon name="chevron_forward" size={ESize.Medium} color={[EColor.Black, 700]} />)
+      items.push(<Icon name="chevron_forward" size={ESize.Medium} color={[color, 700]} />)
     }
   })
 
