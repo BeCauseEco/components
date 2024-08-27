@@ -21,7 +21,7 @@ const RadixDialogContent = styled(RadixDialog.Content)<
   position: "fixed",
   top: p.offsetTopOverride,
   left: p.offsetLeftOverride,
-  width: `calc(100vw - ${p.offsetTopOverride})`,
+  width: `calc(100vw - ${p.offsetLeftOverride})`,
   height: `calc(100vh - ${p.offsetTopOverride})`,
   zIndex: 1,
   maxHeight: `calc(100vh - ${p.offsetTopOverride})`,
