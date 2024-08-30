@@ -42,17 +42,18 @@ const Label = styled.label({
 
 export type TInputCheckBox = {
   value: boolean | "indeterminate"
+  id?: string
   onChange: (value: boolean) => void
   colorBackground: EColor
   colorForeground: EColor
   label?: ReactElement<TText>
 }
 
-export const InputCheckbox = ({ value, onChange, colorBackground, colorForeground, label }: TInputCheckBox) => {
+export const InputCheckbox = ({ value, id, onChange, colorBackground, colorForeground, label }: TInputCheckBox) => {
   const key = useId()
 
   return (
-    <Container>
+    <Container id={id}>
       <KeyValuePair direction={EDirection.Horizontal} spacing={ESize.Xsmall}>
         <Composition>
           <BackgroundCard colorBackground={[colorBackground, 700]} borderRadius={ESize.Tiny} />
