@@ -46,6 +46,7 @@ export type TInputText = {
   label?: ReactElement<TText>
   placeholder?: string
   value: string
+  id?: string
   onChange: (value: string) => void
   disabled?: boolean
 }
@@ -53,7 +54,7 @@ export type TInputText = {
 export const InputText = forwardRef<HTMLInputElement, TInputText>((props, ref) => {
   const key = useId()
 
-  const { rows = 1, color, label, placeholder = "", value = "", onChange } = props
+  const { rows = 1, color, label, placeholder = "", value = "", id, onChange } = props
 
   const propsOverride = {
     ...props,
@@ -66,12 +67,12 @@ export const InputText = forwardRef<HTMLInputElement, TInputText>((props, ref) =
 
   return (
     <KeyValuePair direction={EDirection.Vertical} spacing={ESize.Xsmall}>
-      {label && <Label htmlFor={key}>{label}</Label>}
+      {label && <Label htmlFor={id ?? key}>{label}</Label>}
 
       <Output
         as={rows !== 1 ? "textarea" : "input"}
         ref={ref}
-        id={key}
+        id={id ?? key}
         value={value}
         rows={rows}
         color={color}

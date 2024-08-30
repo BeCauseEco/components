@@ -56,6 +56,7 @@ export enum EInputButtonVariant {
 
 type TInputButtonBase = {
   size: ESize.Small | ESize.Medium | ESize.Large
+  id?: string
   onClick?: () => void
   loading?: boolean
   omitPadding?: boolean
@@ -86,6 +87,7 @@ export const InputButton = forwardRef<HTMLButtonElement | HTMLAnchorElement, Pro
       loading = false,
       omitPadding = false,
       size,
+      id,
       onClick,
       // @ts-expect-error TypeScript is not smart enough to accept discriminating unions in this case
       href,
@@ -133,6 +135,7 @@ export const InputButton = forwardRef<HTMLButtonElement | HTMLAnchorElement, Pro
         variant={variant}
         color={variant !== EInputButtonVariant.Link ? props.color : EColor.Transparent}
         loading={loading}
+        id={id}
         onClick={onClick}
         {...(props as any)}
       >

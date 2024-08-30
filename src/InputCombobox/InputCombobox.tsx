@@ -121,6 +121,7 @@ type TInputCombobox = {
    * When InputCombobox.multiple is set to true; "value" parameter is of type boolean[].
    *
    * Otherwise the type is of string */
+  id?: string
   onChange: (value: TInputComboboxValue) => void
 
   children: ReactElement<TInputComboboxItem> | ReactElement<TInputComboboxItem>[]
@@ -138,6 +139,7 @@ export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<TInput
     label,
     value,
     multiple = false,
+    id,
     onChange,
     children,
   } = props
@@ -199,7 +201,7 @@ export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<TInput
   }
 
   return (
-    <Container ref={ref}>
+    <Container ref={ref} id={id}>
       <Popover
         open={open}
         onOpenChange={setOpen}

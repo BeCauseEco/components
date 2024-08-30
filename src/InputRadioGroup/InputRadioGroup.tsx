@@ -14,14 +14,16 @@ const Root = styled(RadixRadioGroup.Root)({
 export type TInputRadioGroup = {
   defaultValue: string
   value: string
-  onChange?: (value: string) => void
   label?: ReactElement<TText>
+  id?: string
+  onChange?: (value: string) => void
 }
 
 export const InputRadioGroup = ({
   defaultValue,
   value,
   label,
+  id,
   onChange,
   children,
 }: PropsWithChildren<TInputRadioGroup>) => {
@@ -29,9 +31,9 @@ export const InputRadioGroup = ({
 
   return (
     <KeyValuePair direction={EDirection.Vertical} spacing={ESize.Xsmall}>
-      <label htmlFor={key}>{label}</label>
+      <label htmlFor={id ?? key}>{label}</label>
 
-      <Root id={key} defaultValue={defaultValue} value={value} onValueChange={onChange}>
+      <Root id={id ?? key} defaultValue={defaultValue} value={value} onValueChange={onChange}>
         {children}
       </Root>
     </KeyValuePair>
