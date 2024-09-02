@@ -7,6 +7,8 @@ export enum EColor {
   Primary = "#4E4073",
   Secondary = "#57BAAF",
   Tertiary = "#D7444F",
+  Quarternary = "#1F73B7",
+  Quinary = "#F8685B",
   SDG1 = "#EA263D",
   SDG2 = "#D8A93F",
   SDG3 = "#37A557",
@@ -37,49 +39,62 @@ export const computeColor = (color: TColor) => {
   const baseColor = color[0]
   const lightness = color[1] || 700
 
-  if (baseColor === EColor.Transparent) {
-    return baseColor
-  } else {
-    const colorsLight = samples(28)
-      .map(interpolate<"oklab">(["#ffffff", baseColor]))
-      .map(formatHex)
+  try {
+    if (baseColor === EColor.Transparent) {
+      return baseColor
+    } else {
+      const colorsLight = samples(28)
+        .map(interpolate<"oklab">(["#ffffff", baseColor]))
+        .map(formatHex)
 
-    const colorsMedium = samples(18)
-      .map(interpolate<"oklab">(["#ffffff", baseColor]))
-      .map(formatHex)
+      const colorsMedium = samples(18)
+        .map(interpolate<"oklab">(["#ffffff", baseColor]))
+        .map(formatHex)
 
-    const colorsDark = samples(8)
-      .map(interpolate<"oklab">([baseColor, "#000000"]))
-      .map(formatHex)
+      const colorsDark = samples(8)
+        .map(interpolate<"oklab">([baseColor, "#000000"]))
+        .map(formatHex)
 
-    const combined = [
-      colorsLight[1],
-      colorsMedium[2],
-      colorsMedium[6],
-      colorsMedium[8],
-      colorsMedium[10],
-      colorsMedium[12],
-      colorsMedium[14],
-      colorsMedium[17],
-      colorsDark[1],
-      colorsDark[2],
-      colorsDark[3],
-    ]
+      const combined = [
+        colorsLight[1],
+        colorsMedium[2],
+        colorsMedium[6],
+        colorsMedium[8],
+        colorsMedium[10],
+        colorsMedium[12],
+        colorsMedium[14],
+        colorsMedium[17],
+        colorsDark[1],
+        colorsDark[2],
+        colorsDark[3],
+      ]
 
-    return combined[lightness === 50 ? 0 : lightness / 100]
+      return combined[lightness === 50 ? 0 : lightness / 100]
+    }
+  } catch (e) {
+    throw "Color.ts - missing color* property on component. Run a local build (`yarn build`) to type-check for missing color properties."
   }
 }
 
-// const generateColorPallette = () => {
-//   console.log("---")
-//   const colors = ["4E4073", "57BAAF", "D7444F", "3E63DD", "F8685B", "3A835B", "F59613", "D9364C", "333333", "FFFFFF"]
-//   colors.forEach(c => {
-//     console.log("baseColor:", c)
-//     console.log("-")
-//     const lightness = [50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000]
-//     lightness.forEach(l => {
-//       console.log(`lightness ${l}:`, computeColor({ baseColor: c, lightness: l } as any))
-//     })
-//     console.log("-")
-//   })
-// }
+export const generateColorPallette = () => {
+  console.log("---")
+  Object.keys(EColor).forEach(key => {
+    console.log(`"${key}":`)
+    if (key === "White") {
+      console.log(EColor.White)
+    } else if (key === "Transparent") {
+      // ...
+    } else {
+      const lightness = [50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000]
+      lightness.forEach(l => {
+        try {
+          console.log(`lightness ${l}:`, computeColor([EColor[key], l as TLightness]))
+        } catch (e) {
+          console.error(e)
+        }
+      })
+    }
+
+    console.log("---")
+  })
+}

@@ -21,7 +21,7 @@ const Overlay = styled(RadixDialog.Overlay)({
   inset: 0,
   backgroundColor: EColor.Black,
   opacity: EOpacity.Heavy,
-  zIndex: 3,
+  zIndex: 9999,
 })
 
 const RadixDialogClose = styled(RadixDialog.Close)({
@@ -36,11 +36,11 @@ const Content = styled(RadixDialog.Content)<TDialogContentProperties>(p => ({
   display: "flex",
   position: "fixed",
   top: p.size === ESize.Medium ? "50%" : `calc(50% + ${offsetTop} / 2)`,
-  left: "50%",
+  left: p.size === ESize.Medium ? "calc(50% + calc(var(--BU) * 25))" : "50%",
   transform: "translate(-50%, -50%)",
-  width: p.size === ESize.Medium ? "calc(var(--BU) * 40))" : "calc(100vw - calc(var(--BU) * 10))",
+  width: p.size === ESize.Medium ? "calc(var(--BU) * 100)" : "calc(100vw - calc(var(--BU) * 10))",
   height: p.size === ESize.Medium ? "auto" : `calc(100vh - ${offsetTop} - calc(var(--BU) * 10))`,
-  zIndex: 4,
+  zIndex: 99999,
   maxHeight: `calc(100vh - ${offsetTop} - calc(var(--BU) * 10))`,
   overflowY: "auto",
 }))
@@ -48,6 +48,7 @@ const Content = styled(RadixDialog.Content)<TDialogContentProperties>(p => ({
 const TitleAndDescription = styled.div({
   display: "flex",
   flexDirection: "column",
+  justifyContent: "center",
 })
 
 export type TDialog = {
