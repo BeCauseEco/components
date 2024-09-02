@@ -29,7 +29,7 @@ const Output = styled.output<Omit<TInputText, "id"> & { rows: number }>(p => ({
   },
 
   "&::placeholder": {
-    color: computeColor([p.color, 700]),
+    color: computeColor([p.color, 400]),
   },
 }))
 

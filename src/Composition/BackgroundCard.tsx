@@ -12,6 +12,7 @@ const Container = styled.div<TBackgroundCard>(p => ({
   boxShadow: p.shadow ? p.shadow : "none",
   borderRadius: p.borderRadius ? p.borderRadius : 0,
   transition: "background-color 0.025s ease-in",
+  cursor: "inherit",
 
   // ...(p.stacked && {
   //   "&:before, &:after": {
