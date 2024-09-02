@@ -9,7 +9,7 @@ const Container = styled.div<Pick<TOverflowContainer, "maxHeight" | "omitPadding
   height: "inherit",
   padding: p.omitPadding ? 0 : "calc(var(--BU) * 4)",
   ...(p.maxHeight && { maxHeight: p.maxHeight }),
-  overflowY: "scroll",
+  overflowY: "auto",
 }))
 
 export type TOverflowContainer = {
