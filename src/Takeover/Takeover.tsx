@@ -14,28 +14,30 @@ const offsetTop = "64px"
 const offsetLeft = "76px"
 const offsetLeftSmall = "40px"
 
-const RadixDialogClose = styled(RadixDialog.Close)({
-  display: "flex",
-  transform: "translateX(var(--BU))",
-  height: "fit-content",
-})
-
-const RadixDialogContent = styled(RadixDialog.Content)({
+const RadixDialogContent = styled(RadixDialog.Content)<
+  Pick<TTakeover, "offsetTopOverride" | "offsetLeftOverride" | "offsetLeftSmallOverride">
+>(p => ({
   display: "flex",
   position: "fixed",
-  top: offsetTop,
-  left: offsetLeft,
-  width: `calc(100vw - ${offsetLeft})`,
-  height: `calc(100vh - ${offsetTop})`,
+  top: p.offsetTopOverride,
+  left: p.offsetLeftOverride,
+  width: `calc(100vw - ${p.offsetLeftOverride})`,
+  height: `calc(100vh - ${p.offsetTopOverride})`,
   zIndex: 1,
-  maxHeight: `calc(100vh - ${offsetTop})`,
+  maxHeight: `calc(100vh - ${p.offsetTopOverride})`,
   overflowY: "auto",
   backgroundColor: "red",
 
   "@media (max-width: 900px)": {
-    left: offsetLeftSmall,
-    width: `calc(100vw - ${offsetLeftSmall})`,
+    left: p.offsetLeftSmallOverride,
+    width: `calc(100vw - ${p.offsetLeftSmallOverride})`,
   },
+}))
+
+const RadixDialogClose = styled(RadixDialog.Close)({
+  display: "flex",
+  transform: "translateX(var(--BU))",
+  height: "fit-content",
 })
 
 export type TTakeover = {
@@ -48,6 +50,9 @@ export type TTakeover = {
   buttonPrimary?: ReactElement<TInputButton>
   buttonSecondary?: ReactElement<TInputButton>
   buttonTertiary?: ReactElement<TInputButton>
+  offsetTopOverride?: string
+  offsetLeftOverride?: string
+  offsetLeftSmallOverride?: string
 }
 
 export const Takeover = ({
@@ -60,6 +65,9 @@ export const Takeover = ({
   buttonPrimary,
   buttonSecondary,
   buttonTertiary,
+  offsetTopOverride = offsetTop,
+  offsetLeftOverride = offsetLeft,
+  offsetLeftSmallOverride = offsetLeftSmall,
 }: TTakeover) => {
   useEffect(() => {
     if (open) {
@@ -76,7 +84,11 @@ export const Takeover = ({
   return (
     <RadixDialog.Root open={open} onOpenChange={onOpenChange} modal={false}>
       <RadixDialog.Portal>
-        <RadixDialogContent>
+        <RadixDialogContent
+          offsetTopOverride={offsetTopOverride}
+          offsetLeftOverride={offsetLeftOverride}
+          offsetLeftSmallOverride={offsetLeftSmallOverride}
+        >
           <Composition explodeHeight>
             <BackgroundCard colorBackground={[EColor.White]} />
 
