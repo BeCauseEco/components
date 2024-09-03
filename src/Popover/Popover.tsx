@@ -38,7 +38,7 @@ const Content = styled(RadixPopover.Content)<Pick<TPopover, "overflowBehavior">>
   animationDuration: "400ms",
   animationTimingFunction: "cubic-bezier(0.16, 1, 0.3, 1)",
   willChange: "transform, opacity",
-  zIndex: 1001, // zIndex of 1001 is needed to be used in modal context
+  zIndex: 99999, // zIndex of 1001 is needed to be used in modal context
 
   ...(p.overflowBehavior === EPopoverOverflowBehavior.OverflowScroll && {
     maxHeight: "var(--radix-popover-content-available-height)",
