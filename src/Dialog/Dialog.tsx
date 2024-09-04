@@ -38,7 +38,7 @@ const Content = styled(RadixDialog.Content)<TDialogContentProperties>(p => ({
   top: p.size === ESize.Medium ? "50%" : `calc(50% + ${offsetTop} / 2)`,
   left: p.size === ESize.Medium ? "calc(50% + calc(var(--BU) * 25))" : "50%",
   transform: "translate(-50%, -50%)",
-  width: p.size === ESize.Medium ? "calc(var(--BU) * 150)" : "calc(100vw - calc(var(--BU) * 10))",
+  minWidth: p.size === ESize.Medium ? "calc(var(--BU) * 150)" : "calc(100vw - calc(var(--BU) * 10))",
   height: p.size === ESize.Medium ? "auto" : `calc(100vh - ${offsetTop} - calc(var(--BU) * 10))`,
   zIndex: 99999,
   maxHeight: `calc(100vh - ${offsetTop} - calc(var(--BU) * 10))`,
