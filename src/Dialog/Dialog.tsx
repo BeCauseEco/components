@@ -40,6 +40,7 @@ const Content = styled(RadixDialog.Content)<TDialogContentProperties>(p => ({
   transform: "translate(-50%, -50%)",
   minWidth: p.size === ESize.Medium ? "calc(var(--BU) * 160)" : "calc(100vw - calc(var(--BU) * 10))",
   minHeight: p.size === ESize.Medium ? "calc(var(--BU) * 160)" : `calc(100vh - ${offsetTop} - calc(var(--BU) * 10))`,
+
   zIndex: 99999,
   maxHeight: `calc(100vh - ${offsetTop} - calc(var(--BU) * 10))`,
   overflowY: "auto",
