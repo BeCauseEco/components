@@ -30,7 +30,7 @@ const RadixDialogClose = styled(RadixDialog.Close)({
   height: "fit-content",
 })
 
-type TDialogContentProperties = Pick<TDialog, "size">
+type TDialogContentProperties = Pick<TDialog, "size" | "collapseHeight">
 
 const Content = styled(RadixDialog.Content)<TDialogContentProperties>(p => ({
   display: "flex",
@@ -39,7 +39,12 @@ const Content = styled(RadixDialog.Content)<TDialogContentProperties>(p => ({
   left: p.size === ESize.Medium ? "calc(50% + calc(var(--BU) * 25))" : "50%",
   transform: "translate(-50%, -50%)",
   minWidth: p.size === ESize.Medium ? "calc(var(--BU) * 160)" : "calc(100vw - calc(var(--BU) * 10))",
-  minHeight: p.size === ESize.Medium ? "calc(var(--BU) * 160)" : `calc(100vh - ${offsetTop} - calc(var(--BU) * 10))`,
+  minHeight:
+    p.size === ESize.Medium
+      ? p.collapseHeight
+        ? "auto"
+        : "calc(var(--BU) * 160)"
+      : `calc(100vh - ${offsetTop} - calc(var(--BU) * 10))`,
   zIndex: 99999,
   maxHeight: `calc(100vh - ${offsetTop} - calc(var(--BU) * 10))`,
   overflowY: "auto",
@@ -56,6 +61,7 @@ export type TDialog = {
   content: ReactElement<TComposition>
   open: boolean
   onOpenChange: (open: boolean) => void
+  collapseHeight?: boolean
   title?: ReactElement<TText>
   description?: ReactElement<TText> | ReactElement<TText | TSpacer>[]
   buttonPrimary?: ReactElement<TInputButton>
@@ -69,6 +75,7 @@ export const Dialog = ({
   open = false,
   onOpenChange = () => {},
   title,
+  collapseHeight,
   description,
   buttonPrimary,
   buttonSecondary,
@@ -79,7 +86,7 @@ export const Dialog = ({
       <RadixDialog.Portal>
         <Overlay />
 
-        <Content size={size}>
+        <Content size={size} collapseHeight={collapseHeight}>
           <Composition>
             <BackgroundCard colorBackground={[EColor.White]} borderRadius={ESize.Tiny} shadow={EShadow.Large} />
 
