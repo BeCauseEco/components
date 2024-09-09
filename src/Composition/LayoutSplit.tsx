@@ -63,9 +63,15 @@ export const LayoutSplit = ({
   omitPadding = false,
   spacing,
   collapse,
+  playwrightTestId,
 }: TLayoutSplit) => {
   return (
-    <Container omitPadding={omitPadding} direction={direction} spacing={spacing}>
+    <Container
+      omitPadding={omitPadding}
+      direction={direction}
+      spacing={spacing}
+      data-playwright-testid={playwrightTestId}
+    >
       <ContentStart className="layout-container" direction={direction} collapse={collapse}>
         {contentStart}
       </ContentStart>

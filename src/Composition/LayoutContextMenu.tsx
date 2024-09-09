@@ -20,9 +20,9 @@ export type TLayoutContextMenu = TLayoutBase & {
   omitPadding?: boolean
 }
 
-export const LayoutContextMenu = ({ content, direction }: TLayoutContextMenu) => {
+export const LayoutContextMenu = ({ content, direction, playwrightTestId }: TLayoutContextMenu) => {
   return (
-    <Container direction={direction} className="layout-container">
+    <Container direction={direction} className="layout-container" data-playwright-testid={playwrightTestId}>
       {content}
     </Container>
   )

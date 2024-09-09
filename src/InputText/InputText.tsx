@@ -5,6 +5,7 @@ import { StyleFontFamily, StyleBodyXsmall, TText } from "@new/Text/Text"
 import { KeyValuePair } from "@new/KeyValuePair/KeyValuePair"
 import { EDirection } from "@new/EDirection"
 import { ESize } from "@new/ESize"
+import { TPlaywright } from "@new/TPlaywright"
 
 const Output = styled.output<Omit<TInputText, "id"> & { rows: number }>(p => ({
   display: "flex",
@@ -40,7 +41,7 @@ const Label = styled.label({
   cursor: "pointer",
 })
 
-export type TInputText = {
+export type TInputText = TPlaywright & {
   rows?: 1 | 2 | 3
   color: EColor
   label?: ReactElement<TText>
@@ -54,7 +55,7 @@ export type TInputText = {
 export const InputText = forwardRef<HTMLInputElement, TInputText>((props, ref) => {
   const key = useId()
 
-  const { rows = 1, color, label, placeholder = "", value = "", id, onChange } = props
+  const { rows = 1, color, label, placeholder = "", value = "", id, onChange, playwrightTestId } = props
 
   const propsOverride = {
     ...props,
@@ -66,7 +67,7 @@ export const InputText = forwardRef<HTMLInputElement, TInputText>((props, ref) =
   }
 
   return (
-    <KeyValuePair direction={EDirection.Vertical} spacing={ESize.Xsmall}>
+    <KeyValuePair direction={EDirection.Vertical} spacing={ESize.Xsmall} playwrightTestId={playwrightTestId}>
       {label && <Label htmlFor={id ?? key}>{label}</Label>}
 
       <Output

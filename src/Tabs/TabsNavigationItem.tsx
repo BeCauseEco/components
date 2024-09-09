@@ -4,6 +4,7 @@ import { TText } from "@new/Text/Text"
 import styled from "@emotion/styled"
 import * as Tabs from "@radix-ui/react-tabs"
 import { PropsWithChildren, ReactElement, RefAttributes, forwardRef } from "react"
+import { TPlaywright } from "@new/TPlaywright"
 
 const Trigger = styled(Tabs.Trigger)({
   display: "flex",
@@ -23,7 +24,7 @@ const Trigger = styled(Tabs.Trigger)({
   },
 })
 
-export type TTabsNavigationItem = {
+export type TTabsNavigationItem = TPlaywright & {
   contentTargetId: string
   children: ReactElement<TIcon | TText | TSpacer> | ReactElement<TIcon | TText | TSpacer>[]
 }
@@ -32,10 +33,17 @@ export const TabsNavigationItem = forwardRef<
   Tabs.TabsTriggerProps & RefAttributes<HTMLButtonElement>,
   PropsWithChildren<TTabsNavigationItem>
 >((props, ref) => {
-  const { contentTargetId, children } = props
+  const { contentTargetId, children, playwrightTestId } = props
 
   return (
-    <Trigger key={`tabstrigger${contentTargetId}`} ref={ref} value={contentTargetId} {...(props as any)} asChild>
+    <Trigger
+      key={`tabstrigger${contentTargetId}`}
+      ref={ref}
+      value={contentTargetId}
+      data-playwright-testid={playwrightTestId}
+      {...(props as any)}
+      asChild
+    >
       {children}
     </Trigger>
   )

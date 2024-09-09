@@ -3,6 +3,7 @@ import styled from "@emotion/styled"
 import { TColor, computeColor } from "@new/Color"
 import { ESize } from "@new/ESize"
 import { EAlignment } from "@new/EAlignment"
+import { TPlaywright } from "@new/TPlaywright"
 
 type TContainerProperties = TText & { color: TColor; alignment?: EAlignment }
 
@@ -119,7 +120,7 @@ const Container = styled.p<TContainerProperties>(p => ({
   ...(!p.wrap && p.size === ESize.Huge && { lineHeight: StyleBodyHuge.fontSize }),
 }))
 
-export type TText = {
+export type TText = TPlaywright & {
   size: ESize
   color: TColor
   emphasize?: boolean
@@ -145,6 +146,7 @@ export const Text = forwardRef<HTMLHeadingElement | HTMLParagraphElement, PropsW
     monospace = false,
     children,
     title,
+    playwrightTestId,
   } = props
 
   return (
@@ -160,6 +162,7 @@ export const Text = forwardRef<HTMLHeadingElement | HTMLParagraphElement, PropsW
       monospace={monospace}
       textAlign={computeAlignment(alignment)}
       title={title}
+      data-playwright-testid={playwrightTestId}
       {...(props as any)}
     >
       {children}

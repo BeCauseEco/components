@@ -1,4 +1,5 @@
 import styled from "@emotion/styled"
+import { TPlaywright } from "@new/TPlaywright"
 import { ReactElement } from "react"
 
 type TContainerProperties = Omit<TTableCell, "children">
@@ -10,15 +11,15 @@ const Container = styled.td<TContainerProperties>(p => ({
   width: p.width || "auto",
 }))
 
-export type TTableCell = {
+export type TTableCell = TPlaywright & {
   children?: ReactElement | ReactElement[]
   width?: string
   omitPadding?: boolean
   columnSpan?: number
 }
 
-export const TableCell = ({ children, width, omitPadding, columnSpan = 1 }: TTableCell) => (
-  <Container width={width} colSpan={columnSpan} omitPadding={omitPadding}>
+export const TableCell = ({ children, width, omitPadding, columnSpan = 1, playwrightTestId }: TTableCell) => (
+  <Container width={width} colSpan={columnSpan} omitPadding={omitPadding} data-playwright-testid={playwrightTestId}>
     {children}
   </Container>
 )

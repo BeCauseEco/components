@@ -6,6 +6,7 @@ import * as RadixRadioGroup from "@radix-ui/react-radio-group"
 import { PropsWithChildren, ReactElement, useId } from "react"
 import { KeyValuePair } from "@new/KeyValuePair/KeyValuePair"
 import { EDirection } from "@new/EDirection"
+import { TPlaywright } from "@new/TPlaywright"
 
 const Container = styled.div({
   display: "flex",
@@ -55,7 +56,7 @@ const Label = styled.label({
   userSelect: "none",
 })
 
-export type TInputRadioGroupItem = {
+export type TInputRadioGroupItem = TPlaywright & {
   value: string
   colorForeground: EColor
   colorBackground: EColor
@@ -67,11 +68,12 @@ export const InputRadioGroupItem = ({
   colorForeground,
   colorBackground,
   children,
+  playwrightTestId,
 }: PropsWithChildren<TInputRadioGroupItem>) => {
   const key = useId()
 
   return (
-    <Container>
+    <Container data-playwright-testid={playwrightTestId}>
       <KeyValuePair direction={EDirection.Horizontal} spacing={ESize.Xsmall}>
         <Item id={key} value={value} colorForeground={colorForeground} colorBackground={colorBackground}>
           <Indicator colorForeground={colorForeground} colorBackground={colorBackground} />

@@ -11,6 +11,7 @@ import { ESize } from "@new/ESize"
 import { Spacer } from "@new/Spacer/Spacer"
 import { EShadow } from "@new/EShadow"
 import { TText } from "@new/Text/Text"
+import { TPlaywright } from "@new/TPlaywright"
 
 const Overlay = styled(RadixAlertDialog.Overlay)({
   display: "flex",
@@ -30,7 +31,7 @@ const Content = styled(RadixAlertDialog.Content)({
   zIndex: 2,
 })
 
-export type TAlertDialog = {
+export type TAlertDialog = TPlaywright & {
   title?: ReactElement<TText>
   description?: ReactElement<TText>
   colorBackground: EColor
@@ -46,6 +47,7 @@ export const Alert = ({
   buttonTrigger,
   buttonPrimary,
   buttonSecondary,
+  playwrightTestId,
 }: TAlertDialog) => (
   <RadixAlertDialog.Root>
     <RadixAlertDialog.Trigger asChild>{buttonTrigger}</RadixAlertDialog.Trigger>
@@ -53,7 +55,7 @@ export const Alert = ({
     <RadixAlertDialog.Portal>
       <Overlay />
 
-      <Content>
+      <Content data-playwright-testid={playwrightTestId}>
         <Composition>
           <BackgroundCard colorBackground={[colorBackground, 50]} borderRadius={ESize.Tiny} shadow={EShadow.Large} />
 

@@ -9,6 +9,7 @@ import { LayoutTakeover } from "./internal/LayoutTakeover"
 import styled from "@emotion/styled"
 import { Spacer } from "@new/Spacer/Spacer"
 import { TText } from "@new/Text/Text"
+import { TPlaywright } from "@new/TPlaywright"
 
 const offsetTop = "64px"
 const offsetLeft = "76px"
@@ -40,7 +41,7 @@ const RadixDialogClose = styled(RadixDialog.Close)({
   height: "fit-content",
 })
 
-export type TTakeover = {
+export type TTakeover = TPlaywright & {
   content: ReactElement<TComposition>
   open: boolean
   onOpenChange: (open: boolean) => void
@@ -68,6 +69,7 @@ export const Takeover = ({
   offsetTopOverride = offsetTop,
   offsetLeftOverride = offsetLeft,
   offsetLeftSmallOverride = offsetLeftSmall,
+  playwrightTestId,
 }: TTakeover) => {
   useEffect(() => {
     if (open) {
@@ -82,7 +84,7 @@ export const Takeover = ({
   }, [open])
 
   return (
-    <RadixDialog.Root open={open} onOpenChange={onOpenChange} modal={false}>
+    <RadixDialog.Root open={open} onOpenChange={onOpenChange} modal={false} data-playwright-testid={playwrightTestId}>
       <RadixDialog.Portal>
         <RadixDialogContent
           offsetTopOverride={offsetTopOverride}
