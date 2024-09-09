@@ -3,6 +3,7 @@ import { ReactElement } from "react"
 import { TTableRow } from "@new/Table/TableRow"
 import { ESize } from "@new/ESize"
 import { TColor, computeColor } from "@new/Color"
+import { TPlaywright } from "@new/TPlaywright"
 
 type TContainerProperties = Omit<TTable, "head" | "body">
 
@@ -40,7 +41,7 @@ const Body = styled.tbody({
   display: "table-row-group",
 })
 
-export type TTable = {
+export type TTable = TPlaywright & {
   head?: ReactElement<TTableRow>
   body: ReactElement<TTableRow> | ReactElement<TTableRow>[]
   colorBorder: TColor
@@ -48,8 +49,13 @@ export type TTable = {
   colorRowHover: TColor
 }
 
-export const Table = ({ head, body, colorBorder, colorCellSeparator, colorRowHover }: TTable) => (
-  <Container colorBorder={colorBorder} colorCellSeparator={colorCellSeparator} colorRowHover={colorRowHover}>
+export const Table = ({ head, body, colorBorder, colorCellSeparator, colorRowHover, playwrightTestId }: TTable) => (
+  <Container
+    colorBorder={colorBorder}
+    colorCellSeparator={colorCellSeparator}
+    colorRowHover={colorRowHover}
+    data-playwright-testid={playwrightTestId}
+  >
     <Head>{head}</Head>
 
     <Body>{body}</Body>

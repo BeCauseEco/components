@@ -16,9 +16,9 @@ export type TLayoutGrid = TLayoutBase & {
   rows: "auto"
 }
 
-export const LayoutGrid = ({ columns, rows, content }: TLayoutGrid) => {
+export const LayoutGrid = ({ columns, rows, content, playwrightTestId }: TLayoutGrid) => {
   return (
-    <Container className="layout-container" columns={columns} rows={rows}>
+    <Container className="layout-container" columns={columns} rows={rows} data-playwright-testid={playwrightTestId}>
       {content}
     </Container>
   )

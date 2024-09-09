@@ -10,6 +10,7 @@ import { LayoutInputButton } from "./internal/LayoutInputButton"
 import Link, { LinkProps } from "next/link"
 import React from "react"
 import { TSpacer } from "@new/Spacer/Spacer"
+import { TPlaywright } from "@new/TPlaywright"
 
 const Output = styled.output<Pick<TInputButton, "loading" | "variant">>(p => ({
   display: "flex",
@@ -54,7 +55,7 @@ export enum EInputButtonVariant {
   Link,
 }
 
-type TInputButtonBase = {
+type TInputButtonBase = TPlaywright & {
   size: ESize.Small | ESize.Medium | ESize.Large
   id?: string
   onClick?: () => void
@@ -92,6 +93,7 @@ export const InputButton = forwardRef<HTMLButtonElement | HTMLAnchorElement, Pro
       // @ts-expect-error TypeScript is not smart enough to accept discriminating unions in this case
       href,
       children,
+      playwrightTestId,
     } = props
 
     const childIconOnly = React.Children.toArray(children)[0]["type"]["name"] === "Icon"
@@ -137,6 +139,7 @@ export const InputButton = forwardRef<HTMLButtonElement | HTMLAnchorElement, Pro
         loading={loading}
         id={id}
         onClick={onClick}
+        data-playwright-testid={playwrightTestId}
         {...(props as any)}
       >
         <Composition>

@@ -34,9 +34,15 @@ export const LayoutThirds = ({
   direction = EDirection.Vertical,
   omitPadding = false,
   spacing,
+  playwrightTestId,
 }: TLayoutThirds) => {
   return (
-    <Container omitPadding={omitPadding} spacing={spacing} direction={direction}>
+    <Container
+      omitPadding={omitPadding}
+      spacing={spacing}
+      direction={direction}
+      data-playwright-testid={playwrightTestId}
+    >
       <Content direction={direction} className="layout-container">
         {contentStart}
       </Content>

@@ -2,6 +2,7 @@ import { ESize } from "@new/ESize"
 import { TColor, computeColor } from "@new/Color"
 import styled from "@emotion/styled"
 import { EWeight } from "@new/EWeight"
+import { TPlaywright } from "@new/TPlaywright"
 
 const calculateFontVariantSettings = (size: ESize, weight: EWeight) => {
   let w = [ESize.Large, ESize.Huge].includes(size) ? "700" : "600"
@@ -33,7 +34,7 @@ const Container = styled.i<Omit<TIcon, "name"> & { color: TColor; weight: EWeigh
   userSelect: "none",
 }))
 
-export type TIcon = {
+export type TIcon = TPlaywright & {
   name: string | "blank"
   size: ESize
   color: TColor
@@ -41,7 +42,7 @@ export type TIcon = {
   onClick?: any
 }
 
-export const Icon = ({ name, size, color, weight = EWeight.Normal, onClick = undefined }: TIcon) => {
+export const Icon = ({ name, size, color, weight = EWeight.Normal, onClick = undefined, playwrightTestId }: TIcon) => {
   const noop = () => {}
 
   return (
@@ -51,6 +52,7 @@ export const Icon = ({ name, size, color, weight = EWeight.Normal, onClick = und
       color={color as any}
       className="material-symbols-rounded"
       onClick={onClick || noop}
+      data-playwright-testid={playwrightTestId}
     >
       {name === "blank" ? null : name}
     </Container>

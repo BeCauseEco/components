@@ -6,6 +6,7 @@ import { TText } from "@new/Text/Text"
 import { KeyValuePair } from "@new/KeyValuePair/KeyValuePair"
 import { EDirection } from "@new/EDirection"
 import { ESize } from "@new/ESize"
+import { TPlaywright } from "@new/TPlaywright"
 
 const Container = styled.div({
   display: "flex",
@@ -55,7 +56,7 @@ const Label = styled.label({
   cursor: "pointer",
 })
 
-export type TSwitch = {
+export type TSwitch = TPlaywright & {
   value: boolean
   onChange: (value: boolean) => void
   colorBackground: EColor
@@ -64,11 +65,19 @@ export type TSwitch = {
   label?: ReactElement<TText>
 }
 
-export const Switch = ({ value, onChange, colorBackground, colorForeground, colorValueTrue, label }: TSwitch) => {
+export const Switch = ({
+  value,
+  onChange,
+  colorBackground,
+  colorForeground,
+  colorValueTrue,
+  label,
+  playwrightTestId,
+}: TSwitch) => {
   const key = useId()
 
   return (
-    <Container>
+    <Container data-playwright-testid={playwrightTestId}>
       <KeyValuePair direction={EDirection.Horizontal} spacing={ESize.Xsmall}>
         <SwitchRoot
           id={key}

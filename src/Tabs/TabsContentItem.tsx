@@ -3,8 +3,9 @@ import { PropsWithChildren, ReactElement, RefAttributes, forwardRef } from "reac
 import { TComposition } from "@new/Composition/Composition"
 import { ESize } from "@new/ESize"
 import { Spacer } from "@new/Spacer/Spacer"
+import { TPlaywright } from "@new/TPlaywright"
 
-export type TTabsContentItem = {
+export type TTabsContentItem = TPlaywright & {
   contentTargetId: string
   children: ReactElement<TComposition>
 }
@@ -13,10 +14,17 @@ export const TabsContentItem = forwardRef<
   Tabs.TabsContentProps & RefAttributes<HTMLDivElement>,
   PropsWithChildren<TTabsContentItem>
 >((props, ref) => {
-  const { contentTargetId, children } = props
+  const { contentTargetId, children, playwrightTestId } = props
 
   return (
-    <Tabs.Content key={`tabscontent${contentTargetId}`} ref={ref} value={contentTargetId} {...(props as any)} asChild>
+    <Tabs.Content
+      key={`tabscontent${contentTargetId}`}
+      ref={ref}
+      value={contentTargetId}
+      data-playwright-testid={playwrightTestId}
+      {...(props as any)}
+      asChild
+    >
       <>
         <Spacer size={ESize.Small} />
 

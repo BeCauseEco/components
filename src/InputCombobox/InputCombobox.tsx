@@ -18,6 +18,7 @@ import { LayoutCombobox } from "./internal/LayoutInputCombobox"
 import { EAlignment } from "@new/EAlignment"
 import { Spacer } from "@new/Spacer/Spacer"
 import { InputCheckbox } from "@new/InputCheckbox/InputCheckbox"
+import { TPlaywright } from "@new/TPlaywright"
 
 const Container = styled.div({
   display: "flex",
@@ -95,7 +96,7 @@ export type TInputComboBoxFilterOptions = {
 
 export type TInputComboboxValue = string | boolean[]
 
-type TInputCombobox = {
+type TInputCombobox = TPlaywright & {
   colorButtonBackground: EColor
   colorButtonForeground: EColor
   colorPopOverBackground: EColor
@@ -142,6 +143,7 @@ export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<TInput
     id,
     onChange,
     children,
+    playwrightTestId,
   } = props
 
   const [open, setOpen] = useState(false)
@@ -201,7 +203,7 @@ export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<TInput
   }
 
   return (
-    <Container ref={ref} id={id}>
+    <Container ref={ref} id={id} data-playwright-testid={playwrightTestId}>
       <Popover
         open={open}
         onOpenChange={setOpen}
@@ -277,6 +279,7 @@ export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<TInput
                       colorBackground={item.colorBackground}
                       colorBackgroundHover={item.colorBackgroundHover}
                       colorForeground={item.colorForeground}
+                      data-playwright-testid={item.playwrightTestId}
                     >
                       {multiple ? (
                         <InputCheckbox

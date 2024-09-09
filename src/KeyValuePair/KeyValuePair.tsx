@@ -4,6 +4,7 @@ import { forwardRef, PropsWithChildren, ReactElement } from "react"
 import { Spacer } from "@new/Spacer/Spacer"
 import { EDirection } from "@new/EDirection"
 import { EDistribution } from "@new/EDistrubution"
+import { TPlaywright } from "@new/TPlaywright"
 
 type TConatinerProperties = Pick<TKeyValuePair, "direction" | "itemDistribution">
 
@@ -27,7 +28,7 @@ const Content = styled.div({
   },
 })
 
-export type TKeyValuePair = {
+export type TKeyValuePair = TPlaywright & {
   direction: EDirection
   spacing: ESize
   children: [ReactElement | null | undefined, ReactElement | null | undefined]
@@ -35,10 +36,10 @@ export type TKeyValuePair = {
 }
 
 export const KeyValuePair = forwardRef<HTMLDivElement, PropsWithChildren<TKeyValuePair>>((props, ref) => {
-  const { spacing, children } = props
+  const { spacing, children, playwrightTestId } = props
 
   return (
-    <Container ref={ref} {...props}>
+    <Container ref={ref} data-playwright-testid={playwrightTestId} {...props}>
       <Content>{children[0]}</Content>
 
       {children[0] && <Spacer size={spacing} />}

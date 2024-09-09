@@ -3,6 +3,7 @@ import { EShadow } from "@new/EShadow"
 import { ESize } from "@new/ESize"
 import styled from "@emotion/styled"
 import { css, Global } from "@emotion/react"
+import { TPlaywright } from "@new/TPlaywright"
 
 const Container = styled.div<TBackgroundCard>(p => ({
   position: "relative",
@@ -39,7 +40,7 @@ const Container = styled.div<TBackgroundCard>(p => ({
   // }),
 }))
 
-export type TBackgroundCard = {
+export type TBackgroundCard = TPlaywright & {
   colorBackground?: TColor
   colorBackgroundHover?: TColor
   colorOutline?: TColor
@@ -57,6 +58,7 @@ export const BackgroundCard = ({
   borderRadius,
   shadow,
   stacked,
+  playwrightTestId,
 }: TBackgroundCard) => {
   // TO-DO: @cllpse: clean up at a later date
   const id = Math.random().toString().replace(".", "")
@@ -86,6 +88,7 @@ export const BackgroundCard = ({
         borderRadius={borderRadius}
         shadow={shadow}
         stacked={stacked}
+        data-playwright-testid={playwrightTestId}
       />
     </>
   )

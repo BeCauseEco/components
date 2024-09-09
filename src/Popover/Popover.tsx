@@ -8,6 +8,7 @@ import { EAlignment } from "@new/EAlignment"
 import { TBackgroundCard } from "@new/Composition/BackgroundCard"
 import { TLayoutBase } from "@new/Composition/TLayoutBase"
 import { Composition } from "@new/Composition/Composition"
+import { TPlaywright } from "@new/TPlaywright"
 
 const slideUpAndFade = keyframes({
   from: { opacity: 0, transform: "translateY(2px)" },
@@ -91,7 +92,7 @@ export enum EPopoverOverflowBehavior {
   OverflowHidden,
 }
 
-export type TPopover = {
+export type TPopover = TPlaywright & {
   // colorArrow: EColor
   open?: boolean
   onOpenChange?: (value: boolean) => void
@@ -102,13 +103,26 @@ export type TPopover = {
   alignment: EAlignment
 }
 
-export const Popover = ({ open, onOpenChange, trigger, background, layout, overflowBehavior, alignment }: TPopover) => {
+export const Popover = ({
+  open,
+  onOpenChange,
+  trigger,
+  background,
+  layout,
+  overflowBehavior,
+  alignment,
+  playwrightTestId,
+}: TPopover) => {
   return (
     <Root open={open} onOpenChange={onOpenChange}>
       <RadixPopover.Trigger asChild>{trigger}</RadixPopover.Trigger>
 
       <RadixPopover.Portal>
-        <Content align={alignTranslate(alignment)} overflowBehavior={overflowBehavior}>
+        <Content
+          align={alignTranslate(alignment)}
+          overflowBehavior={overflowBehavior}
+          data-playwright-testid={playwrightTestId}
+        >
           <Composition>
             {background}
 

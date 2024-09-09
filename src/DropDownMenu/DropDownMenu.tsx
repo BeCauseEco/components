@@ -10,6 +10,7 @@ import { TDropDownMenuSeparator } from "./DrownDownMenuSeparator"
 import { ESize } from "@new/ESize"
 import { EShadow } from "@new/EShadow"
 import { LayoutDropDownMenu } from "./internal/LayoutDropDownMenu"
+import { TPlaywright } from "@new/TPlaywright"
 
 const Content = styled(RadixDropDownMenu.Content)({
   zIndex: 1,
@@ -22,7 +23,7 @@ const Arrow = styled(RadixDropDownMenu.Arrow)<TDropDownMenuArrowProperties>(p =>
   fill: p.color,
 }))
 
-export type TDropDownMenu = {
+export type TDropDownMenu = TPlaywright & {
   buttonTrigger: ReactElement<TInputButton>
   items:
     | ReactElement<TDropDownMenuItem | TDropDownMenuSeparator>
@@ -30,12 +31,12 @@ export type TDropDownMenu = {
   colorBackground: EColor
 }
 
-export const DropDownMenu = ({ buttonTrigger, items, colorBackground }: TDropDownMenu) => (
+export const DropDownMenu = ({ buttonTrigger, items, colorBackground, playwrightTestId }: TDropDownMenu) => (
   <RadixDropDownMenu.Root>
     <RadixDropDownMenu.Trigger asChild>{buttonTrigger}</RadixDropDownMenu.Trigger>
 
     <RadixDropDownMenu.Portal>
-      <Content sideOffset={4}>
+      <Content sideOffset={4} data-playwright-testid={playwrightTestId}>
         <Composition>
           <BackgroundCard colorBackground={[colorBackground, 700]} borderRadius={ESize.Tiny} shadow={EShadow.Medium} />
 
