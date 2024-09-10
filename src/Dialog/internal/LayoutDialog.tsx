@@ -20,6 +20,7 @@ const ContentStart = styled.div({
 const ContentStartContent = styled.div({
   display: "flex",
   flexDirection: "row",
+  alignItems: "center",
 })
 
 const ContentMiddle = styled.div({
