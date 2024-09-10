@@ -40,12 +40,7 @@ const Content = styled(RadixDialog.Content)<TDialogContentProperties>(p => ({
   left: p.size === ESize.Medium ? "calc(50% + calc(var(--BU) * 25))" : "50%",
   transform: "translate(-50%, -50%)",
   minWidth: p.size === ESize.Medium ? "calc(var(--BU) * 160)" : "calc(100vw - calc(var(--BU) * 10))",
-  minHeight:
-    p.size === ESize.Medium
-      ? p.collapseHeight
-        ? "auto"
-        : "calc(var(--BU) * 160)"
-      : `calc(100vh - ${offsetTop} - calc(var(--BU) * 10))`,
+  minHeight: p.size === ESize.Medium ? "auto" : `calc(100vh - ${offsetTop} - calc(var(--BU) * 10))`,
   zIndex: 99999,
   // TO-DO: @cllpe
   // maxHeight: `calc(100vh - ${offsetTop} - calc(var(--BU) * 10))`,
@@ -89,7 +84,7 @@ export const Dialog = ({
         <Overlay />
 
         <Content size={size} collapseHeight={collapseHeight} data-playwright-testid={playwrightTestId}>
-          <Composition>
+          <Composition explodeHeight>
             <BackgroundCard colorBackground={[EColor.White]} borderRadius={ESize.Tiny} shadow={EShadow.Large} />
 
             <LayoutDialog
