@@ -84,7 +84,7 @@ export const Dialog = ({
         <Overlay />
 
         <Content size={size} collapseHeight={collapseHeight} data-playwright-testid={playwrightTestId}>
-          <Composition explodeHeight>
+          <Composition>
             <BackgroundCard colorBackground={[EColor.White]} borderRadius={ESize.Tiny} shadow={EShadow.Large} />
 
             <LayoutDialog
@@ -92,7 +92,7 @@ export const Dialog = ({
                 <TitleAndDescription>
                   {title}
 
-                  {description && <Spacer size={ESize.Medium} />}
+                  {description && <Spacer size={ESize.Xsmall} />}
 
                   {description}
                 </TitleAndDescription>
