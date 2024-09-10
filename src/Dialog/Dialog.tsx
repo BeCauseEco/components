@@ -12,6 +12,7 @@ import { Spacer, TSpacer } from "@new/Spacer/Spacer"
 import { EShadow } from "@new/EShadow"
 import { TText } from "@new/Text/Text"
 import { Icon } from "@new/Icon/Icon"
+import { TPlaywright } from "@new/TPlaywright"
 
 const offsetTop = "128px"
 
@@ -56,7 +57,7 @@ const TitleAndDescription = styled.div({
   justifyContent: "center",
 })
 
-export type TDialog = {
+export type TDialog = TPlaywright & {
   size: ESize.Medium | ESize.Huge
   content: ReactElement<TComposition>
   open: boolean
@@ -80,13 +81,14 @@ export const Dialog = ({
   buttonPrimary,
   buttonSecondary,
   buttonTertiary,
+  playwrightTestId,
 }: TDialog) => {
   return (
     <RadixDialog.Root open={open} onOpenChange={onOpenChange}>
       <RadixDialog.Portal>
         <Overlay />
 
-        <Content size={size} collapseHeight={collapseHeight}>
+        <Content size={size} collapseHeight={collapseHeight} data-playwright-testid={playwrightTestId}>
           <Composition>
             <BackgroundCard colorBackground={[EColor.White]} borderRadius={ESize.Tiny} shadow={EShadow.Large} />
 

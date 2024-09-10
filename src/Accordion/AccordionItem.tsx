@@ -9,6 +9,7 @@ import { TColor } from "@new/Color"
 import { BackgroundCard } from "@new/Composition/BackgroundCard"
 import { TIcon } from "@new/Icon/Icon"
 import { EDirection } from "@new/EDirection"
+import { TPlaywright } from "@new/TPlaywright"
 
 type TContainerProperties = Omit<TAccordionItem, "content" | "label" | "colorHead" | "colorContent">
 
@@ -58,7 +59,7 @@ const Content = styled(Accordion.Content)({
   },
 })
 
-export type TAccordionItem = {
+export type TAccordionItem = TPlaywright & {
   label: ReactElement<TText> | ReactElement<TIcon>
   value: string
   content: ReactElement | ReactElement[] | undefined
@@ -66,8 +67,8 @@ export type TAccordionItem = {
   colorContent: TColor
 }
 
-export const AccordionItem = ({ label, value, content, colorHead, colorContent }: TAccordionItem) => (
-  <Item value={value}>
+export const AccordionItem = ({ label, value, content, colorHead, colorContent, playwrightTestId }: TAccordionItem) => (
+  <Item value={value} data-playwright-testid={playwrightTestId}>
     <Header>
       <Trigger>
         <Composition>

@@ -1,6 +1,7 @@
 import { EColor } from "@new/Color"
+import { TPlaywright } from "@new/TPlaywright"
 
-export type TInputComboboxItem = {
+export type TInputComboboxItem = TPlaywright & {
   label: string
   value: string | boolean
   colorBackground: EColor

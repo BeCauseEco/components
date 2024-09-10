@@ -6,6 +6,7 @@ import { TLayoutSplit } from "@new/Composition/LayoutSplit"
 import { TLayoutThirds } from "@new/Composition/LayoutThirds"
 import { TLayoutGrid } from "@new/Composition/LayoutGrid"
 import { TLayoutBase } from "./TLayoutBase"
+import { TPlaywright } from "@new/TPlaywright"
 
 const Container = styled.div<Pick<TComposition, "loading" | "explodeHeight" | "overflowHidden" | "onClick">>(p => ({
   display: "flex",
@@ -49,7 +50,7 @@ type AllowedBackgrounds = TBackgroundCard
 
 type TAllowedLayouts = TLayoutSingle | TLayoutSplit | TLayoutThirds | TLayoutGrid | TLayoutBase
 
-export type TComposition = {
+export type TComposition = TPlaywright & {
   children: ReactElement<TAllowedLayouts> | [ReactElement<AllowedBackgrounds>, ReactElement<TAllowedLayouts>]
   loading?: boolean
   explodeHeight?: boolean
@@ -58,7 +59,7 @@ export type TComposition = {
 }
 
 export const Composition = forwardRef<HTMLDivElement, PropsWithChildren<TComposition>>((props, ref) => {
-  const { children, loading = false, explodeHeight = false, overflowHidden = false, onClick } = props
+  const { children, loading = false, explodeHeight = false, overflowHidden = false, onClick, playwrightTestId } = props
 
   const c = React.Children.toArray(children)
 
@@ -70,6 +71,7 @@ export const Composition = forwardRef<HTMLDivElement, PropsWithChildren<TComposi
       overflowHidden={overflowHidden}
       className="component-composition component-composition-reset"
       onClick={onClick}
+      data-playwright-testid={playwrightTestId}
     >
       {c.length === 1 ? (
         <>

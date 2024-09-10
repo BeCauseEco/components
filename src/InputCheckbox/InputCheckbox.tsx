@@ -11,6 +11,7 @@ import { Composition } from "@new/Composition/Composition"
 import { BackgroundCard } from "@new/Composition/BackgroundCard"
 import { KeyValuePair } from "@new/KeyValuePair/KeyValuePair"
 import { LayoutSingle } from "@new/Composition/LayoutSingle"
+import { TPlaywright } from "@new/TPlaywright"
 
 const Container = styled.div({
   display: "flex",
@@ -40,7 +41,7 @@ const Label = styled.label({
   cursor: "pointer",
 })
 
-export type TInputCheckBox = {
+export type TInputCheckBox = TPlaywright & {
   value: boolean | "indeterminate"
   id?: string
   onChange: (value: boolean) => void
@@ -49,11 +50,19 @@ export type TInputCheckBox = {
   label?: ReactElement<TText>
 }
 
-export const InputCheckbox = ({ value, id, onChange, colorBackground, colorForeground, label }: TInputCheckBox) => {
+export const InputCheckbox = ({
+  value,
+  id,
+  onChange,
+  colorBackground,
+  colorForeground,
+  label,
+  playwrightTestId,
+}: TInputCheckBox) => {
   const key = useId()
 
   return (
-    <Container id={id}>
+    <Container id={id} data-playwright-testid={playwrightTestId}>
       <KeyValuePair direction={EDirection.Horizontal} spacing={ESize.Xsmall}>
         <Composition>
           <BackgroundCard colorBackground={[colorBackground, 700]} borderRadius={ESize.Tiny} />

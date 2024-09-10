@@ -5,13 +5,14 @@ import { TText } from "@new/Text/Text"
 import styled from "@emotion/styled"
 import * as RadixRadioGroup from "@radix-ui/react-radio-group"
 import { PropsWithChildren, ReactElement, useId } from "react"
+import { TPlaywright } from "@new/TPlaywright"
 
 const Root = styled(RadixRadioGroup.Root)({
   display: "flex",
   flexDirection: "column",
 })
 
-export type TInputRadioGroup = {
+export type TInputRadioGroup = TPlaywright & {
   defaultValue: string
   value: string
   label?: ReactElement<TText>
@@ -26,11 +27,12 @@ export const InputRadioGroup = ({
   id,
   onChange,
   children,
+  playwrightTestId,
 }: PropsWithChildren<TInputRadioGroup>) => {
   const key = useId()
 
   return (
-    <KeyValuePair direction={EDirection.Vertical} spacing={ESize.Xsmall}>
+    <KeyValuePair direction={EDirection.Vertical} spacing={ESize.Xsmall} playwrightTestId={playwrightTestId}>
       <label htmlFor={id ?? key}>{label}</label>
 
       <Root id={id ?? key} defaultValue={defaultValue} value={value} onValueChange={onChange}>

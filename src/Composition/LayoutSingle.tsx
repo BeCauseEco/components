@@ -18,9 +18,14 @@ export type TLayoutSingle = TLayoutBase & {
   omitPadding?: boolean
 }
 
-export const LayoutSingle = ({ content, omitPadding, direction }: TLayoutSingle) => {
+export const LayoutSingle = ({ content, omitPadding, direction, playwrightTestId }: TLayoutSingle) => {
   return (
-    <Container omitPadding={omitPadding} direction={direction} className="layout-container">
+    <Container
+      omitPadding={omitPadding}
+      direction={direction}
+      className="layout-container"
+      data-playwright-testid={playwrightTestId}
+    >
       {content}
     </Container>
   )

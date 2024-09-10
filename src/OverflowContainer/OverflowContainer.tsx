@@ -1,4 +1,5 @@
 import styled from "@emotion/styled"
+import { TPlaywright } from "@new/TPlaywright"
 
 import { PropsWithChildren, ReactElement } from "react"
 
@@ -20,7 +21,7 @@ export enum EOverflowContainerAxis {
   Both,
 }
 
-export type TOverflowContainer = {
+export type TOverflowContainer = TPlaywright & {
   axes: EOverflowContainerAxis
   omitPadding?: boolean
   minHeight?: string
@@ -34,8 +35,15 @@ export const OverflowContainer = ({
   minHeight,
   maxHeight,
   children,
+  playwrightTestId,
 }: PropsWithChildren<TOverflowContainer>) => (
-  <Container minHeight={minHeight} maxHeight={maxHeight} omitPadding={omitPadding} axes={axes}>
+  <Container
+    minHeight={minHeight}
+    maxHeight={maxHeight}
+    omitPadding={omitPadding}
+    axes={axes}
+    data-playwright-testid={playwrightTestId}
+  >
     {children}
   </Container>
 )
