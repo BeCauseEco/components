@@ -83,6 +83,27 @@ export const Takeover = ({
     }
   }, [open])
 
+  const contentEnd: ReactElement[] = []
+
+  if (status) {
+    contentEnd.push(status)
+    contentEnd.push(<Spacer size={ESize.Large} />)
+  }
+
+  if (buttonTertiary) {
+    contentEnd.push(buttonTertiary)
+  }
+
+  if (buttonSecondary) {
+    contentEnd.push(<Spacer size={ESize.Small} />)
+    contentEnd.push(buttonSecondary)
+  }
+
+  if (buttonPrimary) {
+    contentEnd.push(<Spacer size={ESize.Small} />)
+    contentEnd.push(buttonPrimary)
+  }
+
   return (
     <RadixDialog.Root open={open} onOpenChange={onOpenChange} modal={false} data-playwright-testid={playwrightTestId}>
       <RadixDialog.Portal>
@@ -95,37 +116,9 @@ export const Takeover = ({
             <BackgroundCard colorBackground={[EColor.White]} />
 
             <LayoutTakeover
-              contentStart={<>{title}</>}
+              contentStart={title}
               contentMiddle={content}
-              contentEnd={
-                <>
-                  {status && (
-                    <>
-                      {status}
-
-                      <Spacer size={ESize.Large} />
-                    </>
-                  )}
-
-                  {buttonTertiary && <>{buttonTertiary}</>}
-
-                  {buttonSecondary && (
-                    <>
-                      <Spacer size={ESize.Small} />
-
-                      {buttonSecondary}
-                    </>
-                  )}
-
-                  {buttonPrimary && (
-                    <>
-                      <Spacer size={ESize.Small} />
-
-                      {buttonPrimary}
-                    </>
-                  )}
-                </>
-              }
+              contentEnd={contentEnd.length > 0 ? contentEnd : undefined}
               buttonClose={<RadixDialogClose asChild>{buttonClose}</RadixDialogClose>}
             />
           </Composition>

@@ -246,6 +246,7 @@ export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<TInput
               filterOptions && (
                 <>
                   <InputText
+                    width={ESize.Full}
                     color={colorButtonBackground}
                     value={search}
                     onChange={value => setSearch(value)}
