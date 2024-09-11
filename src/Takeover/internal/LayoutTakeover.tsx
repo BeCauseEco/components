@@ -51,7 +51,7 @@ const ContentEnd = styled.div({
 export type TLayoutTakeover = TLayoutBase & {
   contentStart?: ReactNode | ReactNode[]
   contentMiddle: ReactNode | ReactNode[]
-  contentEnd: ReactNode | ReactNode[]
+  contentEnd?: ReactNode | ReactNode[]
   buttonClose: ReactNode
   omitPadding?: boolean
 }
@@ -67,7 +67,7 @@ export const LayoutTakeover = ({ contentStart, contentMiddle, contentEnd, button
 
       <ContentMiddle>{contentMiddle}</ContentMiddle>
 
-      <ContentEnd>{contentEnd}</ContentEnd>
+      {contentEnd && <ContentEnd>{contentEnd}</ContentEnd>}
     </Container>
   )
 }

@@ -7,4 +7,8 @@ export enum ESize {
   XLarge = "32px",
   XXLarge = "40px",
   Huge = "48px",
+  Quarter = "25%",
+  Half = "50%",
+  TwoThirds = "75%",
+  Full = "100%",
 }

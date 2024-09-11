@@ -7,9 +7,9 @@ import { EDirection } from "@new/EDirection"
 import { ESize } from "@new/ESize"
 import { TPlaywright } from "@new/TPlaywright"
 
-const Output = styled.output<Omit<TInputText, "id"> & { rows: number }>(p => ({
+const Output = styled.output<Pick<TInputText, "color" | "width"> & { rows: number }>(p => ({
   display: "flex",
-  width: "100%",
+  width: p.width,
   height: p.rows === 1 ? "calc(var(--BU) * 7)" : `calc(var(--BU) * 7 * ${p.rows - 1} + calc(var(--BU) * 3))`,
   padding: p.rows === 1 ? "0 calc(var(--BU) * 2)" : "calc(var(--BU) * 2)",
   resize: "none",
@@ -44,6 +44,7 @@ const Label = styled.label({
 export type TInputText = TPlaywright & {
   rows?: 1 | 2 | 3
   color: EColor
+  width: ESize.Full | ESize.TwoThirds | ESize.Half | ESize.Quarter
   label?: ReactElement<TText>
   placeholder?: string
   value: string
@@ -55,7 +56,7 @@ export type TInputText = TPlaywright & {
 export const InputText = forwardRef<HTMLInputElement, TInputText>((props, ref) => {
   const key = useId()
 
-  const { rows = 1, color, label, placeholder = "", value = "", id, onChange, playwrightTestId } = props
+  const { rows = 1, color, width, label, placeholder = "", value = "", id, onChange, playwrightTestId } = props
 
   const propsOverride = {
     ...props,
@@ -77,6 +78,7 @@ export const InputText = forwardRef<HTMLInputElement, TInputText>((props, ref) =
         value={value}
         rows={rows}
         color={color}
+        width={width}
         placeholder={placeholder}
         {...(propsOverride as any)}
       />
