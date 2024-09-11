@@ -16,7 +16,7 @@ const Container = styled.div<Pick<TComposition, "loading" | "explodeHeight" | "o
   width: "100%",
   height: p.explodeHeight ? "100%" : "auto",
   opacity: p.loading ? 0.5 : 1,
-  cursor: p.loading ? "loading" : p.onClick ? "pointer" : "auto",
+  cursor: p.loading ? "wait" : p.onClick ? "pointer" : "auto",
   overflow: p.overflowHidden ? "hidden" : "visible",
 }))
 
@@ -74,9 +74,7 @@ export const Composition = forwardRef<HTMLDivElement, PropsWithChildren<TComposi
       data-playwright-testid={playwrightTestId}
     >
       {c.length === 1 ? (
-        <>
-          <Layout className="component-composition-layout">{c[0]}</Layout>
-        </>
+        <Layout className="component-composition-layout">{c[0]}</Layout>
       ) : (
         <>
           <Background className="component-composition-background">{c[0]}</Background>
