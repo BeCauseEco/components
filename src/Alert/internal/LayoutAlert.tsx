@@ -1,8 +1,8 @@
 import { ReactNode } from "react"
 import styled from "@emotion/styled"
-import { EColor, TColor, computeColor } from "@new/Color"
 import { ESize } from "@new/ESize"
 import { TLayoutBase } from "@new/Composition/TLayoutBase"
+import { computeColor, EColor } from "@new/Color"
 
 const Container = styled.div({
   display: "flex",
@@ -14,56 +14,43 @@ const ContentTop = styled.div({
   flexDirection: "row",
   justifyContent: "space-between",
   padding: "calc(var(--BU) * 4)",
-  paddingBottom: 0,
+  paddingBottom: "calc(var(--BU) * 2)",
+  userSelect: "none",
 })
 
 const ContentMiddle = styled.div({
   display: "flex",
   flexDirection: "column",
   padding: "calc(var(--BU) * 4)",
+  paddingTop: 0,
+  userSelect: "none",
 })
 
-type TContentEndProperties = {
-  baseColor: EColor
-  colorBackground: TColor
-  colorBorderTop: TColor
-}
-
-const ContentEnd = styled.div<TContentEndProperties>(p => ({
+const ContentEnd = styled.div({
   display: "flex",
   flexDirection: "row",
   padding: "calc(var(--BU) * 4)",
-  backgroundColor: computeColor(p.colorBackground),
-  borderTop:
-    p.baseColor === EColor.White
-      ? `solid 1px ${computeColor([EColor.Black, 50])} `
-      : `solid 1px ${computeColor(p.colorBorderTop)}`,
+  borderTop: `solid 1px ${computeColor([EColor.Black, 100])}`,
   borderBottomLeftRadius: ESize.Tiny,
   borderBottomRightRadius: ESize.Tiny,
-}))
+  justifyContent: "flex-end",
+})
 
 export type TLayoutDialog = TLayoutBase & {
-  colorBackground: EColor
   contentTop: ReactNode | ReactNode[]
   contentMiddle: ReactNode | ReactNode[]
   contentEnd: ReactNode | ReactNode[]
   omitPadding?: boolean
 }
 
-export const LayoutAlert = ({ contentTop, contentMiddle, contentEnd, colorBackground }: TLayoutDialog) => {
+export const LayoutAlert = ({ contentTop, contentMiddle, contentEnd }: TLayoutDialog) => {
   return (
     <Container className="layout-container">
       <ContentTop>{contentTop}</ContentTop>
 
-      <ContentMiddle>{contentMiddle}</ContentMiddle>
+      {contentMiddle && <ContentMiddle>{contentMiddle}</ContentMiddle>}
 
-      <ContentEnd
-        baseColor={colorBackground}
-        colorBackground={[colorBackground, 100]}
-        colorBorderTop={[colorBackground, 300]}
-      >
-        {contentEnd}
-      </ContentEnd>
+      <ContentEnd>{contentEnd}</ContentEnd>
     </Container>
   )
 }

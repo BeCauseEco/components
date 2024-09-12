@@ -18,49 +18,38 @@ const Overlay = styled(RadixAlertDialog.Overlay)({
   position: "fixed",
   inset: 0,
   backgroundColor: EColor.Black,
-  opacity: EOpacity.Heavy,
-  zIndex: 1,
+  opacity: EOpacity.Light,
+  zIndex: 999999,
 })
 
 const Content = styled(RadixAlertDialog.Content)({
   display: "flex",
   position: "fixed",
   top: "50%",
-  left: "50%",
+  left: "calc(50% + calc(var(--BU) * 20))",
   transform: "translate(-50%, -50%)",
-  zIndex: 2,
+  width: "calc(var(--BU) * 100)",
+  zIndex: 9999999,
 })
 
 export type TAlertDialog = TPlaywright & {
+  open: boolean
   title?: ReactElement<TText>
   description?: ReactElement<TText>
-  colorBackground: EColor
-  buttonTrigger: ReactElement<TInputButton>
   buttonPrimary: ReactElement<TInputButton>
-  buttonSecondary?: ReactElement<TInputButton>
+  buttonSecondary: ReactElement<TInputButton>
 }
 
-export const Alert = ({
-  title,
-  description,
-  colorBackground,
-  buttonTrigger,
-  buttonPrimary,
-  buttonSecondary,
-  playwrightTestId,
-}: TAlertDialog) => (
-  <RadixAlertDialog.Root>
-    <RadixAlertDialog.Trigger asChild>{buttonTrigger}</RadixAlertDialog.Trigger>
-
+export const Alert = ({ open, title, description, buttonPrimary, buttonSecondary, playwrightTestId }: TAlertDialog) => (
+  <RadixAlertDialog.Root open={open}>
     <RadixAlertDialog.Portal>
       <Overlay />
 
       <Content data-playwright-testid={playwrightTestId}>
         <Composition>
-          <BackgroundCard colorBackground={[colorBackground, 50]} borderRadius={ESize.Tiny} shadow={EShadow.Large} />
+          <BackgroundCard colorBackground={[EColor.White]} borderRadius={ESize.Tiny} shadow={EShadow.Large} />
 
           <LayoutAlert
-            colorBackground={colorBackground}
             contentTop={title}
             contentMiddle={description}
             contentEnd={
