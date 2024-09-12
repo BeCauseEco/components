@@ -21,7 +21,7 @@ const Overlay = styled(RadixDialog.Overlay)({
   position: "fixed",
   inset: 0,
   backgroundColor: EColor.Black,
-  opacity: EOpacity.Heavy,
+  opacity: EOpacity.Light,
   zIndex: 9999,
 })
 

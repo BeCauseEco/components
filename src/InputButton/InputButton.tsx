@@ -105,7 +105,7 @@ export const InputButton = forwardRef<HTMLButtonElement | HTMLAnchorElement, Pro
         background = (
           <BackgroundCard
             colorBackground={[props.color, 700]}
-            colorBackgroundHover={[props.color, 900]}
+            colorBackgroundHover={[props.color, 800]}
             borderRadius={ESize.Tiny}
           />
         )
