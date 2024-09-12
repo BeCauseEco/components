@@ -3,7 +3,7 @@ import { samples, interpolate, formatHex } from "culori"
 //Simplistic approach taken from:
 //https://medium.com/@steve.alves2/how-to-type-hex-colors-in-typescript-3c3b9a32baa7
 //It does not guard against invalid hex values due to an incorrect string such as ##000000, but it does provide a simplistic check, and is a simple solution for now.
-export type THexcolor = `#${string}`
+export type THexColor = `#${string}`
 
 export enum EColor {
   Black = "#000000",
@@ -38,7 +38,7 @@ export enum EColor {
 
 export type TLightness = 50 | 100 | 200 | 300 | 400 | 500 | 600 | 700 | 800 | 900 | 1000
 
-export type TColor = [EColor, TLightness] | [EColor.White] | [EColor.Transparent] | [THexcolor, TLightness]
+export type TColor = [EColor, TLightness] | [EColor.White] | [EColor.Transparent] | [THexColor, TLightness]
 
 export const computeColor = (color: TColor) => {
   const baseColor = color[0]
