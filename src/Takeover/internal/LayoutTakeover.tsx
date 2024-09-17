@@ -23,7 +23,7 @@ const ContentCloseButton = styled.div({
 
 const ContentTitle = styled.div({
   display: "flex",
-  flexDirection: "row",
+  flexDirection: "column",
   width: "100%",
   height: "100%",
   padding: "calc(var(--BU) * 4)",
@@ -33,7 +33,7 @@ const ContentTitle = styled.div({
 
 const ContentMiddle = styled.div({
   display: "flex",
-  flexDirection: "row",
+  flexDirection: "column",
   justifyContent: "space-between",
   height: "inherit",
   overflow: "hidden",
@@ -41,7 +41,7 @@ const ContentMiddle = styled.div({
 
 const ContentEnd = styled.div({
   display: "flex",
-  flexDirection: "row",
+  flexDirection: "column",
   padding: "calc(var(--BU) * 4)",
   borderTop: `solid 1px ${computeColor([EColor.Black, 100])}`,
   justifyContent: "flex-end",

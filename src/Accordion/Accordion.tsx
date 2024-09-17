@@ -15,15 +15,49 @@ const Root = styled(RadixAccordion.Root)({
   width: "100%",
 })
 
-export type TAccordion = TPlaywright & {
+type TAccordionBase = TPlaywright & {
   items: ReactElement<TAccordionItem> | ReactElement<TAccordionItem>[]
-  defaultValue: string
+  collapsible: boolean
 }
 
-export const Accordion = ({ items, defaultValue, playwrightTestId }: TAccordion) => (
+export type TAccordionSingle = TAccordionBase & {
+  type: "single"
+  value?: string
+  onValueChange?: (value: string) => void
+}
+
+export type TAccordionMultiple = TAccordionBase & {
+  type: "multiple"
+  value?: string[]
+  onValueChange?: (value: string[]) => void
+}
+
+export const Accordion = ({
+  type,
+  items,
+  value,
+  onValueChange,
+  collapsible,
+  playwrightTestId,
+}: TAccordionSingle | TAccordionMultiple) => (
   <Container data-playwright-testid={playwrightTestId}>
-    <Root defaultValue={defaultValue} type="single" collapsible>
-      {items}
-    </Root>
+    {type === "single" ? (
+      <Root
+        type="single"
+        value={value as string}
+        onValueChange={v => (onValueChange ? onValueChange(v as string) : () => {})}
+        collapsible={collapsible}
+      >
+        {items}
+      </Root>
+    ) : (
+      <Root
+        type="multiple"
+        value={value as string[]}
+        onValueChange={v => (onValueChange ? onValueChange(v as string[]) : () => {})}
+      >
+        {items}
+      </Root>
+    )}
   </Container>
 )

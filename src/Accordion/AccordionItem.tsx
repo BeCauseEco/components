@@ -10,6 +10,7 @@ import { BackgroundCard } from "@new/Composition/BackgroundCard"
 import { TIcon } from "@new/Icon/Icon"
 import { EDirection } from "@new/EDirection"
 import { TPlaywright } from "@new/TPlaywright"
+import { TAccordionMultiple, TAccordionSingle } from "./Accordion"
 
 type TContainerProperties = Omit<TAccordionItem, "content" | "label" | "colorHead" | "colorContent">
 
@@ -62,7 +63,7 @@ const Content = styled(Accordion.Content)({
 export type TAccordionItem = TPlaywright & {
   label: ReactElement<TText> | ReactElement<TIcon>
   value: string
-  content: ReactElement | ReactElement[] | undefined
+  content: ReactElement<TAccordionSingle | TAccordionMultiple> | ReactElement | ReactElement[]
   colorHead: TColor
   colorContent: TColor
 }

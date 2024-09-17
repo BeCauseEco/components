@@ -13,6 +13,7 @@ const Container = styled.div<Pick<TOverflowContainer, "minHeight" | "maxHeight" 
   ...(p.maxHeight && { maxHeight: p.maxHeight }),
   overflowX: p.axes === EOverflowContainerAxis.Both || p.axes === EOverflowContainerAxis.XAxis ? "auto" : "hidden",
   overflowY: p.axes === EOverflowContainerAxis.Both || p.axes === EOverflowContainerAxis.YAxis ? "auto" : "hidden",
+  outline: "solid 1px red",
 }))
 
 export enum EOverflowContainerAxis {
