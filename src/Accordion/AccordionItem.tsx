@@ -2,7 +2,7 @@ import styled from "@emotion/styled"
 import { ReactElement } from "react"
 import * as Accordion from "@radix-ui/react-accordion"
 import { keyframes } from "@emotion/react"
-import { Composition } from "@new/Composition/Composition"
+import { Composition } from "@new/Composition/CompositionLegacy"
 import { LayoutSingle } from "@new/Composition/LayoutSingle"
 import { TText } from "@new/Text/Text"
 import { TColor } from "@new/Color"
@@ -12,9 +12,7 @@ import { EDirection } from "@new/EDirection"
 import { TPlaywright } from "@new/TPlaywright"
 import { TAccordionMultiple, TAccordionSingle } from "./Accordion"
 
-type TContainerProperties = Omit<TAccordionItem, "content" | "label" | "colorHead" | "colorContent">
-
-const Item = styled(Accordion.Item)<TContainerProperties>({
+const Item = styled(Accordion.Item)({
   width: "100%",
   overflow: "hidden",
 })
@@ -64,16 +62,27 @@ export type TAccordionItem = TPlaywright & {
   label: ReactElement<TText> | ReactElement<TIcon>
   value: string
   content: ReactElement<TAccordionSingle | TAccordionMultiple> | ReactElement | ReactElement[]
-  colorHead: TColor
-  colorContent: TColor
+  colorHead?: TColor
+  colorContent?: TColor
+  colorOutlineHead?: TColor
+  colorOutlineContent?: TColor
 }
 
-export const AccordionItem = ({ label, value, content, colorHead, colorContent, playwrightTestId }: TAccordionItem) => (
+export const AccordionItem = ({
+  label,
+  value,
+  content,
+  colorHead,
+  colorContent,
+  colorOutlineHead,
+  colorOutlineContent,
+  playwrightTestId,
+}: TAccordionItem) => (
   <Item value={value} data-playwright-testid={playwrightTestId}>
     <Header>
       <Trigger>
         <Composition>
-          <BackgroundCard colorBackground={colorHead} />
+          <BackgroundCard colorBackground={colorHead} colorOutline={colorOutlineHead} />
 
           <LayoutSingle direction={EDirection.Vertical} content={[<Label key="accordion-item-label">{label}</Label>]} />
         </Composition>
@@ -82,7 +91,7 @@ export const AccordionItem = ({ label, value, content, colorHead, colorContent, 
 
     <Content>
       <Composition>
-        <BackgroundCard colorBackground={colorContent} />
+        <BackgroundCard colorBackground={colorContent} colorOutline={colorOutlineContent} />
 
         <LayoutSingle direction={EDirection.Vertical} content={content} />
       </Composition>

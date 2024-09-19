@@ -2,13 +2,13 @@ import styled from "@emotion/styled"
 import { ReactElement } from "react"
 import * as RadixAccordion from "@radix-ui/react-accordion"
 import { TAccordionItem } from "./AccordionItem"
-import { ESize } from "@new/ESize"
+// import { ESize } from "@new/ESize"
 import { TPlaywright } from "@new/TPlaywright"
 
 const Container = styled.div({
   display: "flex",
-  borderRadius: ESize.Tiny,
-  overflow: "clip",
+  // borderRadius: ESize.Tiny,
+  // overflow: "clip",
 })
 
 const Root = styled(RadixAccordion.Root)({
@@ -17,7 +17,7 @@ const Root = styled(RadixAccordion.Root)({
 
 type TAccordionBase = TPlaywright & {
   items: ReactElement<TAccordionItem> | ReactElement<TAccordionItem>[]
-  collapsible: boolean
+  collapsible?: boolean
 }
 
 export type TAccordionSingle = TAccordionBase & {
@@ -37,7 +37,7 @@ export const Accordion = ({
   items,
   value,
   onValueChange,
-  collapsible,
+  collapsible = false,
   playwrightTestId,
 }: TAccordionSingle | TAccordionMultiple) => (
   <Container data-playwright-testid={playwrightTestId}>
