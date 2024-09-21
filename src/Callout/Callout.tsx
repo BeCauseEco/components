@@ -1,5 +1,5 @@
 import { Align } from "@new/Align/Align"
-import { EColor } from "@new/Color"
+import { TColor } from "@new/Color"
 import { BackgroundCard } from "@new/Composition/BackgroundCard"
 import { Composition } from "@new/Composition/Composition"
 import { LayoutSingle } from "@new/Composition/LayoutSingle"
@@ -11,16 +11,17 @@ import { Text } from "@new/Text/Text"
 import { LayoutCallout } from "./internal/LayoutCallout"
 
 type CalloutProps = {
-  isLoading: boolean
   icon?: string
+  backgroundColor: TColor
+  color: TColor
   message: string
   additionalContent?: React.ReactNode
 }
 
-export const Callout = ({ isLoading, icon = "info", message, additionalContent }: CalloutProps) => {
+export const Callout = ({ icon = "info", backgroundColor, color, message, additionalContent }: CalloutProps) => {
   return (
-    <Composition loading={isLoading}>
-      <BackgroundCard colorBackground={[EColor.Black, 50]} borderRadius={ESize.Tiny} />
+    <Composition>
+      <BackgroundCard colorBackground={backgroundColor} borderRadius={ESize.Tiny} />
       <LayoutCallout
         content={
           <LayoutSingle
@@ -28,9 +29,9 @@ export const Callout = ({ isLoading, icon = "info", message, additionalContent }
             content={
               <Composition>
                 <Align row middle>
-                  <Icon name={icon} color={[EColor.Black, 300]} size={ESize.Medium} />
+                  <Icon name={icon} color={color} size={ESize.Medium} />
                   <Spacer size={ESize.Xsmall} />
-                  <Text size={ESize.Tiny} color={[EColor.Black, 600]} wrap>
+                  <Text size={ESize.Tiny} color={color} wrap>
                     {message}
                   </Text>
                   {additionalContent && additionalContent}
