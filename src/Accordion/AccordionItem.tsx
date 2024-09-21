@@ -10,6 +10,7 @@ import { BackgroundCard } from "@new/Composition/BackgroundCard"
 import { TIcon } from "@new/Icon/Icon"
 import { EDirection } from "@new/EDirection"
 import { TPlaywright } from "@new/TPlaywright"
+import { Align } from "@new/Align/Align"
 
 type TContainerProperties = Omit<TAccordionItem, "content" | "label" | "colorHead" | "colorContent">
 
@@ -74,7 +75,11 @@ export const AccordionItem = ({ label, value, content, colorHead, colorContent, 
         <Composition>
           <BackgroundCard colorBackground={colorHead} />
 
-          <LayoutSingle direction={EDirection.Vertical} content={[<Label key="accordion-item-label">{label}</Label>]} />
+          <LayoutSingle>
+            <Align vertical left>
+              <Label key="accordion-item-label">{label}</Label>
+            </Align>
+          </LayoutSingle>
         </Composition>
       </Trigger>
     </Header>
@@ -83,7 +88,11 @@ export const AccordionItem = ({ label, value, content, colorHead, colorContent, 
       <Composition>
         <BackgroundCard colorBackground={colorContent} />
 
-        <LayoutSingle direction={EDirection.Vertical} content={content} />
+        <LayoutSingle>
+          <Align vertical left>
+            <Label key="accordion-item-label">{content}</Label>
+          </Align>
+        </LayoutSingle>
       </Composition>
     </Content>
   </Item>

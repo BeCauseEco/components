@@ -5,6 +5,7 @@ import { Spacer } from "@new/Spacer/Spacer"
 import { EDirection } from "@new/EDirection"
 import { EDistribution } from "@new/EDistrubution"
 import { TPlaywright } from "@new/TPlaywright"
+import { TAlign } from "@new/Align/Align"
 
 type TConatinerProperties = Pick<TKeyValuePair, "direction" | "itemDistribution">
 
@@ -31,7 +32,7 @@ const Content = styled.div({
 export type TKeyValuePair = TPlaywright & {
   direction: EDirection
   spacing: ESize
-  children: [ReactElement | null | undefined, ReactElement | null | undefined]
+  children: [ReactElement<TAlign> | null | undefined, ReactElement<TAlign> | null | undefined]
   itemDistribution?: EDistribution
 }
 

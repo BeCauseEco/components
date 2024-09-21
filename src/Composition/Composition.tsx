@@ -7,6 +7,7 @@ import { TLayoutThirds } from "@new/Composition/LayoutThirds"
 import { TLayoutGrid } from "@new/Composition/LayoutGrid"
 import { TLayoutBase } from "./TLayoutBase"
 import { TPlaywright } from "@new/TPlaywright"
+import { TBackground } from "./Background"
 
 const Container = styled.div<Pick<TComposition, "loading" | "explodeHeight" | "overflowHidden" | "onClick">>(p => ({
   display: "flex",
@@ -46,7 +47,7 @@ const Layout = styled.div<Pick<TComposition, "loading">>(p => ({
     : {}),
 }))
 
-type AllowedBackgrounds = TBackgroundCard
+type AllowedBackgrounds = TBackgroundCard | TBackground
 
 type TAllowedLayouts = TLayoutSingle | TLayoutSplit | TLayoutThirds | TLayoutGrid | TLayoutBase
 

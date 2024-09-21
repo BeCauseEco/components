@@ -12,6 +12,7 @@ import { BackgroundCard } from "@new/Composition/BackgroundCard"
 import { KeyValuePair } from "@new/KeyValuePair/KeyValuePair"
 import { LayoutSingle } from "@new/Composition/LayoutSingle"
 import { TPlaywright } from "@new/TPlaywright"
+import { Align } from "@new/Align/Align"
 
 const Container = styled.div({
   display: "flex",
@@ -67,10 +68,8 @@ export const InputCheckbox = ({
         <Composition>
           <BackgroundCard colorBackground={[colorBackground, 700]} borderRadius={ESize.Tiny} />
 
-          <LayoutSingle
-            direction={EDirection.Vertical}
-            omitPadding
-            content={
+          <LayoutSingle>
+            <Align vertical left>
               <Root id={key} checked={value} onCheckedChange={checked => onChange(checked === true)}>
                 <RadixCheckbox.Indicator>
                   {value === "indeterminate" && (
@@ -82,8 +81,8 @@ export const InputCheckbox = ({
                   )}
                 </RadixCheckbox.Indicator>
               </Root>
-            }
-          />
+            </Align>
+          </LayoutSingle>
         </Composition>
 
         <Label htmlFor={key}>{label}</Label>

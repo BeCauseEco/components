@@ -91,6 +91,11 @@ const Container = styled.p<TContainerProperties>(p => ({
 
   "& a": {
     color: "inherit",
+    textDecoration: "underline",
+  },
+
+  "& a:hover": {
+    textDecoration: "none",
   },
 
   "& abbr": {
@@ -99,8 +104,7 @@ const Container = styled.p<TContainerProperties>(p => ({
   },
 
   "::selection": {
-    background: "rgba(0, 0, 0, 0.2)",
-    // filter: "brightness(0.8)",
+    background: "color-mix(in lab, currentColor 25%, transparent)",
   },
 
   ...(p.size === ESize.Tiny && StyleBodyTiny),
@@ -121,7 +125,7 @@ const Container = styled.p<TContainerProperties>(p => ({
 }))
 
 export type TText = TPlaywright & {
-  size: ESize
+  size: ESize.Tiny | ESize.Xsmall | ESize.Small | ESize.Medium | ESize.Large | ESize.XLarge | ESize.Huge
   color: TColor
   emphasize?: boolean
   italicize?: boolean

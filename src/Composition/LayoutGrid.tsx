@@ -1,6 +1,8 @@
-import { ReactNode } from "react"
+import { PropsWithChildren, ReactElement } from "react"
 import styled from "@emotion/styled"
 import { TLayoutBase } from "./TLayoutBase"
+import { TComposition } from "./Composition"
+import { TAlign } from "@new/Align/Align"
 
 const Container = styled.div<Pick<TLayoutGrid, "rows" | "columns">>(p => ({
   display: "grid",
@@ -11,15 +13,15 @@ const Container = styled.div<Pick<TLayoutGrid, "rows" | "columns">>(p => ({
 }))
 
 export type TLayoutGrid = TLayoutBase & {
-  content: ReactNode | ReactNode[]
   columns: "1fr" | "1fr 1fr" | "1fr 1fr 1fr" | "1fr 1fr 1fr 1fr"
   rows: "auto"
+  children: ReactElement<TComposition | TAlign>[]
 }
 
-export const LayoutGrid = ({ columns, rows, content, playwrightTestId }: TLayoutGrid) => {
+export const LayoutGrid = ({ columns, rows, children, playwrightTestId }: PropsWithChildren<TLayoutGrid>) => {
   return (
     <Container className="layout-container" columns={columns} rows={rows} data-playwright-testid={playwrightTestId}>
-      {content}
+      {children}
     </Container>
   )
 }
