@@ -12,13 +12,19 @@ import { LayoutCallout } from "./internal/LayoutCallout"
 
 type CalloutProps = {
   icon?: string
-  backgroundColor: TColor
-  color: TColor
+  colorBackground: TColor
+  colorForeground: TColor
   message: string
   additionalContent?: React.ReactNode
 }
 
-export const Callout = ({ icon = "info", backgroundColor, color, message, additionalContent }: CalloutProps) => {
+export const Callout = ({
+  icon = "info",
+  colorBackground: backgroundColor,
+  colorForeground: color,
+  message,
+  additionalContent,
+}: CalloutProps) => {
   return (
     <Composition>
       <BackgroundCard colorBackground={backgroundColor} borderRadius={ESize.Tiny} />
