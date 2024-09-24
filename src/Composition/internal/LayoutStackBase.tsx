@@ -6,19 +6,19 @@ import { TComposition } from "../Composition"
 import { TAlign } from "@new/Align/Align"
 import { TSpacer } from "@new/Spacer/Spacer"
 
-const Container = styled.div<Pick<TLayoutMultipleBase, "omitPadding" | "direction">>(p => ({
+const Container = styled.div<Pick<TLayoutStackBase, "omitPadding" | "direction">>(p => ({
   display: "flex",
   flexDirection: p.direction === EDirection.Horizontal ? "row" : "column",
   height: "inherit",
   padding: p.omitPadding ? 0 : "calc(var(--BU) * 4)",
 }))
 
-export type TLayoutMultipleBase = TLayoutBase & {
-  children: ReactElement<TComposition | TAlign | TSpacer>[]
+export type TLayoutStackBase = TLayoutBase & {
+  children: ReactElement<TComposition | TAlign> | ReactElement<TComposition | TAlign | TSpacer>[]
   direction: EDirection
 }
 
-export const LayoutMultipleBase = ({ children, omitPadding, direction, playwrightTestId }: TLayoutMultipleBase) => {
+export const LayoutStackBase = ({ children, omitPadding, direction, playwrightTestId }: TLayoutStackBase) => {
   return (
     <Container
       className="layout-container layout-single"

@@ -1,13 +1,13 @@
 import React, { PropsWithChildren, ReactElement, forwardRef } from "react"
 import styled from "@emotion/styled"
 import { TBackgroundCard } from "@new/Composition/BackgroundCard"
-import { TLayoutSingle } from "@new/Composition/LayoutSingle"
 import { TLayoutSplit } from "@new/Composition/LayoutSplit"
-import { TLayoutThirds } from "@new/Composition/LayoutThirds"
 import { TLayoutGrid } from "@new/Composition/LayoutGrid"
 import { TLayoutBase } from "./TLayoutBase"
 import { TPlaywright } from "@new/TPlaywright"
 import { TBackground } from "./Background"
+import { TLayoutStackHorizontal } from "./LayoutStackHorizontal"
+import { TLayoutStackVertical } from "./LayoutStackVertical"
 
 const Container = styled.div<Pick<TComposition, "loading" | "explodeHeight" | "overflowHidden" | "onClick">>(p => ({
   display: "flex",
@@ -49,7 +49,7 @@ const Layout = styled.div<Pick<TComposition, "loading">>(p => ({
 
 type AllowedBackgrounds = TBackgroundCard | TBackground
 
-type TAllowedLayouts = TLayoutSingle | TLayoutSplit | TLayoutThirds | TLayoutGrid | TLayoutBase
+type TAllowedLayouts = TLayoutStackVertical | TLayoutStackHorizontal | TLayoutSplit | TLayoutGrid | TLayoutBase
 
 export type TComposition = TPlaywright & {
   children: ReactElement<TAllowedLayouts> | [ReactElement<AllowedBackgrounds>, ReactElement<TAllowedLayouts>]

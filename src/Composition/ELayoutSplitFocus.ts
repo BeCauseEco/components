@@ -1,4 +1,4 @@
-export enum ELayoutDoubleFocus {
+export enum ELayoutSplitFocus {
   None,
   Equal,
   Left,
