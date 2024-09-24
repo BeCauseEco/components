@@ -35,13 +35,6 @@ const Output = styled.output<Pick<TInputButton, "loading" | "variant">>(p => ({
       textDecoration: "none",
     },
   },
-
-  ...(p.loading
-    ? {
-        opacity: 0.5,
-        pointerEvents: "none",
-      }
-    : null),
 }))
 
 const NextLink = styled(Link)({
@@ -60,6 +53,7 @@ type TInputButtonBase = TPlaywright & {
   id?: string
   onClick?: () => void
   loading?: boolean
+  disabled?: boolean
   omitPadding?: boolean
   children:
     | ReactElement<TText | TIcon>
@@ -86,6 +80,7 @@ export const InputButton = forwardRef<HTMLButtonElement | HTMLAnchorElement, Pro
     const {
       variant,
       loading = false,
+      disabled = false,
       omitPadding = false,
       size,
       id,
@@ -136,13 +131,12 @@ export const InputButton = forwardRef<HTMLButtonElement | HTMLAnchorElement, Pro
         as={variant === EInputButtonVariant.Link ? "span" : "button"}
         variant={variant}
         color={variant !== EInputButtonVariant.Link ? props.color : EColor.Transparent}
-        loading={loading}
         id={id}
         onClick={onClick}
         data-playwright-testid={playwrightTestId}
         {...(props as any)}
       >
-        <Composition>
+        <Composition loading={loading} disabled={disabled}>
           {background}
 
           {href ? <NextLink href={href}>{Layout}</NextLink> : Layout}
