@@ -35,7 +35,7 @@ const Background = styled.div({
 })
 
 const Loader = styled.div<Pick<TComposition, "loading">>(p => ({
-  display: "flex",
+  display: p.loading ? "flex" : "none",
   position: "absolute",
   width: "100%",
   height: "100%",
@@ -43,9 +43,8 @@ const Loader = styled.div<Pick<TComposition, "loading">>(p => ({
   justifyContent: "center",
   zIndex: 0,
   cursor: "inherit",
-  transition: "opacity 0.2s ease-in-out",
-  opacity: p.loading ? 1 : 0,
   containerType: "size",
+  overflow: "hidden",
 }))
 
 const keyframeA = keyframes({
@@ -66,6 +65,7 @@ const keyframeB = keyframes({
 })
 
 const Spinner = styled.div<Pick<TComposition, "loading"> & { color: TColor }>(p => ({
+  diplay: "flex",
   height: "100%",
   aspectRatio: "1",
   borderRadius: "50%",
