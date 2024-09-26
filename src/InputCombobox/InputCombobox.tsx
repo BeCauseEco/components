@@ -10,7 +10,7 @@ import { EPopoverOverflowBehavior, Popover } from "@new/Popover/Popover"
 import { EInputButtonVariant, InputButton } from "@new/InputButton/InputButton"
 import { KeyValuePair } from "@new/KeyValuePair/KeyValuePair"
 import { EDirection } from "@new/EDirection"
-import { Icon } from "@new/Icon/Icon"
+import { Icon, TIcon } from "@new/Icon/Icon"
 import { BackgroundCard } from "@new/Composition/BackgroundCard"
 import { EShadow } from "@new/EShadow"
 import { InputText } from "@new/InputText/InputText"
@@ -108,6 +108,7 @@ type TInputCombobox = TPlaywright & {
   filterOptions?: TInputComboBoxFilterOptions
 
   label?: ReactElement<TText>
+  icon?: ReactElement<TIcon>
   value: TInputComboboxValue
 
   /**
@@ -138,6 +139,7 @@ export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<TInput
     width,
     filterOptions,
     label,
+    icon,
     value,
     multiple = false,
     id,
@@ -215,14 +217,22 @@ export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<TInput
 
             <InputButton size={ESize.Medium} variant={EInputButtonVariant.Outlined} color={colorButtonBackground}>
               <KeyValuePair direction={EDirection.Horizontal} spacing={ESize.Tiny}>
-                <TextWithOverflow
-                  color={[colorButtonForeground, 700]}
-                  size={ESize.Xsmall}
-                  alignment={EAlignment.Start}
-                  width={width}
-                >
-                  {generateCurrentValueLabel(multiple)}
-                </TextWithOverflow>
+                <>
+                  {icon && (
+                    <>
+                      {icon} <Spacer size={ESize.Xsmall} />
+                    </>
+                  )}
+
+                  <TextWithOverflow
+                    color={[colorButtonForeground, 700]}
+                    size={ESize.Xsmall}
+                    alignment={EAlignment.Start}
+                    width={width}
+                  >
+                    {generateCurrentValueLabel(multiple)}
+                  </TextWithOverflow>
+                </>
 
                 <Icon
                   name={open ? "keyboard_arrow_up" : "keyboard_arrow_down"}
@@ -252,7 +262,6 @@ export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<TInput
                     onChange={value => setSearch(value)}
                     placeholder={filterOptions.textFilterPlaceholder}
                   />
-
                   <Spacer size={ESize.Xsmall} />
                 </>
               )
