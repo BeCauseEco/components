@@ -1,11 +1,9 @@
 import React, { ReactElement } from "react"
 import styled from "@emotion/styled"
-// import { TLayoutBase } from "./TLayoutBase"
-// import { EDirection } from "@new/EDirection"
 import { TAlign } from "@new/Align/Align"
 import { TLayoutBase } from "./TLayoutBase"
 import { EDirection } from "@new/EDirection"
-// import { EDirection } from "@new/EDirection"
+import { containsIlligalChildren } from "@new/Functions"
 
 const Container = styled.div<Pick<TLayoutStackBase, "omitPadding"> & { direction: EDirection }>(p => ({
   display: "flex",
@@ -26,21 +24,25 @@ type TLayoutStackHorizontal = TLayoutStackBase & {
   horizontal: true
 }
 
-export const LayoutStack = (properties: TLayoutStackVertical | TLayoutStackHorizontal) => {
+export const LayoutStack = (p: TLayoutStackVertical | TLayoutStackHorizontal) => {
+  if (containsIlligalChildren(p.children, ["Align"])) {
+    throw "LayoutStack only acceps children of type TAlign"
+  }
+
   let direction = EDirection.Vertical
 
-  if (properties["horizontal"] && !properties["vertical"]) {
+  if (p["horizontal"] && !p["vertical"]) {
     direction = EDirection.Horizontal
   }
 
   return (
     <Container
       className="layout-container layout-single"
-      omitPadding={properties.omitPadding}
+      omitPadding={p.omitPadding}
       direction={direction}
-      data-playwright-testid={properties.playwrightTestId}
+      data-playwright-testid={p.playwrightTestId}
     >
-      {properties.children}
+      {p.children}
     </Container>
   )
 }
