@@ -6,8 +6,7 @@ import { TLayoutGrid } from "@new/Composition/LayoutGrid"
 import { TLayoutBase } from "./TLayoutBase"
 import { TPlaywright } from "@new/TPlaywright"
 import { TBackground } from "./Background"
-import { TLayoutStackHorizontal } from "./LayoutStackHorizontal"
-import { TLayoutStackVertical } from "./LayoutStackVertical"
+import { TLayoutStack } from "./LayoutStack"
 
 const Container = styled.div<Pick<TComposition, "loading" | "explodeHeight" | "overflowHidden" | "onClick">>(p => ({
   display: "flex",
@@ -49,7 +48,7 @@ const Layout = styled.div<Pick<TComposition, "loading">>(p => ({
 
 type AllowedBackgrounds = TBackgroundCard | TBackground
 
-type TAllowedLayouts = TLayoutStackVertical | TLayoutStackHorizontal | TLayoutSplit | TLayoutGrid | TLayoutBase
+type TAllowedLayouts = TLayoutStack | TLayoutSplit | TLayoutGrid | TLayoutBase
 
 export type TComposition = TPlaywright & {
   children: ReactElement<TAllowedLayouts> | [ReactElement<AllowedBackgrounds>, ReactElement<TAllowedLayouts>]
