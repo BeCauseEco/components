@@ -3,7 +3,7 @@ import { ReactElement } from "react"
 import * as Accordion from "@radix-ui/react-accordion"
 import { keyframes } from "@emotion/react"
 import { Composition } from "@new/Composition/Composition"
-import { LayoutStackVertical } from "@new/Composition/LayoutStackVertical"
+import { LayoutStack } from "@new/Composition/LayoutStack"
 import { TText } from "@new/Text/Text"
 import { TColor } from "@new/Color"
 import { BackgroundCard } from "@new/Composition/BackgroundCard"
@@ -74,11 +74,11 @@ export const AccordionItem = ({ label, value, content, colorHead, colorContent, 
         <Composition>
           <BackgroundCard colorBackground={colorHead} />
 
-          <LayoutStackVertical>
+          <LayoutStack vertical>
             <Align vertical left>
               <Label key="accordion-item-label">{label}</Label>
             </Align>
-          </LayoutStackVertical>
+          </LayoutStack>
         </Composition>
       </Trigger>
     </Header>
@@ -87,11 +87,11 @@ export const AccordionItem = ({ label, value, content, colorHead, colorContent, 
       <Composition>
         <BackgroundCard colorBackground={colorContent} />
 
-        <LayoutStackVertical>
+        <LayoutStack vertical>
           <Align vertical left>
             <Label key="accordion-item-label">{content}</Label>
           </Align>
-        </LayoutStackVertical>
+        </LayoutStack>
       </Composition>
     </Content>
   </Item>

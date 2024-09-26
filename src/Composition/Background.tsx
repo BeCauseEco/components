@@ -6,8 +6,6 @@ import { css, Global } from "@emotion/react"
 import { TPlaywright } from "@new/TPlaywright"
 
 const calculateBorderRadius = (size?: ESize): string => {
-  console.log("lol", size)
-
   switch (size) {
     case ESize.Small:
       return "var(--BU)"
