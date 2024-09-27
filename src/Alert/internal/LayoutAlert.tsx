@@ -1,4 +1,4 @@
-import { ReactNode } from "react"
+import { ReactElement } from "react"
 import styled from "@emotion/styled"
 import { ESize } from "@new/ESize"
 import { TLayoutBase } from "@new/Composition/TLayoutBase"
@@ -37,9 +37,9 @@ const ContentEnd = styled.div({
 })
 
 export type TLayoutDialog = TLayoutBase & {
-  contentTop: ReactNode | ReactNode[]
-  contentMiddle: ReactNode | ReactNode[]
-  contentEnd: ReactNode | ReactNode[]
+  contentTop: ReactElement | ReactElement[]
+  contentMiddle: ReactElement | ReactElement[]
+  contentEnd: ReactElement | ReactElement[]
   omitPadding?: boolean
 }
 

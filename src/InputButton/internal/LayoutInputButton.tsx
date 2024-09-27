@@ -1,4 +1,4 @@
-import { ReactNode } from "react"
+import { ReactElement } from "react"
 import styled from "@emotion/styled"
 import { TLayoutBase } from "@new/Composition/TLayoutBase"
 import { ESize } from "@new/ESize"
@@ -31,7 +31,7 @@ const Container = styled.div<Pick<TLayoutInputButton, "size" | "childIconOnly" |
 }))
 
 export type TLayoutInputButton = TLayoutBase & {
-  content: ReactNode
+  content: ReactElement | ReactElement[]
   size: ESize
   childIconOnly: boolean
   omitPadding: boolean

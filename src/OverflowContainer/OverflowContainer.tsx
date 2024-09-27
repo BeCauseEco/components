@@ -1,24 +1,41 @@
 import styled from "@emotion/styled"
+import { computeColor } from "@new/Color"
+import { TColor } from "@new/Color"
 import { TPlaywright } from "@new/TPlaywright"
 
 import { PropsWithChildren, ReactElement } from "react"
 
-const Container = styled.div<Pick<TOverflowContainer, "minHeight" | "maxHeight" | "omitPadding" | "axes">>(p => ({
+const Container = styled.div<
+  Pick<
+    TOverflowContainer,
+    "axes" | "colorBackground" | "colorForeground" | "minWidth" | "maxWidth" | "minHeight" | "maxHeight" | "omitPadding"
+  >
+>(p => ({
   display: "flex",
   flexDirection: "inherit",
   width: "100%",
   height: "inherit",
   padding: p.omitPadding ? 0 : "calc(var(--BU) * 4)",
+  ...(p.minWidth && { minWidth: p.minWidth }),
+  ...(p.maxWidth && { maxWidth: p.maxWidth }),
   ...(p.minHeight && { minHeight: p.minHeight }),
-  ...(p.maxHeight && { maxHeight: p.maxHeight }),
-  overflowX: p.axes === EOverflowContainerAxis.Both || p.axes === EOverflowContainerAxis.XAxis ? "auto" : "hidden",
-  overflowY: p.axes === EOverflowContainerAxis.Both || p.axes === EOverflowContainerAxis.YAxis ? "auto" : "hidden",
-  outline: "solid 1px red",
+  ...(p.maxHeight !== undefined && { maxHeight: p.maxHeight }),
+  overflowX: p.axes === EOverflowContainerAxis.Both || p.axes === EOverflowContainerAxis.Horizontal ? "auto" : "hidden",
+  overflowY: p.axes === EOverflowContainerAxis.Both || p.axes === EOverflowContainerAxis.Vertical ? "auto" : "hidden",
+
+  "::-webkit-scrollbar-track": {
+    backgroundColor: computeColor(p.colorBackground),
+  },
+
+  "::-webkit-scrollbar-thumb": {
+    backgroundColor: computeColor(p.colorForeground),
+    borderColor: computeColor(p.colorBackground),
+  },
 }))
 
 export enum EOverflowContainerAxis {
-  YAxis,
-  XAxis,
+  Vertical,
+  Horizontal,
   Both,
 }
 
@@ -29,26 +46,37 @@ export enum EMaxheightOptions {
 
 export type TOverflowContainer = TPlaywright & {
   axes: EOverflowContainerAxis
-  omitPadding?: boolean
+  colorBackground: TColor
+  colorForeground: TColor
+  minWidth?: string
+  maxWidth?: string
   minHeight?: string
   maxHeight?: EMaxheightOptions | string
+  omitPadding?: boolean
   children: ReactElement | ReactElement[]
 }
 
 export const OverflowContainer = ({
   axes,
-  omitPadding,
+  colorBackground,
+  colorForeground,
+  minWidth,
+  maxWidth,
   minHeight,
   maxHeight,
+  omitPadding,
   children,
   playwrightTestId,
 }: PropsWithChildren<TOverflowContainer>) => (
   <Container
-    className="component-overflow_container"
+    axes={axes}
+    colorBackground={colorBackground}
+    colorForeground={colorForeground}
+    minWidth={minWidth}
+    maxWidth={maxWidth}
     minHeight={minHeight}
     maxHeight={maxHeight}
     omitPadding={omitPadding}
-    axes={axes}
     data-playwright-testid={playwrightTestId}
   >
     {children}

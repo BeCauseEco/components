@@ -1,4 +1,4 @@
-import { JSXElementConstructor, ReactElement, ReactNode } from "react"
+import { ReactElement } from "react"
 import styled from "@emotion/styled"
 import { ESize } from "@new/ESize"
 
@@ -109,11 +109,7 @@ type TAlignBase = {
   /** Vertical axis, align bottom  */
   bottom?: boolean
 
-  children:
-    | ReactElement<any, string | JSXElementConstructor<any>>
-    | ReactElement<any, string | JSXElementConstructor<any>>[]
-    | ReactNode
-    | ReactNode[]
+  children: ReactElement | ReactElement[]
 }
 
 type TAlign =

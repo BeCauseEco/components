@@ -1,4 +1,4 @@
-import { ReactNode } from "react"
+import { ReactElement } from "react"
 import styled from "@emotion/styled"
 import { EDirection } from "@new/EDirection"
 import { TLayoutBase } from "./TLayoutBase"
@@ -13,7 +13,7 @@ const Container = styled.div<TContainerProperties>(p => ({
 }))
 
 export type TLayoutSingle = TLayoutBase & {
-  content: ReactNode | ReactNode[]
+  content: ReactElement | ReactElement[]
   direction: EDirection
   omitPadding?: boolean
 }
