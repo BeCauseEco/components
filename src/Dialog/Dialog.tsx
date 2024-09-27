@@ -22,7 +22,9 @@ const Overlay = styled(RadixDialog.Overlay)({
   inset: 0,
   backgroundColor: EColor.Black,
   opacity: EOpacity.Light,
-  zIndex: 9999,
+  zIndex: 99999,
+  outline: "solid 1px red",
+  outlineOffset: -1,
 })
 
 const RadixDialogClose = styled(RadixDialog.Close)({
