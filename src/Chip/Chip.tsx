@@ -15,15 +15,16 @@ const Container = styled.div({
 })
 
 export type TChip = TPlaywright & {
-  color: TColor
+  colorBackground?: TColor
+  colorOutline?: TColor
   children: ReactElement<TText> | ReactElement<TKeyValuePair>
 }
 
-export const Chip = ({ color, children, playwrightTestId }: PropsWithChildren<TChip>) => {
+export const Chip = ({ colorBackground, colorOutline, children, playwrightTestId }: PropsWithChildren<TChip>) => {
   return (
     <Container data-playwright-testid={playwrightTestId}>
       <Composition>
-        <BackgroundCard colorBackground={color} borderRadius={ESize.Tiny} />
+        <BackgroundCard colorBackground={colorBackground} colorOutline={colorOutline} borderRadius={ESize.Tiny} />
 
         <LayoutChip content={children} />
       </Composition>
