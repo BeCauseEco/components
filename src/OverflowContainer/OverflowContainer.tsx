@@ -13,6 +13,7 @@ const Container = styled.div<Pick<TOverflowContainer, "minHeight" | "maxHeight" 
   ...(p.maxHeight && { maxHeight: p.maxHeight }),
   overflowX: p.axes === EOverflowContainerAxis.Both || p.axes === EOverflowContainerAxis.XAxis ? "auto" : "hidden",
   overflowY: p.axes === EOverflowContainerAxis.Both || p.axes === EOverflowContainerAxis.YAxis ? "auto" : "hidden",
+  outline: "solid 1px red",
 }))
 
 export enum EOverflowContainerAxis {
@@ -21,11 +22,16 @@ export enum EOverflowContainerAxis {
   Both,
 }
 
+export enum EMaxheightOptions {
+  RadixAccordionContentHeight = "var(--radix-accordion-content-height)",
+  RadixPopoverContentAvailableHeight = "var(--radix-popover-content-available-height)",
+}
+
 export type TOverflowContainer = TPlaywright & {
   axes: EOverflowContainerAxis
   omitPadding?: boolean
   minHeight?: string
-  maxHeight?: string
+  maxHeight?: EMaxheightOptions | string
   children: ReactElement | ReactElement[]
 }
 
@@ -38,6 +44,7 @@ export const OverflowContainer = ({
   playwrightTestId,
 }: PropsWithChildren<TOverflowContainer>) => (
   <Container
+    className="component-overflow_container"
     minHeight={minHeight}
     maxHeight={maxHeight}
     omitPadding={omitPadding}
