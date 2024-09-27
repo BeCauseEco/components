@@ -35,16 +35,11 @@ const Root = styled(RadixPopover.Root)({
   flexDirection: "column",
 })
 
-const Content = styled(RadixPopover.Content)<Pick<TPopover, "overflowBehavior">>(p => ({
+const Content = styled(RadixPopover.Content)({
   animationDuration: "400ms",
   animationTimingFunction: "cubic-bezier(0.16, 1, 0.3, 1)",
   willChange: "transform, opacity",
-  zIndex: 99999, // zIndex of 1001 is needed to be used in modal context
-
-  ...(p.overflowBehavior === EPopoverOverflowBehavior.OverflowScroll && {
-    maxHeight: "var(--radix-popover-content-available-height)",
-    overflowY: "auto",
-  }),
+  zIndex: 999999,
 
   ":focus": {
     outline: "none",
@@ -65,7 +60,7 @@ const Content = styled(RadixPopover.Content)<Pick<TPopover, "overflowBehavior">>
   "&[data-state='open'][data-side='left']": {
     animationName: slideRightAndFade,
   },
-}))
+})
 
 // const Arrow = styled(RadixPopover.Arrow)<Pick<TPopover, "colorArrow">>(p => ({
 //   fill: computeColor([p.colorArrow, 700]),
@@ -84,14 +79,6 @@ const alignTranslate = (alignment: EAlignment) => {
   }
 }
 
-export enum EPopoverOverflowBehavior {
-  /** Allow for scrolling when content overflows */
-  OverflowScroll,
-
-  /** Hide overflowing content (primarily used by components which handles overflow themselves) */
-  OverflowHidden,
-}
-
 export type TPopover = TPlaywright & {
   // colorArrow: EColor
   open?: boolean
@@ -99,30 +86,16 @@ export type TPopover = TPlaywright & {
   trigger: ReactElement
   background: ReactElement<TBackgroundCard>
   layout: ReactElement<TLayoutBase>
-  overflowBehavior: EPopoverOverflowBehavior
   alignment: EAlignment
 }
 
-export const Popover = ({
-  open,
-  onOpenChange,
-  trigger,
-  background,
-  layout,
-  overflowBehavior,
-  alignment,
-  playwrightTestId,
-}: TPopover) => {
+export const Popover = ({ open, onOpenChange, trigger, background, layout, alignment, playwrightTestId }: TPopover) => {
   return (
     <Root open={open} onOpenChange={onOpenChange}>
       <RadixPopover.Trigger asChild>{trigger}</RadixPopover.Trigger>
 
       <RadixPopover.Portal>
-        <Content
-          align={alignTranslate(alignment)}
-          overflowBehavior={overflowBehavior}
-          data-playwright-testid={playwrightTestId}
-        >
+        <Content align={alignTranslate(alignment)} data-playwright-testid={playwrightTestId}>
           <Composition>
             {background}
 
