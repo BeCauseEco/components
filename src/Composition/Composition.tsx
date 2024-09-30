@@ -19,7 +19,7 @@ const Container = styled.div<
   borderRadius: "inherit",
   width: "100%",
   height: p.explodeHeight ? "100%" : "auto",
-  cursor: p.disabled ? "not-allowed" : p.loading ? "wait" : p.onClick ? "pointer" : "auto",
+  cursor: p.disabled ? "not-allowed" : p.loading ? "wait" : p.onClick ? "pointer" : "inherit",
   overflow: p.overflowHidden ? "hidden" : "visible",
   containerType: "normal",
 }))

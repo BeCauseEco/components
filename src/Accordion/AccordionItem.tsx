@@ -20,12 +20,12 @@ const Item = styled(Accordion.Item)({
 const Header = styled(Accordion.Header)({
   all: "unset",
   display: "flex",
+  cursor: "pointer",
 })
 
 const Trigger = styled(Accordion.Trigger)({
   all: "unset",
   width: "100%",
-  cursor: "pointer",
   display: "flex",
   justifyContent: "space-between",
 })
