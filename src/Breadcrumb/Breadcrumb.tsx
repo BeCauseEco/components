@@ -1,4 +1,4 @@
-import { PropsWithChildren, ReactElement } from "react"
+import { PropsWithChildren, ReactNode } from "react"
 import { TInputButton } from "@new/InputButton/InputButton"
 import { Icon } from "@new/Icon/Icon"
 import { ESize } from "@new/ESize"
@@ -12,11 +12,11 @@ import { TPlaywright } from "@new/TPlaywright"
 export type TBreadcrumb = TPlaywright & {
   color: EColor
   omitPadding?: boolean
-  children: ReactElement<TInputButton | TText> | ReactElement<TInputButton | TText>[]
+  children: ReactNode<TInputButton | TText> | ReactNode<TInputButton | TText>[]
 }
 
 export const Breadcrumb = ({ color, omitPadding, children, playwrightTestId }: PropsWithChildren<TBreadcrumb>) => {
-  const items: ReactElement[] = []
+  const items: ReactNode[] = []
 
   React.Children.forEach(children, child => {
     if (React.isValidElement(child)) {

@@ -1,4 +1,4 @@
-import { ReactElement } from "react"
+import { ReactNode } from "react"
 import * as RadixTabs from "@radix-ui/react-tabs"
 import { TTabsNavigationItem } from "@new/Tabs/TabsNavigationItem"
 import { TTabsContentItem } from "@new/Tabs/TabsContentItem"
@@ -20,8 +20,8 @@ const List = styled(RadixTabs.List)({
 
 export type TTabs = TPlaywright & {
   defaultContentTargetId: string
-  navigationItems: ReactElement<TTabsNavigationItem> | ReactElement<TTabsNavigationItem>[]
-  contentItems: ReactElement<TTabsContentItem> | ReactElement<TTabsContentItem>[]
+  navigationItems: ReactNode<TTabsNavigationItem> | ReactNode<TTabsNavigationItem>[]
+  contentItems: ReactNode<TTabsContentItem> | ReactNode<TTabsContentItem>[]
 }
 
 export const Tabs = ({ defaultContentTargetId, navigationItems, contentItems, playwrightTestId }: TTabs) => {

@@ -1,4 +1,4 @@
-import { ReactElement } from "react"
+import { ReactNode } from "react"
 import styled from "@emotion/styled"
 import { TLayoutBase } from "./TLayoutBase"
 
@@ -11,7 +11,7 @@ const Container = styled.div<Pick<TLayoutGrid, "rows" | "columns">>(p => ({
 }))
 
 export type TLayoutGrid = TLayoutBase & {
-  content: ReactElement | ReactElement[]
+  content: ReactNode | ReactNode[]
   columns: "1fr" | "1fr 1fr" | "1fr 1fr 1fr" | "1fr 1fr 1fr 1fr"
   rows: "auto"
 }

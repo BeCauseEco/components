@@ -3,7 +3,7 @@ import { TSpacer } from "@new/Spacer/Spacer"
 import { TText } from "@new/Text/Text"
 import styled from "@emotion/styled"
 import * as Tabs from "@radix-ui/react-tabs"
-import { PropsWithChildren, ReactElement, RefAttributes, forwardRef } from "react"
+import { PropsWithChildren, ReactNode, RefAttributes, forwardRef } from "react"
 import { TPlaywright } from "@new/TPlaywright"
 
 const Trigger = styled(Tabs.Trigger)({
@@ -26,7 +26,7 @@ const Trigger = styled(Tabs.Trigger)({
 
 export type TTabsNavigationItem = TPlaywright & {
   contentTargetId: string
-  children: ReactElement<TIcon | TText | TSpacer> | ReactElement<TIcon | TText | TSpacer>[]
+  children: ReactNode<TIcon | TText | TSpacer> | ReactNode<TIcon | TText | TSpacer>[]
 }
 
 export const TabsNavigationItem = forwardRef<

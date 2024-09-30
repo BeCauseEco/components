@@ -3,7 +3,7 @@ import { ESize } from "@new/ESize"
 import { TText } from "@new/Text/Text"
 import styled from "@emotion/styled"
 import * as RadixRadioGroup from "@radix-ui/react-radio-group"
-import { PropsWithChildren, ReactElement, useId } from "react"
+import { PropsWithChildren, ReactNode, useId } from "react"
 import { KeyValuePair } from "@new/KeyValuePair/KeyValuePair"
 import { EDirection } from "@new/EDirection"
 import { TPlaywright } from "@new/TPlaywright"
@@ -60,7 +60,7 @@ export type TInputRadioGroupItem = TPlaywright & {
   value: string
   colorForeground: EColor
   colorBackground: EColor
-  children: ReactElement<TText>
+  children: ReactNode<TText>
 }
 
 export const InputRadioGroupItem = ({

@@ -1,6 +1,6 @@
 import styled from "@emotion/styled"
 import { TIcon } from "@new/Icon/Icon"
-import { PropsWithChildren, ReactElement, forwardRef } from "react"
+import { PropsWithChildren, ReactNode, forwardRef } from "react"
 import { EColor } from "@new/Color"
 import { TText } from "@new/Text/Text"
 import { ESize } from "@new/ESize"
@@ -56,9 +56,9 @@ type TInputButtonBase = TPlaywright & {
   disabled?: boolean
   omitPadding?: boolean
   children:
-    | ReactElement<TText | TIcon>
-    | [ReactElement<TText>, ReactElement<TSpacer>, ReactElement<TIcon>]
-    | [ReactElement<TIcon>, ReactElement<TSpacer>, ReactElement<TText>]
+    | ReactNode<TText | TIcon>
+    | [ReactNode<TText>, ReactNode<TSpacer>, ReactNode<TIcon>]
+    | [ReactNode<TIcon>, ReactNode<TSpacer>, ReactNode<TText>]
 }
 
 type TNextLinkHref = LinkProps["href"]

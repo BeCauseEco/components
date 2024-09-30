@@ -1,5 +1,5 @@
 import styled from "@emotion/styled"
-import { ReactElement } from "react"
+import { ReactNode } from "react"
 import * as RadixAccordion from "@radix-ui/react-accordion"
 import { TAccordionItem } from "./AccordionItem"
 import { ESize } from "@new/ESize"
@@ -16,7 +16,7 @@ const Root = styled(RadixAccordion.Root)({
 })
 
 export type TAccordion = TPlaywright & {
-  items: ReactElement<TAccordionItem> | ReactElement<TAccordionItem>[]
+  items: ReactNode<TAccordionItem> | ReactNode<TAccordionItem>[]
   defaultValue: string
 }
 

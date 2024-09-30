@@ -4,7 +4,7 @@ import { EColor } from "@new/Color"
 import * as RadixCheckbox from "@radix-ui/react-checkbox"
 import { Icon } from "@new/Icon/Icon"
 import { TText } from "@new/Text/Text"
-import { ReactElement, useId } from "react"
+import { ReactNode, useId } from "react"
 import { EDirection } from "@new/EDirection"
 import { EWeight } from "@new/EWeight"
 import { Composition } from "@new/Composition/Composition"
@@ -47,7 +47,7 @@ export type TInputCheckBox = TPlaywright & {
   onChange: (value: boolean) => void
   colorBackground: EColor
   colorForeground: EColor
-  label?: ReactElement<TText>
+  label?: ReactNode<TText>
 }
 
 export const InputCheckbox = ({

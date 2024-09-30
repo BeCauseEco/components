@@ -2,7 +2,7 @@ import { EColor } from "@new/Color"
 import { TInputButton } from "@new/InputButton/InputButton"
 import styled from "@emotion/styled"
 import * as RadixDropDownMenu from "@radix-ui/react-dropdown-menu"
-import { ReactElement } from "react"
+import { ReactNode } from "react"
 import { Composition } from "@new/Composition/Composition"
 import { BackgroundCard } from "../Composition/BackgroundCard"
 import { TDropDownMenuItem } from "./DrownDownMenuItem"
@@ -24,10 +24,10 @@ const Arrow = styled(RadixDropDownMenu.Arrow)<TDropDownMenuArrowProperties>(p =>
 }))
 
 export type TDropDownMenu = TPlaywright & {
-  buttonTrigger: ReactElement<TInputButton>
+  buttonTrigger: ReactNode<TInputButton>
   items:
-    | ReactElement<TDropDownMenuItem | TDropDownMenuSeparator>
-    | ReactElement<TDropDownMenuItem | TDropDownMenuSeparator>[]
+    | ReactNode<TDropDownMenuItem | TDropDownMenuSeparator>
+    | ReactNode<TDropDownMenuItem | TDropDownMenuSeparator>[]
   colorBackground: EColor
 }
 

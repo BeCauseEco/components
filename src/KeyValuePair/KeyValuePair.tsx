@@ -1,6 +1,6 @@
 import styled from "@emotion/styled"
 import { ESize } from "@new/ESize"
-import { forwardRef, PropsWithChildren, ReactElement } from "react"
+import { forwardRef, PropsWithChildren, ReactNode } from "react"
 import { Spacer } from "@new/Spacer/Spacer"
 import { EDirection } from "@new/EDirection"
 import { EDistribution } from "@new/EDistrubution"
@@ -31,7 +31,7 @@ const Content = styled.div({
 export type TKeyValuePair = TPlaywright & {
   direction: EDirection
   spacing: ESize
-  children: [ReactElement | null | undefined, ReactElement | null | undefined]
+  children: [ReactNode | null | undefined, ReactNode | null | undefined]
   itemDistribution?: EDistribution
 }
 

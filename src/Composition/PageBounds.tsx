@@ -1,4 +1,4 @@
-import React, { ReactElement } from "react"
+import React, { ReactNode } from "react"
 import styled from "@emotion/styled"
 import { TComposition } from "./Composition"
 import { TPlaywright } from "@new/TPlaywright"
@@ -12,7 +12,7 @@ const Container = styled.div({
 })
 
 export type TPageBounds = TPlaywright & {
-  children: ReactElement<TComposition>
+  children: ReactNode<TComposition>
 }
 
 export const PageBounds = ({ children, playwrightTestId }: TPageBounds) => (

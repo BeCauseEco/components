@@ -1,4 +1,4 @@
-import { ReactElement } from "react"
+import { ReactNode } from "react"
 import styled from "@emotion/styled"
 import { EDirection } from "@new/EDirection"
 import { ESize } from "@new/ESize"
@@ -48,8 +48,8 @@ export enum ELayoutSplitCollapse {
 }
 
 export type TLayoutSplit = TLayoutBase & {
-  contentStart: ReactElement | ReactElement[]
-  contentEnd: ReactElement | ReactElement[]
+  contentStart: ReactNode | ReactNode[]
+  contentEnd: ReactNode | ReactNode[]
   direction: EDirection
   omitPadding?: boolean
   spacing?: ESize

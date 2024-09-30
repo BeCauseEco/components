@@ -1,6 +1,6 @@
 import styled from "@emotion/styled"
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from "cmdk"
-import { PropsWithChildren, ReactElement, forwardRef, useEffect, useId, useState } from "react"
+import { PropsWithChildren, ReactNode, forwardRef, useEffect, useId, useState } from "react"
 import { TInputComboboxItem } from "./InputComboboxItem"
 import React from "react"
 import { Text, TText } from "@new/Text/Text"
@@ -107,8 +107,8 @@ type TInputCombobox = TPlaywright & {
   /** Enables filtering, if supplied. */
   filterOptions?: TInputComboBoxFilterOptions
 
-  label?: ReactElement<TText>
-  icon?: ReactElement<TIcon>
+  label?: ReactNode<TText>
+  icon?: ReactNode<TIcon>
   value: TInputComboboxValue
 
   /**
@@ -126,7 +126,7 @@ type TInputCombobox = TPlaywright & {
   id?: string
   onChange: (value: TInputComboboxValue) => void
 
-  children: ReactElement<TInputComboboxItem> | ReactElement<TInputComboboxItem>[]
+  children: ReactNode<TInputComboboxItem> | ReactNode<TInputComboboxItem>[]
 }
 
 export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<TInputCombobox>>((props, ref) => {

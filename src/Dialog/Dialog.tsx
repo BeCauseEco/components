@@ -1,4 +1,4 @@
-import { ReactElement } from "react"
+import { ReactNode } from "react"
 import * as RadixDialog from "@radix-ui/react-dialog"
 import { EInputButtonVariant, InputButton, TInputButton } from "@new/InputButton/InputButton"
 import { Composition, TComposition } from "@new/Composition/Composition"
@@ -54,15 +54,15 @@ const TitleAndDescription = styled.div({
 
 export type TDialog = TPlaywright & {
   size: ESize.Medium | ESize.Huge
-  content: ReactElement<TComposition>
+  content: ReactNode<TComposition>
   open: boolean
   onOpenChange: (open: boolean) => void
   collapseHeight?: boolean
-  title?: ReactElement<TText>
-  description?: ReactElement<TText> | ReactElement<TText | TSpacer>[]
-  buttonPrimary?: ReactElement<TInputButton>
-  buttonSecondary?: ReactElement<TInputButton>
-  buttonTertiary?: ReactElement<TInputButton>
+  title?: ReactNode<TText>
+  description?: ReactNode<TText> | ReactNode<TText | TSpacer>[]
+  buttonPrimary?: ReactNode<TInputButton>
+  buttonSecondary?: ReactNode<TInputButton>
+  buttonTertiary?: ReactNode<TInputButton>
 }
 
 export const Dialog = ({

@@ -1,5 +1,5 @@
 import styled from "@emotion/styled"
-import { ChangeEvent, forwardRef, ReactElement, useId } from "react"
+import { ChangeEvent, forwardRef, ReactNode, useId } from "react"
 import { EColor, computeColor } from "@new/Color"
 import { StyleFontFamily, StyleBodyXsmall, TText } from "@new/Text/Text"
 import { KeyValuePair } from "@new/KeyValuePair/KeyValuePair"
@@ -45,7 +45,7 @@ export type TInputText = TPlaywright & {
   rows?: 1 | 2 | 3
   color: EColor
   width: ESize.Full | ESize.TwoThirds | ESize.Half | ESize.Quarter
-  label?: ReactElement<TText>
+  label?: ReactNode<TText>
   placeholder?: string
   value: string
   id?: string

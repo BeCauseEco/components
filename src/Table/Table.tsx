@@ -1,5 +1,5 @@
 import styled from "@emotion/styled"
-import { ReactElement } from "react"
+import { ReactNode } from "react"
 import { TTableRow } from "@new/Table/TableRow"
 import { ESize } from "@new/ESize"
 import { TColor, computeColor } from "@new/Color"
@@ -42,8 +42,8 @@ const Body = styled.tbody({
 })
 
 export type TTable = TPlaywright & {
-  head?: ReactElement<TTableRow>
-  body: ReactElement<TTableRow> | ReactElement<TTableRow>[]
+  head?: ReactNode<TTableRow>
+  body: ReactNode<TTableRow> | ReactNode<TTableRow>[]
   colorBorder: TColor
   colorCellSeparator: TColor
   colorRowHover: TColor

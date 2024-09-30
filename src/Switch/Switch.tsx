@@ -1,4 +1,4 @@
-import { ReactElement, useId } from "react"
+import { ReactNode, useId } from "react"
 import * as RadixSwitch from "@radix-ui/react-switch"
 import styled from "@emotion/styled"
 import { computeColor, EColor } from "@new/Color"
@@ -62,7 +62,7 @@ export type TSwitch = TPlaywright & {
   colorBackground: EColor
   colorForeground: EColor
   colorValueTrue: EColor
-  label?: ReactElement<TText>
+  label?: ReactNode<TText>
 }
 
 export const Switch = ({

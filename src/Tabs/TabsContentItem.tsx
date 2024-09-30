@@ -1,5 +1,5 @@
 import * as Tabs from "@radix-ui/react-tabs"
-import { PropsWithChildren, ReactElement, RefAttributes, forwardRef } from "react"
+import { PropsWithChildren, ReactNode, RefAttributes, forwardRef } from "react"
 import { TComposition } from "@new/Composition/Composition"
 import { ESize } from "@new/ESize"
 import { Spacer } from "@new/Spacer/Spacer"
@@ -7,7 +7,7 @@ import { TPlaywright } from "@new/TPlaywright"
 
 export type TTabsContentItem = TPlaywright & {
   contentTargetId: string
-  children: ReactElement<TComposition>
+  children: ReactNode<TComposition>
 }
 
 export const TabsContentItem = forwardRef<

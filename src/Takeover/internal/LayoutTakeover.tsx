@@ -1,4 +1,4 @@
-import { ReactElement } from "react"
+import { ReactNode } from "react"
 import styled from "@emotion/styled"
 import { EColor, computeColor } from "@new/Color"
 import { TLayoutBase } from "@new/Composition/TLayoutBase"
@@ -49,10 +49,10 @@ const ContentEnd = styled.div({
 })
 
 export type TLayoutTakeover = TLayoutBase & {
-  contentStart?: ReactElement | ReactElement[]
-  contentMiddle: ReactElement | ReactElement[]
-  contentEnd?: ReactElement | ReactElement[]
-  buttonClose: ReactElement
+  contentStart?: ReactNode | ReactNode[]
+  contentMiddle: ReactNode | ReactNode[]
+  contentEnd?: ReactNode | ReactNode[]
+  buttonClose: ReactNode
   omitPadding?: boolean
 }
 

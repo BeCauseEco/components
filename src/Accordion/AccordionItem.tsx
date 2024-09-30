@@ -1,5 +1,5 @@
 import styled from "@emotion/styled"
-import { ReactElement } from "react"
+import { ReactNode } from "react"
 import * as Accordion from "@radix-ui/react-accordion"
 import { keyframes } from "@emotion/react"
 import { Composition } from "@new/Composition/Composition"
@@ -60,9 +60,9 @@ const Content = styled(Accordion.Content)({
 })
 
 export type TAccordionItem = TPlaywright & {
-  label: ReactElement<TText> | ReactElement<TIcon>
+  label: ReactNode<TText> | ReactNode<TIcon>
   value: string
-  content: ReactElement | ReactElement[] | undefined
+  content: ReactNode | ReactNode[] | undefined
   colorHead: TColor
   colorContent: TColor
 }

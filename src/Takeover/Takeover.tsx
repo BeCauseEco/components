@@ -1,4 +1,4 @@
-import { ReactElement, useEffect } from "react"
+import { ReactNode, useEffect } from "react"
 import * as RadixDialog from "@radix-ui/react-dialog"
 import { TInputButton } from "@new/InputButton/InputButton"
 import { Composition, TComposition } from "@new/Composition/Composition"
@@ -42,15 +42,15 @@ const RadixDialogClose = styled(RadixDialog.Close)({
 })
 
 export type TTakeover = TPlaywright & {
-  content: ReactElement<TComposition>
+  content: ReactNode<TComposition>
   open: boolean
   onOpenChange: (open: boolean) => void
-  buttonClose?: ReactElement<TInputButton>
-  title?: ReactElement<TText>
-  status?: ReactElement<TText>
-  buttonPrimary?: ReactElement<TInputButton>
-  buttonSecondary?: ReactElement<TInputButton>
-  buttonTertiary?: ReactElement<TInputButton>
+  buttonClose?: ReactNode<TInputButton>
+  title?: ReactNode<TText>
+  status?: ReactNode<TText>
+  buttonPrimary?: ReactNode<TInputButton>
+  buttonSecondary?: ReactNode<TInputButton>
+  buttonTertiary?: ReactNode<TInputButton>
   offsetTopOverride?: string
   offsetLeftOverride?: string
   offsetLeftSmallOverride?: string
@@ -83,7 +83,7 @@ export const Takeover = ({
     }
   }, [open])
 
-  const contentEnd: ReactElement[] = []
+  const contentEnd: ReactNode[] = []
 
   if (status) {
     contentEnd.push(status)

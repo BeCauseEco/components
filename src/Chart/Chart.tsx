@@ -1,4 +1,4 @@
-import { ComponentType, PropsWithChildren, ReactElement } from "react"
+import { ComponentType, PropsWithChildren, ReactNode } from "react"
 import styled from "@emotion/styled"
 
 import dynamic from "next/dynamic"
@@ -19,7 +19,7 @@ export enum EChartType {
 
 export type TChart = Omit<TChartBase, "items"> & {
   type: EChartType
-  children: ReactElement<TChartItem> | ReactElement<TChartItem>[]
+  children: ReactNode<TChartItem> | ReactNode<TChartItem>[]
 }
 
 export const Chart = ({ type, direction, xAxis, yAxis, data, height, children }: PropsWithChildren<TChart>) => {

@@ -1,4 +1,4 @@
-import React, { PropsWithChildren, ReactElement, forwardRef } from "react"
+import React, { PropsWithChildren, ReactNode, forwardRef } from "react"
 import styled from "@emotion/styled"
 import { keyframes } from "@emotion/react"
 import { TBackgroundCard } from "@new/Composition/BackgroundCard"
@@ -129,7 +129,7 @@ type AllowedBackgrounds = TBackgroundCard
 type TAllowedLayouts = TLayoutSingle | TLayoutSplit | TLayoutThirds | TLayoutGrid | TLayoutBase
 
 export type TComposition = TPlaywright & {
-  children: ReactElement<TAllowedLayouts> | [ReactElement<AllowedBackgrounds>, ReactElement<TAllowedLayouts>]
+  children: ReactNode<TAllowedLayouts> | [ReactNode<AllowedBackgrounds>, ReactNode<TAllowedLayouts>]
   loading?: boolean
   disabled?: boolean
   explodeHeight?: boolean

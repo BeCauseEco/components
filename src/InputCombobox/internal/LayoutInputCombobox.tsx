@@ -1,4 +1,4 @@
-import { ReactElement } from "react"
+import { ReactNode } from "react"
 import styled from "@emotion/styled"
 import { TLayoutBase } from "@new/Composition/TLayoutBase"
 import { EOverflowContainerAxis, OverflowContainer } from "@new/OverflowContainer/OverflowContainer"
@@ -22,8 +22,8 @@ const Bottom = styled.div({
 })
 
 export type TLayoutCombobox = TLayoutBase & {
-  contentTop: ReactElement | ReactElement[]
-  contentBottom: ReactElement | ReactElement[]
+  contentTop: ReactNode | ReactNode[]
+  contentBottom: ReactNode | ReactNode[]
 }
 
 export const LayoutCombobox = ({ contentTop, contentBottom }: TLayoutCombobox) => {

@@ -4,7 +4,7 @@ import { KeyValuePair } from "@new/KeyValuePair/KeyValuePair"
 import { TText } from "@new/Text/Text"
 import styled from "@emotion/styled"
 import * as RadixRadioGroup from "@radix-ui/react-radio-group"
-import { PropsWithChildren, ReactElement, useId } from "react"
+import { PropsWithChildren, ReactNode, useId } from "react"
 import { TPlaywright } from "@new/TPlaywright"
 
 const Root = styled(RadixRadioGroup.Root)({
@@ -15,7 +15,7 @@ const Root = styled(RadixRadioGroup.Root)({
 export type TInputRadioGroup = TPlaywright & {
   defaultValue: string
   value: string
-  label?: ReactElement<TText>
+  label?: ReactNode<TText>
   id?: string
   onChange?: (value: string) => void
 }

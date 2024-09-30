@@ -3,7 +3,7 @@ import { TLayoutBase } from "./TLayoutBase"
 import { TText } from "@new/Text/Text"
 import { ESize } from "@new/ESize"
 import { Spacer } from "@new/Spacer/Spacer"
-import { ReactElement } from "react"
+import { ReactNode } from "react"
 import { TInputButton } from "@new/InputButton/InputButton"
 import { TInputComboboxItem } from "@new/InputCombobox/InputComboboxItem"
 
@@ -16,9 +16,9 @@ const Container = styled.div({
 })
 
 export type TLayoutEmptyState = TLayoutBase & {
-  head: ReactElement<TText>
-  body: ReactElement<TText>
-  content?: ReactElement<TInputButton | TInputComboboxItem>
+  head: ReactNode<TText>
+  body: ReactNode<TText>
+  content?: ReactNode<TInputButton | TInputComboboxItem>
 }
 
 export const LayoutEmptyState = ({ head, body, content, playwrightTestId }: TLayoutEmptyState) => {

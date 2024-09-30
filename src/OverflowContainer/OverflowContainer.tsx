@@ -3,7 +3,7 @@ import { computeColor } from "@new/Color"
 import { TColor } from "@new/Color"
 import { TPlaywright } from "@new/TPlaywright"
 
-import { PropsWithChildren, ReactElement } from "react"
+import { PropsWithChildren, ReactNode } from "react"
 
 const Container = styled.div<
   Pick<
@@ -53,7 +53,7 @@ export type TOverflowContainer = TPlaywright & {
   minHeight?: string
   maxHeight?: EMaxheightOptions | string
   omitPadding?: boolean
-  children: ReactElement | ReactElement[]
+  children: ReactNode | ReactNode[]
 }
 
 export const OverflowContainer = ({

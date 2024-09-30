@@ -1,4 +1,4 @@
-import { PropsWithChildren, ReactElement } from "react"
+import { PropsWithChildren, ReactNode } from "react"
 import { TText } from "@new/Text/Text"
 import { TColor } from "@new/Color"
 import { BackgroundCard } from "@new/Composition/BackgroundCard"
@@ -17,7 +17,7 @@ const Container = styled.div({
 export type TChip = TPlaywright & {
   colorBackground?: TColor
   colorOutline?: TColor
-  children: ReactElement<TText> | ReactElement<TKeyValuePair>
+  children: ReactNode<TText> | ReactNode<TKeyValuePair>
 }
 
 export const Chip = ({ colorBackground, colorOutline, children, playwrightTestId }: PropsWithChildren<TChip>) => {

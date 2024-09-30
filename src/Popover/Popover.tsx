@@ -1,5 +1,5 @@
 import styled from "@emotion/styled"
-import React, { ReactElement } from "react"
+import React, { ReactNode } from "react"
 import * as RadixPopover from "@radix-ui/react-popover"
 import { keyframes } from "@emotion/react"
 // import { EColor, computeColor } from "@new/Color"
@@ -83,9 +83,9 @@ export type TPopover = TPlaywright & {
   // colorArrow: EColor
   open?: boolean
   onOpenChange?: (value: boolean) => void
-  trigger: ReactElement
-  background: ReactElement<TBackgroundCard>
-  layout: ReactElement<TLayoutBase>
+  trigger: ReactNode
+  background: ReactNode<TBackgroundCard>
+  layout: ReactNode<TLayoutBase>
   alignment: EAlignment
 }
 

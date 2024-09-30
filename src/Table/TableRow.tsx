@@ -1,5 +1,5 @@
 import styled from "@emotion/styled"
-import { ReactElement } from "react"
+import { ReactNode } from "react"
 import { TTableCell } from "@new/Table/TableCell"
 import { TPlaywright } from "@new/TPlaywright"
 
@@ -10,7 +10,7 @@ const Container = styled.tr<TContainerProperties>({
 })
 
 export type TTableRow = TPlaywright & {
-  children: ReactElement<TTableCell> | ReactElement<TTableCell>[]
+  children: ReactNode<TTableCell> | ReactNode<TTableCell>[]
 }
 
 export const TableRow = ({ children, playwrightTestId }: TTableRow) => (
