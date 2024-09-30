@@ -47,7 +47,10 @@ export const Chart = ({ type, direction, xAxis, yAxis, data, height, children }:
 
   return (
     <Container>
-      {Chart && <Chart direction={direction} xAxis={xAxis} yAxis={yAxis} data={data} items={items} height={height} />}
+      {Chart &&
+        ((
+          <Chart direction={direction} xAxis={xAxis} yAxis={yAxis} data={data} items={items} height={height} />
+        ) as any)}
     </Container>
   )
 }
