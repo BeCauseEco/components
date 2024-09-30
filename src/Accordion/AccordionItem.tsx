@@ -10,10 +10,9 @@ import { BackgroundCard } from "@new/Composition/BackgroundCard"
 import { TIcon } from "@new/Icon/Icon"
 import { EDirection } from "@new/EDirection"
 import { TPlaywright } from "@new/TPlaywright"
+import { TAccordionMultiple, TAccordionSingle } from "./Accordion"
 
-type TContainerProperties = Omit<TAccordionItem, "content" | "label" | "colorHead" | "colorContent">
-
-const Item = styled(Accordion.Item)<TContainerProperties>({
+const Item = styled(Accordion.Item)({
   width: "100%",
   overflow: "hidden",
 })
@@ -62,17 +61,28 @@ const Content = styled(Accordion.Content)({
 export type TAccordionItem = TPlaywright & {
   label: ReactElement<TText> | ReactElement<TIcon>
   value: string
-  content: ReactElement | ReactElement[] | undefined
-  colorHead: TColor
-  colorContent: TColor
+  content: ReactElement<TAccordionSingle | TAccordionMultiple> | ReactElement | ReactElement[]
+  colorHead?: TColor
+  colorContent?: TColor
+  colorOutlineHead?: TColor
+  colorOutlineContent?: TColor
 }
 
-export const AccordionItem = ({ label, value, content, colorHead, colorContent, playwrightTestId }: TAccordionItem) => (
+export const AccordionItem = ({
+  label,
+  value,
+  content,
+  colorHead,
+  colorContent,
+  colorOutlineHead,
+  colorOutlineContent,
+  playwrightTestId,
+}: TAccordionItem) => (
   <Item value={value} data-playwright-testid={playwrightTestId}>
     <Header>
       <Trigger>
         <Composition>
-          <BackgroundCard colorBackground={colorHead} />
+          <BackgroundCard colorBackground={colorHead} colorOutline={colorOutlineHead} />
 
           <LayoutSingle direction={EDirection.Vertical} content={[<Label key="accordion-item-label">{label}</Label>]} />
         </Composition>
@@ -81,7 +91,7 @@ export const AccordionItem = ({ label, value, content, colorHead, colorContent, 
 
     <Content>
       <Composition>
-        <BackgroundCard colorBackground={colorContent} />
+        <BackgroundCard colorBackground={colorContent} colorOutline={colorOutlineContent} />
 
         <LayoutSingle direction={EDirection.Vertical} content={content} />
       </Composition>
