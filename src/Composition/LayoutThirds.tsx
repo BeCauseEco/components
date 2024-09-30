@@ -1,4 +1,4 @@
-import { ReactNode } from "react"
+import { ReactElement } from "react"
 import styled from "@emotion/styled"
 import { EDirection } from "@new/EDirection"
 import { ESize } from "@new/ESize"
@@ -19,18 +19,18 @@ const Content = styled.div<Pick<TLayoutThirds, "direction">>(p => ({
 }))
 
 export type TLayoutThirds = TLayoutBase & {
-  contentStart: ReactNode | ReactNode[]
-  contentMiddle: ReactNode | ReactNode[]
-  contentEnd: ReactNode | ReactNode[]
+  contentStart: ReactElement | ReactElement[]
+  contentMiddle: ReactElement | ReactElement[]
+  contentEnd: ReactElement | ReactElement[]
   direction: EDirection
   omitPadding?: boolean
   spacing?: ESize
 }
 
 export const LayoutThirds = ({
-  contentStart = null,
-  contentMiddle = null,
-  contentEnd = null,
+  contentStart,
+  contentMiddle,
+  contentEnd,
   direction = EDirection.Vertical,
   omitPadding = false,
   spacing,

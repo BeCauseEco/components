@@ -1,4 +1,4 @@
-import { ReactNode } from "react"
+import { ReactElement } from "react"
 import styled from "@emotion/styled"
 import { TLayoutBase } from "@new/Composition/TLayoutBase"
 import { computeColor, EColor } from "@new/Color"
@@ -72,11 +72,11 @@ const Main = styled.div({
 })
 
 export type TLayoutChrome = TLayoutBase & {
-  contentBreadcrumbs: ReactNode
-  contentPrimaryNavigation: ReactNode | ReactNode[]
-  contentSecondaryNavigation: ReactNode | ReactNode[]
-  contentTertiaryNavigation: ReactNode | ReactNode[]
-  contentMain: ReactNode | ReactNode[]
+  contentBreadcrumbs: ReactElement
+  contentPrimaryNavigation: ReactElement | ReactElement[]
+  contentSecondaryNavigation: ReactElement | ReactElement[]
+  contentTertiaryNavigation: ReactElement | ReactElement[]
+  contentMain: ReactElement | ReactElement[]
 }
 
 export const LayoutChrome = ({

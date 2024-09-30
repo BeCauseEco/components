@@ -1,13 +1,13 @@
-import { ReactNode } from "react"
+import { ReactElement } from "react"
 import styled from "@emotion/styled"
 import { TLayoutBase } from "@new/Composition/TLayoutBase"
+import { EOverflowContainerAxis, OverflowContainer } from "@new/OverflowContainer/OverflowContainer"
+import { EColor } from "@new/Color"
 
 const Container = styled.div({
   display: "flex",
   flexDirection: "column",
   padding: "calc(var(--BU) * 2)",
-  maxHeight: "var(--radix-popover-content-available-height)",
-  overflowY: "auto",
 })
 
 const Top = styled.div({
@@ -18,20 +18,28 @@ const Top = styled.div({
 const Bottom = styled.div({
   display: "flex",
   flexDirection: "column",
-  maxHeight: "var(--radix-popover-content-available-height)",
+  overflowY: "auto",
 })
 
 export type TLayoutCombobox = TLayoutBase & {
-  contentTop: ReactNode | ReactNode[]
-  contentBottom: ReactNode | ReactNode[]
+  contentTop: ReactElement | ReactElement[]
+  contentBottom: ReactElement | ReactElement[]
 }
 
 export const LayoutCombobox = ({ contentTop, contentBottom }: TLayoutCombobox) => {
   return (
     <Container className="layout-container">
-      <Top>{contentTop}</Top>
+      <OverflowContainer
+        axes={EOverflowContainerAxis.Vertical}
+        colorBackground={[EColor.White]}
+        colorForeground={[EColor.Black, 500]}
+        maxHeight={"calc(var(--radix-popover-content-available-height) - calc(var(--BU) * 8))"}
+        omitPadding
+      >
+        <Top>{contentTop}</Top>
 
-      <Bottom>{contentBottom}</Bottom>
+        <Bottom>{contentBottom}</Bottom>
+      </OverflowContainer>
     </Container>
   )
 }
