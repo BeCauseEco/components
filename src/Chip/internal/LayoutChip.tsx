@@ -1,4 +1,4 @@
-import { ReactElement } from "react"
+import { ReactNode } from "react"
 import styled from "@emotion/styled"
 import { TLayoutBase } from "@new/Composition/TLayoutBase"
 
@@ -8,7 +8,7 @@ const Container = styled.div({
 })
 
 export type TLayoutChip = TLayoutBase & {
-  content: ReactElement
+  content: ReactNode
 }
 
 export const LayoutChip = ({ content }: TLayoutChip) => {

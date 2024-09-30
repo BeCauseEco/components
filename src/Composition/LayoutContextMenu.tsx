@@ -1,4 +1,4 @@
-import { ReactElement } from "react"
+import { ReactNode } from "react"
 import styled from "@emotion/styled"
 import { EDirection } from "@new/EDirection"
 import { TLayoutBase } from "./TLayoutBase"
@@ -15,7 +15,7 @@ const Container = styled.div<Omit<TLayoutContextMenu, "content">>(p => ({
 }))
 
 export type TLayoutContextMenu = TLayoutBase & {
-  content: ReactElement | ReactElement[]
+  content: ReactNode | ReactNode[]
   direction: EDirection
   omitPadding?: boolean
 }

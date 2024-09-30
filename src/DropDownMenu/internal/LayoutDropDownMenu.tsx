@@ -1,4 +1,4 @@
-import { ReactElement } from "react"
+import { ReactNode } from "react"
 import styled from "@emotion/styled"
 import { TLayoutBase } from "@new/Composition/TLayoutBase"
 
@@ -9,7 +9,7 @@ const Container = styled.div({
 })
 
 export type TLayoutDropDownMenu = TLayoutBase & {
-  content: ReactElement | ReactElement[]
+  content: ReactNode | ReactNode[]
 }
 
 export const LayoutDropDownMenu = ({ content }: TLayoutDropDownMenu) => {
