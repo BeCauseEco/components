@@ -19,6 +19,7 @@ import { EAlignment } from "@new/EAlignment"
 import { Spacer } from "@new/Spacer/Spacer"
 import { InputCheckbox } from "@new/InputCheckbox/InputCheckbox"
 import { TPlaywright } from "@new/TPlaywright"
+import { Virtuoso } from "react-virtuoso"
 
 const Container = styled.div({
   display: "flex",
@@ -278,37 +279,40 @@ export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<TInput
                 )}
 
                 <CommandGroup>
-                  {items.map((item, index) => (
-                    <CommandItemStyled
-                      multiple={multiple}
-                      key={index}
-                      value={item.label}
-                      onSelect={value => (multiple ? () => {} : onSelectSingle(value))}
-                      selected={value == item.value}
-                      colorBackground={item.colorBackground}
-                      colorBackgroundHover={item.colorBackgroundHover}
-                      colorForeground={item.colorForeground}
-                      data-playwright-testid={item.playwrightTestId}
-                    >
-                      {multiple ? (
-                        <InputCheckbox
-                          value={item.value === true}
-                          onChange={value => onSelectMultiple(index, value)}
-                          colorBackground={item.colorBackground}
-                          colorForeground={item.colorForeground}
-                          label={
-                            <Text size={ESize.Xsmall} color={[item.colorBackground, 700]}>
-                              {item.label}
-                            </Text>
-                          }
-                        />
-                      ) : (
-                        <Text size={ESize.Xsmall} color={[item.colorForeground, 700]}>
-                          {item.label}
-                        </Text>
-                      )}
-                    </CommandItemStyled>
-                  ))}
+                  <Virtuoso
+                    data={items}
+                    itemContent={(index, item) => (
+                      <CommandItemStyled
+                        multiple={multiple}
+                        key={index}
+                        value={item.label}
+                        onSelect={value => (multiple ? () => {} : onSelectSingle(value))}
+                        selected={value == item.value}
+                        colorBackground={item.colorBackground}
+                        colorBackgroundHover={item.colorBackgroundHover}
+                        colorForeground={item.colorForeground}
+                        data-playwright-testid={item.playwrightTestId}
+                      >
+                        {multiple ? (
+                          <InputCheckbox
+                            value={item.value === true}
+                            onChange={value => onSelectMultiple(index, value)}
+                            colorBackground={item.colorBackground}
+                            colorForeground={item.colorForeground}
+                            label={
+                              <Text size={ESize.Xsmall} color={[item.colorBackground, 700]}>
+                                {item.label}
+                              </Text>
+                            }
+                          />
+                        ) : (
+                          <Text size={ESize.Xsmall} color={[item.colorForeground, 700]}>
+                            {item.label}
+                          </Text>
+                        )}
+                      </CommandItemStyled>
+                    )}
+                  />
                 </CommandGroup>
               </Command>
             }
