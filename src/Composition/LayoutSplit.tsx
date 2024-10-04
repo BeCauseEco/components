@@ -57,8 +57,8 @@ export type TLayoutSplit = TLayoutBase & {
 }
 
 export const LayoutSplit = ({
-  contentStart,
-  contentEnd,
+  contentStart = null,
+  contentEnd = null,
   direction,
   omitPadding = false,
   spacing,

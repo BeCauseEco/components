@@ -23,7 +23,7 @@ export type TChart = Omit<TChartBase, "items"> & {
 }
 
 export const Chart = ({ type, direction, xAxis, yAxis, data, height, children }: PropsWithChildren<TChart>) => {
-  let Chart: ComponentType<TChartBar> | ComponentType<TChartLine> | null = null
+  let Chart: any = null
 
   const items: TChartItem[] = []
 

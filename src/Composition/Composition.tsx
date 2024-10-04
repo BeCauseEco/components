@@ -6,6 +6,8 @@ import { TLayoutSingle } from "@new/Composition/LayoutSingle"
 import { TLayoutSplit } from "@new/Composition/LayoutSplit"
 import { TLayoutThirds } from "@new/Composition/LayoutThirds"
 import { TLayoutGrid } from "@new/Composition/LayoutGrid"
+import { TLayoutGridDEPRICATED } from "@new/Composition/LayoutGridDEPRICATED"
+import { TLayoutStack } from "@new/Composition/LayoutStack"
 import { TLayoutBase } from "./TLayoutBase"
 import { TPlaywright } from "@new/TPlaywright"
 import { computeColor, EColor, TColor } from "@new/Color"
@@ -126,7 +128,14 @@ const Layout = styled.div<Pick<TComposition, "loading" | "disabled">>(p => ({
 
 type AllowedBackgrounds = TBackgroundCard
 
-type TAllowedLayouts = TLayoutSingle | TLayoutSplit | TLayoutThirds | TLayoutGrid | TLayoutBase
+type TAllowedLayouts =
+  | TLayoutSingle
+  | TLayoutSplit
+  | TLayoutThirds
+  | TLayoutGrid
+  | TLayoutGridDEPRICATED
+  | TLayoutStack
+  | TLayoutBase
 
 export type TComposition = TPlaywright & {
   children: ReactElement<TAllowedLayouts> | [ReactElement<AllowedBackgrounds>, ReactElement<TAllowedLayouts>]

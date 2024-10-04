@@ -4,7 +4,7 @@ import { TLayoutBase } from "@new/Composition/TLayoutBase"
 import { computeColor, EColor } from "@new/Color"
 import { Composition } from "@new/Composition/Composition"
 import { BackgroundCard } from "@new/Composition/BackgroundCard"
-import { Align } from "@new/Align/Align"
+import { AlignDEPRICATED } from "@new/Align/AlignDEPRICATED"
 
 const Container = styled.div({
   display: "flex",
@@ -113,9 +113,9 @@ export const LayoutChrome = ({
 
         <CombinedInner>
           <Breadcrumbs>
-            <Align column middle>
+            <AlignDEPRICATED column middle>
               {contentBreadcrumbs}
-            </Align>
+            </AlignDEPRICATED>
           </Breadcrumbs>
 
           <Main>{contentMain}</Main>
