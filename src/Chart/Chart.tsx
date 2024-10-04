@@ -1,10 +1,8 @@
-import { ComponentType, PropsWithChildren, ReactElement } from "react"
+import { PropsWithChildren, ReactElement } from "react"
 import styled from "@emotion/styled"
 
 import dynamic from "next/dynamic"
 import { TChartBase } from "./internal/TChartBase"
-import { TChartBar } from "./internal/ChartBar"
-import { TChartLine } from "./internal/ChartLine"
 import { TChartItem } from "./ChartItem"
 import React from "react"
 
