@@ -1,7 +1,7 @@
 import { ReactElement, useId } from "react"
 import * as RadixSwitch from "@radix-ui/react-switch"
 import styled from "@emotion/styled"
-import { computeColor, EColor } from "@new/Color"
+import { computeColor, TColor } from "@new/Color"
 import { TText } from "@new/Text/Text"
 import { KeyValuePair } from "@new/KeyValuePair/KeyValuePair"
 import { EDirection } from "@new/EDirection"
@@ -22,7 +22,7 @@ const SwitchRoot = styled(RadixSwitch.Root)<Pick<TSwitch, "colorBackground" | "c
   width: "calc(var(--BU) * 8)",
   height: "calc(var(--BU) * 5)",
   border: 0,
-  backgroundColor: computeColor([p.colorBackground, 700]),
+  backgroundColor: computeColor(p.colorBackground),
   borderRadius: "9999px",
   cursor: "pointer",
 
@@ -31,7 +31,7 @@ const SwitchRoot = styled(RadixSwitch.Root)<Pick<TSwitch, "colorBackground" | "c
   },
 
   "&[data-state='checked']": {
-    backgroundColor: computeColor([p.colorValueTrue, 700]),
+    backgroundColor: computeColor(p.colorValueTrue),
   },
 }))
 
@@ -39,7 +39,7 @@ const SwitchThumb = styled(RadixSwitch.Thumb)<Pick<TSwitch, "colorForeground">>(
   display: "flex",
   width: "calc(var(--BU) * 5 - 2px)",
   height: "calc(var(--BU) * 5 - 2px)",
-  backgroundColor: computeColor([p.colorForeground, 700]),
+  backgroundColor: computeColor(p.colorForeground),
   borderRadius: "9999px",
   transition: "transform 100ms",
   transform: "translateX(1px) translateY(1px)",
@@ -59,9 +59,9 @@ const Label = styled.label({
 export type TSwitch = TPlaywright & {
   value: boolean
   onChange: (value: boolean) => void
-  colorBackground: EColor
-  colorForeground: EColor
-  colorValueTrue: EColor
+  colorBackground: TColor
+  colorForeground: TColor
+  colorValueTrue: TColor
   label?: ReactElement<TText>
 }
 
