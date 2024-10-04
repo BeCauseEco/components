@@ -17,7 +17,7 @@ export type TLayoutGrid = TLayoutBase & {
   children: ReactElement<TAlign>[]
 }
 
-export const LayoutGridDEPRICATED = ({ columns, rows, children, playwrightTestId }: PropsWithChildren<TLayoutGrid>) => {
+export const LayoutGrid = ({ columns, rows, children, playwrightTestId }: PropsWithChildren<TLayoutGrid>) => {
   return (
     <Container className="layout-container" columns={columns} rows={rows} data-playwright-testid={playwrightTestId}>
       {children}
