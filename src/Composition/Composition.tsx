@@ -11,6 +11,7 @@ import { TLayoutStack } from "@new/Composition/LayoutStack"
 import { TLayoutBase } from "./TLayoutBase"
 import { TPlaywright } from "@new/TPlaywright"
 import { computeColor, EColor, TColor } from "@new/Color"
+import { TBackground } from "./Background"
 
 const Container = styled.div<
   Pick<TComposition, "loading" | "disabled" | "explodeHeight" | "overflowHidden" | "onClick">
@@ -126,7 +127,7 @@ const Layout = styled.div<Pick<TComposition, "loading" | "disabled">>(p => ({
     : {}),
 }))
 
-type AllowedBackgrounds = TBackgroundCard
+type AllowedBackgrounds = TBackgroundCard | TBackground
 
 type TAllowedLayouts =
   | TLayoutSingle
