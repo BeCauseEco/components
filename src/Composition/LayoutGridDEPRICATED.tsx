@@ -16,7 +16,7 @@ export type TLayoutGridDEPRICATED = TLayoutBase & {
   rows: "auto"
 }
 
-export const LayoutGridDEPRICATED = ({ columns, rows, content, playwrightTestId }: TLayoutGrid) => {
+export const LayoutGridDEPRICATED = ({ columns, rows, content, playwrightTestId }: TLayoutGridDEPRICATED) => {
   return (
     <Container className="layout-container" columns={columns} rows={rows} data-playwright-testid={playwrightTestId}>
       {content}
