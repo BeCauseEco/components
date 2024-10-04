@@ -1,74 +1,100 @@
-import { ReactNode } from "react"
+import { PropsWithChildren } from "react"
 import styled from "@emotion/styled"
-import { ESize } from "@new/ESize"
 
-const computeAlignment = (
-  column = false,
-  row = false,
-  start = false,
-  center = false,
-  end = false,
-  top = false,
-  middle = false,
-  bottom = false,
-) => {
+const computeAlignment = (p: Omit<TAlign, "spacing">) => {
   const r = {
-    justifyContent: "normal",
-    alignContent: "normal",
-    alignItems: "normal",
+    justifyContent: "",
+    alignItems: "",
   }
 
-  if (column) {
-    if (start) {
+  if (p.vertical) {
+    if (p.topLeft) {
       r.justifyContent = "flex-start"
-    }
-
-    if (center) {
-      r.alignContent = "center"
-      r.alignItems = "center"
-    }
-
-    if (end) {
-      r.alignContent = "flex-end"
-      r.alignItems = "flex-end"
-    }
-
-    if (top) {
-      r.justifyContent = "flex-start"
-    }
-
-    if (middle) {
-      r.justifyContent = "center"
-    }
-
-    if (bottom) {
-      r.justifyContent = "flex-end"
-    }
-  } else if (row) {
-    if (start) {
-      r.justifyContent = "flex-start"
-    }
-
-    if (center) {
-      r.justifyContent = "center"
-    }
-
-    if (end) {
-      r.justifyContent = "flex-end"
-    }
-
-    if (top) {
-      r.alignContent = "flex-start"
       r.alignItems = "flex-start"
     }
 
-    if (middle) {
-      r.alignContent = "center"
+    if (p.topCenter) {
+      r.justifyContent = "flex-start"
       r.alignItems = "center"
     }
 
-    if (bottom) {
-      r.alignContent = "flex-end"
+    if (p.topRight) {
+      r.justifyContent = "flex-start"
+      r.alignItems = "flex-end"
+    }
+
+    if (p.left) {
+      r.justifyContent = "center"
+      r.alignItems = "flex-start"
+    }
+
+    if (p.center) {
+      r.justifyContent = "center"
+      r.alignItems = "center"
+    }
+
+    if (p.right) {
+      r.justifyContent = "center"
+      r.alignItems = "flex-end"
+    }
+
+    if (p.bottomLeft) {
+      r.justifyContent = "flex-end"
+      r.alignItems = "flex-start"
+    }
+
+    if (p.bottomCenter) {
+      r.justifyContent = "flex-end"
+      r.alignItems = "center"
+    }
+
+    if (p.bottomRight) {
+      r.justifyContent = "flex-end"
+      r.alignItems = "flex-end"
+    }
+  } else if (p.horizontal) {
+    if (p.topLeft) {
+      r.justifyContent = "flex-start"
+      r.alignItems = "flex-start"
+    }
+
+    if (p.topCenter) {
+      r.justifyContent = "center"
+      r.alignItems = "flex-start"
+    }
+
+    if (p.topRight) {
+      r.justifyContent = "flex-end"
+      r.alignItems = "flex-start"
+    }
+
+    if (p.left) {
+      r.justifyContent = "flex-start"
+      r.alignItems = "center"
+    }
+
+    if (p.center) {
+      r.justifyContent = "center"
+      r.alignItems = "center"
+    }
+
+    if (p.right) {
+      r.justifyContent = "flex-end"
+      r.alignItems = "center"
+    }
+
+    if (p.bottomLeft) {
+      r.justifyContent = "flex-start"
+      r.alignItems = "flex-end"
+    }
+
+    if (p.bottomCenter) {
+      r.justifyContent = "center"
+      r.alignItems = "flex-end"
+    }
+
+    if (p.bottomRight) {
+      r.justifyContent = "flex-end"
       r.alignItems = "flex-end"
     }
   }
@@ -79,74 +105,41 @@ const computeAlignment = (
 const Container = styled.div<TAlign>(p => ({
   display: "flex",
   flexWrap: "inherit",
-  // @ts-expect-error TypeScript is not smart enough to accept discriminating unions in this case
-  flexDirection: p.column ? "column" : "row",
+  flexDirection: p.vertical ? "column" : "row",
   width: "100%",
   height: "100%",
-  // @ts-expect-error see first ignore
-  ...computeAlignment(p.column, p.row, p.start, p.center, p.end, p.top, p.middle, p.bottom),
-  gap: p.spacing || 0,
+
+  ...computeAlignment(p),
 }))
 
-type TAlignBase = {
-  spacing?: ESize
-
-  /** Horizontal axis, align start  */
-  start?: boolean
-
-  /** Horizontal axis, align center  */
+export type TAlign = {
+  vertical?: boolean
+  horizontal?: boolean
+  topLeft?: boolean
+  topCenter?: boolean
+  topRight?: boolean
+  left?: boolean
   center?: boolean
-
-  /** Horizontal axis, align end  */
-  end?: boolean
-
-  /** Vertical axis, align top  */
-  top?: boolean
-
-  /** Vertical axis, align middle  */
-  middle?: boolean
-
-  /** Vertical axis, align bottom  */
-  bottom?: boolean
-
-  children: ReactNode | ReactNode[]
+  right?: boolean
+  bottomLeft?: boolean
+  bottomCenter?: boolean
+  bottomRight?: boolean
 }
 
-type TAlign =
-  | (TAlignBase & {
-      /** Set flex-direction to "column" */
-      column: boolean
-    })
-  | (TAlignBase & {
-      /** Set flex-direction to "row" */
-      row: boolean
-    })
-
-export const Align = ({
-  // @ts-expect-error see first ignore
-  column,
-  // @ts-expect-error see first ignore
-  row,
-  spacing,
-  start = false,
-  center = false,
-  end = false,
-  top = false,
-  middle = false,
-  bottom = false,
-  children,
-}: TAlign) => (
+export const Align = (p: PropsWithChildren<TAlign>) => (
   <Container
-    column={column}
-    row={row}
-    start={start}
-    center={center}
-    end={end}
-    top={top}
-    middle={middle}
-    bottom={bottom}
-    spacing={spacing}
+    topLeft={p.topLeft}
+    topCenter={p.topCenter}
+    topRight={p.topRight}
+    left={p.left}
+    center={p.center}
+    right={p.right}
+    bottomLeft={p.bottomLeft}
+    bottomCenter={p.bottomCenter}
+    bottomRight={p.bottomRight}
+    vertical={p.vertical}
+    horizontal={p.horizontal}
   >
-    {children}
+    {p.children}
   </Container>
 )
