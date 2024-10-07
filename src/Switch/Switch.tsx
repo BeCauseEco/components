@@ -22,7 +22,7 @@ const SwitchRoot = styled(RadixSwitch.Root)<Pick<TSwitch, "colorBackground" | "c
   width: "calc(var(--BU) * 8)",
   height: "calc(var(--BU) * 5)",
   border: 0,
-  backgroundColor: computeColor([p.colorBackground, 700]),
+  backgroundColor: computeColor([p.colorBackground, 100]),
   borderRadius: "9999px",
   cursor: "pointer",
 
