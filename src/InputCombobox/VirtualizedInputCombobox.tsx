@@ -43,8 +43,6 @@ const CommandItemStyled = styled(CommandItem)<
     backgroundColor: computeColor([p.colorBackgroundHover, 100]),
   },
 
-  // border: !p.multiple && p.selected ? `dotted 1px ${computeColor([p.colorBackgroundHover, 200])}` : "none",
-
   ...(p.selected && {
     ":after": {
       content: `""`,
