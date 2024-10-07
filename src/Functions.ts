@@ -1,6 +1,7 @@
 // import React from "react"
 import { ReactElement } from "react"
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export const containsIlligalChildren = (children: ReactElement | ReactElement[], allowedTypes: string[]): boolean => {
   // const a = React.Children.toArray(children).flatMap(a => a["type"]["name"])
   // const b = allowedTypes
