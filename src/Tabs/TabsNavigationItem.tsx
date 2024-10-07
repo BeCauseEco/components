@@ -27,13 +27,14 @@ const Trigger = styled(Tabs.Trigger)({
 export type TTabsNavigationItem = TPlaywright & {
   contentTargetId: string
   children: ReactElement<TIcon | TText | TSpacer> | ReactElement<TIcon | TText | TSpacer>[]
+  onClick?: () => void
 }
 
 export const TabsNavigationItem = forwardRef<
   Tabs.TabsTriggerProps & RefAttributes<HTMLButtonElement>,
   PropsWithChildren<TTabsNavigationItem>
 >((props, ref) => {
-  const { contentTargetId, children, playwrightTestId } = props
+  const { contentTargetId, children, onClick, playwrightTestId } = props
 
   return (
     <Trigger
@@ -41,6 +42,7 @@ export const TabsNavigationItem = forwardRef<
       ref={ref}
       value={contentTargetId}
       data-playwright-testid={playwrightTestId}
+      onClick={onClick}
       {...(props as any)}
       asChild
     >
