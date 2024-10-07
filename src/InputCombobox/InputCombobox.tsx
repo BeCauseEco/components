@@ -6,7 +6,7 @@ import React from "react"
 import { Text, TText } from "@new/Text/Text"
 import { ESize } from "@new/ESize"
 import { computeColor, EColor } from "@new/Color"
-import { EPopoverOverflowBehavior, Popover } from "@new/Popover/Popover"
+import { Popover } from "@new/Popover/Popover"
 import { EInputButtonVariant, InputButton } from "@new/InputButton/InputButton"
 import { KeyValuePair } from "@new/KeyValuePair/KeyValuePair"
 import { EDirection } from "@new/EDirection"
@@ -210,7 +210,6 @@ export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<TInput
         open={open}
         onOpenChange={setOpen}
         alignment={EAlignment.Start}
-        overflowBehavior={EPopoverOverflowBehavior.OverflowHidden}
         trigger={
           <KeyValuePair direction={EDirection.Vertical} spacing={ESize.Xsmall}>
             {label && <Label htmlFor={key}>{label}</Label>}

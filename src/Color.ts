@@ -82,24 +82,25 @@ export const computeColor = (color: TColor) => {
 }
 
 export const generateColorPallette = () => {
-  console.log("---")
-  Object.keys(EColor).forEach(key => {
-    console.log(`"${key}":`)
-    if (key === "White") {
-      console.log(EColor.White)
-    } else if (key === "Transparent") {
-      // ...
-    } else {
-      const lightness = [50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000]
-      lightness.forEach(l => {
-        try {
-          console.log(`lightness ${l}:`, computeColor([EColor[key], l as TLightness]))
-        } catch (e) {
-          console.error(e)
-        }
-      })
-    }
+  throw "generateColorPallette: comment out the code before running"
+  // console.log("---")
+  // Object.keys(EColor).forEach(key => {
+  //   console.log(`"${key}":`)
+  //   if (key === "White") {
+  //     console.log(EColor.White)
+  //   } else if (key === "Transparent") {
+  //     // ...
+  //   } else {
+  //     const lightness = [50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000]
+  //     lightness.forEach(l => {
+  //       try {
+  //         console.log(`lightness ${l}:`, computeColor([EColor[key], l as TLightness]))
+  //       } catch (e) {
+  //         console.error(e)
+  //       }
+  //     })
+  //   }
 
-    console.log("---")
-  })
+  //   console.log("---")
+  // })
 }

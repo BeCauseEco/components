@@ -31,7 +31,7 @@ const Container = styled.div<Pick<TLayoutInputButton, "size" | "childIconOnly" |
 }))
 
 export type TLayoutInputButton = TLayoutBase & {
-  content: ReactNode
+  content: ReactNode | ReactNode[]
   size: ESize
   childIconOnly: boolean
   omitPadding: boolean

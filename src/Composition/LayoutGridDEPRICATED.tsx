@@ -1,9 +1,8 @@
-import { PropsWithChildren, ReactElement } from "react"
+import { ReactNode } from "react"
 import styled from "@emotion/styled"
 import { TLayoutBase } from "./TLayoutBase"
-import { TAlign } from "@new/Align/Align"
 
-const Container = styled.div<Pick<TLayoutGrid, "rows" | "columns">>(p => ({
+const Container = styled.div<Pick<TLayoutGridDEPRICATED, "rows" | "columns">>(p => ({
   display: "grid",
   gap: "calc(var(--BU) * 4)",
   gridTemplateColumns: p.columns,
@@ -11,16 +10,16 @@ const Container = styled.div<Pick<TLayoutGrid, "rows" | "columns">>(p => ({
   height: "inherit",
 }))
 
-export type TLayoutGrid = TLayoutBase & {
+export type TLayoutGridDEPRICATED = TLayoutBase & {
+  content: ReactNode | ReactNode[]
   columns: "1fr" | "1fr 1fr" | "1fr 1fr 1fr" | "1fr 1fr 1fr 1fr"
   rows: "auto"
-  children: ReactElement<TAlign>[]
 }
 
-export const LayoutGrid = ({ columns, rows, children, playwrightTestId }: PropsWithChildren<TLayoutGrid>) => {
+export const LayoutGridDEPRICATED = ({ columns, rows, content, playwrightTestId }: TLayoutGridDEPRICATED) => {
   return (
     <Container className="layout-container" columns={columns} rows={rows} data-playwright-testid={playwrightTestId}>
-      {children}
+      {content}
     </Container>
   )
 }

@@ -28,9 +28,9 @@ export type TLayoutThirds = TLayoutBase & {
 }
 
 export const LayoutThirds = ({
-  contentStart = null,
-  contentMiddle = null,
-  contentEnd = null,
+  contentStart,
+  contentMiddle,
+  contentEnd,
   direction = EDirection.Vertical,
   omitPadding = false,
   spacing,
