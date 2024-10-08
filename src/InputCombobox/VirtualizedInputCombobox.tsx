@@ -302,6 +302,7 @@ export const VirtualizedInputCombobox = forwardRef<HTMLDivElement, PropsWithChil
                         minWidth: `${LIST_WIDTH}px`,
                         overflowX: "hidden",
                       }}
+                      increaseViewportBy={100}
                       totalListHeightChanged={h => setHeight(h > LIST_HEIGHT ? LIST_HEIGHT : h)}
                       data={filteredItems}
                       itemContent={(index, item) => (
