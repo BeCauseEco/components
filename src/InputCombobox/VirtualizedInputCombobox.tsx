@@ -186,11 +186,9 @@ export const VirtualizedInputCombobox = forwardRef<HTMLDivElement, PropsWithChil
       onChange([item?.id as string])
     }
 
-    const onSelectMultiple = (index: number, value: boolean) => {
-      const itemByIndex = Object.values(items)[index]
-
+    const onSelectMultiple = (selectedItemId: string, value: boolean) => {
       setSelectedItemIds(prev => {
-        const selectedItemsIds = value ? [...prev, itemByIndex.id] : prev.filter(item => item !== itemByIndex.id)
+        const selectedItemsIds = value ? [...prev, selectedItemId] : prev.filter(item => item !== selectedItemId)
         onChange(selectedItemsIds)
 
         return selectedItemsIds
@@ -321,7 +319,7 @@ export const VirtualizedInputCombobox = forwardRef<HTMLDivElement, PropsWithChil
                           {multiple ? (
                             <InputCheckbox
                               value={selectedItemIds.includes(item.id)}
-                              onChange={value => onSelectMultiple(index, value)}
+                              onChange={value => onSelectMultiple(item.id, value)}
                               colorBackground={item.colorBackground}
                               colorForeground={item.colorForeground}
                               label={
