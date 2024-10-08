@@ -187,10 +187,10 @@ export const VirtualizedInputCombobox = forwardRef<HTMLDivElement, PropsWithChil
     }
 
     const onSelectMultiple = (index: number, value: boolean) => {
-      const itemByIndex = Object.values(items)[index]
+      const itemIdByIndex = filteredItems[index]?.id
 
       setSelectedItemIds(prev => {
-        const selectedItemsIds = value ? [...prev, itemByIndex.id] : prev.filter(item => item !== itemByIndex.id)
+        const selectedItemsIds = value ? [...prev, itemIdByIndex] : prev.filter(item => item !== itemIdByIndex)
         onChange(selectedItemsIds)
 
         return selectedItemsIds
