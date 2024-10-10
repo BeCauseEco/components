@@ -19,14 +19,21 @@ const List = styled(RadixTabs.List)({
 })
 
 export type TTabs = TPlaywright & {
+  contentTargetId?: string
   defaultContentTargetId: string
   navigationItems: ReactElement<TTabsNavigationItem> | ReactElement<TTabsNavigationItem>[]
   contentItems: ReactElement<TTabsContentItem> | ReactElement<TTabsContentItem>[]
 }
 
-export const Tabs = ({ defaultContentTargetId, navigationItems, contentItems, playwrightTestId }: TTabs) => {
+export const Tabs = ({
+  contentTargetId,
+  defaultContentTargetId,
+  navigationItems,
+  contentItems,
+  playwrightTestId,
+}: TTabs) => {
   return (
-    <Root defaultValue={defaultContentTargetId} data-playwright-testid={playwrightTestId}>
+    <Root value={contentTargetId} defaultValue={defaultContentTargetId} data-playwright-testid={playwrightTestId}>
       <List>{navigationItems}</List>
 
       {contentItems}
