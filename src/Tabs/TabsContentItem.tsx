@@ -26,7 +26,7 @@ export const TabsContentItem = forwardRef<
       asChild
     >
       <>
-        <Spacer size={ESize.Small} />
+        <Spacer size={ESize.Large} />
 
         {children}
       </>
