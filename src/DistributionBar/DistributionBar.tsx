@@ -2,15 +2,7 @@ import styled from "@emotion/styled"
 import { EColor } from "@new/Color"
 import * as Tooltip from "@radix-ui/react-tooltip"
 import React from "react"
-
-const DistributionBarLayout = styled.div({
-  display: "flex",
-  width: "100%",
-  height: "10px",
-  borderRadius: "8px",
-  overflow: "hidden",
-  border: "1px solid #ddd",
-})
+import { LayoutDistributionBar } from "./internal/LayoutDistributionBar"
 
 const Segment = styled.div<{ color: EColor; width: number }>(props => ({
   height: "100%",
@@ -32,11 +24,7 @@ const SegmentLabelContainer = styled.div({
   fontSize: "12px",
 })
 
-const SegmentLabel = ({ label, value }: { label: string; value: number }) => (
-  <SegmentLabelContainer>
-    {label}: {value}%
-  </SegmentLabelContainer>
-)
+const SegmentLabel = ({ label }: { label: string }) => <SegmentLabelContainer>{label}</SegmentLabelContainer>
 
 interface SegmentProps {
   label: string
@@ -53,22 +41,22 @@ export const DistributionBar = ({ segments }: DistributionBarProps) => {
 
   return (
     <Tooltip.Provider>
-      <DistributionBarLayout>
+      <LayoutDistributionBar>
         {segments.map((segment, index) => (
           <Tooltip.Root key={index}>
             <Tooltip.Trigger asChild>
               <Segment color={segment.color} width={segment.value} />
             </Tooltip.Trigger>
             <Tooltip.Portal>
-              <Tooltip.Content side="top" align="center" sideOffset={5}>
-                <SegmentLabel label={segment.label} value={segment.value} />
+              <Tooltip.Content side="top" align="center" sideOffset={5} style={{ zIndex: 1 }}>
+                <SegmentLabel label={segment.label} />
                 <Tooltip.Arrow />
               </Tooltip.Content>
             </Tooltip.Portal>
           </Tooltip.Root>
         ))}
         {totalValue < 100 && <FillerSegment style={{ width: `${100 - totalValue}%` }} />}
-      </DistributionBarLayout>
+      </LayoutDistributionBar>
     </Tooltip.Provider>
   )
 }

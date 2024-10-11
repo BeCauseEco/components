@@ -12,9 +12,9 @@ const Container = styled.div({
 })
 
 export type TLayoutDistributionBar = TLayoutBase & {
-  content: ReactNode | ReactNode[]
+  children: ReactNode | ReactNode[]
 }
 
-export const LayoutDistributionBar = ({ content }: TLayoutDistributionBar) => {
-  return <Container className="layout-container">{content}</Container>
+export const LayoutDistributionBar = ({ children }: TLayoutDistributionBar) => {
+  return <Container className="layout-container">{children}</Container>
 }
