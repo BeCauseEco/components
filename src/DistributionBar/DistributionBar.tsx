@@ -10,11 +10,11 @@ const Segment = styled.div<{ color: EColor; width: number }>(props => ({
   backgroundColor: props.color,
 }))
 
-const FillerSegment = styled.div({
+const FillerSegment = styled.div<{ width: number }>(props => ({
   height: "100%",
-  width: "100%",
+  width: `${props.width}%`,
   backgroundColor: "#f0f0f0",
-})
+}))
 
 const SegmentLabelContainer = styled.div({
   padding: "4px 8px",
@@ -55,7 +55,7 @@ export const DistributionBar = ({ segments }: DistributionBarProps) => {
             </Tooltip.Portal>
           </Tooltip.Root>
         ))}
-        {totalValue < 100 && <FillerSegment style={{ width: `${100 - totalValue}%` }} />}
+        {totalValue < 100 && <FillerSegment width={100 - totalValue} />}
       </LayoutDistributionBar>
     </Tooltip.Provider>
   )
