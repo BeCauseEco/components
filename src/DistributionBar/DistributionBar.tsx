@@ -24,8 +24,6 @@ const SegmentLabelContainer = styled.div({
   fontSize: "12px",
 })
 
-const SegmentLabel = ({ label }: { label: string }) => <SegmentLabelContainer>{label}</SegmentLabelContainer>
-
 interface SegmentProps {
   label: string
   value: number
@@ -49,7 +47,7 @@ export const DistributionBar = ({ segments }: DistributionBarProps) => {
             </Tooltip.Trigger>
             <Tooltip.Portal>
               <Tooltip.Content side="top" align="center" sideOffset={5} style={{ zIndex: 1 }}>
-                <SegmentLabel label={segment.label} />
+                <SegmentLabelContainer>{segment.label}</SegmentLabelContainer>
                 <Tooltip.Arrow />
               </Tooltip.Content>
             </Tooltip.Portal>
