@@ -11,6 +11,7 @@ import Link, { LinkProps } from "next/link"
 import React from "react"
 import { TSpacer } from "@new/Spacer/Spacer"
 import { TPlaywright } from "@new/TPlaywright"
+import { TColor } from "@new/Color"
 
 const Output = styled.output<Pick<TInputButton, "loading" | "variant">>(p => ({
   display: "flex",
@@ -71,6 +72,8 @@ type TInputButtonVariantLink = TInputButtonBase & {
 type TInputButtonVariantOthers = TInputButtonBase & {
   variant: EInputButtonVariant.Solid | EInputButtonVariant.Outlined | EInputButtonVariant.Transparent
   color: EColor
+  outlineColor?: TColor
+  colorBackgroundHover?: TColor
 }
 
 export type TInputButton = TInputButtonVariantLink | TInputButtonVariantOthers | TInputButtonVariantOthers
@@ -109,8 +112,8 @@ export const InputButton = forwardRef<HTMLButtonElement | HTMLAnchorElement, Pro
       case EInputButtonVariant.Outlined:
         background = (
           <BackgroundCard
-            colorOutline={[props.color, 700]}
-            colorBackgroundHover={[props.color, 100]}
+            colorOutline={props.outlineColor ?? [props.color, 700]}
+            colorBackgroundHover={props.colorBackgroundHover ?? [props.color, 100]}
             borderRadius={ESize.Tiny}
           />
         )

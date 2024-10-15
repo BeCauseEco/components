@@ -21,6 +21,7 @@ import { TPlaywright } from "@new/TPlaywright"
 import { TInputComboBoxFilterOptions, TInputComboboxValue } from "./InputCombobox"
 import { Virtuoso } from "react-virtuoso"
 import { TVirtualizedInputComboboxItem } from "./VirtualizedInputComboboxItem"
+import { Chip } from "@new/Chip/Chip"
 
 const Container = styled.div({
   display: "flex",
@@ -77,6 +78,11 @@ const TextWithOverflow = styled(Text)<Pick<TVirtualizedInputCombobox, "width">>(
   textWrap: "nowrap",
   display: "block",
 }))
+
+const SelectedItemsContainer = styled.div({
+  display: "flex",
+  gap: "3px",
+})
 
 type TVirtualizedInputCombobox = TPlaywright & {
   colorButtonBackground: EColor
@@ -163,19 +169,64 @@ export const VirtualizedInputCombobox = forwardRef<HTMLDivElement, PropsWithChil
       setSelectedItemIds(prev => prev.filter(prevId => newItemsSet.has(prevId)))
     }, [items])
 
-    const generateCurrentValueLabel = multiple => {
+    const generateCurrentValueLabel = (multiple: boolean) => {
       if (multiple) {
         const selectedItemsIdsSet = new Set(selectedItemIds)
         const selectedItems = Object.entries(items)
           .filter(([id]) => selectedItemsIdsSet.has(id))
           .flatMap(([, value]) => value.label)
 
-        const label = selectedItems.join(", ")
+        if (selectedItems.length === 0) {
+          return textNoSelection
+        }
 
-        return selectedItems.length > 0 ? label : textNoSelection
-      } else {
-        return Object.values(items).findLast(item => (item.value as string) === value)?.label || textNoSelection
+        const visibleItems = selectedItems.slice(0, 2)
+        const remainingCount = selectedItems.length - 2
+
+        return (
+          <SelectedItemsContainer>
+            {visibleItems.map((item, index) => (
+              <Chip
+                colorBackground={[EColor.Black, 100]}
+                key={index}
+                children={
+                  <KeyValuePair direction={EDirection.Horizontal} spacing={ESize.Xsmall}>
+                    <Text size={ESize.Small} color={[EColor.Black, 700]} alignment={EAlignment.Start}>
+                      {item}
+                    </Text>
+                    <Icon
+                      name="close"
+                      point
+                      size={ESize.Small}
+                      color={[EColor.Black, 700]}
+                      onClick={(event: Event) => handleRemoveItem(event, item)}
+                    />
+                  </KeyValuePair>
+                }
+              />
+            ))}
+            {remainingCount > 0 && (
+              <Chip
+                key={remainingCount}
+                colorBackground={[EColor.Black, 100]}
+                children={
+                  <Text size={ESize.Small} color={[EColor.Black, 700]} alignment={EAlignment.Start}>
+                    +{remainingCount}
+                  </Text>
+                }
+              />
+            )}
+          </SelectedItemsContainer>
+        )
       }
+      return Object.values(items).findLast(item => (item.value as string) === value)?.label || textNoSelection
+    }
+
+    const handleRemoveItem = (event: Event, label: string) => {
+      event.preventDefault()
+      const item = Object.values(items).findLast(item => item.label.toLowerCase() === label.toLowerCase())
+
+      onChange([item?.id as string])
     }
 
     const onSelectSingle = (value: string) => {
@@ -231,8 +282,14 @@ export const VirtualizedInputCombobox = forwardRef<HTMLDivElement, PropsWithChil
             <KeyValuePair direction={EDirection.Vertical} spacing={ESize.Xsmall}>
               {label && <Label htmlFor={key}>{label}</Label>}
 
-              <InputButton size={ESize.Medium} variant={EInputButtonVariant.Outlined} color={colorButtonBackground}>
-                <KeyValuePair direction={EDirection.Horizontal} spacing={ESize.Tiny}>
+              <InputButton
+                size={ESize.Medium}
+                variant={EInputButtonVariant.Outlined}
+                color={colorButtonBackground}
+                colorBackgroundHover={[colorButtonBackground, 50]}
+                outlineColor={[colorButtonBackground, 100]}
+              >
+                <KeyValuePair direction={EDirection.Horizontal} spacing={ESize.Large}>
                   <>
                     {icon && (
                       <>
@@ -241,7 +298,7 @@ export const VirtualizedInputCombobox = forwardRef<HTMLDivElement, PropsWithChil
                     )}
 
                     <TextWithOverflow
-                      color={[colorButtonForeground, 700]}
+                      color={[colorButtonForeground, 1000]}
                       size={ESize.Xsmall}
                       alignment={EAlignment.Start}
                       width={width}
@@ -253,7 +310,7 @@ export const VirtualizedInputCombobox = forwardRef<HTMLDivElement, PropsWithChil
                   <Icon
                     name={open ? "keyboard_arrow_up" : "keyboard_arrow_down"}
                     size={ESize.Medium}
-                    color={[colorButtonForeground, 700]}
+                    color={[colorButtonForeground, 1000]}
                   />
                 </KeyValuePair>
               </InputButton>
@@ -269,7 +326,8 @@ export const VirtualizedInputCombobox = forwardRef<HTMLDivElement, PropsWithChil
           layout={
             <LayoutCombobox
               contentTop={
-                filterOptions && (
+                filterOptions &&
+                filteredItems.length > 9 && (
                   <>
                     <InputText
                       width={ESize.Full}

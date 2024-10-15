@@ -19,6 +19,7 @@ import { EAlignment } from "@new/EAlignment"
 import { Spacer } from "@new/Spacer/Spacer"
 import { InputCheckbox } from "@new/InputCheckbox/InputCheckbox"
 import { TPlaywright } from "@new/TPlaywright"
+import { Chip } from "@new/Chip/Chip"
 
 const Container = styled.div({
   display: "flex",
@@ -81,7 +82,7 @@ const Label = styled.label({
 })
 
 const TextWithOverflow = styled(Text)<Pick<TInputCombobox, "width">>(p => ({
-  width: p.width === ESize.Small ? "150px" : "300px",
+  minWidth: p.width === ESize.Small ? "150px" : "300px",
   overflowX: "hidden",
   overflowY: "hidden",
   textOverflow: "ellipsis",
@@ -91,6 +92,11 @@ const TextWithOverflow = styled(Text)<Pick<TInputCombobox, "width">>(p => ({
 
 const TitleText = styled(Text)({
   marginRight: "5px",
+})
+
+const SelectedItemsContainer = styled.div({
+  display: "flex",
+  gap: "3px",
 })
 
 export type TInputComboBoxFilterOptions = {
@@ -174,15 +180,60 @@ export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<TInput
   }, [children])
 
   const generateCurrentValueLabel = multiple => {
-    if (multiple) {
-      const selectedItems = items.filter(item => item.value === true).flatMap(item => item.label)
-
-      const label = selectedItems.join(", ")
-
-      return selectedItems.length > 0 ? label : textNoSelection
-    } else {
+    if (!multiple) {
       return items.findLast(item => (item.value as string) === value)?.label || textNoSelection
     }
+    const selectedItems = items.filter(item => item.value === true).flatMap(item => item.label)
+    if (selectedItems.length === 0) {
+      return textNoSelection
+    }
+
+    const visibleItems = selectedItems.slice(0, 2)
+    const remainingCount = selectedItems.length - 2
+
+    return (
+      <SelectedItemsContainer>
+        {visibleItems?.map((item, index) => (
+          <Chip
+            colorBackground={[EColor.Black, 100]}
+            key={index}
+            children={
+              <KeyValuePair direction={EDirection.Horizontal} spacing={ESize.Xsmall}>
+                <Text size={ESize.Small} color={[EColor.Black, 700]} alignment={EAlignment.Start}>
+                  {item}
+                </Text>
+                <Icon
+                  name="close"
+                  point
+                  size={ESize.Small}
+                  color={[EColor.Black, 700]}
+                  onClick={(event: Event) => handleRemoveItem(event, item)}
+                />
+              </KeyValuePair>
+            }
+          />
+        ))}
+        {remainingCount > 0 && (
+          <Chip
+            key={remainingCount}
+            colorBackground={[EColor.Black, 100]}
+            children={
+              <Text size={ESize.Small} color={[EColor.Black, 700]} alignment={EAlignment.Start}>
+                +{remainingCount}
+              </Text>
+            }
+          />
+        )}
+      </SelectedItemsContainer>
+    )
+  }
+
+  const handleRemoveItem = (event: Event, label: string) => {
+    event.preventDefault()
+    const updatedItems = items.map(item => (item.label === label ? { ...item, value: false } : item))
+
+    const booleanValues = updatedItems.map(item => item.value as boolean)
+    onChange(booleanValues)
   }
 
   const onSelectSingle = (value: string) => {
@@ -221,22 +272,28 @@ export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<TInput
           <KeyValuePair direction={EDirection.Vertical} spacing={ESize.Xsmall}>
             {label && <Label htmlFor={key}>{label}</Label>}
 
-            <InputButton size={ESize.Medium} variant={EInputButtonVariant.Outlined} color={colorButtonBackground}>
+            <InputButton
+              size={ESize.Large}
+              variant={EInputButtonVariant.Outlined}
+              color={colorButtonBackground}
+              colorBackgroundHover={[colorButtonBackground, 50]}
+              outlineColor={[colorButtonBackground, 100]}
+            >
               <KeyValuePair direction={EDirection.Horizontal} spacing={ESize.Large}>
                 <>
                   {icon && (
                     <>
-                      {icon} <Spacer size={ESize.Xsmall} />
+                      {icon} <Spacer size={ESize.Small} />
                     </>
                   )}
                   {title && (
-                    <TitleText color={[colorButtonForeground, 300]} size={ESize.Xsmall} alignment={EAlignment.Start}>
+                    <TitleText color={[colorButtonForeground, 500]} size={ESize.Small} alignment={EAlignment.Start}>
                       {title}
                     </TitleText>
                   )}
                   <TextWithOverflow
-                    color={[colorButtonForeground, 700]}
-                    size={ESize.Xsmall}
+                    color={[colorButtonForeground, 1000]}
+                    size={ESize.Small}
                     alignment={EAlignment.Start}
                     width={width}
                   >
@@ -247,7 +304,7 @@ export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<TInput
                 <Icon
                   name={open ? "keyboard_arrow_up" : "keyboard_arrow_down"}
                   size={ESize.Medium}
-                  color={[colorButtonForeground, 700]}
+                  color={[colorButtonForeground, 1000]}
                 />
               </KeyValuePair>
             </InputButton>
