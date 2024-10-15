@@ -39,6 +39,8 @@ const Label = styled.label({
   display: "flex",
   userSelect: "none",
   cursor: "pointer",
+  gap: "5px",
+  alignItems: "center",
 })
 
 export type TInputCheckBox = TPlaywright & {
@@ -48,6 +50,7 @@ export type TInputCheckBox = TPlaywright & {
   colorBackground: EColor
   colorForeground: EColor
   label?: ReactElement<TText>
+  icon?: ReactElement
 }
 
 export const InputCheckbox = ({
@@ -58,6 +61,7 @@ export const InputCheckbox = ({
   colorForeground,
   label,
   playwrightTestId,
+  icon,
 }: TInputCheckBox) => {
   const key = useId()
 
@@ -85,8 +89,10 @@ export const InputCheckbox = ({
             }
           />
         </Composition>
-
-        <Label htmlFor={key}>{label}</Label>
+        <Label htmlFor={key}>
+          {icon}
+          {label}
+        </Label>
       </KeyValuePair>
     </Container>
   )

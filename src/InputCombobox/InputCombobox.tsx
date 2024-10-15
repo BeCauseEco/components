@@ -89,6 +89,10 @@ const TextWithOverflow = styled(Text)<Pick<TInputCombobox, "width">>(p => ({
   display: "block",
 }))
 
+const TitleText = styled(Text)({
+  marginRight: "5px",
+})
+
 export type TInputComboBoxFilterOptions = {
   textFilterNoResults: string
   textFilterPlaceholder: string
@@ -124,6 +128,8 @@ type TInputCombobox = TPlaywright & {
    *
    * Otherwise the type is of string */
   id?: string
+
+  title?: string
   onChange: (value: TInputComboboxValue) => void
 
   children: ReactElement<TInputComboboxItem> | ReactElement<TInputComboboxItem>[]
@@ -143,6 +149,7 @@ export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<TInput
     value,
     multiple = false,
     id,
+    title,
     onChange,
     children,
     playwrightTestId,
@@ -215,14 +222,18 @@ export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<TInput
             {label && <Label htmlFor={key}>{label}</Label>}
 
             <InputButton size={ESize.Medium} variant={EInputButtonVariant.Outlined} color={colorButtonBackground}>
-              <KeyValuePair direction={EDirection.Horizontal} spacing={ESize.Tiny}>
+              <KeyValuePair direction={EDirection.Horizontal} spacing={ESize.Large}>
                 <>
                   {icon && (
                     <>
                       {icon} <Spacer size={ESize.Xsmall} />
                     </>
                   )}
-
+                  {title && (
+                    <TitleText color={[colorButtonForeground, 300]} size={ESize.Xsmall} alignment={EAlignment.Start}>
+                      {title}
+                    </TitleText>
+                  )}
                   <TextWithOverflow
                     color={[colorButtonForeground, 700]}
                     size={ESize.Xsmall}
@@ -252,7 +263,8 @@ export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<TInput
         layout={
           <LayoutCombobox
             contentTop={
-              filterOptions && (
+              filterOptions &&
+              items.length > 9 && (
                 <>
                   <InputText
                     width={ESize.Full}
@@ -284,7 +296,7 @@ export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<TInput
                       key={index}
                       value={item.label}
                       onSelect={value => (multiple ? () => {} : onSelectSingle(value))}
-                      selected={value == item.value}
+                      selected={value === item.value}
                       colorBackground={item.colorBackground}
                       colorBackgroundHover={item.colorBackgroundHover}
                       colorForeground={item.colorForeground}
@@ -296,6 +308,7 @@ export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<TInput
                           onChange={value => onSelectMultiple(index, value)}
                           colorBackground={item.colorBackground}
                           colorForeground={item.colorForeground}
+                          icon={item.icon}
                           label={
                             <Text size={ESize.Xsmall} color={[item.colorBackground, 700]}>
                               {item.label}
