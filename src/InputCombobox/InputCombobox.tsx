@@ -202,13 +202,14 @@ export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<TInput
                 <Text size={ESize.Small} color={[EColor.Black, 700]} alignment={EAlignment.Start}>
                   {item}
                 </Text>
-                <Icon
-                  name="close"
-                  point
-                  size={ESize.Small}
-                  color={[EColor.Black, 700]}
-                  onClick={(event: Event) => handleRemoveItem(event, item)}
-                />
+                <InputButton size={ESize.Xsmall} variant={EInputButtonVariant.Transparent} color={EColor.Transparent}>
+                  <Icon
+                    name="close"
+                    size={ESize.Small}
+                    color={[EColor.Black, 700]}
+                    onClick={(event: Event) => handleRemoveItem(event, item)}
+                  />
+                </InputButton>
               </KeyValuePair>
             }
           />

@@ -3,6 +3,11 @@ import styled from "@emotion/styled"
 import { TLayoutBase } from "@new/Composition/TLayoutBase"
 import { ESize } from "@new/ESize"
 
+const StyleSizeXSmall = (childIconOnly: boolean) => ({
+  padding: childIconOnly ? "calc(var(--BU) * 0.5)" : "calc(var(--BU) * 0.5) var(--BU)",
+  borderRadius: "var(--BU)",
+})
+
 const StyleSizeSmall = childIconOnly => ({
   padding: childIconOnly ? "var(--BU)" : "var(--BU) calc(var(--BU) * 2)",
   borderRadius: "var(--BU)",
@@ -23,6 +28,7 @@ const Container = styled.div<Pick<TLayoutInputButton, "size" | "childIconOnly" |
   width: "100%",
   cursor: "pointer",
 
+  ...(p.size === ESize.Xsmall && StyleSizeXSmall(p.childIconOnly)),
   ...(p.size === ESize.Small && StyleSizeSmall(p.childIconOnly)),
   ...(p.size === ESize.Medium && StyleSizeMedium(p.childIconOnly)),
   ...(p.size === ESize.Large && StyleSizeLarge(p.childIconOnly)),

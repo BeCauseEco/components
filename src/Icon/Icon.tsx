@@ -28,7 +28,6 @@ const Container = styled.i<Omit<TIcon, "name">>(p => ({
   width: "fit-content",
   height: p.size,
   lineHeight: p.size,
-  cursor: p.point ? "pointer" : "default",
   fontSize: p.size,
   color: computeColor(p.color),
   "font-variation-settings": calculateFontVariantSettings(p.size, p.weight || EWeight.Normal, p.fill || false),
@@ -42,10 +41,9 @@ export type TIcon = TPlaywright & {
   weight?: EWeight
   fill?: boolean
   onClick?: any
-  point?: boolean
 }
 
-export const Icon = ({ name, size, color, weight, fill, onClick = undefined, playwrightTestId, point }: TIcon) => {
+export const Icon = ({ name, size, color, weight, fill, onClick = undefined, playwrightTestId }: TIcon) => {
   const noop = () => {}
 
   return (
@@ -57,7 +55,6 @@ export const Icon = ({ name, size, color, weight, fill, onClick = undefined, pla
       className="material-symbols-rounded"
       onClick={onClick || noop}
       data-playwright-testid={playwrightTestId}
-      point={point}
     >
       {name === "blank" ? null : name}
     </Container>

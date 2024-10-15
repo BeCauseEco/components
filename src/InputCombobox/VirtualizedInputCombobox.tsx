@@ -196,7 +196,6 @@ export const VirtualizedInputCombobox = forwardRef<HTMLDivElement, PropsWithChil
                     </Text>
                     <Icon
                       name="close"
-                      point
                       size={ESize.Small}
                       color={[EColor.Black, 700]}
                       onClick={(event: Event) => handleRemoveItem(event, item)}

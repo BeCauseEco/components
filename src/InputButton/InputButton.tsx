@@ -50,7 +50,7 @@ export enum EInputButtonVariant {
 }
 
 type TInputButtonBase = TPlaywright & {
-  size: ESize.Small | ESize.Medium | ESize.Large
+  size: ESize.Xsmall | ESize.Small | ESize.Medium | ESize.Large
   id?: string
   onClick?: () => void
   loading?: boolean
