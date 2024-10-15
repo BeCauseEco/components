@@ -194,12 +194,18 @@ export const VirtualizedInputCombobox = forwardRef<HTMLDivElement, PropsWithChil
                     <Text size={ESize.Small} color={[EColor.Black, 700]} alignment={EAlignment.Start}>
                       {item}
                     </Text>
-                    <Icon
-                      name="close"
-                      size={ESize.Small}
-                      color={[EColor.Black, 700]}
-                      onClick={(event: Event) => handleRemoveItem(event, item)}
-                    />
+                    <InputButton
+                      size={ESize.Xsmall}
+                      variant={EInputButtonVariant.Transparent}
+                      color={EColor.Transparent}
+                    >
+                      <Icon
+                        name="close"
+                        size={ESize.Small}
+                        color={[EColor.Black, 700]}
+                        onClick={(event: Event) => handleRemoveItem(event, item)}
+                      />
+                    </InputButton>
                   </KeyValuePair>
                 }
               />
@@ -223,9 +229,17 @@ export const VirtualizedInputCombobox = forwardRef<HTMLDivElement, PropsWithChil
 
     const handleRemoveItem = (event: Event, label: string) => {
       event.preventDefault()
-      const item = Object.values(items).findLast(item => item.label.toLowerCase() === label.toLowerCase())
 
-      onChange([item?.id as string])
+      const item = Object.values(items).findLast(item => item.label.toLowerCase() === label.toLowerCase())
+      if (!item) {
+        return
+      }
+
+      setSelectedItemIds(prev => {
+        const updatedItems = prev.filter(id => id !== item.id)
+        onChange(updatedItems)
+        return updatedItems
+      })
     }
 
     const onSelectSingle = (value: string) => {
