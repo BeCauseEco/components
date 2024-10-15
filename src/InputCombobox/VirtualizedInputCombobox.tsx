@@ -71,7 +71,7 @@ const Label = styled.label({
 })
 
 const TextWithOverflow = styled(Text)<Pick<TVirtualizedInputCombobox, "width">>(p => ({
-  width: p.width === ESize.Small ? "150px" : "300px",
+  minWidth: p.width === ESize.Small ? "150px" : "300px",
   overflowX: "hidden",
   overflowY: "hidden",
   textOverflow: "ellipsis",
