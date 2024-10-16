@@ -15,6 +15,8 @@ import { TPlaywright } from "@new/TPlaywright"
 const Output = styled.output<Pick<TInputButton, "loading" | "variant">>(p => ({
   display: "flex",
   alignItems: "center",
+  alignContent: "center",
+  justifyContent: "center",
   border: 0,
   background: "none",
   userSelect: "none",
@@ -49,7 +51,7 @@ export enum EInputButtonVariant {
 }
 
 type TInputButtonBase = TPlaywright & {
-  size: ESize.Small | ESize.Medium | ESize.Large
+  size: ESize.Xsmall | ESize.Small | ESize.Medium | ESize.Large
   id?: string
   onClick?: () => void
   loading?: boolean
@@ -59,6 +61,7 @@ type TInputButtonBase = TPlaywright & {
     | ReactElement<TText | TIcon>
     | [ReactElement<TText>, ReactElement<TSpacer>, ReactElement<TIcon>]
     | [ReactElement<TIcon>, ReactElement<TSpacer>, ReactElement<TText>]
+    | any // TO-DO: @cllpse: signature needed for TInputCombobox
 }
 
 type TNextLinkHref = LinkProps["href"]
@@ -91,7 +94,13 @@ export const InputButton = forwardRef<HTMLButtonElement | HTMLAnchorElement, Pro
       playwrightTestId,
     } = props
 
-    const childIconOnly = React.Children.toArray(children)[0]["type"]["name"] === "Icon"
+    let childIconOnly = false
+
+    try {
+      childIconOnly = React.Children.toArray(children)[0]["type"]["name"] === "Icon"
+    } catch (error) {
+      // console.error(error)
+    }
 
     let background
 
@@ -109,7 +118,7 @@ export const InputButton = forwardRef<HTMLButtonElement | HTMLAnchorElement, Pro
       case EInputButtonVariant.Outlined:
         background = (
           <BackgroundCard
-            colorOutline={[props.color, 700]}
+            colorOutline={[props.color, 300]}
             colorBackgroundHover={[props.color, 100]}
             borderRadius={ESize.Tiny}
           />

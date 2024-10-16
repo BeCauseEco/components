@@ -1,14 +1,12 @@
 import styled from "@emotion/styled"
 import { Command, CommandEmpty, CommandGroup, CommandItem } from "cmdk"
-import { PropsWithChildren, ReactElement, forwardRef, useCallback, useEffect, useId, useMemo, useState } from "react"
+import { PropsWithChildren, ReactElement, forwardRef, useCallback, useEffect, useMemo, useState } from "react"
 import React from "react"
 import { Text, TText } from "@new/Text/Text"
 import { ESize } from "@new/ESize"
 import { computeColor, EColor } from "@new/Color"
 import { Popover } from "@new/Popover/Popover"
 import { EInputButtonVariant, InputButton } from "@new/InputButton/InputButton"
-import { KeyValuePair } from "@new/KeyValuePair/KeyValuePair"
-import { EDirection } from "@new/EDirection"
 import { Icon, TIcon } from "@new/Icon/Icon"
 import { BackgroundCard } from "@new/Composition/BackgroundCard"
 import { EShadow } from "@new/EShadow"
@@ -21,6 +19,7 @@ import { TPlaywright } from "@new/TPlaywright"
 import { TInputComboBoxFilterOptions, TInputComboboxValue } from "./InputCombobox"
 import { Virtuoso } from "react-virtuoso"
 import { TVirtualizedInputComboboxItem } from "./VirtualizedInputComboboxItem"
+import { Chip } from "@new/Chip/Chip"
 
 const Container = styled.div({
   display: "flex",
@@ -63,20 +62,19 @@ const CommandEmptyStyled = styled(CommandEmpty)({
   userSelect: "none",
 })
 
-const Label = styled.label({
-  display: "flex",
-  userSelect: "none",
-  cursor: "pointer",
-})
-
 const TextWithOverflow = styled(Text)<Pick<TVirtualizedInputCombobox, "width">>(p => ({
-  width: p.width === ESize.Small ? "150px" : "300px",
+  maxWidth: p.width === ESize.Small ? "150px" : "300px",
   overflowX: "hidden",
   overflowY: "hidden",
   textOverflow: "ellipsis",
   textWrap: "nowrap",
   display: "block",
 }))
+
+const InputButtonCollapse = styled(InputButton)({
+  height: 0,
+  paddingTop: 0,
+})
 
 type TVirtualizedInputCombobox = TPlaywright & {
   colorButtonBackground: EColor
@@ -142,8 +140,6 @@ export const VirtualizedInputCombobox = forwardRef<HTMLDivElement, PropsWithChil
 
     const [height, setHeight] = useState(1)
 
-    const key = useId()
-
     const items: { [id: string]: TVirtualizedInputComboboxItem } = useMemo(() => {
       const a: { [id: string]: TVirtualizedInputComboboxItem } = {}
 
@@ -163,19 +159,86 @@ export const VirtualizedInputCombobox = forwardRef<HTMLDivElement, PropsWithChil
       setSelectedItemIds(prev => prev.filter(prevId => newItemsSet.has(prevId)))
     }, [items])
 
-    const generateCurrentValueLabel = multiple => {
+    const generateCurrentValueLabel = (multiple: boolean) => {
       if (multiple) {
         const selectedItemsIdsSet = new Set(selectedItemIds)
         const selectedItems = Object.entries(items)
           .filter(([id]) => selectedItemsIdsSet.has(id))
           .flatMap(([, value]) => value.label)
 
-        const label = selectedItems.join(", ")
+        if (selectedItems.length === 0) {
+          return textNoSelection
+        }
 
-        return selectedItems.length > 0 ? label : textNoSelection
-      } else {
-        return Object.values(items).findLast(item => (item.value as string) === value)?.label || textNoSelection
+        const visibleItems = selectedItems.slice(0, 2)
+        const remainingCount = selectedItems.length - 2
+
+        return (
+          <>
+            {visibleItems?.map((item, index) => (
+              <>
+                <Chip colorBackground={[colorButtonBackground, 100]} key={index}>
+                  <TextWithOverflow color={[colorButtonForeground, 700]} size={ESize.Xsmall} width={width}>
+                    {item}
+                  </TextWithOverflow>
+
+                  <Spacer size={ESize.Tiny} />
+
+                  <InputButtonCollapse
+                    size={ESize.Small}
+                    variant={EInputButtonVariant.Transparent}
+                    color={colorButtonBackground}
+                    omitPadding
+                  >
+                    <Icon
+                      name="close"
+                      size={ESize.Medium}
+                      color={[colorButtonBackground, 700]}
+                      onClick={(event: Event) => handleRemoveItem(event, item)}
+                    />
+                  </InputButtonCollapse>
+                </Chip>
+
+                <Spacer size={ESize.Tiny} />
+              </>
+            ))}
+
+            {remainingCount > 0 && (
+              <Chip key={remainingCount} colorBackground={[colorButtonBackground, 100]}>
+                <Text size={ESize.Xsmall} color={[EColor.Black, 700]}>
+                  +{remainingCount}
+                </Text>
+              </Chip>
+            )}
+          </>
+        )
       }
+
+      return (
+        <TextWithOverflow
+          color={[colorButtonForeground, 700]}
+          size={ESize.Xsmall}
+          alignment={EAlignment.Start}
+          width={width}
+        >
+          {Object.values(items).findLast(item => (item.value as string) === value)?.label || textNoSelection}
+        </TextWithOverflow>
+      )
+    }
+
+    const handleRemoveItem = (event: Event, label: string) => {
+      event.preventDefault()
+
+      const item = Object.values(items).findLast(item => item.label.toLowerCase() === label.toLowerCase())
+      if (!item) {
+        return
+      }
+
+      setSelectedItemIds(prev => {
+        const updatedItems = prev.filter(id => id !== item.id)
+        onChange(updatedItems)
+        return updatedItems
+      })
     }
 
     const onSelectSingle = (value: string) => {
@@ -228,36 +291,31 @@ export const VirtualizedInputCombobox = forwardRef<HTMLDivElement, PropsWithChil
           onOpenChange={setOpen}
           alignment={EAlignment.Start}
           trigger={
-            <KeyValuePair direction={EDirection.Vertical} spacing={ESize.Xsmall}>
-              {label && <Label htmlFor={key}>{label}</Label>}
+            <InputButton size={ESize.Medium} variant={EInputButtonVariant.Outlined} color={colorButtonBackground}>
+              {label && (
+                <>
+                  {label}
 
-              <InputButton size={ESize.Medium} variant={EInputButtonVariant.Outlined} color={colorButtonBackground}>
-                <KeyValuePair direction={EDirection.Horizontal} spacing={ESize.Tiny}>
-                  <>
-                    {icon && (
-                      <>
-                        {icon} <Spacer size={ESize.Xsmall} />
-                      </>
-                    )}
+                  <Spacer size={ESize.Xsmall} />
+                </>
+              )}
 
-                    <TextWithOverflow
-                      color={[colorButtonForeground, 700]}
-                      size={ESize.Xsmall}
-                      alignment={EAlignment.Start}
-                      width={width}
-                    >
-                      {generateCurrentValueLabel(multiple)}
-                    </TextWithOverflow>
-                  </>
+              {icon && (
+                <>
+                  {icon} <Spacer size={ESize.Small} />
+                </>
+              )}
 
-                  <Icon
-                    name={open ? "keyboard_arrow_up" : "keyboard_arrow_down"}
-                    size={ESize.Medium}
-                    color={[colorButtonForeground, 700]}
-                  />
-                </KeyValuePair>
-              </InputButton>
-            </KeyValuePair>
+              {generateCurrentValueLabel(multiple)}
+
+              <Spacer size={ESize.Xsmall} />
+
+              <Icon
+                name={open ? "keyboard_arrow_up" : "keyboard_arrow_down"}
+                size={ESize.Medium}
+                color={[colorButtonForeground, 700]}
+              />
+            </InputButton>
           }
           background={
             <BackgroundCard
@@ -269,7 +327,8 @@ export const VirtualizedInputCombobox = forwardRef<HTMLDivElement, PropsWithChil
           layout={
             <LayoutCombobox
               contentTop={
-                filterOptions && (
+                filterOptions &&
+                filteredItems.length > 9 && (
                   <>
                     <InputText
                       width={ESize.Full}
@@ -318,17 +377,22 @@ export const VirtualizedInputCombobox = forwardRef<HTMLDivElement, PropsWithChil
                           data-playwright-testid={item.playwrightTestId}
                         >
                           {multiple ? (
-                            <InputCheckbox
-                              value={selectedItemIds.includes(item.id)}
-                              onChange={value => onSelectMultiple(item.id, value)}
-                              colorBackground={item.colorBackground}
-                              colorForeground={item.colorForeground}
-                              label={
-                                <Text size={ESize.Xsmall} color={[item.colorBackground, 700]} wrap>
-                                  {item.label}
-                                </Text>
-                              }
-                            />
+                            <div style={{ display: "flex", alignItems: "center" }}>
+                              {item.icon}
+                              <Spacer size={ESize.Xsmall} />
+
+                              <InputCheckbox
+                                value={selectedItemIds.includes(item.id)}
+                                onChange={value => onSelectMultiple(item.id, value)}
+                                colorBackground={item.colorBackground}
+                                colorForeground={item.colorForeground}
+                                label={
+                                  <Text size={ESize.Xsmall} color={[item.colorBackground, 700]} wrap>
+                                    {item.label}
+                                  </Text>
+                                }
+                              />
+                            </div>
                           ) : (
                             <Text size={ESize.Xsmall} color={[item.colorForeground, 700]} wrap>
                               {item.label}

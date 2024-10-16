@@ -1,5 +1,6 @@
 import { EColor } from "@new/Color"
 import { TPlaywright } from "@new/TPlaywright"
+import { ReactElement } from "react"
 
 export type TVirtualizedInputComboboxItem = TPlaywright & {
   id: string
@@ -8,6 +9,7 @@ export type TVirtualizedInputComboboxItem = TPlaywright & {
   colorBackground: EColor
   colorBackgroundHover: EColor
   colorForeground: EColor
+  icon?: ReactElement
 }
 
 export const VirtualizedInputComboboxItem = ({
@@ -17,4 +19,6 @@ export const VirtualizedInputComboboxItem = ({
   label,
   // eslint-disable-next-line
   value,
+  // eslint-disable-next-line
+  icon,
 }: TVirtualizedInputComboboxItem) => null
