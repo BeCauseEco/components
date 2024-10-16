@@ -1,14 +1,12 @@
 import styled from "@emotion/styled"
 import { Command, CommandEmpty, CommandGroup, CommandItem } from "cmdk"
-import { PropsWithChildren, ReactElement, forwardRef, useCallback, useEffect, useId, useMemo, useState } from "react"
+import { PropsWithChildren, ReactElement, forwardRef, useCallback, useEffect, useMemo, useState } from "react"
 import React from "react"
 import { Text, TText } from "@new/Text/Text"
 import { ESize } from "@new/ESize"
 import { computeColor, EColor } from "@new/Color"
 import { Popover } from "@new/Popover/Popover"
 import { EInputButtonVariant, InputButton } from "@new/InputButton/InputButton"
-import { KeyValuePair } from "@new/KeyValuePair/KeyValuePair"
-import { EDirection } from "@new/EDirection"
 import { Icon, TIcon } from "@new/Icon/Icon"
 import { BackgroundCard } from "@new/Composition/BackgroundCard"
 import { EShadow } from "@new/EShadow"
@@ -62,12 +60,6 @@ const CommandItemStyled = styled(CommandItem)<
 const CommandEmptyStyled = styled(CommandEmpty)({
   padding: "calc(var(--BU) * 1.5) 0",
   userSelect: "none",
-})
-
-const Label = styled.label({
-  display: "flex",
-  userSelect: "none",
-  cursor: "pointer",
 })
 
 const TextWithOverflow = styled(Text)<Pick<TVirtualizedInputCombobox, "width">>(p => ({
@@ -147,8 +139,6 @@ export const VirtualizedInputCombobox = forwardRef<HTMLDivElement, PropsWithChil
     const [selectedItemIds, setSelectedItemIds] = useState<string[]>([])
 
     const [height, setHeight] = useState(1)
-
-    const key = useId()
 
     const items: { [id: string]: TVirtualizedInputComboboxItem } = useMemo(() => {
       const a: { [id: string]: TVirtualizedInputComboboxItem } = {}
@@ -387,17 +377,22 @@ export const VirtualizedInputCombobox = forwardRef<HTMLDivElement, PropsWithChil
                           data-playwright-testid={item.playwrightTestId}
                         >
                           {multiple ? (
-                            <InputCheckbox
-                              value={selectedItemIds.includes(item.id)}
-                              onChange={value => onSelectMultiple(item.id, value)}
-                              colorBackground={item.colorBackground}
-                              colorForeground={item.colorForeground}
-                              label={
-                                <Text size={ESize.Xsmall} color={[item.colorBackground, 700]} wrap>
-                                  {item.label}
-                                </Text>
-                              }
-                            />
+                            <div style={{ display: "flex", alignItems: "center" }}>
+                              {item.icon}
+                              <Spacer size={ESize.Xsmall} />
+
+                              <InputCheckbox
+                                value={selectedItemIds.includes(item.id)}
+                                onChange={value => onSelectMultiple(item.id, value)}
+                                colorBackground={item.colorBackground}
+                                colorForeground={item.colorForeground}
+                                label={
+                                  <Text size={ESize.Xsmall} color={[item.colorBackground, 700]} wrap>
+                                    {item.label}
+                                  </Text>
+                                }
+                              />
+                            </div>
                           ) : (
                             <Text size={ESize.Xsmall} color={[item.colorForeground, 700]} wrap>
                               {item.label}
