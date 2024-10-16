@@ -11,11 +11,12 @@ import Link, { LinkProps } from "next/link"
 import React from "react"
 import { TSpacer } from "@new/Spacer/Spacer"
 import { TPlaywright } from "@new/TPlaywright"
-import { TColor } from "@new/Color"
 
 const Output = styled.output<Pick<TInputButton, "loading" | "variant">>(p => ({
   display: "flex",
   alignItems: "center",
+  alignContent: "center",
+  justifyContent: "center",
   border: 0,
   background: "none",
   userSelect: "none",
@@ -60,6 +61,7 @@ type TInputButtonBase = TPlaywright & {
     | ReactElement<TText | TIcon>
     | [ReactElement<TText>, ReactElement<TSpacer>, ReactElement<TIcon>]
     | [ReactElement<TIcon>, ReactElement<TSpacer>, ReactElement<TText>]
+    | any // TO-DO: @cllpse: signature needed for TInputCombobox
 }
 
 type TNextLinkHref = LinkProps["href"]
@@ -72,8 +74,6 @@ type TInputButtonVariantLink = TInputButtonBase & {
 type TInputButtonVariantOthers = TInputButtonBase & {
   variant: EInputButtonVariant.Solid | EInputButtonVariant.Outlined | EInputButtonVariant.Transparent
   color: EColor
-  outlineColor?: TColor
-  colorBackgroundHover?: TColor
 }
 
 export type TInputButton = TInputButtonVariantLink | TInputButtonVariantOthers | TInputButtonVariantOthers
@@ -94,7 +94,13 @@ export const InputButton = forwardRef<HTMLButtonElement | HTMLAnchorElement, Pro
       playwrightTestId,
     } = props
 
-    const childIconOnly = React.Children.toArray(children)[0]["type"]["name"] === "Icon"
+    let childIconOnly = false
+
+    try {
+      childIconOnly = React.Children.toArray(children)[0]["type"]["name"] === "Icon"
+    } catch (error) {
+      // console.error(error)
+    }
 
     let background
 
@@ -112,8 +118,8 @@ export const InputButton = forwardRef<HTMLButtonElement | HTMLAnchorElement, Pro
       case EInputButtonVariant.Outlined:
         background = (
           <BackgroundCard
-            colorOutline={props.outlineColor ?? [props.color, 700]}
-            colorBackgroundHover={props.colorBackgroundHover ?? [props.color, 100]}
+            colorOutline={[props.color, 300]}
+            colorBackgroundHover={[props.color, 100]}
             borderRadius={ESize.Tiny}
           />
         )
