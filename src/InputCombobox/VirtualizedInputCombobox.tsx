@@ -71,7 +71,7 @@ const Label = styled.label({
 })
 
 const TextWithOverflow = styled(Text)<Pick<TVirtualizedInputCombobox, "width">>(p => ({
-  minWidth: p.width === ESize.Small ? "150px" : "300px",
+  maxWidth: p.width === ESize.Small ? "150px" : "300px",
   overflowX: "hidden",
   overflowY: "hidden",
   textOverflow: "ellipsis",
@@ -79,9 +79,9 @@ const TextWithOverflow = styled(Text)<Pick<TVirtualizedInputCombobox, "width">>(
   display: "block",
 }))
 
-const SelectedItemsContainer = styled.div({
-  display: "flex",
-  gap: "3px",
+const InputButtonCollapse = styled(InputButton)({
+  height: 0,
+  paddingTop: 0,
 })
 
 type TVirtualizedInputCombobox = TPlaywright & {
@@ -184,47 +184,56 @@ export const VirtualizedInputCombobox = forwardRef<HTMLDivElement, PropsWithChil
         const remainingCount = selectedItems.length - 2
 
         return (
-          <SelectedItemsContainer>
-            {visibleItems.map((item, index) => (
-              <Chip
-                colorBackground={[EColor.Black, 100]}
-                key={index}
-                children={
-                  <KeyValuePair direction={EDirection.Horizontal} spacing={ESize.Xsmall}>
-                    <Text size={ESize.Small} color={[EColor.Black, 700]} alignment={EAlignment.Start}>
-                      {item}
-                    </Text>
-                    <InputButton
-                      size={ESize.Xsmall}
-                      variant={EInputButtonVariant.Transparent}
-                      color={EColor.Transparent}
-                    >
-                      <Icon
-                        name="close"
-                        size={ESize.Small}
-                        color={[EColor.Black, 700]}
-                        onClick={(event: Event) => handleRemoveItem(event, item)}
-                      />
-                    </InputButton>
-                  </KeyValuePair>
-                }
-              />
+          <>
+            {visibleItems?.map((item, index) => (
+              <>
+                <Chip colorBackground={[colorButtonBackground, 100]} key={index}>
+                  <TextWithOverflow color={[colorButtonForeground, 700]} size={ESize.Xsmall} width={width}>
+                    {item}
+                  </TextWithOverflow>
+
+                  <Spacer size={ESize.Tiny} />
+
+                  <InputButtonCollapse
+                    size={ESize.Small}
+                    variant={EInputButtonVariant.Transparent}
+                    color={colorButtonBackground}
+                    omitPadding
+                  >
+                    <Icon
+                      name="close"
+                      size={ESize.Medium}
+                      color={[colorButtonBackground, 700]}
+                      onClick={(event: Event) => handleRemoveItem(event, item)}
+                    />
+                  </InputButtonCollapse>
+                </Chip>
+
+                <Spacer size={ESize.Tiny} />
+              </>
             ))}
+
             {remainingCount > 0 && (
-              <Chip
-                key={remainingCount}
-                colorBackground={[EColor.Black, 100]}
-                children={
-                  <Text size={ESize.Small} color={[EColor.Black, 700]} alignment={EAlignment.Start}>
-                    +{remainingCount}
-                  </Text>
-                }
-              />
+              <Chip key={remainingCount} colorBackground={[colorButtonBackground, 100]}>
+                <Text size={ESize.Xsmall} color={[EColor.Black, 700]}>
+                  +{remainingCount}
+                </Text>
+              </Chip>
             )}
-          </SelectedItemsContainer>
+          </>
         )
       }
-      return Object.values(items).findLast(item => (item.value as string) === value)?.label || textNoSelection
+
+      return (
+        <TextWithOverflow
+          color={[colorButtonForeground, 700]}
+          size={ESize.Xsmall}
+          alignment={EAlignment.Start}
+          width={width}
+        >
+          {Object.values(items).findLast(item => (item.value as string) === value)?.label || textNoSelection}
+        </TextWithOverflow>
+      )
     }
 
     const handleRemoveItem = (event: Event, label: string) => {
@@ -292,42 +301,31 @@ export const VirtualizedInputCombobox = forwardRef<HTMLDivElement, PropsWithChil
           onOpenChange={setOpen}
           alignment={EAlignment.Start}
           trigger={
-            <KeyValuePair direction={EDirection.Vertical} spacing={ESize.Xsmall}>
-              {label && <Label htmlFor={key}>{label}</Label>}
+            <InputButton size={ESize.Medium} variant={EInputButtonVariant.Outlined} color={colorButtonBackground}>
+              {label && (
+                <>
+                  {label}
 
-              <InputButton
+                  <Spacer size={ESize.Xsmall} />
+                </>
+              )}
+
+              {icon && (
+                <>
+                  {icon} <Spacer size={ESize.Small} />
+                </>
+              )}
+
+              {generateCurrentValueLabel(multiple)}
+
+              <Spacer size={ESize.Xsmall} />
+
+              <Icon
+                name={open ? "keyboard_arrow_up" : "keyboard_arrow_down"}
                 size={ESize.Medium}
-                variant={EInputButtonVariant.Outlined}
-                color={colorButtonBackground}
-                colorBackgroundHover={[colorButtonBackground, 50]}
-                outlineColor={[colorButtonBackground, 100]}
-              >
-                <KeyValuePair direction={EDirection.Horizontal} spacing={ESize.Large}>
-                  <>
-                    {icon && (
-                      <>
-                        {icon} <Spacer size={ESize.Xsmall} />
-                      </>
-                    )}
-
-                    <TextWithOverflow
-                      color={[colorButtonForeground, 1000]}
-                      size={ESize.Xsmall}
-                      alignment={EAlignment.Start}
-                      width={width}
-                    >
-                      {generateCurrentValueLabel(multiple)}
-                    </TextWithOverflow>
-                  </>
-
-                  <Icon
-                    name={open ? "keyboard_arrow_up" : "keyboard_arrow_down"}
-                    size={ESize.Medium}
-                    color={[colorButtonForeground, 1000]}
-                  />
-                </KeyValuePair>
-              </InputButton>
-            </KeyValuePair>
+                color={[colorButtonForeground, 700]}
+              />
+            </InputButton>
           }
           background={
             <BackgroundCard
