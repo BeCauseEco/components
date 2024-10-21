@@ -328,7 +328,7 @@ export const VirtualizedInputCombobox = forwardRef<HTMLDivElement, PropsWithChil
             <LayoutCombobox
               contentTop={
                 filterOptions &&
-                filteredItems.length > 9 && (
+                Object.keys(items).length > 9 && (
                   <>
                     <InputText
                       width={ESize.Full}
