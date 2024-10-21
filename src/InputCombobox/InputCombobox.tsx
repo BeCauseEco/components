@@ -1,5 +1,5 @@
 import styled from "@emotion/styled"
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from "cmdk"
+import { Command, CommandEmpty, CommandInput, CommandItem, CommandList } from "cmdk"
 import { PropsWithChildren, ReactElement, forwardRef, useEffect, useState } from "react"
 import { TInputComboboxItem } from "./InputComboboxItem"
 import React from "react"
@@ -329,7 +329,7 @@ export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<TInput
                   </CommandEmptyStyled>
                 )}
 
-                <CommandGroup>
+                <CommandList>
                   {items.map((item, index) => (
                     <CommandItemStyled
                       multiple={multiple}
@@ -367,7 +367,7 @@ export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<TInput
                       )}
                     </CommandItemStyled>
                   ))}
-                </CommandGroup>
+                </CommandList>
               </Command>
             }
           />
