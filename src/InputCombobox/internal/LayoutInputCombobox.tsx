@@ -34,7 +34,7 @@ export const LayoutCombobox = ({ contentTop, contentBottom }: TLayoutCombobox) =
         colorBackground={[EColor.White]}
         colorForeground={[EColor.Black, 500]}
         maxHeight={"calc(var(--radix-popover-content-available-height) - calc(var(--BU) * 8))"}
-        omitPadding
+        collapse
       >
         <Top>{contentTop}</Top>
 
