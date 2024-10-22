@@ -80,8 +80,6 @@ export type TInputComboBoxFilterOptions = {
   textFilterPlaceholder: string
 }
 
-export type TInputComboboxValue = string | boolean[]
-
 type TInputCombobox = TPlaywright & {
   colorButtonBackground: EColor
   colorButtonForeground: EColor
@@ -95,17 +93,21 @@ type TInputCombobox = TPlaywright & {
 
   label?: ReactElement<TText>
   icon?: ReactElement<TIcon>
-  value: TInputComboboxValue
 
   /**
    * Enables multiple selection.
    *
-   * When InputCombobox.multiple is set to true both InputCombobox.value and parameter: "value" of the onChange function types are of boolean[]
+   * When InputCombobox.multiple is set to false the parameter "value" of the onChange function has only one element.
    *
-   * Otherwise both types are of string. */
+   * Otherwise it has a lits of selected elements ids. */
   multiple?: boolean
 
   id?: string
+
+  /**
+   * Provide at most one element if multiple is false.
+   */
+  defaultSelectedIds?: string[]
 
   onChange: (selectedIds: string[]) => void
 
@@ -131,9 +133,9 @@ export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<TInput
     filterOptions,
     label,
     icon,
-    value,
     multiple = false,
     id,
+    defaultSelectedIds,
     onChange,
     children,
     playwrightTestId,
@@ -146,7 +148,7 @@ export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<TInput
   const [height, setHeight] = useState(1)
 
   const [filteredItemIds, setFilteredItemIds] = useState<string[]>([])
-  const [selectedItemIds, setSelectedItemIds] = useState<string[]>([])
+  const [selectedItemIds, setSelectedItemIds] = useState<string[]>(defaultSelectedIds ?? [])
 
   const items: { [id: string]: TInputComboboxItem } = useMemo(() => {
     const a: { [id: string]: TInputComboboxItem } = {}
@@ -176,7 +178,7 @@ export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<TInput
           alignment={EAlignment.Start}
           width={width}
         >
-          {Object.values(items).findLast(item => (item.value as string) === value)?.label || textNoSelection}
+          {Object.values(items).findLast(item => selectedItemIds.includes(item.id))?.label || textNoSelection}
         </TextWithOverflow>
       )
     }
@@ -240,7 +242,10 @@ export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<TInput
 
       const item = Object.values(items).findLast(item => item.label.toLowerCase() === value.toLowerCase())
 
-      onChange([item?.id as string])
+      if (item) {
+        onChange([item.id])
+        setSelectedItemIds([item.id])
+      }
     }
 
     const onSelectMultiple = (selectedItemId: string, value: boolean) => {
@@ -258,7 +263,7 @@ export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<TInput
         multiple={multiple}
         value={item.label}
         onSelect={value => (multiple ? () => {} : onSelectSingle(value))}
-        selected={value == item.value}
+        selected={selectedItemIds.includes(item.id)}
         colorBackground={item.colorBackground}
         colorBackgroundHover={item.colorBackgroundHover}
         colorForeground={item.colorForeground}
