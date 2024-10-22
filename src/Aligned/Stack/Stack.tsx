@@ -55,41 +55,43 @@ const Container = styled.div<
   },
 }))
 
-const Children = styled.div<Pick<TStack, "loading" | "disabled" | "collapse"> & { flexDirection: any }>(p => ({
-  display: "inherit",
-  flexDirection: p.flexDirection,
-  width: "inherit",
-  height: "inherit",
-  padding: p.collapse ? 0 : "calc(var(--BU) * 4)",
-  transition: "opacity 0.2s ease-in-out",
-  willChange: "opacity",
+const Children = styled.div<Pick<TStack, "loading" | "disabled" | "collapse"> & { flexDirection: "column" | "row" }>(
+  p => ({
+    display: "inherit",
+    flexDirection: p.flexDirection,
+    width: "inherit",
+    height: "inherit",
+    padding: p.collapse ? 0 : "calc(var(--BU) * 4)",
+    transition: "opacity 0.2s ease-in-out",
+    willChange: "opacity",
 
-  ...(p.loading
-    ? {
-        // minHeight: "fit-content", TO-DO: @cllpse: perhaps this will break things like text
-        height: "unset",
-        maxHeight: "calc(var(--BU) * 40)",
-        opacity: 0,
-        overflow: "hidden",
-        cursor: "wait",
+    ...(p.loading
+      ? {
+          // minHeight: "fit-content", TO-DO: @cllpse: perhaps this will break things like text
+          height: "unset",
+          maxHeight: "calc(var(--BU) * 40)",
+          opacity: 0,
+          overflow: "hidden",
+          cursor: "wait",
 
-        "& *": {
-          pointerEvents: "none",
-        },
-      }
-    : {}),
+          "& *": {
+            pointerEvents: "none",
+          },
+        }
+      : {}),
 
-  ...(p.disabled
-    ? {
-        opacity: 0.6,
-        cursor: "not-allowed",
+    ...(p.disabled
+      ? {
+          opacity: 0.6,
+          cursor: "not-allowed",
 
-        "& *": {
-          pointerEvents: "none",
-        },
-      }
-    : {}),
-}))
+          "& *": {
+            pointerEvents: "none",
+          },
+        }
+      : {}),
+  }),
+)
 
 export type TStack = TLayoutBase & {
   vertical?: boolean
