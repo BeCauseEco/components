@@ -1,5 +1,5 @@
 import styled from "@emotion/styled"
-import { Command, CommandEmpty, CommandGroup, CommandItem } from "cmdk"
+import { Command, CommandEmpty, CommandList, CommandItem } from "cmdk"
 import { PropsWithChildren, ReactElement, forwardRef, useCallback, useEffect, useMemo, useState } from "react"
 import React from "react"
 import { Text, TText } from "@new/Text/Text"
@@ -354,7 +354,7 @@ export const VirtualizedInputCombobox = forwardRef<HTMLDivElement, PropsWithChil
                     </CommandEmptyStyled>
                   )}
 
-                  <CommandGroup>
+                  <CommandList>
                     <Virtuoso
                       style={{
                         height: `${height}px`,
@@ -401,7 +401,7 @@ export const VirtualizedInputCombobox = forwardRef<HTMLDivElement, PropsWithChil
                         </CommandItemStyled>
                       )}
                     />
-                  </CommandGroup>
+                  </CommandList>
                 </Command>
               }
             />
