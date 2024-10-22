@@ -1,6 +1,6 @@
 import styled from "@emotion/styled"
-import { Command, CommandEmpty, CommandInput, CommandItem, CommandList } from "cmdk"
-import { PropsWithChildren, ReactElement, forwardRef, useEffect, useState } from "react"
+import { Command, CommandEmpty, CommandItem, CommandList } from "cmdk"
+import { PropsWithChildren, ReactElement, forwardRef, useCallback, useEffect, useMemo, useState } from "react"
 import { TInputComboboxItem } from "./InputComboboxItem"
 import React from "react"
 import { Text, TText } from "@new/Text/Text"
@@ -18,6 +18,7 @@ import { Spacer } from "@new/Spacer/Spacer"
 import { InputCheckbox } from "@new/InputCheckbox/InputCheckbox"
 import { TPlaywright } from "@new/TPlaywright"
 import { Chip } from "@new/Chip/Chip"
+import { Virtuoso } from "react-virtuoso"
 
 const Container = styled.div({
   display: "flex",
@@ -58,17 +59,6 @@ const CommandItemStyled = styled(CommandItem)<
 const CommandEmptyStyled = styled(CommandEmpty)({
   padding: "calc(var(--BU) * 1.5) 0",
   userSelect: "none",
-})
-
-const CommandInputStyled = styled(CommandInput)({
-  unset: "all",
-  display: "flex",
-  overflow: "hidden",
-  width: 0,
-  height: 0,
-  border: 0,
-  opacity: 0,
-  pointerEvents: "none",
 })
 
 const TextWithOverflow = styled(Text)<Pick<TInputCombobox, "width">>(p => ({
@@ -115,16 +105,20 @@ type TInputCombobox = TPlaywright & {
    * Otherwise both types are of string. */
   multiple?: boolean
 
-  /**
-   * When InputCombobox.multiple is set to true; "value" parameter is of type boolean[].
-   *
-   * Otherwise the type is of string */
   id?: string
 
-  onChange: (value: TInputComboboxValue) => void
+  onChange: (selectedIds: string[]) => void
 
   children: ReactElement<TInputComboboxItem> | ReactElement<TInputComboboxItem>[]
+
+  /**
+   * Enables the virtuoso list for the combobox. Only use this if you have a large number of items.
+   */
+  enableVirtuoso?: boolean
 }
+
+const LIST_HEIGHT = 360
+const LIST_WIDTH = 260
 
 export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<TInputCombobox>>((props, ref) => {
   const {
@@ -143,25 +137,37 @@ export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<TInput
     onChange,
     children,
     playwrightTestId,
+    enableVirtuoso,
   } = props
 
   const [open, setOpen] = useState(false)
   const [search, setSearch] = useState("")
-  const [items, setItems] = useState<TInputComboboxItem[]>([])
 
-  useEffect(() => {
-    const a: TInputComboboxItem[] = []
+  const [height, setHeight] = useState(1)
+
+  const [filteredItemIds, setFilteredItemIds] = useState<string[]>([])
+  const [selectedItemIds, setSelectedItemIds] = useState<string[]>([])
+
+  const items: { [id: string]: TInputComboboxItem } = useMemo(() => {
+    const a: { [id: string]: TInputComboboxItem } = {}
 
     React.Children.forEach(children, child => {
       if (React.isValidElement(child)) {
-        a.push(child.props)
+        a[child.props.id] = child.props as TInputComboboxItem
       }
     })
 
-    setItems(a)
-  }, [children])
+    return a
+  }, [React.Children.count(children)])
 
-  const generateCurrentValueLabel = multiple => {
+  useEffect(() => {
+    const newItems = Object.values(items).map(item => item.id)
+    const newItemsSet = new Set(newItems)
+    setFilteredItemIds(newItems)
+    setSelectedItemIds(prev => prev.filter(prevId => newItemsSet.has(prevId)))
+  }, [items])
+
+  const generateCurrentValueLabel = (multiple: boolean) => {
     if (!multiple) {
       return (
         <TextWithOverflow
@@ -170,12 +176,15 @@ export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<TInput
           alignment={EAlignment.Start}
           width={width}
         >
-          {items.findLast(item => (item.value as string) === value)?.label || textNoSelection}
+          {Object.values(items).findLast(item => (item.value as string) === value)?.label || textNoSelection}
         </TextWithOverflow>
       )
     }
 
-    const selectedItems = items.filter(item => item.value === true).flatMap(item => item.label)
+    const selectedItemsIdsSet = new Set(selectedItemIds)
+    const selectedItems = Object.entries(items)
+      .filter(([id]) => selectedItemsIdsSet.has(id))
+      .flatMap(([, value]) => value.label)
 
     if (selectedItems.length === 0) {
       return textNoSelection
@@ -225,39 +234,156 @@ export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<TInput
     )
   }
 
+  const filteredItems = useMemo(() => {
+    const filteredItemIdsSet = new Set(filteredItemIds)
+
+    return Object.entries(items)
+      .filter(([id]) => filteredItemIdsSet.has(id))
+      .map(([, value]) => value)
+  }, [filteredItemIds, items])
+
+  let commandListItems: ReactElement | null = null
+  if (enableVirtuoso) {
+    commandListItems = (
+      <Virtuoso
+        style={{
+          height: `${height}px`,
+          maxHeight: "calc(var(--radix-popover-content-available-height) - calc(var(--BU) * 20))",
+          minWidth: `${LIST_WIDTH}px`,
+          overflowX: "hidden",
+        }}
+        increaseViewportBy={100}
+        totalListHeightChanged={h => setHeight(h > LIST_HEIGHT ? LIST_HEIGHT : h)}
+        data={filteredItems}
+        itemContent={(index, item) => (
+          <CommandItemStyled
+            key={index}
+            multiple={multiple}
+            value={item.label}
+            onSelect={value => (multiple ? () => {} : onSelectSingle(value))}
+            selected={value == item.value}
+            colorBackground={item.colorBackground}
+            colorBackgroundHover={item.colorBackgroundHover}
+            colorForeground={item.colorForeground}
+            data-playwright-testid={item.playwrightTestId}
+          >
+            {multiple ? (
+              <div style={{ display: "flex", alignItems: "center" }}>
+                {item.icon}
+                <Spacer size={ESize.Xsmall} />
+
+                <InputCheckbox
+                  value={selectedItemIds.includes(item.id)}
+                  onChange={value => onSelectMultiple(item.id, value)}
+                  colorBackground={item.colorBackground}
+                  colorForeground={item.colorForeground}
+                  label={
+                    <Text size={ESize.Xsmall} color={[item.colorBackground, 700]} wrap>
+                      {item.label}
+                    </Text>
+                  }
+                />
+              </div>
+            ) : (
+              <Text size={ESize.Xsmall} color={[item.colorForeground, 700]} wrap>
+                {item.label}
+              </Text>
+            )}
+          </CommandItemStyled>
+        )}
+      />
+    )
+  } else {
+    commandListItems = (
+      <>
+        {filteredItems.map((item, index) => (
+          <CommandItemStyled
+            multiple={multiple}
+            key={index}
+            value={item.label}
+            onSelect={value => (multiple ? () => {} : onSelectSingle(value))}
+            selected={value === item.value}
+            colorBackground={item.colorBackground}
+            colorBackgroundHover={item.colorBackgroundHover}
+            colorForeground={item.colorForeground}
+            data-playwright-testid={item.playwrightTestId}
+          >
+            {multiple ? (
+              <div style={{ display: "flex", alignItems: "center" }}>
+                {item.icon}
+
+                <Spacer size={ESize.Xsmall} />
+
+                <InputCheckbox
+                  value={selectedItemIds.includes(item.id)}
+                  onChange={value => onSelectMultiple(item.id, value)}
+                  colorBackground={item.colorBackground}
+                  colorForeground={item.colorForeground}
+                  label={
+                    <Text size={ESize.Xsmall} color={[item.colorBackground, 700]}>
+                      {item.label}
+                    </Text>
+                  }
+                />
+              </div>
+            ) : (
+              <Text size={ESize.Xsmall} color={[item.colorForeground, 700]}>
+                {item.label}
+              </Text>
+            )}
+          </CommandItemStyled>
+        ))}
+      </>
+    )
+  }
+
   const handleRemoveItem = (event: Event, label: string) => {
     event.preventDefault()
-    const updatedItems = items.map(item => (item.label === label ? { ...item, value: false } : item))
 
-    const booleanValues = updatedItems.map(item => item.value as boolean)
-    onChange(booleanValues)
+    const item = Object.values(items).findLast(item => item.label.toLowerCase() === label.toLowerCase())
+    if (!item) {
+      return
+    }
+
+    setSelectedItemIds(prev => {
+      const updatedItems = prev.filter(id => id !== item.id)
+      onChange(updatedItems)
+      return updatedItems
+    })
   }
 
   const onSelectSingle = (value: string) => {
     setOpen(false)
 
-    const item = items.findLast(item => item.label.toLowerCase() === (value as unknown as string).toLowerCase())
+    const item = Object.values(items).findLast(item => item.label.toLowerCase() === value.toLowerCase())
 
-    onChange((item?.value as string) || "")
+    onChange([item?.id as string])
   }
 
-  const onSelectMultiple = (index: number, value: boolean) => {
-    const onChangeValuesTemp: TInputComboboxValue = []
-    const itemsTemp: TInputComboboxItem[] = []
+  const onSelectMultiple = (selectedItemId: string, value: boolean) => {
+    setSelectedItemIds(prev => {
+      const selectedItemsIds = value ? [...prev, selectedItemId] : prev.filter(item => item !== selectedItemId)
+      onChange(selectedItemsIds)
 
-    items.forEach((fItem, fIndex) => {
-      if (fIndex === index) {
-        itemsTemp.push({ ...fItem, ...{ value: value } })
-        onChangeValuesTemp.push(value)
-      } else {
-        itemsTemp.push(fItem)
-        onChangeValuesTemp.push(fItem.value as boolean)
-      }
+      return selectedItemsIds
     })
-
-    setItems(itemsTemp)
-    onChange(onChangeValuesTemp)
   }
+
+  const filterResults = useCallback(
+    (value: string) => {
+      if (value === "") {
+        setFilteredItemIds(Object.values(items).map(item => item.id))
+        return
+      }
+
+      const itemsFiltered = Object.values(items).filter(item => item.label.toLowerCase().includes(value.toLowerCase()))
+
+      setFilteredItemIds(itemsFiltered.map(item => item.id))
+    },
+    [items],
+  )
+
+  const filterWithDebounce = useMemo(() => debounce(filterResults, 300), [filterResults])
 
   return (
     <Container ref={ref} id={id} data-playwright-testid={playwrightTestId}>
@@ -303,13 +429,16 @@ export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<TInput
           <LayoutCombobox
             contentTop={
               filterOptions &&
-              items.length > 9 && (
+              Object.keys(items).length > 9 && (
                 <>
                   <InputText
                     width={ESize.Full}
                     color={colorButtonBackground}
                     value={search}
-                    onChange={value => setSearch(value)}
+                    onChange={value => {
+                      setSearch(value)
+                      filterWithDebounce(value)
+                    }}
                     placeholder={filterOptions.textFilterPlaceholder}
                   />
 
@@ -319,8 +448,6 @@ export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<TInput
             }
             contentBottom={
               <Command loop>
-                <CommandInputStyled value={search} />
-
                 {filterOptions && (
                   <CommandEmptyStyled>
                     <Text color={[colorPopOverForeground, 700]} size={ESize.Xsmall}>
@@ -329,45 +456,7 @@ export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<TInput
                   </CommandEmptyStyled>
                 )}
 
-                <CommandList>
-                  {items.map((item, index) => (
-                    <CommandItemStyled
-                      multiple={multiple}
-                      key={index}
-                      value={item.label}
-                      onSelect={value => (multiple ? () => {} : onSelectSingle(value))}
-                      selected={value === item.value}
-                      colorBackground={item.colorBackground}
-                      colorBackgroundHover={item.colorBackgroundHover}
-                      colorForeground={item.colorForeground}
-                      data-playwright-testid={item.playwrightTestId}
-                    >
-                      {multiple ? (
-                        <div style={{ display: "flex", alignItems: "center" }}>
-                          {item.icon}
-
-                          <Spacer size={ESize.Xsmall} />
-
-                          <InputCheckbox
-                            value={item.value === true}
-                            onChange={value => onSelectMultiple(index, value)}
-                            colorBackground={item.colorBackground}
-                            colorForeground={item.colorForeground}
-                            label={
-                              <Text size={ESize.Xsmall} color={[item.colorBackground, 700]}>
-                                {item.label}
-                              </Text>
-                            }
-                          />
-                        </div>
-                      ) : (
-                        <Text size={ESize.Xsmall} color={[item.colorForeground, 700]}>
-                          {item.label}
-                        </Text>
-                      )}
-                    </CommandItemStyled>
-                  ))}
-                </CommandList>
+                <CommandList>{commandListItems}</CommandList>
               </Command>
             }
           />
@@ -376,3 +465,14 @@ export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<TInput
     </Container>
   )
 })
+
+const debounce = <F extends (...args: Parameters<F>) => ReturnType<F>>(func: F, waitFor: number) => {
+  let timeout: NodeJS.Timeout
+
+  const debounced = (...args: Parameters<F>) => {
+    clearTimeout(timeout)
+    timeout = setTimeout(() => func(...args), waitFor)
+  }
+
+  return debounced
+}
