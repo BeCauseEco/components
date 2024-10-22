@@ -94,16 +94,14 @@ type TInputCombobox = TPlaywright & {
   label?: ReactElement<TText>
   icon?: ReactElement<TIcon>
 
-  /**
-   * Enables multiple selection.
-   *
-   * When InputCombobox.multiple is set to false the parameter "value" of the onChange function is of type string.
-   *
-   * Otherwise it is of type string[]. */
   multiple?: boolean
 
   id?: string
 
+  /**
+   * When InputCombobox.multiple is set to true; "value" parameter is of type string[].
+   *
+   * Otherwise the type is of string */
   value: string | string[]
 
   onChange: (value: string | string[]) => void
