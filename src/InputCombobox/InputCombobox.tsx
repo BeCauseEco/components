@@ -236,7 +236,7 @@ export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<TInput
   const onSelectSingle = (value: string) => {
     setOpen(false)
 
-    const item = items.findLast(item => item.label.toLowerCase() === (value as unknown as string).toLowerCase())
+    const item = items.findLast(item => item.label.toLowerCase() === value.trim().toLowerCase())
 
     onChange((item?.value as string) || "")
   }
