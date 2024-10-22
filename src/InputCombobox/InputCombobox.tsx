@@ -234,6 +234,62 @@ export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<TInput
     )
   }
 
+  const getCommandItem = (index: number, item: TInputComboboxItem): React.ReactNode => {
+    const onSelectSingle = (value: string) => {
+      setOpen(false)
+
+      const item = Object.values(items).findLast(item => item.label.toLowerCase() === value.toLowerCase())
+
+      onChange([item?.id as string])
+    }
+
+    const onSelectMultiple = (selectedItemId: string, value: boolean) => {
+      setSelectedItemIds(prev => {
+        const selectedItemsIds = value ? [...prev, selectedItemId] : prev.filter(item => item !== selectedItemId)
+        onChange(selectedItemsIds)
+
+        return selectedItemsIds
+      })
+    }
+
+    return (
+      <CommandItemStyled
+        key={index}
+        multiple={multiple}
+        value={item.label}
+        onSelect={value => (multiple ? () => {} : onSelectSingle(value))}
+        selected={value == item.value}
+        colorBackground={item.colorBackground}
+        colorBackgroundHover={item.colorBackgroundHover}
+        colorForeground={item.colorForeground}
+        data-playwright-testid={item.playwrightTestId}
+      >
+        {multiple ? (
+          <div style={{ display: "flex", alignItems: "center" }}>
+            {item.icon}
+            <Spacer size={ESize.Xsmall} />
+
+            <InputCheckbox
+              value={selectedItemIds.includes(item.id)}
+              onChange={value => onSelectMultiple(item.id, value)}
+              colorBackground={item.colorBackground}
+              colorForeground={item.colorForeground}
+              label={
+                <Text size={ESize.Xsmall} color={[item.colorBackground, 700]} wrap>
+                  {item.label}
+                </Text>
+              }
+            />
+          </div>
+        ) : (
+          <Text size={ESize.Xsmall} color={[item.colorForeground, 700]} wrap>
+            {item.label}
+          </Text>
+        )}
+      </CommandItemStyled>
+    )
+  }
+
   const filteredItems = useMemo(() => {
     const filteredItemIdsSet = new Set(filteredItemIds)
 
@@ -255,86 +311,11 @@ export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<TInput
         increaseViewportBy={100}
         totalListHeightChanged={h => setHeight(h > LIST_HEIGHT ? LIST_HEIGHT : h)}
         data={filteredItems}
-        itemContent={(index, item) => (
-          <CommandItemStyled
-            key={index}
-            multiple={multiple}
-            value={item.label}
-            onSelect={value => (multiple ? () => {} : onSelectSingle(value))}
-            selected={value == item.value}
-            colorBackground={item.colorBackground}
-            colorBackgroundHover={item.colorBackgroundHover}
-            colorForeground={item.colorForeground}
-            data-playwright-testid={item.playwrightTestId}
-          >
-            {multiple ? (
-              <div style={{ display: "flex", alignItems: "center" }}>
-                {item.icon}
-                <Spacer size={ESize.Xsmall} />
-
-                <InputCheckbox
-                  value={selectedItemIds.includes(item.id)}
-                  onChange={value => onSelectMultiple(item.id, value)}
-                  colorBackground={item.colorBackground}
-                  colorForeground={item.colorForeground}
-                  label={
-                    <Text size={ESize.Xsmall} color={[item.colorBackground, 700]} wrap>
-                      {item.label}
-                    </Text>
-                  }
-                />
-              </div>
-            ) : (
-              <Text size={ESize.Xsmall} color={[item.colorForeground, 700]} wrap>
-                {item.label}
-              </Text>
-            )}
-          </CommandItemStyled>
-        )}
+        itemContent={(index, item) => getCommandItem(index, item)}
       />
     )
   } else {
-    commandListItems = (
-      <>
-        {filteredItems.map((item, index) => (
-          <CommandItemStyled
-            multiple={multiple}
-            key={index}
-            value={item.label}
-            onSelect={value => (multiple ? () => {} : onSelectSingle(value))}
-            selected={value === item.value}
-            colorBackground={item.colorBackground}
-            colorBackgroundHover={item.colorBackgroundHover}
-            colorForeground={item.colorForeground}
-            data-playwright-testid={item.playwrightTestId}
-          >
-            {multiple ? (
-              <div style={{ display: "flex", alignItems: "center" }}>
-                {item.icon}
-
-                <Spacer size={ESize.Xsmall} />
-
-                <InputCheckbox
-                  value={selectedItemIds.includes(item.id)}
-                  onChange={value => onSelectMultiple(item.id, value)}
-                  colorBackground={item.colorBackground}
-                  colorForeground={item.colorForeground}
-                  label={
-                    <Text size={ESize.Xsmall} color={[item.colorBackground, 700]}>
-                      {item.label}
-                    </Text>
-                  }
-                />
-              </div>
-            ) : (
-              <Text size={ESize.Xsmall} color={[item.colorForeground, 700]}>
-                {item.label}
-              </Text>
-            )}
-          </CommandItemStyled>
-        ))}
-      </>
-    )
+    commandListItems = <>{filteredItems.map((item, index) => getCommandItem(index, item))}</>
   }
 
   const handleRemoveItem = (event: Event, label: string) => {
@@ -349,23 +330,6 @@ export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<TInput
       const updatedItems = prev.filter(id => id !== item.id)
       onChange(updatedItems)
       return updatedItems
-    })
-  }
-
-  const onSelectSingle = (value: string) => {
-    setOpen(false)
-
-    const item = Object.values(items).findLast(item => item.label.toLowerCase() === value.toLowerCase())
-
-    onChange([item?.id as string])
-  }
-
-  const onSelectMultiple = (selectedItemId: string, value: boolean) => {
-    setSelectedItemIds(prev => {
-      const selectedItemsIds = value ? [...prev, selectedItemId] : prev.filter(item => item !== selectedItemId)
-      onChange(selectedItemsIds)
-
-      return selectedItemsIds
     })
   }
 
