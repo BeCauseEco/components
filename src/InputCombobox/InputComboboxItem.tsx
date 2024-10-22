@@ -3,7 +3,7 @@ import { TPlaywright } from "@new/TPlaywright"
 import { ReactElement } from "react"
 
 export type TInputComboboxItem = TPlaywright & {
-  id: string
+  value: string
   label: string
   colorBackground: EColor
   colorBackgroundHover: EColor
@@ -13,7 +13,7 @@ export type TInputComboboxItem = TPlaywright & {
 
 export const InputComboboxItem = ({
   // eslint-disable-next-line
-  id,
+  value,
   // eslint-disable-next-line
   label,
   // eslint-disable-next-line

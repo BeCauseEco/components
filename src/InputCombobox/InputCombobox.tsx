@@ -97,19 +97,16 @@ type TInputCombobox = TPlaywright & {
   /**
    * Enables multiple selection.
    *
-   * When InputCombobox.multiple is set to false the parameter "value" of the onChange function has only one element.
+   * When InputCombobox.multiple is set to false the parameter "value" of the onChange function is of type string.
    *
-   * Otherwise it has a lits of selected elements ids. */
+   * Otherwise it is of type string[]. */
   multiple?: boolean
 
   id?: string
 
-  /**
-   * Provide at most one element if multiple is false.
-   */
-  defaultSelectedIds?: string[]
+  value: string | string[]
 
-  onChange: (selectedIds: string[]) => void
+  onChange: (value: string | string[]) => void
 
   children: ReactElement<TInputComboboxItem> | ReactElement<TInputComboboxItem>[]
 
@@ -135,7 +132,7 @@ export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<TInput
     icon,
     multiple = false,
     id,
-    defaultSelectedIds,
+    value,
     onChange,
     children,
     playwrightTestId,
@@ -147,15 +144,14 @@ export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<TInput
 
   const [height, setHeight] = useState(1)
 
-  const [filteredItemIds, setFilteredItemIds] = useState<string[]>([])
-  const [selectedItemIds, setSelectedItemIds] = useState<string[]>(defaultSelectedIds ?? [])
+  const [filteredValues, setFilteredValues] = useState<string[]>([])
 
-  const items: { [id: string]: TInputComboboxItem } = useMemo(() => {
-    const a: { [id: string]: TInputComboboxItem } = {}
+  const items: { [value: string]: TInputComboboxItem } = useMemo(() => {
+    const a: { [value: string]: TInputComboboxItem } = {}
 
     React.Children.forEach(children, child => {
       if (React.isValidElement(child)) {
-        a[child.props.id] = child.props as TInputComboboxItem
+        a[child.props.value] = child.props as TInputComboboxItem
       }
     })
 
@@ -163,10 +159,8 @@ export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<TInput
   }, [React.Children.count(children)])
 
   useEffect(() => {
-    const newItems = Object.values(items).map(item => item.id)
-    const newItemsSet = new Set(newItems)
-    setFilteredItemIds(newItems)
-    setSelectedItemIds(prev => prev.filter(prevId => newItemsSet.has(prevId)))
+    const newItems = Object.values(items).map(item => item.value)
+    setFilteredValues(newItems)
   }, [items])
 
   const generateCurrentValueLabel = (multiple: boolean) => {
@@ -178,14 +172,14 @@ export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<TInput
           alignment={EAlignment.Start}
           width={width}
         >
-          {Object.values(items).findLast(item => selectedItemIds.includes(item.id))?.label || textNoSelection}
+          {Object.values(items).findLast(item => value === item.value)?.label || textNoSelection}
         </TextWithOverflow>
       )
     }
 
-    const selectedItemsIdsSet = new Set(selectedItemIds)
+    const selectedValuesSet = new Set(value)
     const selectedItems = Object.entries(items)
-      .filter(([id]) => selectedItemsIdsSet.has(id))
+      .filter(([id]) => selectedValuesSet.has(id))
       .flatMap(([, value]) => value.label)
 
     if (selectedItems.length === 0) {
@@ -243,18 +237,16 @@ export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<TInput
       const item = Object.values(items).findLast(item => item.label.toLowerCase() === value.trim().toLowerCase())
 
       if (item) {
-        onChange([item.id])
-        setSelectedItemIds([item.id])
+        onChange(item.value)
       }
     }
 
-    const onSelectMultiple = (selectedItemId: string, value: boolean) => {
-      setSelectedItemIds(prev => {
-        const selectedItemsIds = value ? [...prev, selectedItemId] : prev.filter(item => item !== selectedItemId)
-        onChange(selectedItemsIds)
-
-        return selectedItemsIds
-      })
+    const onSelectMultiple = (selectedItemId: string, newValue: boolean) => {
+      const currentValue = value as string[]
+      const selectedItemsIds = newValue
+        ? [...currentValue, selectedItemId]
+        : currentValue.filter(item => item !== selectedItemId)
+      onChange(selectedItemsIds)
     }
 
     return (
@@ -263,7 +255,7 @@ export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<TInput
         multiple={multiple}
         value={item.label}
         onSelect={value => (multiple ? () => {} : onSelectSingle(value))}
-        selected={selectedItemIds.includes(item.id)}
+        selected={multiple ? (value as string[]).includes(item.value) : value === item.value}
         colorBackground={item.colorBackground}
         colorBackgroundHover={item.colorBackgroundHover}
         colorForeground={item.colorForeground}
@@ -275,8 +267,8 @@ export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<TInput
             <Spacer size={ESize.Xsmall} />
 
             <InputCheckbox
-              value={selectedItemIds.includes(item.id)}
-              onChange={value => onSelectMultiple(item.id, value)}
+              value={multiple ? (value as string[]).includes(item.value) : value === item.value}
+              onChange={value => onSelectMultiple(item.value, value)}
               colorBackground={item.colorBackground}
               colorForeground={item.colorForeground}
               label={
@@ -296,12 +288,12 @@ export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<TInput
   }
 
   const filteredItems = useMemo(() => {
-    const filteredItemIdsSet = new Set(filteredItemIds)
+    const filteredItemIdsSet = new Set(filteredValues)
 
     return Object.entries(items)
       .filter(([id]) => filteredItemIdsSet.has(id))
       .map(([, value]) => value)
-  }, [filteredItemIds, items])
+  }, [filteredValues, items])
 
   let commandListItems: ReactElement | null = null
   if (enableVirtuoso) {
@@ -331,23 +323,20 @@ export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<TInput
       return
     }
 
-    setSelectedItemIds(prev => {
-      const updatedItems = prev.filter(id => id !== item.id)
-      onChange(updatedItems)
-      return updatedItems
-    })
+    const updatedItems = (value as string[]).filter(id => id !== item.value)
+    onChange(updatedItems)
   }
 
   const filterResults = useCallback(
     (value: string) => {
       if (value === "") {
-        setFilteredItemIds(Object.values(items).map(item => item.id))
+        setFilteredValues(Object.values(items).map(item => item.value))
         return
       }
 
       const itemsFiltered = Object.values(items).filter(item => item.label.toLowerCase().includes(value.toLowerCase()))
 
-      setFilteredItemIds(itemsFiltered.map(item => item.id))
+      setFilteredValues(itemsFiltered.map(item => item.value))
     },
     [items],
   )
