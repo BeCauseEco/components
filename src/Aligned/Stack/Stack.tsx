@@ -92,7 +92,7 @@ const Children = styled.div<Pick<TStack, "loading" | "disabled" | "collapse"> & 
         }
       : {}),
 
-    ...(p.disabled
+    ...(!p.loading && p.disabled
       ? {
           opacity: 0.6,
           cursor: "not-allowed",
