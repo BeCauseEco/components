@@ -130,7 +130,7 @@ const Children = (p: Omit<TInputButton, "onClick">) => {
           horizontal
           colorBackground={[p.color, 700]}
           colorBackgroundHover={[p.color, 800]}
-          colorLoading={p.color}
+          colorLoading={[p.color, 50]}
           borderRadius={ESize.Small}
           collapse="partly"
           loading={p.loading}
@@ -147,7 +147,7 @@ const Children = (p: Omit<TInputButton, "onClick">) => {
           horizontal
           colorOutline={[p.color, 300]}
           colorBackgroundHover={[p.color, 100]}
-          colorLoading={p.color}
+          colorLoading={[p.color, 700]}
           borderRadius={ESize.Small}
           collapse="partly"
           loading={p.loading}
@@ -164,7 +164,7 @@ const Children = (p: Omit<TInputButton, "onClick">) => {
         <Stack
           horizontal
           colorBackgroundHover={[p.color, 100]}
-          colorLoading={p.color}
+          colorLoading={[p.color, 700]}
           borderRadius={ESize.Small}
           collapse="partly"
           loading={p.loading}

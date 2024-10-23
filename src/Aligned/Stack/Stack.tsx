@@ -45,6 +45,8 @@ const Container = styled.div<
   position: "relative",
   borderRadius: translateBorderRadius(p.borderRadius),
   backgroundColor: computeColor(p.colorBackground || [EColor.Transparent]),
+  transition: "background-color 0.1s ease-in-out",
+  willChange: "background-color",
 
   ...(p.aspectRatio && {
     aspectRatio: p.aspectRatio,
@@ -114,7 +116,7 @@ export type TStack = TLayoutBase & {
   colorBackgroundHover?: TColor
   colorOutline?: TColor
   colorOutlineHover?: TColor
-  colorLoading?: EColor
+  colorLoading?: TColor
 
   borderRadius?: ESize.Small | ESize.Medium | ESize.Large
 
