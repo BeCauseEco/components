@@ -124,7 +124,7 @@ export type TAlign = {
   bottomLeft?: boolean
   bottomCenter?: boolean
   bottomRight?: boolean
-  collapse?: boolean
+  collapse?: boolean | "width" | "height"
 }
 
 export const Align = (p: PropsWithChildren<TAlign>) => (

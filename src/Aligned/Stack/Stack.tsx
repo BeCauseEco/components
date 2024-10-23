@@ -34,6 +34,7 @@ const Container = styled.div<
     | "colorBackgroundHover"
     | "colorOutline"
     | "colorOutlineHover"
+    | "aspectRatio"
   >
 >(p => ({
   display: "flex",
@@ -44,13 +45,22 @@ const Container = styled.div<
   position: "relative",
   borderRadius: translateBorderRadius(p.borderRadius),
   backgroundColor: computeColor(p.colorBackground || [EColor.Transparent]),
-  outline: `solid 1px ${computeColor(p.colorOutline || [EColor.Transparent])}`,
+
+  ...(p.aspectRatio && {
+    aspectRatio: p.aspectRatio,
+  }),
+
+  outlineOffset: -1,
+
+  ...(p.colorOutline && {
+    outline: `solid 1px ${computeColor(p.colorOutline || [EColor.Transparent])}`,
+  }),
 
   "&:hover": {
     ...(p.colorBackgroundHover && { backgroundColor: computeColor(p.colorBackgroundHover || [EColor.Transparent]) }),
 
-    ...(p.colorBackgroundHover && {
-      outlineColor: computeColor(p.colorBackgroundHover || [EColor.Transparent]),
+    ...(p.colorOutlineHover && {
+      outlineColor: computeColor(p.colorOutlineHover || [EColor.Transparent]),
     }),
   },
 }))
@@ -61,7 +71,7 @@ const Children = styled.div<Pick<TStack, "loading" | "disabled" | "collapse"> & 
     flexDirection: p.flexDirection,
     width: "inherit",
     height: "inherit",
-    padding: p.collapse ? 0 : "calc(var(--BU) * 4)",
+    padding: p.collapse ? (p.collapse === "partly" ? "calc(var(--BU) * 2)" : 0) : "calc(var(--BU) * 4)",
     transition: "opacity 0.2s ease-in-out",
     willChange: "opacity",
 
@@ -108,9 +118,11 @@ export type TStack = TLayoutBase & {
 
   borderRadius?: ESize.Small | ESize.Medium | ESize.Large
 
-  collapse?: boolean
+  collapse?: boolean | "partly"
   explodeHeight?: boolean
   overflowHidden?: boolean
+
+  aspectRatio?: "auto" | "1"
 
   children: ReactElement<TAlign | null> | ReactElement<TAlign | null>[]
 }
@@ -131,6 +143,7 @@ export const Stack = (p: TStack) => {
       explodeHeight={p.explodeHeight}
       overflowHidden={p.overflowHidden}
       borderRadius={p.borderRadius}
+      aspectRatio={p.aspectRatio}
     >
       <Loader loading={p.loading}>
         <Spinner colorLoading={p.colorLoading} loading={p.loading} />

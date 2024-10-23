@@ -28,7 +28,7 @@ const Container = styled.i<Omit<TIcon, "name">>(p => ({
   width: "fit-content",
   height: p.size,
   lineHeight: p.size,
-  fontSize: `calc(${p.size} - 4px)`,
+  fontSize: `calc(${p.size} * 0.8)`,
   color: computeColor(p.color),
   "font-variation-settings": calculateFontVariantSettings(p.size, p.weight || EWeight.Normal, p.fill || false),
   userSelect: "none",
