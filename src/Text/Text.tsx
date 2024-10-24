@@ -82,7 +82,7 @@ const Container = styled.p<TContainerProperties>(p => ({
   ...(p.monospace ? StyleMonospace : StyleFontFamily),
   color: computeColor(p.color),
   fontStyle: p.italicize ? "italic" : "normal",
-  fontWeight: p.emphasize ? 600 : 500,
+  fontWeight: p.emphasize ? 500 : 400,
   textDecoration: p.underline ? "underline" : "inherit",
   textTransform: p.capitalize ? "uppercase" : "inherit",
   textWrap: p.wrap ? "pretty" : "nowrap",

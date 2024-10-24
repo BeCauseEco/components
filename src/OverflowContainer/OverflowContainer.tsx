@@ -8,14 +8,14 @@ import { PropsWithChildren, ReactElement } from "react"
 const Container = styled.div<
   Pick<
     TOverflowContainer,
-    "axes" | "colorBackground" | "colorForeground" | "minWidth" | "maxWidth" | "minHeight" | "maxHeight" | "omitPadding"
+    "axes" | "colorBackground" | "colorForeground" | "minWidth" | "maxWidth" | "minHeight" | "maxHeight" | "collapse"
   >
 >(p => ({
   display: "flex",
   flexDirection: "inherit",
   width: "100%",
   height: "inherit",
-  padding: p.omitPadding ? 0 : "calc(var(--BU) * 4)",
+  padding: p.collapse ? 0 : "calc(var(--BU) * 4)",
   ...(p.minWidth && { minWidth: p.minWidth }),
   ...(p.maxWidth && { maxWidth: p.maxWidth }),
   ...(p.minHeight && { minHeight: p.minHeight }),
@@ -52,7 +52,7 @@ export type TOverflowContainer = TPlaywright & {
   maxWidth?: string
   minHeight?: string
   maxHeight?: EMaxheightOptions | string
-  omitPadding?: boolean
+  collapse?: boolean
   children: ReactElement | ReactElement[]
 }
 
@@ -64,7 +64,7 @@ export const OverflowContainer = ({
   maxWidth,
   minHeight,
   maxHeight,
-  omitPadding,
+  collapse,
   children,
   playwrightTestId,
 }: PropsWithChildren<TOverflowContainer>) => (
@@ -76,7 +76,7 @@ export const OverflowContainer = ({
     maxWidth={maxWidth}
     minHeight={minHeight}
     maxHeight={maxHeight}
-    omitPadding={omitPadding}
+    collapse={collapse}
     data-playwright-testid={playwrightTestId}
   >
     {children}

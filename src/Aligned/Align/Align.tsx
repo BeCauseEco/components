@@ -1,7 +1,7 @@
 import { PropsWithChildren } from "react"
 import styled from "@emotion/styled"
 
-const computeAlignment = (p: Omit<TAlign, "spacing">) => {
+const computeAlignment = (p: Omit<TAlign, "spacing" | "collapse">) => {
   const r = {
     justifyContent: "",
     alignItems: "",
@@ -106,8 +106,8 @@ const Container = styled.div<TAlign>(p => ({
   display: "flex",
   flexWrap: "inherit",
   flexDirection: p.vertical ? "column" : "row",
-  width: "100%",
-  height: "100%",
+  width: p.collapse ? "auto" : "100%",
+  height: p.collapse ? "auto" : "100%",
 
   ...computeAlignment(p),
 }))
@@ -124,6 +124,7 @@ export type TAlign = {
   bottomLeft?: boolean
   bottomCenter?: boolean
   bottomRight?: boolean
+  collapse?: boolean | "width" | "height"
 }
 
 export const Align = (p: PropsWithChildren<TAlign>) => (
@@ -139,6 +140,7 @@ export const Align = (p: PropsWithChildren<TAlign>) => (
     bottomRight={p.bottomRight}
     vertical={p.vertical}
     horizontal={p.horizontal}
+    collapse={p.collapse}
   >
     {p.children}
   </Container>
