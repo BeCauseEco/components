@@ -18,18 +18,18 @@ export type TBreadcrumb = TPlaywright & {
 export const Breadcrumb = ({ color, omitPadding, children, playwrightTestId }: PropsWithChildren<TBreadcrumb>) => {
   const items: ReactElement[] = []
 
-  React.Children.forEach(children, child => {
+  React.Children.forEach(children, (child, index) => {
     if (React.isValidElement(child)) {
       items.push(child)
 
-      items.push(<Icon name="chevron_forward" size={ESize.Medium} color={[color, 700]} />)
+      items.push(<Icon name="chevron_forward" size={ESize.Medium} color={[color, 700]} key={index} />)
     }
   })
 
   items.pop()
 
   // TO-DO: @cllpse: a little hacky, but stops content shift.
-  items.push(<Icon name="chevron_forward" size={ESize.Medium} color={[EColor.Transparent]} />)
+  items.push(<Icon name="chevron_forward" size={ESize.Medium} color={[EColor.Transparent]} key={items.length} />)
 
   return (
     <Composition playwrightTestId={playwrightTestId}>
