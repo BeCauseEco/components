@@ -130,8 +130,8 @@ export type TStack = TLayoutBase & {
 }
 
 export const Stack = (p: TStack) => {
-  if (p.children && containsIlligalChildren(p.children, ["Align"])) {
-    throw "<Stack /> only acceps children of type: TAlign"
+  if (containsIlligalChildren(p.children, ["Align"])) {
+    return <pre>TStack only acceps children of type: TAlign</pre>
   }
 
   return (
