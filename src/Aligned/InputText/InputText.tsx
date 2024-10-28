@@ -1,7 +1,7 @@
 import styled from "@emotion/styled"
 import { forwardRef, ReactElement, useId, useState } from "react"
 import { EColor, computeColor } from "@new/Color"
-import { StyleFontFamily, StyleBodySmall, Text, StyleBodyMedium } from "@new/Text/Text"
+import { StyleFontFamily, StyleBodySmall, Text, StyleBodyMedium } from "@new/Aligned/Text/Text"
 import { ESize } from "@new/ESize"
 import { TPlaywright } from "@new/TPlaywright"
 import { Stack } from "@new/Aligned/Stack/Stack"
@@ -9,7 +9,7 @@ import { Align } from "@new/Aligned/Align/Align"
 import { Icon } from "@new/Aligned/Icon/Icon"
 import { Spacer } from "@new/Aligned/Spacer/Spacer"
 
-const Output = styled.textarea<Pick<TInputText, "color" | "size" | "rows"> & { focus: boolean }>(p => ({
+const Output = styled.output<Pick<TInputText, "color" | "size" | "rows"> & { focus: boolean }>(p => ({
   display: "flex",
   width: p.rows === 1 ? "100%" : "calc(100% - 1px)",
   height: p.rows === 1 ? "calc(var(--BU) * 8)" : `calc(var(--BU) * 8 * ${p.rows - 1} + calc(var(--BU) * 3) - 2px)`,
@@ -27,7 +27,6 @@ const Output = styled.textarea<Pick<TInputText, "color" | "size" | "rows"> & { f
   outline: "none",
   background: "transparent",
   borderRadius: ESize.Tiny,
-  // boxShadow: `inset 0 0 0 1px ${computeColor([p.color, 700])}`,
 
   ...(p.focus && {
     "::-webkit-scrollbar-track": {
@@ -44,7 +43,7 @@ const Output = styled.textarea<Pick<TInputText, "color" | "size" | "rows"> & { f
   }),
 
   ...StyleFontFamily,
-  ...(p.size === ESize.Small ? StyleBodySmall : StyleBodyMedium),
+  ...(p.size === "small" ? StyleBodySmall : StyleBodyMedium),
 
   "&::selection": {
     background: computeColor([p.color, 200]),
@@ -62,8 +61,7 @@ const Label = styled.label({
 })
 
 export type TInputText = TPlaywright & {
-  size: ESize.Small | ESize.Large
-  // width: "25%" | "33%" | "50%" | "100%"
+  size: "small" | "large"
   rows: 1 | 2 | 3
 
   color: EColor
@@ -82,7 +80,7 @@ export type TInputText = TPlaywright & {
   collapse?: boolean
 }
 
-export const InputText = forwardRef<HTMLTextAreaElement, TInputText>((p, ref) => {
+export const InputText = forwardRef<HTMLInputElement | HTMLTextAreaElement, TInputText>((p, ref) => {
   const key = useId()
 
   const [focus, setFocus] = useState(false)
@@ -94,10 +92,10 @@ export const InputText = forwardRef<HTMLTextAreaElement, TInputText>((p, ref) =>
   if (p.label) {
     label = (
       <Align horizontal left collapse>
-        <Spacer xsmall={p.size === ESize.Small} small={p.size === ESize.Large} />
+        <Spacer xsmall={p.size === "small"} small={p.size === "large"} />
 
         <Label htmlFor={key}>
-          <Text size={p.size === ESize.Small ? ESize.Xsmall : ESize.Small} color={[p.color, 700]}>
+          <Text size={p.size === "small" ? "xsmall" : "small"} color={[p.color, 700]}>
             {p.label}
           </Text>
         </Label>
@@ -108,13 +106,9 @@ export const InputText = forwardRef<HTMLTextAreaElement, TInputText>((p, ref) =>
   if (p.iconStartName && p.rows === 1) {
     iconStart = (
       <Align horizontal center={p.rows === 1} collapse="width">
-        <Spacer tiny={p.size === ESize.Small} xsmall={p.size === ESize.Large} />
+        <Spacer tiny={p.size === "small"} xsmall={p.size === "large"} />
 
-        <Icon
-          name={p.iconStartName}
-          size={p.size === ESize.Small ? ESize.Medium : ESize.Large}
-          color={[p.color, 700]}
-        />
+        <Icon name={p.iconStartName} size={p.size === "small" ? "medium" : "large"} color={[p.color, 700]} />
       </Align>
     )
   }
@@ -122,9 +116,9 @@ export const InputText = forwardRef<HTMLTextAreaElement, TInputText>((p, ref) =>
   if (p.iconEndName && p.rows === 1) {
     iconEnd = (
       <Align horizontal center collapse="width">
-        <Icon name={p.iconEndName} size={p.size === ESize.Small ? ESize.Medium : ESize.Large} color={[p.color, 700]} />
+        <Icon name={p.iconEndName} size={p.size === "small" ? "medium" : "large"} color={[p.color, 700]} />
 
-        <Spacer tiny={p.size === ESize.Small} xsmall={p.size === ESize.Large} />
+        <Spacer tiny={p.size === "small"} xsmall={p.size === "large"} />
       </Align>
     )
   }
@@ -136,7 +130,7 @@ export const InputText = forwardRef<HTMLTextAreaElement, TInputText>((p, ref) =>
       colorOutline={[p.color, 700]}
       colorOutlineHover={focus ? [p.color, 700] : [p.color, 900]}
       colorBackground={[focus ? p.color : EColor.Transparent, 50]}
-      borderRadius={ESize.Small}
+      borderRadius="small"
     >
       {label}
 
@@ -145,12 +139,12 @@ export const InputText = forwardRef<HTMLTextAreaElement, TInputText>((p, ref) =>
       <Align horizontal left>
         <Output
           as={p.rows === 1 ? "input" : "textarea"}
+          // @ts-expect-error TypeScript can't infer the type of the `ref` prop when using as="...".
           ref={ref}
           id={key}
           value={p.value}
           rows={p.rows || 1}
           color={p.color}
-          // width={p.width}
           size={p.size}
           focus={focus}
           placeholder={p.placeholder}

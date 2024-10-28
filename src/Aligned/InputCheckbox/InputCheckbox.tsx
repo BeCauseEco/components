@@ -51,12 +51,12 @@ export const InputCheckbox = (p: TInputCheckBox) => {
         <Align horizontal left collapse>
           <Root id={key} checked={p.value} onCheckedChange={checked => p.onChange(checked === true)}>
             {p.value === "indeterminate" && (
-              <Icon name="indeterminate_check_box" size={ESize.Large} color={[p.color, 700]} fill />
+              <Icon name="indeterminate_check_box" size="large" color={[p.color, 700]} fill />
             )}
 
-            {p.value === true && <Icon name="check_box" size={ESize.Large} color={[p.color, 700]} fill />}
+            {p.value === true && <Icon name="check_box" size="large" color={[p.color, 700]} fill />}
 
-            {p.value === false && <Icon name="check_box_outline_blank" size={ESize.Large} color={[p.color, 700]} />}
+            {p.value === false && <Icon name="check_box_outline_blank" size="large" color={[p.color, 700]} />}
           </Root>
 
           {p.label && (

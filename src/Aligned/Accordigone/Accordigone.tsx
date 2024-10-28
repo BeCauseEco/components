@@ -1,12 +1,15 @@
 import styled from "@emotion/styled"
 
 const Pre = styled.pre<TAccordigone>(p => ({
-  fontSize: "100%",
+  width: "100%",
+  height: "auto",
+  fontSize: "1vh",
   fontFamily: "monospace",
-  outline: "dotted 1px black",
+  outline: `dotted 1px ${p.filter === "none" ? "black" : "brown"}`,
   outlineOffset: -1,
   userSelect: "none",
   color: p.filter === "none" ? "black" : "brown",
+  borderRadius: "var(--BU)",
 }))
 
 export type TAccordigone = {

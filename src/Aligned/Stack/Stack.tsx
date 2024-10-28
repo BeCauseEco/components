@@ -4,19 +4,18 @@ import { TAlign } from "@new/Aligned/Align/Align"
 import { containsIlligalChildren } from "@new/Functions"
 import { computeColor, EColor, TColor } from "@new/Color"
 import { TLayoutBase } from "@new/Composition/TLayoutBase"
-import { ESize } from "@new/ESize"
 import { Loader } from "./internal/Loader"
 import { Spinner } from "./internal/Spinner"
 
-const translateBorderRadius = (size?: ESize): string => {
-  switch (size) {
-    case ESize.Small:
+const translateBorderRadius = (p?: Pick<TStack, "borderRadius">): string => {
+  switch (p?.borderRadius) {
+    case "small":
       return "var(--BU)"
 
-    case ESize.Medium:
+    case "medium":
       return "calc(var(--BU) * 1.5)"
 
-    case ESize.Large:
+    case "large":
       return "calc(var(--BU) * 2)"
 
     default:
@@ -43,7 +42,7 @@ const Container = styled.div<
   overflow: p.overflowHidden ? "hidden" : "visible",
   cursor: "inherit",
   position: "relative",
-  borderRadius: translateBorderRadius(p.borderRadius),
+  borderRadius: translateBorderRadius({ borderRadius: p.borderRadius }),
   backgroundColor: computeColor(p.colorBackground || [EColor.Transparent]),
   transition: "background-color 0.1s ease-in-out",
   willChange: "background-color",
@@ -118,7 +117,7 @@ export type TStack = TLayoutBase & {
   colorOutlineHover?: TColor
   colorLoading?: TColor
 
-  borderRadius?: ESize.Small | ESize.Medium | ESize.Large
+  borderRadius?: "small" | "medium" | "large"
 
   collapse?: boolean | "partly"
   explodeHeight?: boolean
@@ -131,7 +130,7 @@ export type TStack = TLayoutBase & {
 
 export const Stack = (p: TStack) => {
   if (containsIlligalChildren(p.children, ["Align"])) {
-    return <pre>TStack only acceps children of type: TAlign</pre>
+    return <pre>TStack only accepts children of type: TAlign</pre>
   }
 
   return (

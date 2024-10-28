@@ -51,11 +51,11 @@ export const InputRadioGroupItem = (p: TInputRadioGroupItem) => {
       <Align horizontal left collapse>
         <Item id={key} value={p.value} color={p.color}>
           <IndicatorUnchecked>
-            <Icon name="radio_button_unchecked" size={ESize.Large} color={[p.color, 700]} />
+            <Icon name="radio_button_unchecked" size="large" color={[p.color, 700]} />
           </IndicatorUnchecked>
 
           <IndicatorChecked>
-            <Icon name="radio_button_checked" size={ESize.Large} color={[p.color, 700]} />
+            <Icon name="radio_button_checked" size="large" color={[p.color, 700]} />
           </IndicatorChecked>
         </Item>
 

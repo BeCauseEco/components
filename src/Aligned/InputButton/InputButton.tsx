@@ -1,12 +1,11 @@
 import styled from "@emotion/styled"
 import { forwardRef, ReactElement } from "react"
 import { EColor } from "@new/Color"
-import { ESize } from "@new/ESize"
 import { Stack } from "@new/Aligned/Stack/Stack"
 import Link, { LinkProps } from "next/link"
 import React from "react"
 import { TPlaywright } from "@new/TPlaywright"
-import { Text, TText } from "@new/Text/Text"
+import { Text, TText } from "@new/Aligned/Text/Text"
 import { Align, TAlign } from "@new/Aligned/Align/Align"
 import { Icon } from "@new/Aligned/Icon/Icon"
 import { Spacer } from "../Spacer/Spacer"
@@ -50,7 +49,7 @@ const Children = (p: Omit<TInputButton, "onClick">) => {
     if (p.variant === "link" && p.href) {
       return (
         <NextLink href={p.href}>
-          <Text size={p.size === ESize.Small ? ESize.Small : ESize.Medium} color={[p.color, 700]}>
+          <Text size={p.size === "small" ? "small" : "medium"} color={[p.color, 700]}>
             {p.label}
           </Text>
         </NextLink>
@@ -58,10 +57,7 @@ const Children = (p: Omit<TInputButton, "onClick">) => {
     } else {
       label = (
         <Align horizontal left collapse>
-          <Text
-            size={p.size === ESize.Small ? ESize.Small : ESize.Medium}
-            color={[p.color, p.variant === "solid" ? 50 : 700]}
-          >
+          <Text size={p.size === "small" ? "small" : "medium"} color={[p.color, p.variant === "solid" ? 50 : 700]}>
             {p.label}
           </Text>
         </Align>
@@ -73,7 +69,7 @@ const Children = (p: Omit<TInputButton, "onClick">) => {
     const icon = (
       <Icon
         name={p.iconName}
-        size={p.size === ESize.Small ? ESize.Medium : ESize.Large}
+        size={p.size === "small" ? "medium" : "large"}
         color={[p.color, p.variant === "solid" ? 50 : 700]}
       />
     )
@@ -83,7 +79,7 @@ const Children = (p: Omit<TInputButton, "onClick">) => {
         <Align horizontal left collapse>
           {icon}
 
-          <Spacer tiny={p.size === ESize.Small} xsmall={p.size === ESize.Large} />
+          <Spacer tiny={p.size === "small"} xsmall={p.size === "large"} />
         </Align>
       )
     }
@@ -91,7 +87,7 @@ const Children = (p: Omit<TInputButton, "onClick">) => {
     if (p.iconPlacement === "afterLabel") {
       iconAfterLabel = (
         <Align horizontal left collapse>
-          <Spacer tiny={p.size === ESize.Small} xsmall={p.size === ESize.Large} />
+          <Spacer tiny={p.size === "small"} xsmall={p.size === "large"} />
 
           {icon}
         </Align>
@@ -131,7 +127,7 @@ const Children = (p: Omit<TInputButton, "onClick">) => {
           colorBackground={[p.color, 700]}
           colorBackgroundHover={[p.color, 800]}
           colorLoading={[p.color, 50]}
-          borderRadius={ESize.Small}
+          borderRadius="small"
           collapse="partly"
           loading={p.loading}
           disabled={p.disabled}
@@ -148,7 +144,7 @@ const Children = (p: Omit<TInputButton, "onClick">) => {
           colorOutline={[p.color, 300]}
           colorBackgroundHover={[p.color, 100]}
           colorLoading={[p.color, 700]}
-          borderRadius={ESize.Small}
+          borderRadius="small"
           collapse="partly"
           loading={p.loading}
           disabled={p.disabled}
@@ -165,7 +161,7 @@ const Children = (p: Omit<TInputButton, "onClick">) => {
           horizontal
           colorBackgroundHover={[p.color, 100]}
           colorLoading={[p.color, 700]}
-          borderRadius={ESize.Small}
+          borderRadius="small"
           collapse="partly"
           loading={p.loading}
           disabled={p.disabled}
@@ -180,7 +176,7 @@ const Children = (p: Omit<TInputButton, "onClick">) => {
 type TInputButton = TPlaywright & {
   variant: "link" | "solid" | "outlined" | "transparent"
 
-  size: ESize.Small | ESize.Large
+  size: "small" | "large"
   color: EColor
 
   href?: LinkProps["href"]
@@ -197,15 +193,18 @@ type TInputButton = TPlaywright & {
 }
 
 export const InputButton = forwardRef<HTMLButtonElement | HTMLAnchorElement, TInputButton>((p, ref) => {
+  const { variant, color, onClick, ...pp } = p
+
   return (
     <Output
+      as={variant === "link" ? "span" : "button"}
+      // @ts-expect-error TypeScript can't infer the type of the `ref` prop when using as="...".
       ref={ref}
-      as={p.variant === "link" ? "span" : "button"}
-      variant={p.variant}
-      color={p.color}
-      onClick={p.onClick}
+      variant={variant}
+      color={color}
+      onClick={onClick}
       data-playwright-testid={p.playwrightTestId}
-      {...(p as any)}
+      {...pp}
     >
       <Children
         variant={p.variant}

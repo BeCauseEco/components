@@ -1,25 +1,23 @@
-import { ESize } from "@new/ESize"
 import { TColor, computeColor } from "@new/Color"
 import styled from "@emotion/styled"
-import { EWeight } from "@new/EWeight"
 import { TPlaywright } from "@new/TPlaywright"
 
-const calculateFontVariantSettings = (size: ESize, weight: EWeight, fill: boolean) => {
-  let w = [ESize.Large, ESize.Huge].includes(size) ? "700" : "600"
+const calculateFontVariantSettings = (p: Pick<TIcon, "size" | "weight" | "fill">) => {
+  let w = ["large", "xlarge", "huge"].includes(p.size) ? "700" : "600"
+  const g = ["large", "xlarge", "huge"].includes(p.size) ? "0" : "-25"
 
-  const g = [ESize.Large, ESize.Huge].includes(size) ? "0" : "-25"
-
-  switch (weight) {
-    case EWeight.Light:
+  switch (p.weight) {
+    case "light":
       w = "200"
       break
 
-    case EWeight.Heavy:
+    case "normal":
+    case "heavy":
       w = "900"
       break
   }
 
-  return `'FILL' ${fill ? "1" : "0"}, 'wght' ${w}, 'GRAD' ${g}, 'opsz' 48`
+  return `'FILL' ${p.fill ? "1" : "0"}, 'wght' ${w}, 'GRAD' ${g}, 'opsz' 48`
 }
 
 const Container = styled.i<Omit<TIcon, "name">>(p => ({
@@ -30,33 +28,36 @@ const Container = styled.i<Omit<TIcon, "name">>(p => ({
   lineHeight: p.size,
   fontSize: `calc(${p.size} * 0.8)`,
   color: computeColor(p.color),
-  "font-variation-settings": calculateFontVariantSettings(p.size, p.weight || EWeight.Normal, p.fill || false),
+
+  "font-variation-settings": calculateFontVariantSettings({
+    size: p.size,
+    weight: p.weight || "normal",
+    fill: p.fill || false,
+  }),
+
   userSelect: "none",
 }))
 
 export type TIcon = TPlaywright & {
   name: string | "blank"
-  size: ESize
+  size: "tiny" | "xsmall" | "small" | "medium" | "large" | "xlarge" | "huge"
   color: TColor
-  weight?: EWeight
+  weight?: "light" | "normal" | "heavy"
   fill?: boolean
-  onClick?: any
+  onClick?: () => void
 }
 
-export const Icon = ({ name, size, color, weight, fill, onClick = undefined, playwrightTestId }: TIcon) => {
-  const noop = () => {}
-
-  return (
-    <Container
-      size={size}
-      weight={weight}
-      fill={fill}
-      color={color as any}
-      className="material-symbols-rounded"
-      onClick={onClick || noop}
-      data-playwright-testid={playwrightTestId}
-    >
-      {name === "blank" ? null : name}
-    </Container>
-  )
-}
+export const Icon = ({ name, size, color, weight, fill, onClick = undefined, playwrightTestId }: TIcon) => (
+  <Container
+    size={size}
+    weight={weight}
+    fill={fill}
+    // @ts-expect-error color dictated as being of type string by @emotion/styled
+    color={color}
+    className="material-symbols-rounded"
+    onClick={onClick}
+    data-playwright-testid={playwrightTestId}
+  >
+    {name === "blank" ? null : name}
+  </Container>
+)
