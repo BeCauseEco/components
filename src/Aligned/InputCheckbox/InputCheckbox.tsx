@@ -1,9 +1,8 @@
 import styled from "@emotion/styled"
-import { ESize } from "@new/ESize"
 import { EColor } from "@new/Color"
 import * as RadixCheckbox from "@radix-ui/react-checkbox"
 import { Icon } from "@new/Aligned/Icon/Icon"
-import { Text } from "@new/Text/Text"
+import { Text } from "@new/Aligned/Text/Text"
 import { useId } from "react"
 import { TPlaywright } from "@new/TPlaywright"
 import { Stack } from "@new/Aligned/Stack/Stack"
@@ -35,7 +34,7 @@ const Label = styled.label({
 })
 
 export type TInputCheckBox = TPlaywright & {
-  size: ESize.Small | ESize.Large
+  size: "small" | "large"
   color: EColor
   value: boolean | "indeterminate"
   onChange: (value: boolean) => void
@@ -64,7 +63,7 @@ export const InputCheckbox = (p: TInputCheckBox) => {
               <Spacer tiny />
 
               <Label htmlFor={key}>
-                <Text size={p.size === ESize.Small ? ESize.Small : ESize.Medium} color={[p.color, 700]}>
+                <Text size={p.size === "small" ? "small" : "medium"} color={[p.color, 700]}>
                   {p.label}
                 </Text>
               </Label>

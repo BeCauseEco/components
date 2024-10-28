@@ -1,10 +1,9 @@
 import { EColor } from "@new/Color"
-import { Text } from "@new/Text/Text"
+import { Text } from "@new/Aligned/Text/Text"
 import styled from "@emotion/styled"
 import * as RadixRadioGroup from "@radix-ui/react-radio-group"
 import { useId } from "react"
 import { TPlaywright } from "@new/TPlaywright"
-import { ESize } from "@new/ESize"
 import { Icon } from "@new/Aligned/Icon/Icon"
 import { Stack } from "@new/Aligned/Stack/Stack"
 import { Align } from "@new/Aligned/Align/Align"
@@ -39,7 +38,7 @@ const Label = styled.label({
 export type TInputRadioGroupItem = TPlaywright & {
   value: string
   color: EColor
-  size: ESize.Small | ESize.Large
+  size: "small" | "large"
   label: string
 }
 
@@ -62,7 +61,7 @@ export const InputRadioGroupItem = (p: TInputRadioGroupItem) => {
         <Spacer tiny />
 
         <Label htmlFor={key}>
-          <Text size={p.size === ESize.Small ? ESize.Small : ESize.Medium} color={[p.color, 700]}>
+          <Text size={p.size === "small" ? "small" : "medium"} color={[p.color, 700]}>
             {p.label}
           </Text>
         </Label>
