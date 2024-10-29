@@ -23,12 +23,12 @@ const calculateFontVariantSettings = (size: ESize, weight: EWeight, fill: boolea
 }
 
 const Container = styled.i<Omit<TIcon, "name">>(p => ({
-  display: "flex",
+  display: "flex !important",
   flexShrink: 0,
   width: "fit-content",
   height: p.size,
-  lineHeight: p.size,
-  fontSize: p.size,
+  lineHeight: `${p.size} !important`,
+  fontSize: `${p.size} !important`,
   color: computeColor(p.color),
   "font-variation-settings": calculateFontVariantSettings(p.size, p.weight || EWeight.Normal, p.fill || false),
   userSelect: "none",
