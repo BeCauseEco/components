@@ -3,7 +3,6 @@ import * as RadixDialog from "@radix-ui/react-dialog"
 import { TInputButton } from "@new/InputButton/InputButton"
 import { Composition, TComposition } from "@new/Composition/Composition"
 import { BackgroundCard } from "@new/Composition/BackgroundCard"
-import { ESize } from "@new/ESize"
 import { EColor } from "@new/Color"
 import { LayoutTakeover } from "./internal/LayoutTakeover"
 import styled from "@emotion/styled"
@@ -87,7 +86,7 @@ export const Takeover = ({
 
   if (status) {
     contentEnd.push(status)
-    contentEnd.push(<Spacer size={ESize.Large} />)
+    contentEnd.push(<Spacer large />)
   }
 
   if (buttonTertiary) {
@@ -95,12 +94,12 @@ export const Takeover = ({
   }
 
   if (buttonSecondary) {
-    contentEnd.push(<Spacer size={ESize.Small} />)
+    contentEnd.push(<Spacer small />)
     contentEnd.push(buttonSecondary)
   }
 
   if (buttonPrimary) {
-    contentEnd.push(<Spacer size={ESize.Small} />)
+    contentEnd.push(<Spacer small />)
     contentEnd.push(buttonPrimary)
   }
 

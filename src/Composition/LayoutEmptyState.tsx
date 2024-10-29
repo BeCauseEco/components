@@ -1,7 +1,6 @@
 import styled from "@emotion/styled"
 import { TLayoutBase } from "./TLayoutBase"
 import { TText } from "@new/Text/Text"
-import { ESize } from "@new/ESize"
 import { Spacer } from "@new/Spacer/Spacer"
 import { ReactElement } from "react"
 import { TInputButton } from "@new/InputButton/InputButton"
@@ -31,19 +30,19 @@ export const LayoutEmptyState = ({ head, body, content, playwrightTestId }: TLay
         />
       </svg>
 
-      <Spacer size={ESize.Large} />
+      <Spacer large />
 
       {head}
 
-      <Spacer size={ESize.Medium} />
+      <Spacer medium />
 
       {body}
 
-      {content && <Spacer size={ESize.Large} />}
+      {content && <Spacer large />}
 
       {content && content}
 
-      {content && <Spacer size={ESize.Large} />}
+      {content && <Spacer large />}
     </Container>
   )
 }
