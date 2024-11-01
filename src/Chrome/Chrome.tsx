@@ -45,7 +45,8 @@ export const Chrome = ({ children }: PropsWithChildren<TChrome>) => {
               >
                 <Icon name="settings" color={[EColor.White]} size={ESize.Medium} />
               </InputButton>
-              <Spacer size={ESize.Xsmall} />
+
+              <Spacer small />
             </>
           ))}
           contentSecondaryNavigation={
@@ -63,7 +64,7 @@ export const Chrome = ({ children }: PropsWithChildren<TChrome>) => {
                     </Text>
                   </InputButton>
 
-                  <Spacer size={ESize.Xsmall} />
+                  <Spacer small />
                 </>
               ))} */}
             </>
@@ -74,7 +75,7 @@ export const Chrome = ({ children }: PropsWithChildren<TChrome>) => {
                 <Icon name="settings" color={[EColor.White]} size={ESize.Medium} />
               </InputButton>
 
-              <Spacer size={ESize.Xsmall} />
+              <Spacer small />
 
               <InputButton variant={EInputButtonVariant.Solid} color={EColor.Primary} size={ESize.Medium}>
                 <Icon name="logout" color={[EColor.White]} size={ESize.Medium} />

@@ -1,7 +1,6 @@
 import styled from "@emotion/styled"
 import { ESize } from "@new/ESize"
 import { forwardRef, PropsWithChildren, ReactElement } from "react"
-import { Spacer } from "@new/Spacer/Spacer"
 import { EDirection } from "@new/EDirection"
 import { EDistribution } from "@new/EDistrubution"
 import { TPlaywright } from "@new/TPlaywright"
@@ -42,7 +41,8 @@ export const KeyValuePair = forwardRef<HTMLDivElement, PropsWithChildren<TKeyVal
     <Container ref={ref} data-playwright-testid={playwrightTestId} {...props}>
       <Content>{children[0]}</Content>
 
-      {children[0] && <Spacer size={spacing} />}
+      {/* TO-DO: @cllpse fix Spacer */}
+      {children[0] && <div style={{ display: "flex", flexShrink: 0, width: spacing, height: spacing }} />}
 
       <Content>{children[1]}</Content>
     </Container>

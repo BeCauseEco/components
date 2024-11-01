@@ -1,7 +1,6 @@
 import * as Tabs from "@radix-ui/react-tabs"
 import { PropsWithChildren, ReactElement, RefAttributes, forwardRef } from "react"
 import { TComposition } from "@new/Composition/Composition"
-import { ESize } from "@new/ESize"
 import { Spacer } from "@new/Spacer/Spacer"
 import { TPlaywright } from "@new/TPlaywright"
 
@@ -26,7 +25,7 @@ export const TabsContentItem = forwardRef<
       asChild
     >
       <>
-        <Spacer size={ESize.Large} />
+        <Spacer large />
 
         {children}
       </>

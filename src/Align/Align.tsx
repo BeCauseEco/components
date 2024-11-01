@@ -1,7 +1,7 @@
 import { PropsWithChildren } from "react"
 import styled from "@emotion/styled"
 
-const computeAlignment = (p: Omit<TAlign, "spacing">) => {
+const computeAlignment = (p: Omit<TAlign, "spacing" | "hug">) => {
   const r = {
     justifyContent: "",
     alignItems: "",
@@ -106,8 +106,8 @@ const Container = styled.div<TAlign>(p => ({
   display: "flex",
   flexWrap: "inherit",
   flexDirection: p.vertical ? "column" : "row",
-  width: "100%",
-  height: "100%",
+  width: p.hug ? "auto" : "100%",
+  height: p.hug ? "auto" : "100%",
 
   ...computeAlignment(p),
 }))
@@ -115,6 +115,7 @@ const Container = styled.div<TAlign>(p => ({
 export type TAlign = {
   vertical?: boolean
   horizontal?: boolean
+
   topLeft?: boolean
   topCenter?: boolean
   topRight?: boolean
@@ -124,6 +125,8 @@ export type TAlign = {
   bottomLeft?: boolean
   bottomCenter?: boolean
   bottomRight?: boolean
+
+  hug?: boolean | "width" | "height"
 }
 
 export const Align = (p: PropsWithChildren<TAlign>) => (
@@ -139,6 +142,7 @@ export const Align = (p: PropsWithChildren<TAlign>) => (
     bottomRight={p.bottomRight}
     vertical={p.vertical}
     horizontal={p.horizontal}
+    hug={p.hug}
   >
     {p.children}
   </Container>
