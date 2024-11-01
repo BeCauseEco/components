@@ -6,17 +6,18 @@ import { computeColor, EColor, TColor } from "@new/Color"
 import { TLayoutBase } from "@new/Composition/TLayoutBase"
 import { Loader } from "./internal/Loader"
 import { Spinner } from "./internal/Spinner"
+import { TGrid } from "@new/Grid/Grid"
 
 const translateBorderRadius = (p?: Pick<TStack, "borderRadius">): string => {
   switch (p?.borderRadius) {
     case "small":
-      return "var(--BU)"
+      return "calc(var(--BU) / 2)"
 
     case "medium":
-      return "calc(var(--BU) * 1.5)"
+      return "calc(var(--BU) * 1)"
 
     case "large":
-      return "calc(var(--BU) * 2)"
+      return "calc(var(--BU) * 1.5)"
 
     default:
       return "0"
@@ -66,43 +67,41 @@ const Container = styled.div<
   },
 }))
 
-const Children = styled.div<Pick<TStack, "loading" | "disabled" | "collapse"> & { flexDirection: "column" | "row" }>(
-  p => ({
-    display: "inherit",
-    flexDirection: p.flexDirection,
-    width: "inherit",
-    height: "inherit",
-    padding: p.collapse ? (p.collapse === "partly" ? "calc(var(--BU) * 2)" : 0) : "calc(var(--BU) * 4)",
-    transition: "opacity 0.2s ease-in-out",
-    willChange: "opacity",
+const Children = styled.div<Pick<TStack, "loading" | "disabled" | "hug"> & { flexDirection: "column" | "row" }>(p => ({
+  display: "inherit",
+  flexDirection: p.flexDirection,
+  width: "inherit",
+  height: "inherit",
+  padding: p.hug ? (p.hug === "partly" ? "calc(var(--BU) * 2)" : 0) : "calc(var(--BU) * 4)",
+  transition: "opacity 0.2s ease-in-out",
+  willChange: "opacity",
 
-    ...(p.loading
-      ? {
-          // minHeight: "fit-content", TO-DO: @cllpse: perhaps this will break things like text
-          height: "unset",
-          maxHeight: "calc(var(--BU) * 40)",
-          opacity: 0,
-          overflow: "hidden",
-          cursor: "wait",
+  ...(p.loading
+    ? {
+        // minHeight: "fit-content", TO-DO: @cllpse: perhaps this will break things like text
+        height: "unset",
+        maxHeight: "calc(var(--BU) * 40)",
+        opacity: 0,
+        overflow: "hidden",
+        cursor: "wait",
 
-          "& *": {
-            pointerEvents: "none",
-          },
-        }
-      : {}),
+        "& *": {
+          pointerEvents: "none",
+        },
+      }
+    : {}),
 
-    ...(!p.loading && p.disabled
-      ? {
-          opacity: 0.6,
-          cursor: "not-allowed",
+  ...(!p.loading && p.disabled
+    ? {
+        opacity: 0.6,
+        cursor: "not-allowed",
 
-          "& *": {
-            pointerEvents: "none",
-          },
-        }
-      : {}),
-  }),
-)
+        "& *": {
+          pointerEvents: "none",
+        },
+      }
+    : {}),
+}))
 
 export type TStack = TLayoutBase & {
   vertical?: boolean
@@ -119,13 +118,13 @@ export type TStack = TLayoutBase & {
 
   borderRadius?: "small" | "medium" | "large"
 
-  collapse?: boolean | "partly"
+  hug?: boolean | "partly"
   explodeHeight?: boolean
   overflowHidden?: boolean
 
   aspectRatio?: "auto" | "1"
 
-  children: ReactElement<TAlign | null> | ReactElement<TAlign | null>[]
+  children: ReactElement<TAlign | null> | ReactElement<TGrid | null> | ReactElement<TAlign | null>[]
 }
 
 export const Stack = (p: TStack) => {
@@ -152,7 +151,7 @@ export const Stack = (p: TStack) => {
 
       <Children
         flexDirection={p["horizontal"] && !p["vertical"] ? "row" : "column"}
-        collapse={p.collapse}
+        hug={p.hug}
         disabled={p.disabled}
         loading={p.loading}
       >
