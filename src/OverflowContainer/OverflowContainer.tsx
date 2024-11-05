@@ -54,6 +54,7 @@ export type TOverflowContainer = TPlaywright & {
   maxHeight?: EMaxheightOptions | string
   hug?: boolean
   children: ReactElement | ReactElement[]
+  className?: string
 }
 
 export const OverflowContainer = ({
@@ -67,6 +68,7 @@ export const OverflowContainer = ({
   hug,
   children,
   playwrightTestId,
+  className,
 }: PropsWithChildren<TOverflowContainer>) => (
   <Container
     axes={axes}
@@ -78,6 +80,7 @@ export const OverflowContainer = ({
     maxHeight={maxHeight}
     hug={hug}
     data-playwright-testid={playwrightTestId}
+    className={className}
   >
     {children}
   </Container>

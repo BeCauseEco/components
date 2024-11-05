@@ -26,6 +26,7 @@ export type TChip = TPlaywright & {
     | ReactElement<TText>
     | [ReactElement<TIcon>, ReactElement<TSpacer>, ReactElement<TText>]
     | [ReactElement<TText>, ReactElement<TSpacer>, ReactElement<TInputButton>]
+    | [ReactElement<any>, ReactElement<TSpacer>, ReactElement<TText>, ReactElement<TSpacer>, ReactElement<TInputButton>]
 }
 
 export const Chip = ({ colorBackground, colorOutline, children, playwrightTestId }: PropsWithChildren<TChip>) => {
