@@ -108,7 +108,7 @@ export const InputText = forwardRef<HTMLInputElement | HTMLTextAreaElement, TInp
       <Align horizontal center={p.rows === 1} collapse="width">
         <Spacer tiny={p.size === "small"} xsmall={p.size === "large"} />
 
-        <Icon name={p.iconStartName} size={p.size === "small" ? "medium" : "large"} color={[p.color, 700]} />
+        <Icon name={p.iconStartName} size={p.size === "small" ? "medium" : "large"} fill={[p.color, 700]} />
       </Align>
     )
   }
@@ -116,7 +116,7 @@ export const InputText = forwardRef<HTMLInputElement | HTMLTextAreaElement, TInp
   if (p.iconEndName && p.rows === 1) {
     iconEnd = (
       <Align horizontal center collapse="width">
-        <Icon name={p.iconEndName} size={p.size === "small" ? "medium" : "large"} color={[p.color, 700]} />
+        <Icon name={p.iconEndName} size={p.size === "small" ? "medium" : "large"} fill={[p.color, 700]} />
 
         <Spacer tiny={p.size === "small"} xsmall={p.size === "large"} />
       </Align>

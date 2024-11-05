@@ -8,7 +8,7 @@ import { TPlaywright } from "@new/TPlaywright"
 import { Text, TText } from "@new/Aligned/Text/Text"
 import { Align, TAlign } from "@new/Aligned/Align/Align"
 import { Icon } from "@new/Aligned/Icon/Icon"
-import { Spacer } from "../Spacer/Spacer"
+import { Spacer } from "@new/Aligned/Spacer/Spacer"
 
 const Output = styled.output<Pick<TInputButton, "variant">>(p => ({
   display: "flex",
@@ -69,8 +69,9 @@ const Children = (p: Omit<TInputButton, "onClick">) => {
     const icon = (
       <Icon
         name={p.iconName}
-        size={p.size === "small" ? "medium" : "large"}
-        color={[p.color, p.variant === "solid" ? 50 : 700]}
+        fill={[p.color, p.variant === "solid" ? 50 : 700]}
+        medium={p.size === "small"}
+        large={p.size === "large"}
       />
     )
 
@@ -173,23 +174,25 @@ const Children = (p: Omit<TInputButton, "onClick">) => {
   }
 }
 
-type TInputButton = TPlaywright & {
+export type TInputButton = TPlaywright & {
   variant: "link" | "solid" | "outlined" | "transparent"
 
   size: "small" | "large"
-  color: EColor
 
-  href?: LinkProps["href"]
-  onClick?: () => void
+  color: EColor
 
   loading?: boolean
   disabled?: boolean
 
   label?: string
+
   iconName?: string
   iconPlacement?: "beforeLabel" | "afterLabel" | "labelNotSpecified"
 
-  collapse?: boolean
+  hug?: boolean
+
+  href?: LinkProps["href"]
+  onClick?: () => void
 }
 
 export const InputButton = forwardRef<HTMLButtonElement | HTMLAnchorElement, TInputButton>((p, ref) => {
@@ -216,7 +219,7 @@ export const InputButton = forwardRef<HTMLButtonElement | HTMLAnchorElement, TIn
         label={p.label}
         iconName={p.iconName}
         iconPlacement={p.iconPlacement}
-        collapse={p.collapse}
+        hug={p.hug}
       />
     </Output>
   )

@@ -35,10 +35,14 @@ const Label = styled.label({
 
 export type TInputCheckBox = TPlaywright & {
   size: "small" | "large"
+
   color: EColor
-  value: boolean | "indeterminate"
-  onChange: (value: boolean) => void
+
   label?: string
+
+  value: boolean | "indeterminate"
+
+  onChange: (value: boolean) => void
 }
 
 export const InputCheckbox = (p: TInputCheckBox) => {
@@ -49,13 +53,11 @@ export const InputCheckbox = (p: TInputCheckBox) => {
       <Stack horizontal collapse>
         <Align horizontal left collapse>
           <Root id={key} checked={p.value} onCheckedChange={checked => p.onChange(checked === true)}>
-            {p.value === "indeterminate" && (
-              <Icon name="indeterminate_check_box" size="large" color={[p.color, 700]} fill />
-            )}
+            {p.value === "indeterminate" && <Icon name="indeterminate_check_box" large fill={[p.color, 700]} style />}
 
-            {p.value === true && <Icon name="check_box" size="large" color={[p.color, 700]} fill />}
+            {p.value === true && <Icon name="check_box" large fill={[p.color, 700]} style />}
 
-            {p.value === false && <Icon name="check_box_outline_blank" size="large" color={[p.color, 700]} />}
+            {p.value === false && <Icon name="check_box_outline_blank" large fill={[p.color, 700]} />}
           </Root>
 
           {p.label && (

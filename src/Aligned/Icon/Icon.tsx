@@ -1,63 +1,112 @@
+import { ESize } from "@new/ESize"
 import { TColor, computeColor } from "@new/Color"
 import styled from "@emotion/styled"
 import { TPlaywright } from "@new/TPlaywright"
 
-const calculateFontVariantSettings = (p: Pick<TIcon, "size" | "weight" | "fill">) => {
-  let w = ["large", "xlarge", "huge"].includes(p.size) ? "700" : "600"
-  const g = ["large", "xlarge", "huge"].includes(p.size) ? "0" : "-25"
+const computeSize = (p: TIcon) => {
+  let size = "0"
 
-  switch (p.weight) {
-    case "light":
-      w = "200"
-      break
-
-    case "normal":
-    case "heavy":
-      w = "900"
-      break
+  if (p.tiny) {
+    size = ESize.Tiny
   }
 
-  return `'FILL' ${p.fill ? "1" : "0"}, 'wght' ${w}, 'GRAD' ${g}, 'opsz' 48`
+  if (p.xsmall) {
+    size = ESize.Xsmall
+  }
+
+  if (p.small) {
+    size = ESize.Small
+  }
+
+  if (p.medium) {
+    size = ESize.Medium
+  }
+
+  if (p.large) {
+    size = ESize.Large
+  }
+
+  if (p.xLarge) {
+    size = ESize.XLarge
+  }
+
+  if (p.xxLarge) {
+    size = ESize.XXLarge
+  }
+
+  if (p.huge) {
+    size = ESize.Huge
+  }
+
+  return size
 }
 
-const Container = styled.i<Omit<TIcon, "name">>(p => ({
-  display: "flex",
+const computeStyle = (p: TIcon) => {
+  console.log("computeStyle", p)
+
+  return "1"
+}
+
+const computeFontVariantSettings = (p: TIcon) => {
+  // let w = [ESize.Large, ESize.Huge].includes(p.size) ? "700" : "600"
+
+  // const g = [ESize.Large, ESize.Huge].includes(p.size) ? "0" : "-25"
+
+  // switch (p.weight) {
+  //   case EWeight.Light:
+  //     w = "200"
+  //     break
+
+  //   case EWeight.Heavy:
+  //     w = "900"
+  //     break
+  // }
+
+  const w = "600"
+  const g = "0"
+
+  return `'FILL' ${computeStyle(p)}, 'wght' ${w}, 'GRAD' ${g}, 'opsz' 48`
+}
+
+const Container = styled.i<Pick<TIcon, "fill"> & { size: string; fontVariationSettings: string }>(p => ({
+  display: "flex !important",
   flexShrink: 0,
   width: "fit-content",
   height: p.size,
-  lineHeight: p.size,
-  fontSize: `calc(${p.size} * 0.8)`,
-  color: computeColor(p.color),
-
-  "font-variation-settings": calculateFontVariantSettings({
-    size: p.size,
-    weight: p.weight || "normal",
-    fill: p.fill || false,
-  }),
-
+  lineHeight: `${p.size} !important`,
+  fontSize: `${p.size} !important`,
+  color: computeColor(p.fill),
+  "font-variation-settings": p.fontVariationSettings,
   userSelect: "none",
 }))
 
 export type TIcon = TPlaywright & {
   name: string | "blank"
-  size: "tiny" | "xsmall" | "small" | "medium" | "large" | "xlarge" | "huge"
-  color: TColor
-  weight?: "light" | "normal" | "heavy"
-  fill?: boolean
-  onClick?: () => void
+  fill: TColor
+
+  tiny?: boolean
+  xsmall?: boolean
+  small?: boolean
+  medium?: boolean
+  large?: boolean
+  xLarge?: boolean
+  xxLarge?: boolean
+  huge?: boolean
+
+  style?: "filled" | "outlined" | "rounded" | "twotone" | "sharp"
+
+  onClick?: any
 }
 
-export const Icon = ({ name, size, color, weight, fill, onClick = undefined, playwrightTestId }: TIcon) => (
+export const Icon = (p: TIcon) => (
   <Container
-    size={size}
-    weight={weight}
-    fill={fill}
-    // @ts-expect-error color dictated as being of type string by @emotion/styled
-    color={color}
+    size={computeSize(p)}
+    fontVariationSettings={computeFontVariantSettings(p)}
+    fill={p.fill as any}
     className="material-symbols-rounded"
-    onClick={onClick}
-    data-playwright-testid={playwrightTestId}
+    onClick={p.onClick}
+    data-playwright-testid={p.playwrightTestId}
   >
-    {name === "blank" ? null : name}
+    {p.name === "blank" ? null : p.name}
   </Container>
 )

@@ -1,34 +1,44 @@
 import { PropsWithChildren, ReactElement } from "react"
 import styled from "@emotion/styled"
-import { TAlign } from "@new/Aligned/Align/Align"
 import { TLayoutBase } from "@new/Composition/TLayoutBase"
 import { TStack } from "@new/Aligned/Stack/Stack"
 
-const Container = styled.div<Pick<TGrid, "rows" | "columns" | "collapse">>(p => ({
+const computeGridTemplateColumns = (columns: TGrid["columns"]): string => {
+  switch (columns) {
+    case "two":
+      return "1fr 1fr"
+
+    case "three":
+      return "1fr 1fr 1fr"
+
+    case "four":
+      return "1fr 1fr 1fr 1fr"
+
+    default:
+      return "1fr"
+  }
+}
+
+const Container = styled.div<Pick<TGrid, "columns" | "hug">>(p => ({
   display: "grid",
-  gap: p.collapse ? 0 : "calc(var(--BU) * 4)",
-  gridTemplateColumns: p.columns,
-  gridTemplateRows: p.rows,
+  gap: p.hug ? 0 : "calc(var(--BU) * 4)",
+  gridTemplateColumns: computeGridTemplateColumns(p.columns),
+  gridTemplateRows: "auto",
   height: "inherit",
 }))
 
 export type TGrid = TLayoutBase & {
-  columns: "1fr" | "1fr 1fr" | "1fr 1fr 1fr" | "1fr 1fr 1fr 1fr"
-  rows: "auto"
-  collapse?: boolean
-  children: ReactElement<TAlign | TStack> | ReactElement<TAlign | TStack>[]
+  columns: "two" | "three" | "four"
+
+  hug?: boolean
+
+  children: ReactElement<TStack> | ReactElement<TStack>[]
 }
 
-export const Grid = ({ columns, rows, collapse, children, playwrightTestId }: PropsWithChildren<TGrid>) => {
+export const Grid = (p: PropsWithChildren<TGrid>) => {
   return (
-    <Container
-      className="layout-container"
-      columns={columns}
-      rows={rows}
-      collapse={collapse}
-      data-playwright-testid={playwrightTestId}
-    >
-      {children}
+    <Container className="layout-container" columns={p.columns} hug={p.hug} data-playwright-testid={p.playwrightTestId}>
+      {p.children}
     </Container>
   )
 }

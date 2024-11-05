@@ -17,12 +17,16 @@ const Root = styled(RadixRadioGroup.Root)<{ marginPosition: "bottom" | "right" }
 }))
 
 export type TInputRadioGroup = TPlaywright & {
+  size: "small" | "large"
+
+  vertical?: boolean
+  horizontal?: boolean
+
   defaultValue: string
   value: string
   onChange: (value: string) => void
+
   children: ReactElement<TInputRadioGroupItem> | ReactElement<TInputRadioGroupItem>[]
-  vertical?: boolean
-  horizontal?: boolean
 }
 
 export const InputRadioGroup = (p: TInputRadioGroup) => {
