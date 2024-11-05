@@ -1,11 +1,13 @@
 import styled from "@emotion/styled"
 import { EColor } from "@new/Color"
 import { BackgroundCard } from "@new/Composition/BackgroundCard"
-import { LayoutSingle } from "@new/Composition/LayoutSingle"
+import { LayoutContextMenu } from "@new/Composition/LayoutContextMenu"
 import { EAlignment } from "@new/EAlignment"
 import { EDirection } from "@new/EDirection"
 import { EShadow } from "@new/EShadow"
 import { ESize } from "@new/ESize"
+import { TInputButton } from "@new/InputButton/InputButton"
+import { TInputText } from "@new/InputText/InputText"
 import { Popover } from "@new/Popover/Popover"
 import { TPlaywright } from "@new/TPlaywright"
 import { forwardRef, PropsWithChildren, ReactElement } from "react"
@@ -15,33 +17,29 @@ const Container = styled.div({
 })
 
 export type TAutocomplete = TPlaywright & {
-  input: ReactElement
+  input: ReactElement<TInputText> | ReactElement<TInputButton>
   results: ReactElement | ReactElement[]
 
   open: boolean
-  setOpen: (open: boolean) => void
+  onOpenChange: (open: boolean) => void
 
-  colorPopOverBackground: EColor
+  colorBackground: EColor
 }
 
 export const Autocomplete = forwardRef<HTMLDivElement, PropsWithChildren<TAutocomplete>>((props, ref) => {
-  const { playwrightTestId, input, results, colorPopOverBackground, open, setOpen } = props
+  const { playwrightTestId, input, results, colorBackground, open, onOpenChange } = props
 
   return (
     <Container ref={ref} data-playwright-testid={playwrightTestId}>
       <Popover
         open={open}
-        onOpenChange={setOpen}
+        onOpenChange={onOpenChange}
         alignment={EAlignment.Start}
         trigger={input}
         background={
-          <BackgroundCard
-            colorBackground={[colorPopOverBackground, 700]}
-            shadow={EShadow.Medium}
-            borderRadius={ESize.Tiny}
-          />
+          <BackgroundCard colorBackground={[colorBackground, 700]} shadow={EShadow.Medium} borderRadius={ESize.Tiny} />
         }
-        layout={<LayoutSingle omitPadding direction={EDirection.Vertical} content={results} />}
+        layout={<LayoutContextMenu direction={EDirection.Vertical} content={results} />}
       />
     </Container>
   )
