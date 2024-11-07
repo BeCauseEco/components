@@ -1,7 +1,7 @@
 import React, { ReactElement } from "react"
 import styled from "@emotion/styled"
 import { TPlaywright } from "@new/TPlaywright"
-import { TStack } from "@new/Stack/Stack"
+import { TStack } from "../Stack/Stack"
 
 const Outer = styled.div({
   display: "flex",

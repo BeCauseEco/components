@@ -1,5 +1,5 @@
 import { EColor } from "@new/Color"
-import { TInputButton } from "@new/InputButton/InputButton"
+import { TInputButtonPrimary } from "@new/InputButton/InputButtonPrimary"
 import styled from "@emotion/styled"
 import * as RadixDropDownMenu from "@radix-ui/react-dropdown-menu"
 import { ReactElement } from "react"
@@ -24,7 +24,7 @@ const Arrow = styled(RadixDropDownMenu.Arrow)<TDropDownMenuArrowProperties>(p =>
 }))
 
 export type TDropDownMenu = TPlaywright & {
-  buttonTrigger: ReactElement<TInputButton>
+  buttonTrigger: ReactElement<TInputButtonPrimary>
   items:
     | ReactElement<TDropDownMenuItem | TDropDownMenuSeparator>
     | ReactElement<TDropDownMenuItem | TDropDownMenuSeparator>[]

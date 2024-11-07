@@ -7,7 +7,7 @@ import { Text, TText } from "@new/Text/Text"
 import { ESize } from "@new/ESize"
 import { computeColor, EColor } from "@new/Color"
 import { Popover } from "@new/Popover/Popover"
-import { EInputButtonVariant, InputButton } from "@new/InputButton/InputButton"
+import { TInputButtonPrimary, InputButtonPrimary } from "@new/InputButton/InputButtonPrimary"
 import { Icon, TIcon } from "@new/Icon/Icon"
 import { BackgroundCard } from "@new/Composition/BackgroundCard"
 import { EShadow } from "@new/EShadow"
@@ -70,7 +70,7 @@ const TextWithOverflow = styled(Text)<Pick<TInputCombobox, "width">>(p => ({
   display: "block",
 }))
 
-const InputButtonCollapse = styled(InputButton)({
+const InputButtonCollapse = styled(InputButtonPrimary)({
   height: 0,
   paddingTop: 0,
 })
@@ -164,12 +164,7 @@ export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<TInput
   const generateCurrentValueLabel = (multiple: boolean) => {
     if (!multiple) {
       return (
-        <TextWithOverflow
-          color={[colorButtonForeground, 700]}
-          size={ESize.Xsmall}
-          alignment={EAlignment.Start}
-          width={width}
-        >
+        <TextWithOverflow color={[colorButtonForeground, 700]} size="xsmall" width={width}>
           {Object.values(items).findLast(item => value === item.value)?.label || textNoSelection}
         </TextWithOverflow>
       )
@@ -191,8 +186,8 @@ export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<TInput
       <>
         {visibleItems?.map((item, index) => (
           <>
-            <Chip colorBackground={[colorButtonBackground, 100]} key={index}>
-              <TextWithOverflow color={[colorButtonForeground, 700]} size={ESize.Xsmall} width={width}>
+            {/* <Chip colorBackground={[colorButtonBackground, 100]} key={index}>
+              <TextWithOverflow color={[colorButtonForeground, 700]} size="xsmall" width={width}>
                 {item}
               </TextWithOverflow>
 
@@ -206,12 +201,12 @@ export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<TInput
               >
                 <Icon
                   name="close"
-                  size={ESize.Medium}
-                  color={[colorButtonBackground, 700]}
+                  medium
+                  fill={[colorButtonBackground, 700]}
                   onClick={(event: Event) => handleRemoveItem(event, item)}
                 />
               </InputButtonCollapse>
-            </Chip>
+            </Chip> */}
 
             <Spacer tiny />
           </>
@@ -219,7 +214,7 @@ export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<TInput
 
         {remainingCount > 0 && (
           <Chip key={remainingCount} colorBackground={[colorButtonBackground, 100]}>
-            <Text size={ESize.Xsmall} color={[EColor.Black, 700]}>
+            <Text size="xsmall" color={[EColor.Black, 700]}>
               +{remainingCount}
             </Text>
           </Chip>
@@ -266,19 +261,15 @@ export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<TInput
             <Spacer xsmall />
 
             <InputCheckbox
+              size="small"
               value={multiple ? (value as string[]).includes(item.value) : value === item.value}
               onChange={value => onSelectMultiple(item.value, value)}
-              colorBackground={item.colorBackground}
-              colorForeground={item.colorForeground}
-              label={
-                <Text size={ESize.Xsmall} color={[item.colorBackground, 700]} wrap>
-                  {item.label}
-                </Text>
-              }
+              color={EColor.Secondary}
+              label={item.label}
             />
           </div>
         ) : (
-          <Text size={ESize.Xsmall} color={[item.colorForeground, 700]} wrap>
+          <Text size="xsmall" color={[item.colorForeground, 700]} wrap>
             {item.label}
           </Text>
         )}
@@ -348,33 +339,34 @@ export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<TInput
         open={open}
         onOpenChange={setOpen}
         alignment={EAlignment.Start}
-        trigger={
-          <InputButton size={ESize.Medium} variant={EInputButtonVariant.Outlined} color={colorButtonBackground}>
-            {label && (
-              <>
-                {label}
+        trigger={<></>}
+        // trigger={
+        //   <InputButton size={ESize.Medium} variant={EInputButtonVariant.Outlined} color={colorButtonBackground}>
+        //     {label && (
+        //       <>
+        //         {label}
 
-                <Spacer xsmall />
-              </>
-            )}
+        //         <Spacer xsmall />
+        //       </>
+        //     )}
 
-            {icon && (
-              <>
-                {icon} <Spacer small />
-              </>
-            )}
+        //     {icon && (
+        //       <>
+        //         {icon} <Spacer small />
+        //       </>
+        //     )}
 
-            {generateCurrentValueLabel(multiple)}
+        //     {generateCurrentValueLabel(multiple)}
 
-            <Spacer xsmall />
+        //     <Spacer xsmall />
 
-            <Icon
-              name={open ? "keyboard_arrow_up" : "keyboard_arrow_down"}
-              size={ESize.Medium}
-              color={[colorButtonForeground, 700]}
-            />
-          </InputButton>
-        }
+        //     <Icon
+        //       name={open ? "keyboard_arrow_up" : "keyboard_arrow_down"}
+        //       size={ESize.Medium}
+        //       color={[colorButtonForeground, 700]}
+        //     />
+        //   </InputButton>
+        // }
         background={
           <BackgroundCard
             colorBackground={[colorPopOverBackground, 700]}
@@ -389,7 +381,8 @@ export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<TInput
               Object.keys(items).length > 9 && (
                 <>
                   <InputText
-                    width={ESize.Full}
+                    rows={1}
+                    size="small"
                     color={colorButtonBackground}
                     value={search}
                     onChange={value => {
@@ -407,7 +400,7 @@ export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<TInput
               <Command loop>
                 {filterOptions && (
                   <CommandEmptyStyled>
-                    <Text color={[colorPopOverForeground, 700]} size={ESize.Xsmall}>
+                    <Text color={[colorPopOverForeground, 700]} size="xsmall">
                       {filterOptions.textFilterNoResults}
                     </Text>
                   </CommandEmptyStyled>

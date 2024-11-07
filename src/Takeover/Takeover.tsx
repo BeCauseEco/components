@@ -1,6 +1,6 @@
 import { ReactElement, useEffect } from "react"
 import * as RadixDialog from "@radix-ui/react-dialog"
-import { TInputButton } from "@new/InputButton/InputButton"
+import { TInputButtonPrimary } from "@new/InputButton/InputButtonPrimary"
 import { Composition, TComposition } from "@new/Composition/Composition"
 import { BackgroundCard } from "@new/Composition/BackgroundCard"
 import { EColor } from "@new/Color"
@@ -44,12 +44,12 @@ export type TTakeover = TPlaywright & {
   content: ReactElement<TComposition>
   open: boolean
   onOpenChange: (open: boolean) => void
-  buttonClose?: ReactElement<TInputButton>
+  buttonClose?: ReactElement<TInputButtonPrimary>
   title?: ReactElement<TText>
   status?: ReactElement<TText>
-  buttonPrimary?: ReactElement<TInputButton>
-  buttonSecondary?: ReactElement<TInputButton>
-  buttonTertiary?: ReactElement<TInputButton>
+  buttonPrimary?: ReactElement<TInputButtonPrimary>
+  buttonSecondary?: ReactElement<TInputButtonPrimary>
+  buttonTertiary?: ReactElement<TInputButtonPrimary>
   offsetTopOverride?: string
   offsetLeftOverride?: string
   offsetLeftSmallOverride?: string

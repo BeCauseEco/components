@@ -1,7 +1,7 @@
 import styled from "@emotion/styled"
 import * as RadixAlertDialog from "@radix-ui/react-alert-dialog"
 import { ReactElement } from "react"
-import { TInputButton } from "@new/InputButton/InputButton"
+import { TInputButtonPrimary } from "@new/InputButton/InputButtonPrimary"
 import { EOpacity } from "@new/Opacity"
 import { EColor } from "@new/Color"
 import { Composition } from "@new/Composition/Composition"
@@ -36,8 +36,8 @@ export type TAlertDialog = TPlaywright & {
   open: boolean
   title?: ReactElement<TText>
   description?: ReactElement<TText>
-  buttonPrimary: ReactElement<TInputButton>
-  buttonSecondary: ReactElement<TInputButton>
+  buttonPrimary: ReactElement<TInputButtonPrimary>
+  buttonSecondary: ReactElement<TInputButtonPrimary>
 }
 
 export const Alert = ({ open, title, description, buttonPrimary, buttonSecondary, playwrightTestId }: TAlertDialog) => (

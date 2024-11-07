@@ -1,27 +1,7 @@
 import { PropsWithChildren, forwardRef } from "react"
 import styled from "@emotion/styled"
 import { TColor, computeColor } from "@new/Color"
-import { ESize } from "@new/ESize"
-import { EAlignment } from "@new/EAlignment"
 import { TPlaywright } from "@new/TPlaywright"
-
-type TContainerProperties = TText & { color: TColor; alignment?: EAlignment }
-
-const computeAlignment = (alignment?: EAlignment) => {
-  switch (alignment) {
-    case EAlignment.Start:
-      return "left"
-
-    case EAlignment.Middle:
-      return "center"
-
-    case EAlignment.End:
-      return "right"
-
-    default:
-      return "inherit"
-  }
-}
 
 export const StyleMonospace = {
   fontFamily: "monospace",
@@ -77,7 +57,7 @@ export const StyleBodyHuge = {
   letterSpacing: "-0.01em",
 }
 
-const Container = styled.p<TContainerProperties>(p => ({
+const Container = styled.p<TText>(p => ({
   display: "inline",
   ...(p.monospace ? StyleMonospace : StyleFontFamily),
   color: computeColor(p.color),
@@ -86,7 +66,7 @@ const Container = styled.p<TContainerProperties>(p => ({
   textDecoration: p.underline ? "underline" : "inherit",
   textTransform: p.capitalize ? "uppercase" : "inherit",
   textWrap: p.wrap ? "pretty" : "nowrap",
-  textAlign: computeAlignment(p.alignment),
+  textAlign: "left",
   alignItems: "inherit",
 
   "& a": {
@@ -103,37 +83,36 @@ const Container = styled.p<TContainerProperties>(p => ({
     // filter: "brightness(0.8)",
   },
 
-  ...(p.size === ESize.Tiny && StyleBodyTiny),
-  ...(p.size === ESize.Xsmall && StyleBodyXsmall),
-  ...(p.size === ESize.Small && StyleBodySmall),
-  ...(p.size === ESize.Medium && StyleBodyMedium),
-  ...(p.size === ESize.Large && StyleBodyLarge),
-  ...(p.size === ESize.XLarge && StyleBodyXLarge),
-  ...(p.size === ESize.Huge && StyleBodyHuge),
+  ...(p.size === "tiny" && StyleBodyTiny),
+  ...(p.size === "xsmall" && StyleBodyXsmall),
+  ...(p.size === "small" && StyleBodySmall),
+  ...(p.size === "medium" && StyleBodyMedium),
+  ...(p.size === "large" && StyleBodyLarge),
+  ...(p.size === "xLarge" && StyleBodyXLarge),
+  ...(p.size === "huge" && StyleBodyHuge),
 
-  ...(!p.wrap && p.size === ESize.Tiny && { lineHeight: StyleBodyTiny.fontSize }),
-  ...(!p.wrap && p.size === ESize.Xsmall && { lineHeight: StyleBodyXsmall.fontSize }),
-  ...(!p.wrap && p.size === ESize.Small && { lineHeight: StyleBodySmall.fontSize }),
-  ...(!p.wrap && p.size === ESize.Medium && { lineHeight: StyleBodyMedium.fontSize }),
-  ...(!p.wrap && p.size === ESize.Large && { lineHeight: StyleBodyLarge.fontSize }),
-  ...(!p.wrap && p.size === ESize.XLarge && { lineHeight: StyleBodyXLarge.fontSize }),
-  ...(!p.wrap && p.size === ESize.Huge && { lineHeight: StyleBodyHuge.fontSize }),
+  ...(!p.wrap && p.size === "tiny" && { lineHeight: StyleBodyTiny.fontSize }),
+  ...(!p.wrap && p.size === "xsmall" && { lineHeight: StyleBodyXsmall.fontSize }),
+  ...(!p.wrap && p.size === "small" && { lineHeight: StyleBodySmall.fontSize }),
+  ...(!p.wrap && p.size === "medium" && { lineHeight: StyleBodyMedium.fontSize }),
+  ...(!p.wrap && p.size === "large" && { lineHeight: StyleBodyLarge.fontSize }),
+  ...(!p.wrap && p.size === "xLarge" && { lineHeight: StyleBodyXLarge.fontSize }),
+  ...(!p.wrap && p.size === "huge" && { lineHeight: StyleBodyHuge.fontSize }),
 }))
 
 export type TText = TPlaywright & {
-  size: ESize
+  size: "tiny" | "xsmall" | "small" | "medium" | "large" | "xLarge" | "huge"
   color: TColor
   emphasize?: boolean
   italicize?: boolean
   underline?: boolean
   capitalize?: boolean
-  alignment?: EAlignment
   wrap?: boolean
   monospace?: boolean
   title?: string
 }
 
-export const Text = forwardRef<HTMLHeadingElement | HTMLParagraphElement, PropsWithChildren<TText>>((props, ref) => {
+export const Text = forwardRef<HTMLHeadingElement | HTMLParagraphElement, PropsWithChildren<TText>>((p, ref) => {
   const {
     size,
     color,
@@ -141,18 +120,18 @@ export const Text = forwardRef<HTMLHeadingElement | HTMLParagraphElement, PropsW
     italicize = false,
     underline = false,
     capitalize = false,
-    alignment = undefined,
     wrap = false,
     monospace = false,
     children,
-    title,
     playwrightTestId,
-  } = props
+    ...rest
+  } = p
 
   return (
     <Container
       ref={ref}
       size={size}
+      // @ts-expect-error color dictated as being of type string by @emotion/styled
       color={color}
       emphasize={emphasize}
       italicize={italicize}
@@ -160,10 +139,8 @@ export const Text = forwardRef<HTMLHeadingElement | HTMLParagraphElement, PropsW
       capitalize={capitalize}
       wrap={wrap}
       monospace={monospace}
-      textAlign={computeAlignment(alignment)}
-      title={title}
       data-playwright-testid={playwrightTestId}
-      {...(props as any)}
+      {...rest}
     >
       {children}
     </Container>

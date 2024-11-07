@@ -1,6 +1,7 @@
 import { ReactElement } from "react"
 import * as RadixDialog from "@radix-ui/react-dialog"
-import { EInputButtonVariant, InputButton, TInputButton } from "@new/InputButton/InputButton"
+// import { TInputButtonPrimary, InputButtonPrimary } from "@new/InputButton/InputButtonPrimary"
+import { TInputButtonPrimary } from "@new/InputButton/InputButtonPrimary"
 import { Composition, TComposition } from "@new/Composition/Composition"
 import { BackgroundCard } from "@new/Composition/BackgroundCard"
 import { ESize } from "@new/ESize"
@@ -11,7 +12,7 @@ import { EOpacity } from "@new/Opacity"
 import { Spacer, TSpacer } from "@new/Spacer/Spacer"
 import { EShadow } from "@new/EShadow"
 import { TText } from "@new/Text/Text"
-import { Icon } from "@new/Icon/Icon"
+// import { Icon } from "@new/Icon/Icon"
 import { TPlaywright } from "@new/TPlaywright"
 
 const offsetTop = "128px"
@@ -60,9 +61,9 @@ export type TDialog = TPlaywright & {
   collapseHeight?: boolean
   title?: ReactElement<TText>
   description?: ReactElement<TText> | ReactElement<TText | TSpacer>[]
-  buttonPrimary?: ReactElement<TInputButton>
-  buttonSecondary?: ReactElement<TInputButton>
-  buttonTertiary?: ReactElement<TInputButton>
+  buttonPrimary?: ReactElement<TInputButtonPrimary>
+  buttonSecondary?: ReactElement<TInputButtonPrimary>
+  buttonTertiary?: ReactElement<TInputButtonPrimary>
 }
 
 export const Dialog = ({
@@ -121,9 +122,9 @@ export const Dialog = ({
               }
               buttonClose={
                 <RadixDialogClose asChild>
-                  <InputButton size={ESize.Medium} variant={EInputButtonVariant.Transparent} color={EColor.Black}>
+                  {/* <InputButtonPrimary medium>
                     <Icon name="close" size={ESize.Large} color={[EColor.Black, 700]} />
-                  </InputButton>
+                  </InputButtonPrimary> */}
                 </RadixDialogClose>
               }
             />

@@ -1,7 +1,6 @@
 import { PropsWithChildren, ReactElement } from "react"
-import { TInputButton } from "@new/InputButton/InputButton"
+import { TInputButtonPrimary } from "@new/InputButton/InputButtonPrimary"
 import { Icon } from "@new/Icon/Icon"
-import { ESize } from "@new/ESize"
 import { EColor } from "@new/Color"
 import React from "react"
 import { Composition } from "@new/Composition/Composition"
@@ -12,7 +11,7 @@ import { TPlaywright } from "@new/TPlaywright"
 export type TBreadcrumb = TPlaywright & {
   color: EColor
   omitPadding?: boolean
-  children: ReactElement<TInputButton | TText> | ReactElement<TInputButton | TText>[]
+  children: ReactElement<TInputButtonPrimary | TText> | ReactElement<TInputButtonPrimary | TText>[]
 }
 
 export const Breadcrumb = ({ color, omitPadding, children, playwrightTestId }: PropsWithChildren<TBreadcrumb>) => {
@@ -22,14 +21,14 @@ export const Breadcrumb = ({ color, omitPadding, children, playwrightTestId }: P
     if (React.isValidElement(child)) {
       items.push(child)
 
-      items.push(<Icon name="chevron_forward" size={ESize.Medium} color={[color, 700]} key={index} />)
+      items.push(<Icon name="chevron_forward" medium fill={[color, 700]} key={index} />)
     }
   })
 
   items.pop()
 
   // TO-DO: @cllpse: a little hacky, but stops content shift.
-  items.push(<Icon name="chevron_forward" size={ESize.Medium} color={[EColor.Transparent]} key={items.length} />)
+  items.push(<Icon name="chevron_forward" medium fill={[EColor.Transparent]} key={items.length} />)
 
   return (
     <Composition playwrightTestId={playwrightTestId}>

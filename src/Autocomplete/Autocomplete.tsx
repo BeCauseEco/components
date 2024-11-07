@@ -6,7 +6,7 @@ import { EAlignment } from "@new/EAlignment"
 import { EDirection } from "@new/EDirection"
 import { EShadow } from "@new/EShadow"
 import { ESize } from "@new/ESize"
-import { TInputButton } from "@new/InputButton/InputButton"
+import { TInputButtonPrimary } from "@new/InputButton/InputButtonPrimary"
 import { TInputText } from "@new/InputText/InputText"
 import { Popover } from "@new/Popover/Popover"
 import { TPlaywright } from "@new/TPlaywright"
@@ -17,7 +17,7 @@ const Container = styled.div({
 })
 
 export type TAutocomplete = TPlaywright & {
-  input: ReactElement<TInputText> | ReactElement<TInputButton>
+  input: ReactElement<TInputText> | ReactElement<TInputButtonPrimary>
   results: ReactElement | ReactElement[]
 
   open: boolean

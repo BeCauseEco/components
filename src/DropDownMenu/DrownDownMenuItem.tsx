@@ -46,7 +46,7 @@ export const DropDownMenuItem = ({
     colorHighlightForeground={colorHighlightForeground}
     data-playwright-testid={playwrightTestId}
   >
-    <Text size={ESize.Medium} color={[colorForeground, 700]}>
+    <Text size="medium" color={[colorForeground, 700]}>
       {label}
     </Text>
   </Item>

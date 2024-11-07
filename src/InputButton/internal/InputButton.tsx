@@ -1,22 +1,31 @@
 import styled from "@emotion/styled"
 import { forwardRef, ReactElement } from "react"
 import { EColor } from "@new/Color"
-import { Stack } from "@new/Aligned/Stack/Stack"
+import { Stack } from "@new/Stack/Stack"
 import Link, { LinkProps } from "next/link"
 import React from "react"
 import { TPlaywright } from "@new/TPlaywright"
-import { Text, TText } from "@new/Aligned/Text/Text"
-import { Align, TAlign } from "@new/Aligned/Align/Align"
-import { Icon } from "@new/Aligned/Icon/Icon"
-import { Spacer } from "@new/Aligned/Spacer/Spacer"
+import { Text, TText } from "@new/Text/Text"
+import { Align, TAlign } from "@new/Align/Align"
+import { Icon } from "@new/Icon/Icon"
+import { Spacer } from "@new/Spacer/Spacer"
 
-const Output = styled.output<Pick<TInputButton, "variant">>(p => ({
+const computeHeight = (p: TInputButton): string => {
+  if (p.size === "small") {
+    return "calc(var(--BU) * 8)"
+  } else {
+    return "calc(var(--BU) * 10)"
+  }
+}
+
+const Output = styled.output<Pick<TInputButton, "variant"> & { height: string }>(p => ({
   display: "flex",
   border: 0,
   background: "none",
   userSelect: "none",
   textDecorationColor: "inherit",
   width: "fit-content",
+  height: p.height,
   lineHeight: 1,
   cursor: "pointer",
 
@@ -56,7 +65,7 @@ const Children = (p: Omit<TInputButton, "onClick">) => {
       )
     } else {
       label = (
-        <Align horizontal left collapse>
+        <Align horizontal left hug>
           <Text size={p.size === "small" ? "small" : "medium"} color={[p.color, p.variant === "solid" ? 50 : 700]}>
             {p.label}
           </Text>
@@ -77,7 +86,7 @@ const Children = (p: Omit<TInputButton, "onClick">) => {
 
     if (p.iconPlacement === "beforeLabel") {
       iconBeforeLabel = (
-        <Align horizontal left collapse>
+        <Align horizontal left hug>
           {icon}
 
           <Spacer tiny={p.size === "small"} xsmall={p.size === "large"} />
@@ -87,7 +96,7 @@ const Children = (p: Omit<TInputButton, "onClick">) => {
 
     if (p.iconPlacement === "afterLabel") {
       iconAfterLabel = (
-        <Align horizontal left collapse>
+        <Align horizontal left hug>
           <Spacer tiny={p.size === "small"} xsmall={p.size === "large"} />
 
           {icon}
@@ -97,7 +106,7 @@ const Children = (p: Omit<TInputButton, "onClick">) => {
 
     if (p.iconPlacement === "labelNotSpecified") {
       iconLabelNotSpecified = (
-        <Align horizontal center collapse>
+        <Align horizontal center hug>
           {icon}
         </Align>
       )
@@ -129,10 +138,10 @@ const Children = (p: Omit<TInputButton, "onClick">) => {
           colorBackgroundHover={[p.color, 800]}
           colorLoading={[p.color, 50]}
           borderRadius="small"
-          collapse="partly"
           loading={p.loading}
           disabled={p.disabled}
           aspectRatio={p.iconPlacement === "labelNotSpecified" ? "1" : "auto"}
+          hug={p.hug}
         >
           {children}
         </Stack>
@@ -146,10 +155,10 @@ const Children = (p: Omit<TInputButton, "onClick">) => {
           colorBackgroundHover={[p.color, 100]}
           colorLoading={[p.color, 700]}
           borderRadius="small"
-          collapse="partly"
           loading={p.loading}
           disabled={p.disabled}
           aspectRatio={p.iconPlacement === "labelNotSpecified" ? "1" : "auto"}
+          hug={p.hug}
         >
           {children}
         </Stack>
@@ -163,10 +172,10 @@ const Children = (p: Omit<TInputButton, "onClick">) => {
           colorBackgroundHover={[p.color, 100]}
           colorLoading={[p.color, 700]}
           borderRadius="small"
-          collapse="partly"
           loading={p.loading}
           disabled={p.disabled}
           aspectRatio={p.iconPlacement === "labelNotSpecified" ? "1" : "auto"}
+          hug={p.hug}
         >
           {children}
         </Stack>
@@ -207,6 +216,7 @@ export const InputButton = forwardRef<HTMLButtonElement | HTMLAnchorElement, TIn
       color={color}
       onClick={onClick}
       data-playwright-testid={p.playwrightTestId}
+      height={computeHeight(p)}
       {...pp}
     >
       <Children

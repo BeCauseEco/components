@@ -9,7 +9,7 @@ import styled from "@emotion/styled"
 import { TPlaywright } from "@new/TPlaywright"
 import { TIcon } from "@new/Icon/Icon"
 import { TSpacer } from "@new/Spacer/Spacer"
-import { TInputButton } from "@new/InputButton/InputButton"
+import { TInputButtonPrimary } from "@new/InputButton/InputButtonPrimary"
 import { TKeyValuePair } from "@new/KeyValuePair/KeyValuePair"
 
 const Container = styled.div({
@@ -25,8 +25,14 @@ export type TChip = TPlaywright & {
     | ReactElement<TKeyValuePair>
     | ReactElement<TText>
     | [ReactElement<TIcon>, ReactElement<TSpacer>, ReactElement<TText>]
-    | [ReactElement<TText>, ReactElement<TSpacer>, ReactElement<TInputButton>]
-    | [ReactElement<any>, ReactElement<TSpacer>, ReactElement<TText>, ReactElement<TSpacer>, ReactElement<TInputButton>]
+    | [ReactElement<TText>, ReactElement<TSpacer>, ReactElement<TInputButtonPrimary>]
+    | [
+        ReactElement<any>,
+        ReactElement<TSpacer>,
+        ReactElement<TText>,
+        ReactElement<TSpacer>,
+        ReactElement<TInputButtonPrimary>,
+      ]
 }
 
 export const Chip = ({ colorBackground, colorOutline, children, playwrightTestId }: PropsWithChildren<TChip>) => {

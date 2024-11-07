@@ -1,8 +1,8 @@
 import { forwardRef } from "react"
-import { TInputButton, InputButton } from "@new/Aligned/InputButton/internal/InputButton"
+import { TInputButton, InputButton } from "@new/InputButton/internal/InputButton"
 import { EColor } from "@new/Color"
 
-type TInputButtonPrimary = Pick<TInputButton, "size" | "hug" | "loading" | "disabled"> & {
+export type TInputButtonPrimary = Pick<TInputButton, "size" | "hug" | "loading" | "disabled" | "onClick"> & {
   label: string
   iconLeftName?: string
   iconRightName?: string
@@ -32,6 +32,7 @@ export const InputButtonPrimary = forwardRef<HTMLButtonElement | HTMLAnchorEleme
       disabled={p.disabled}
       iconName={iconName}
       iconPlacement={iconPlacement}
+      onClick={p.onClick}
     />
   )
 })
