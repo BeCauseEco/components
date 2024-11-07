@@ -56,7 +56,7 @@ export const Alert = ({ open, title, description, buttonPrimary, buttonSecondary
               <>
                 <RadixAlertDialog.Cancel asChild>{buttonSecondary}</RadixAlertDialog.Cancel>
 
-                <Spacer size={ESize.Small} />
+                <Spacer small />
 
                 <RadixAlertDialog.Action asChild>{buttonPrimary}</RadixAlertDialog.Action>
               </>

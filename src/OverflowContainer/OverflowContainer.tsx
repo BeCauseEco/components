@@ -8,14 +8,14 @@ import { PropsWithChildren, ReactElement } from "react"
 const Container = styled.div<
   Pick<
     TOverflowContainer,
-    "axes" | "colorBackground" | "colorForeground" | "minWidth" | "maxWidth" | "minHeight" | "maxHeight" | "collapse"
+    "axes" | "colorBackground" | "colorForeground" | "minWidth" | "maxWidth" | "minHeight" | "maxHeight" | "hug"
   >
 >(p => ({
   display: "flex",
   flexDirection: "inherit",
   width: "100%",
   height: "inherit",
-  padding: p.collapse ? 0 : "calc(var(--BU) * 4)",
+  padding: p.hug ? 0 : "calc(var(--BU) * 4)",
   ...(p.minWidth && { minWidth: p.minWidth }),
   ...(p.maxWidth && { maxWidth: p.maxWidth }),
   ...(p.minHeight && { minHeight: p.minHeight }),
@@ -52,8 +52,9 @@ export type TOverflowContainer = TPlaywright & {
   maxWidth?: string
   minHeight?: string
   maxHeight?: EMaxheightOptions | string
-  collapse?: boolean
+  hug?: boolean
   children: ReactElement | ReactElement[]
+  className?: string
 }
 
 export const OverflowContainer = ({
@@ -64,9 +65,10 @@ export const OverflowContainer = ({
   maxWidth,
   minHeight,
   maxHeight,
-  collapse,
+  hug,
   children,
   playwrightTestId,
+  className,
 }: PropsWithChildren<TOverflowContainer>) => (
   <Container
     axes={axes}
@@ -76,8 +78,9 @@ export const OverflowContainer = ({
     maxWidth={maxWidth}
     minHeight={minHeight}
     maxHeight={maxHeight}
-    collapse={collapse}
+    hug={hug}
     data-playwright-testid={playwrightTestId}
+    className={className}
   >
     {children}
   </Container>

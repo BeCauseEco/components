@@ -92,7 +92,7 @@ export const Dialog = ({
                 <TitleAndDescription>
                   {title}
 
-                  {description && <Spacer size={ESize.Xsmall} />}
+                  {description && <Spacer xsmall />}
 
                   {description}
                 </TitleAndDescription>
@@ -104,7 +104,7 @@ export const Dialog = ({
 
                   {buttonSecondary && (
                     <>
-                      <Spacer size={ESize.Small} />
+                      <Spacer small />
 
                       {buttonSecondary}
                     </>
@@ -112,7 +112,7 @@ export const Dialog = ({
 
                   {buttonPrimary && (
                     <>
-                      <Spacer size={ESize.Small} />
+                      <Spacer small />
 
                       {buttonPrimary}
                     </>

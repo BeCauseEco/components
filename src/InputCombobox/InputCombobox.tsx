@@ -196,7 +196,7 @@ export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<TInput
                 {item}
               </TextWithOverflow>
 
-              <Spacer size={ESize.Tiny} />
+              <Spacer tiny />
 
               <InputButtonCollapse
                 size={ESize.Small}
@@ -213,7 +213,7 @@ export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<TInput
               </InputButtonCollapse>
             </Chip>
 
-            <Spacer size={ESize.Tiny} />
+            <Spacer tiny />
           </>
         ))}
 
@@ -262,7 +262,8 @@ export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<TInput
         {multiple ? (
           <div style={{ display: "flex", alignItems: "center" }}>
             {item.icon}
-            <Spacer size={ESize.Xsmall} />
+
+            <Spacer xsmall />
 
             <InputCheckbox
               value={multiple ? (value as string[]).includes(item.value) : value === item.value}
@@ -353,19 +354,19 @@ export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<TInput
               <>
                 {label}
 
-                <Spacer size={ESize.Xsmall} />
+                <Spacer xsmall />
               </>
             )}
 
             {icon && (
               <>
-                {icon} <Spacer size={ESize.Small} />
+                {icon} <Spacer small />
               </>
             )}
 
             {generateCurrentValueLabel(multiple)}
 
-            <Spacer size={ESize.Xsmall} />
+            <Spacer xsmall />
 
             <Icon
               name={open ? "keyboard_arrow_up" : "keyboard_arrow_down"}
@@ -398,7 +399,7 @@ export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<TInput
                     placeholder={filterOptions.textFilterPlaceholder}
                   />
 
-                  <Spacer size={ESize.Xsmall} />
+                  <Spacer xsmall />
                 </>
               )
             }
