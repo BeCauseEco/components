@@ -62,7 +62,7 @@ const Label = styled.label({
 
 export type TInputText = TPlaywright & {
   size: "small" | "large"
-  rows: 1 | 2 | 3
+  // rows: 1 | 2 | 3
 
   color: EColor
 

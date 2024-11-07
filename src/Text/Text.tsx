@@ -59,12 +59,14 @@ export const StyleBodyHuge = {
 
 const Container = styled.p<TText>(p => ({
   display: "inline",
+
   ...(p.monospace ? StyleMonospace : StyleFontFamily),
-  color: computeColor(p.color),
-  fontStyle: p.italicize ? "italic" : "normal",
-  fontWeight: p.emphasize ? 500 : 400,
-  textDecoration: p.underline ? "underline" : "inherit",
-  textTransform: p.capitalize ? "uppercase" : "inherit",
+
+  color: computeColor(p.fill),
+  fontStyle: "normal",
+  fontWeight: 400,
+  textDecoration: "inherit",
+  textTransform: "inherit",
   textWrap: p.wrap ? "pretty" : "nowrap",
   textAlign: "left",
   alignItems: "inherit",
@@ -83,60 +85,76 @@ const Container = styled.p<TText>(p => ({
     // filter: "brightness(0.8)",
   },
 
-  ...(p.size === "tiny" && StyleBodyTiny),
-  ...(p.size === "xsmall" && StyleBodyXsmall),
-  ...(p.size === "small" && StyleBodySmall),
-  ...(p.size === "medium" && StyleBodyMedium),
-  ...(p.size === "large" && StyleBodyLarge),
-  ...(p.size === "xLarge" && StyleBodyXLarge),
-  ...(p.size === "huge" && StyleBodyHuge),
+  ...(p.tiny && StyleBodyTiny),
+  ...(p.xsmall && StyleBodyXsmall),
+  ...(p.small && StyleBodySmall),
+  ...(p.medium && StyleBodyMedium),
+  ...(p.large && StyleBodyLarge),
+  ...(p.xLarge && StyleBodyXLarge),
+  ...(p.huge && StyleBodyHuge),
 
-  ...(!p.wrap && p.size === "tiny" && { lineHeight: StyleBodyTiny.fontSize }),
-  ...(!p.wrap && p.size === "xsmall" && { lineHeight: StyleBodyXsmall.fontSize }),
-  ...(!p.wrap && p.size === "small" && { lineHeight: StyleBodySmall.fontSize }),
-  ...(!p.wrap && p.size === "medium" && { lineHeight: StyleBodyMedium.fontSize }),
-  ...(!p.wrap && p.size === "large" && { lineHeight: StyleBodyLarge.fontSize }),
-  ...(!p.wrap && p.size === "xLarge" && { lineHeight: StyleBodyXLarge.fontSize }),
-  ...(!p.wrap && p.size === "huge" && { lineHeight: StyleBodyHuge.fontSize }),
+  ...(!p.wrap && p.tiny && { lineHeight: StyleBodyTiny.fontSize }),
+  ...(!p.wrap && p.xsmall && { lineHeight: StyleBodyXsmall.fontSize }),
+  ...(!p.wrap && p.small && { lineHeight: StyleBodySmall.fontSize }),
+  ...(!p.wrap && p.medium && { lineHeight: StyleBodyMedium.fontSize }),
+  ...(!p.wrap && p.large && { lineHeight: StyleBodyLarge.fontSize }),
+  ...(!p.wrap && p.xLarge && { lineHeight: StyleBodyXLarge.fontSize }),
+  ...(!p.wrap && p.huge && { lineHeight: StyleBodyHuge.fontSize }),
 }))
 
 export type TText = TPlaywright & {
-  size: "tiny" | "xsmall" | "small" | "medium" | "large" | "xLarge" | "huge"
-  color: TColor
-  emphasize?: boolean
-  italicize?: boolean
-  underline?: boolean
-  capitalize?: boolean
+  tiny?: boolean
+  xsmall?: boolean
+  small?: boolean
+  medium?: boolean
+  large?: boolean
+  xLarge?: boolean
+  xxLarge?: boolean
+  huge?: boolean
+
+  fill: TColor
+
   wrap?: boolean
+
   monospace?: boolean
-  title?: string
 }
 
 export const Text = forwardRef<HTMLHeadingElement | HTMLParagraphElement, PropsWithChildren<TText>>((p, ref) => {
   const {
-    size,
-    color,
-    emphasize = false,
-    italicize = false,
-    underline = false,
-    capitalize = false,
+    tiny,
+    xsmall,
+    small,
+    medium,
+    large,
+    xLarge,
+    xxLarge,
+    huge,
+
+    fill,
+
     wrap = false,
+
     monospace = false,
+
     children,
+
     playwrightTestId,
+
     ...rest
   } = p
 
   return (
     <Container
       ref={ref}
-      size={size}
-      // @ts-expect-error color dictated as being of type string by @emotion/styled
-      color={color}
-      emphasize={emphasize}
-      italicize={italicize}
-      underline={underline}
-      capitalize={capitalize}
+      tiny={tiny}
+      xsmall={xsmall}
+      small={small}
+      medium={medium}
+      large={large}
+      xLarge={xLarge}
+      xxLarge={xxLarge}
+      huge={huge}
+      fill={fill}
       wrap={wrap}
       monospace={monospace}
       data-playwright-testid={playwrightTestId}

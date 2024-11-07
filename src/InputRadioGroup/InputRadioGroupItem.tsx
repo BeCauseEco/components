@@ -37,8 +37,6 @@ const Label = styled.label({
 
 export type TInputRadioGroupItem = TPlaywright & {
   value: string
-  color: EColor
-  size: "small" | "large"
   label: string
 }
 
@@ -48,20 +46,20 @@ export const InputRadioGroupItem = (p: TInputRadioGroupItem) => {
   return (
     <Stack horizontal hug playwrightTestId={p.playwrightTestId}>
       <Align horizontal left hug>
-        <Item id={key} value={p.value} color={p.color}>
+        <Item id={key} value={p.value}>
           <IndicatorUnchecked>
-            <Icon name="radio_button_unchecked" large fill={[p.color, 700]} />
+            <Icon name="radio_button_unchecked" large fill={[EColor.Transparent]} />
           </IndicatorUnchecked>
 
           <IndicatorChecked>
-            <Icon name="radio_button_checked" large fill={[p.color, 700]} />
+            <Icon name="radio_button_checked" large fill={[EColor.Transparent]} />
           </IndicatorChecked>
         </Item>
 
         <Spacer tiny />
 
         <Label htmlFor={key}>
-          <Text size={p.size === "small" ? "small" : "medium"} color={[p.color, 700]}>
+          <Text huge fill={[EColor.Transparent]}>
             {p.label}
           </Text>
         </Label>
