@@ -4,7 +4,7 @@ import { TTabsNavigationItem } from "@new/Tabs/TabsNavigationItem"
 import { TTabsContentItem } from "@new/Tabs/TabsContentItem"
 import styled from "@emotion/styled"
 import { computeColor, Color } from "@new/Color"
-import { TPlaywright } from "@new/TPlaywright"
+import { Playwright } from "@new/Playwright"
 
 const Root = styled(RadixTabs.Root)({
   display: "flex",
@@ -18,7 +18,7 @@ const List = styled(RadixTabs.List)({
   borderBottom: `solid 1px ${computeColor([Color.Black, 100])}`,
 })
 
-export type TTabs = TPlaywright & {
+export type TTabs = Playwright & {
   contentTargetId?: string
   defaultContentTargetId: string
   navigationItems: ReactElement<TTabsNavigationItem> | ReactElement<TTabsNavigationItem>[]

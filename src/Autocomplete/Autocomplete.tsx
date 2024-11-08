@@ -6,18 +6,18 @@ import { EAlignment } from "@new/EAlignment"
 import { EDirection } from "@new/EDirection"
 import { EShadow } from "@new/EShadow"
 import { Size } from "@new/Size"
-import { TInputButtonPrimary } from "@new/InputButton/InputButtonPrimary"
-import { TInputText } from "@new/InputText/InputText"
+import { InputTextSingleProps } from "@new/InputText/InputTextSingle"
 import { Popover } from "@new/Popover/Popover"
-import { TPlaywright } from "@new/TPlaywright"
+import { Playwright } from "@new/Playwright"
 import { forwardRef, PropsWithChildren, ReactElement } from "react"
+import { InputButtonPrimaryProps } from "@new/InputButton/InputButtonPrimary"
 
 const Container = styled.div({
   display: "flex",
 })
 
-export type TAutocomplete = TPlaywright & {
-  input: ReactElement<TInputText> | ReactElement<TInputButtonPrimary>
+export type TAutocomplete = Playwright & {
+  input: ReactElement<InputTextSingleProps> | ReactElement<InputButtonPrimaryProps>
   results: ReactElement | ReactElement[]
 
   open: boolean

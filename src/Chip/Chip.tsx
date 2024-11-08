@@ -1,16 +1,16 @@
 import { PropsWithChildren, ReactElement } from "react"
-import { TText } from "@new/Text/Text"
+import { TextProps } from "@new/Text/Text"
 import { ColorLightness } from "@new/Color"
 import { BackgroundCard } from "@new/Composition/BackgroundCard"
 import { LayoutChip } from "./internal/LayoutChip"
 import { Composition } from "@new/Composition/Composition"
 import { Size } from "@new/Size"
 import styled from "@emotion/styled"
-import { TPlaywright } from "@new/TPlaywright"
+import { Playwright } from "@new/Playwright"
 import { TIcon } from "@new/Icon/Icon"
 import { TSpacer } from "@new/Spacer/Spacer"
-import { TInputButtonPrimary } from "@new/InputButton/InputButtonPrimary"
 import { TKeyValuePair } from "@new/KeyValuePair/KeyValuePair"
+import { InputButtonTertiaryProps } from "@new/InputButton/InputButtonTertiary"
 
 const Container = styled.div({
   display: "flex",
@@ -18,20 +18,20 @@ const Container = styled.div({
   cursor: "inherit",
 })
 
-export type TChip = TPlaywright & {
+export type TChip = Playwright & {
   colorBackground?: ColorLightness
   colorOutline?: ColorLightness
   children:
     | ReactElement<TKeyValuePair>
-    | ReactElement<TText>
-    | [ReactElement<TIcon>, ReactElement<TSpacer>, ReactElement<TText>]
-    | [ReactElement<TText>, ReactElement<TSpacer>, ReactElement<TInputButtonPrimary>]
+    | ReactElement<TextProps>
+    | [ReactElement<TIcon>, ReactElement<TSpacer>, ReactElement<TextProps>]
+    | [ReactElement<TextProps>, ReactElement<TSpacer>, ReactElement<InputButtonTertiaryProps>]
     | [
         ReactElement<any>,
         ReactElement<TSpacer>,
-        ReactElement<TText>,
+        ReactElement<TextProps>,
         ReactElement<TSpacer>,
-        ReactElement<TInputButtonPrimary>,
+        ReactElement<InputButtonTertiaryProps>,
       ]
 }
 

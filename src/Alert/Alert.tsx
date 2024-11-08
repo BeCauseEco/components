@@ -1,7 +1,6 @@
 import styled from "@emotion/styled"
 import * as RadixAlertDialog from "@radix-ui/react-alert-dialog"
 import { ReactElement } from "react"
-import { TInputButtonPrimary } from "@new/InputButton/InputButtonPrimary"
 import { EOpacity } from "@new/Opacity"
 import { Color } from "@new/Color"
 import { Composition } from "@new/Composition/Composition"
@@ -10,8 +9,9 @@ import { LayoutAlert } from "./internal/LayoutAlert"
 import { Size } from "@new/Size"
 import { Spacer } from "@new/Spacer/Spacer"
 import { EShadow } from "@new/EShadow"
-import { TText } from "@new/Text/Text"
-import { TPlaywright } from "@new/TPlaywright"
+import { TextProps } from "@new/Text/Text"
+import { Playwright } from "@new/Playwright"
+import { InputButtonPrimaryProps } from "@new/InputButton/InputButtonPrimary"
 
 const Overlay = styled(RadixAlertDialog.Overlay)({
   display: "flex",
@@ -32,12 +32,12 @@ const Content = styled(RadixAlertDialog.Content)({
   zIndex: 9999999,
 })
 
-export type TAlertDialog = TPlaywright & {
+export type TAlertDialog = Playwright & {
   open: boolean
-  title?: ReactElement<TText>
-  description?: ReactElement<TText>
-  buttonPrimary: ReactElement<TInputButtonPrimary>
-  buttonSecondary: ReactElement<TInputButtonPrimary>
+  title?: ReactElement<TextProps>
+  description?: ReactElement<TextProps>
+  buttonPrimary: ReactElement<InputButtonPrimaryProps>
+  buttonSecondary: ReactElement<InputButtonPrimaryProps>
 }
 
 export const Alert = ({ open, title, description, buttonPrimary, buttonSecondary, playwrightTestId }: TAlertDialog) => (

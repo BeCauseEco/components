@@ -1,7 +1,5 @@
 import { ReactElement } from "react"
 import * as RadixDialog from "@radix-ui/react-dialog"
-// import { TInputButtonPrimary, InputButtonPrimary } from "@new/InputButton/InputButtonPrimary"
-import { TInputButtonPrimary } from "@new/InputButton/InputButtonPrimary"
 import { Composition, TComposition } from "@new/Composition/Composition"
 import { BackgroundCard } from "@new/Composition/BackgroundCard"
 import { Size } from "@new/Size"
@@ -11,9 +9,12 @@ import styled from "@emotion/styled"
 import { EOpacity } from "@new/Opacity"
 import { Spacer, TSpacer } from "@new/Spacer/Spacer"
 import { EShadow } from "@new/EShadow"
-import { TText } from "@new/Text/Text"
+import { TextProps } from "@new/Text/Text"
 // import { Icon } from "@new/Icon/Icon"
-import { TPlaywright } from "@new/TPlaywright"
+import { Playwright } from "@new/Playwright"
+import { InputButtonPrimaryProps } from "@new/InputButton/InputButtonPrimary"
+import { InputButtonSecondaryProps } from "@new/InputButton/InputButtonSecondary"
+import { InputButtonTertiaryProps } from "@new/InputButton/InputButtonTertiary"
 
 const offsetTop = "128px"
 
@@ -53,17 +54,17 @@ const TitleAndDescription = styled.div({
   justifyContent: "center",
 })
 
-export type TDialog = TPlaywright & {
+export type TDialog = Playwright & {
   size: Size.Medium | Size.Huge
   content: ReactElement<TComposition>
   open: boolean
   onOpenChange: (open: boolean) => void
   collapseHeight?: boolean
-  title?: ReactElement<TText>
-  description?: ReactElement<TText> | ReactElement<TText | TSpacer>[]
-  buttonPrimary?: ReactElement<TInputButtonPrimary>
-  buttonSecondary?: ReactElement<TInputButtonPrimary>
-  buttonTertiary?: ReactElement<TInputButtonPrimary>
+  title?: ReactElement<TextProps>
+  description?: ReactElement<TextProps> | ReactElement<TextProps | TSpacer>[]
+  buttonPrimary?: ReactElement<InputButtonPrimaryProps>
+  buttonSecondary?: ReactElement<InputButtonSecondaryProps>
+  buttonTertiary?: ReactElement<InputButtonTertiaryProps>
 }
 
 export const Dialog = ({

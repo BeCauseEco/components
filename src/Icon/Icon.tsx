@@ -1,7 +1,7 @@
 import { Size } from "@new/Size"
 import { ColorLightness, computeColor } from "@new/Color"
 import styled from "@emotion/styled"
-import { TPlaywright } from "@new/TPlaywright"
+import { Playwright } from "@new/Playwright"
 
 const computeSize = (p: TIcon) => {
   let size = "0"
@@ -80,7 +80,7 @@ const Container = styled.i<Pick<TIcon, "fill"> & { size: string; fontVariationSe
   userSelect: "none",
 }))
 
-export type TIcon = TPlaywright & {
+export type TIcon = Playwright & {
   name: string | "blank"
   fill: ColorLightness
 

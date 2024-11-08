@@ -1,7 +1,7 @@
 import { Size } from "@new/Size"
-import { TPlaywright } from "@new/TPlaywright"
+import { Playwright } from "@new/Playwright"
 
-export type TLayoutBase = TPlaywright & {
+export type TLayoutBase = Playwright & {
   id?: string
   omitPadding?: boolean
   spacing?: Size

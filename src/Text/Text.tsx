@@ -1,7 +1,7 @@
 import { PropsWithChildren, forwardRef } from "react"
 import styled from "@emotion/styled"
 import { ColorLightness, computeColor } from "@new/Color"
-import { TPlaywright } from "@new/TPlaywright"
+import { Playwright } from "@new/Playwright"
 
 export const StyleMonospace = {
   fontFamily: "monospace",
@@ -57,7 +57,7 @@ export const StyleBodyHuge = {
   letterSpacing: "-0.01em",
 }
 
-const Container = styled.p<TText>(p => ({
+const Container = styled.p<TextProps>(p => ({
   display: "inline",
 
   ...(p.monospace ? StyleMonospace : StyleFontFamily),
@@ -102,7 +102,7 @@ const Container = styled.p<TText>(p => ({
   ...(!p.wrap && p.huge && { lineHeight: StyleBodyHuge.fontSize }),
 }))
 
-export type TText = TPlaywright & {
+export type TextProps = Playwright & {
   tiny?: boolean
   xsmall?: boolean
   small?: boolean
@@ -119,7 +119,7 @@ export type TText = TPlaywright & {
   monospace?: boolean
 }
 
-export const Text = forwardRef<HTMLHeadingElement | HTMLParagraphElement, PropsWithChildren<TText>>((p, ref) => {
+export const Text = forwardRef<HTMLHeadingElement | HTMLParagraphElement, PropsWithChildren<TextProps>>((p, ref) => {
   const {
     tiny,
     xsmall,

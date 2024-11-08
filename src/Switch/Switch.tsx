@@ -2,11 +2,11 @@ import { ReactElement, useId } from "react"
 import * as RadixSwitch from "@radix-ui/react-switch"
 import styled from "@emotion/styled"
 import { computeColor, Color } from "@new/Color"
-import { TText } from "@new/Text/Text"
+import { TextProps } from "@new/Text/Text"
 import { KeyValuePair } from "@new/KeyValuePair/KeyValuePair"
 import { EDirection } from "@new/EDirection"
 import { Size } from "@new/Size"
-import { TPlaywright } from "@new/TPlaywright"
+import { Playwright } from "@new/Playwright"
 
 const Container = styled.div({
   display: "flex",
@@ -56,13 +56,13 @@ const Label = styled.label({
   cursor: "pointer",
 })
 
-export type TSwitch = TPlaywright & {
+export type TSwitch = Playwright & {
   value: boolean
   onChange: (value: boolean) => void
   colorBackground: Color
   colorForeground: Color
   colorValueTrue: Color
-  label?: ReactElement<TText>
+  label?: ReactElement<TextProps>
 }
 
 export const Switch = ({

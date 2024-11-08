@@ -1,17 +1,17 @@
 import { PropsWithChildren, ReactElement } from "react"
-import { TInputButtonPrimary } from "@new/InputButton/InputButtonPrimary"
+import { InputButtonLinkProps } from "@new/InputButton/InputButtonLink"
 import { Icon } from "@new/Icon/Icon"
 import { Color } from "@new/Color"
 import React from "react"
 import { Composition } from "@new/Composition/Composition"
 import { LayoutBreadcrumb } from "./internal/LayoutBreadcrumb"
-import { TText } from "@new/Text/Text"
-import { TPlaywright } from "@new/TPlaywright"
+import { TextProps } from "@new/Text/Text"
+import { Playwright } from "@new/Playwright"
 
-export type TBreadcrumb = TPlaywright & {
+export type TBreadcrumb = Playwright & {
   color: Color
   omitPadding?: boolean
-  children: ReactElement<TInputButtonPrimary | TText> | ReactElement<TInputButtonPrimary | TText>[]
+  children: ReactElement<InputButtonLinkProps | TextProps> | ReactElement<InputButtonLinkProps | TextProps>[]
 }
 
 export const Breadcrumb = ({ color, omitPadding, children, playwrightTestId }: PropsWithChildren<TBreadcrumb>) => {

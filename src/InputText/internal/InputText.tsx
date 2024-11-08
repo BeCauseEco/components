@@ -3,13 +3,13 @@ import { forwardRef, ReactElement, useId, useState } from "react"
 import { Color, computeColor } from "@new/Color"
 import { StyleFontFamily, StyleBodySmall, Text, StyleBodyMedium } from "@new/Text/Text"
 import { Size } from "@new/Size"
-import { TPlaywright } from "@new/TPlaywright"
+import { Playwright } from "@new/Playwright"
 import { Stack } from "@new/Stack/Stack"
 import { Align } from "@new/Align/Align"
 import { Icon } from "@new/Icon/Icon"
 import { Spacer } from "@new/Spacer/Spacer"
 
-const Output = styled.output<Pick<TInputText, "color" | "size" | "rows"> & { focus: boolean }>(p => ({
+const Output = styled.output<Pick<InputTextProps, "color" | "size" | "rows"> & { focus: boolean }>(p => ({
   display: "flex",
   width: p.rows === 1 ? "100%" : "calc(100% - 1px)",
   height: p.rows === 1 ? "calc(var(--BU) * 8)" : `calc(var(--BU) * 8 * ${p.rows - 1} + calc(var(--BU) * 3) - 2px)`,
@@ -60,9 +60,9 @@ const Label = styled.label({
   cursor: "pointer",
 })
 
-export type TInputText = TPlaywright & {
+export type InputTextProps = Playwright & {
   size: "small" | "large"
-  // rows: 1 | 2 | 3
+  rows: 1 | 2 | 3
 
   color: Color
 
@@ -74,13 +74,13 @@ export type TInputText = TPlaywright & {
 
   placeholder?: string
   label?: string
-  iconStartName?: string
-  iconEndName?: string
+  iconLeftName?: string
+  iconRightName?: string
 
   collapse?: boolean
 }
 
-export const InputText = forwardRef<HTMLInputElement | HTMLTextAreaElement, TInputText>((p, ref) => {
+export const InputText = forwardRef<HTMLInputElement | HTMLTextAreaElement, InputTextProps>((p, ref) => {
   const key = useId()
 
   const [focus, setFocus] = useState(false)
@@ -95,7 +95,7 @@ export const InputText = forwardRef<HTMLInputElement | HTMLTextAreaElement, TInp
         <Spacer xsmall={p.size === "small"} small={p.size === "large"} />
 
         <Label htmlFor={key}>
-          <Text size={p.size === "small" ? "xsmall" : "small"} color={[p.color, 700]}>
+          <Text xsmall={p.size === "small"} small={p.size !== "small"} fill={[p.color, 700]}>
             {p.label}
           </Text>
         </Label>
@@ -103,20 +103,20 @@ export const InputText = forwardRef<HTMLInputElement | HTMLTextAreaElement, TInp
     )
   }
 
-  if (p.iconStartName && p.rows === 1) {
+  if (p.iconLeftName && p.rows === 1) {
     iconStart = (
       <Align horizontal center={p.rows === 1} hug="width">
         <Spacer tiny={p.size === "small"} xsmall={p.size === "large"} />
 
-        <Icon name={p.iconStartName} small={p.size === "small"} large={p.size === "large"} fill={[p.color, 700]} />
+        <Icon name={p.iconLeftName} small={p.size === "small"} large={p.size === "large"} fill={[p.color, 700]} />
       </Align>
     )
   }
 
-  if (p.iconEndName && p.rows === 1) {
+  if (p.iconRightName && p.rows === 1) {
     iconEnd = (
       <Align horizontal center hug="width">
-        <Icon name={p.iconEndName} small={p.size === "small"} large={p.size === "large"} fill={[p.color, 700]} />
+        <Icon name={p.iconRightName} small={p.size === "small"} large={p.size === "large"} fill={[p.color, 700]} />
 
         <Spacer tiny={p.size === "small"} xsmall={p.size === "large"} />
       </Align>

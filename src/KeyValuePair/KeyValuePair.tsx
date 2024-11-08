@@ -3,7 +3,7 @@ import { Size } from "@new/Size"
 import { forwardRef, PropsWithChildren, ReactElement } from "react"
 import { EDirection } from "@new/EDirection"
 import { EDistribution } from "@new/EDistrubution"
-import { TPlaywright } from "@new/TPlaywright"
+import { Playwright } from "@new/Playwright"
 
 type TConatinerProperties = Pick<TKeyValuePair, "direction" | "itemDistribution">
 
@@ -27,7 +27,7 @@ const Content = styled.div({
   },
 })
 
-export type TKeyValuePair = TPlaywright & {
+export type TKeyValuePair = Playwright & {
   direction: EDirection
   spacing: Size
   children: [ReactElement | null | undefined, ReactElement | null | undefined]

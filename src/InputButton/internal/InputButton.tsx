@@ -4,13 +4,13 @@ import { Color } from "@new/Color"
 import { Stack } from "@new/Stack/Stack"
 import Link, { LinkProps } from "next/link"
 import React from "react"
-import { TPlaywright } from "@new/TPlaywright"
-import { Text, TText } from "@new/Text/Text"
+import { Playwright } from "@new/Playwright"
+import { Text, TextProps } from "@new/Text/Text"
 import { Align, TAlign } from "@new/Align/Align"
 import { Icon } from "@new/Icon/Icon"
 import { Spacer } from "@new/Spacer/Spacer"
 
-const computeHeight = (p: TInputButton): string => {
+const computeHeight = (p: InputButtonProps): string => {
   if (p.size === "small") {
     return "calc(var(--BU) * 8)"
   } else {
@@ -18,7 +18,7 @@ const computeHeight = (p: TInputButton): string => {
   }
 }
 
-const Output = styled.output<Pick<TInputButton, "variant"> & { height: string }>(p => ({
+const Output = styled.output<Pick<InputButtonProps, "variant"> & { height: string }>(p => ({
   display: "flex",
   border: 0,
   background: "none",
@@ -48,8 +48,8 @@ const NextLink = styled(Link)({
   textDecoration: "none",
 })
 
-const Children = (p: Omit<TInputButton, "onClick">) => {
-  let label: ReactElement<TText | TAlign> | null = null
+const Children = (p: Omit<InputButtonProps, "onClick">) => {
+  let label: ReactElement<TextProps | TAlign> | null = null
   let iconBeforeLabel: ReactElement<TAlign> | null = null
   let iconAfterLabel: ReactElement | null = null
   let iconLabelNotSpecified: ReactElement | null = null
@@ -58,7 +58,7 @@ const Children = (p: Omit<TInputButton, "onClick">) => {
     if (p.variant === "link" && p.href) {
       return (
         <NextLink href={p.href}>
-          <Text size={p.size === "small" ? "small" : "medium"} color={[p.color, 700]}>
+          <Text small={p.size === "small"} medium={p.size !== "small"} fill={[p.color, 700]}>
             {p.label}
           </Text>
         </NextLink>
@@ -66,7 +66,11 @@ const Children = (p: Omit<TInputButton, "onClick">) => {
     } else {
       label = (
         <Align horizontal left hug>
-          <Text size={p.size === "small" ? "small" : "medium"} color={[p.color, p.variant === "solid" ? 50 : 700]}>
+          <Text
+            small={p.size === "small"}
+            medium={p.size !== "small"}
+            fill={[p.color, p.variant === "solid" ? 50 : 700]}
+          >
             {p.label}
           </Text>
         </Align>
@@ -183,7 +187,7 @@ const Children = (p: Omit<TInputButton, "onClick">) => {
   }
 }
 
-export type TInputButton = TPlaywright & {
+export type InputButtonProps = Playwright & {
   variant: "link" | "solid" | "outlined" | "transparent"
 
   size: "small" | "large"
@@ -204,7 +208,7 @@ export type TInputButton = TPlaywright & {
   onClick?: () => void
 }
 
-export const InputButton = forwardRef<HTMLButtonElement | HTMLAnchorElement, TInputButton>((p, ref) => {
+export const InputButton = forwardRef<HTMLButtonElement | HTMLAnchorElement, InputButtonProps>((p, ref) => {
   const { variant, color, onClick, ...pp } = p
 
   return (

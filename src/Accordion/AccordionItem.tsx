@@ -4,12 +4,12 @@ import * as Accordion from "@radix-ui/react-accordion"
 import { keyframes } from "@emotion/react"
 import { Composition } from "@new/Composition/Composition"
 import { LayoutSingle } from "@new/Composition/LayoutSingle"
-import { TText } from "@new/Text/Text"
+import { TextProps } from "@new/Text/Text"
 import { ColorLightness } from "@new/Color"
 import { BackgroundCard } from "@new/Composition/BackgroundCard"
 import { TIcon } from "@new/Icon/Icon"
 import { EDirection } from "@new/EDirection"
-import { TPlaywright } from "@new/TPlaywright"
+import { Playwright } from "@new/Playwright"
 
 type TContainerProperties = Omit<TAccordionItem, "content" | "label" | "colorHead" | "colorContent">
 
@@ -59,8 +59,8 @@ const Content = styled(Accordion.Content)({
   },
 })
 
-export type TAccordionItem = TPlaywright & {
-  label: ReactElement<TText> | ReactElement<TIcon>
+export type TAccordionItem = Playwright & {
+  label: ReactElement<TextProps> | ReactElement<TIcon>
   value: string
   content: ReactElement | ReactElement[] | undefined
   colorHead: ColorLightness

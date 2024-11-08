@@ -3,7 +3,7 @@ import { Text } from "@new/Text/Text"
 import styled from "@emotion/styled"
 import * as RadixRadioGroup from "@radix-ui/react-radio-group"
 import { useId } from "react"
-import { TPlaywright } from "@new/TPlaywright"
+import { Playwright } from "@new/Playwright"
 import { Icon } from "@new/Icon/Icon"
 import { Stack } from "@new/Stack/Stack"
 import { Align } from "@new/Align/Align"
@@ -35,7 +35,7 @@ const Label = styled.label({
   userSelect: "none",
 })
 
-export type TInputRadioGroupItem = TPlaywright & {
+export type TInputRadioGroupItem = Playwright & {
   value: string
   label: string
 }

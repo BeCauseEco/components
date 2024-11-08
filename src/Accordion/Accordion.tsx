@@ -3,7 +3,7 @@ import { ReactElement } from "react"
 import * as RadixAccordion from "@radix-ui/react-accordion"
 import { TAccordionItem } from "./AccordionItem"
 import { Size } from "@new/Size"
-import { TPlaywright } from "@new/TPlaywright"
+import { Playwright } from "@new/Playwright"
 
 const Container = styled.div({
   display: "flex",
@@ -15,7 +15,7 @@ const Root = styled(RadixAccordion.Root)({
   width: "100%",
 })
 
-export type TAccordion = TPlaywright & {
+export type TAccordion = Playwright & {
   items: ReactElement<TAccordionItem> | ReactElement<TAccordionItem>[]
   defaultValue: string
 }

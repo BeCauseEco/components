@@ -1,14 +1,17 @@
 import { ReactElement, useEffect } from "react"
 import * as RadixDialog from "@radix-ui/react-dialog"
-import { TInputButtonPrimary } from "@new/InputButton/InputButtonPrimary"
 import { Composition, TComposition } from "@new/Composition/Composition"
 import { BackgroundCard } from "@new/Composition/BackgroundCard"
 import { Color } from "@new/Color"
 import { LayoutTakeover } from "./internal/LayoutTakeover"
 import styled from "@emotion/styled"
 import { Spacer } from "@new/Spacer/Spacer"
-import { TText } from "@new/Text/Text"
-import { TPlaywright } from "@new/TPlaywright"
+import { TextProps } from "@new/Text/Text"
+import { Playwright } from "@new/Playwright"
+import { InputButtonIconProps } from "@new/InputButton/InputButtonIcon"
+import { InputButtonPrimaryProps } from "@new/InputButton/InputButtonPrimary"
+import { InputButtonSecondaryProps } from "@new/InputButton/InputButtonSecondary"
+import { InputButtonTertiaryProps } from "@new/InputButton/InputButtonTertiary"
 
 const offsetTop = "64px"
 const offsetLeft = "76px"
@@ -40,16 +43,16 @@ const RadixDialogClose = styled(RadixDialog.Close)({
   height: "fit-content",
 })
 
-export type TTakeover = TPlaywright & {
+export type TTakeover = Playwright & {
   content: ReactElement<TComposition>
   open: boolean
   onOpenChange: (open: boolean) => void
-  buttonClose?: ReactElement<TInputButtonPrimary>
-  title?: ReactElement<TText>
-  status?: ReactElement<TText>
-  buttonPrimary?: ReactElement<TInputButtonPrimary>
-  buttonSecondary?: ReactElement<TInputButtonPrimary>
-  buttonTertiary?: ReactElement<TInputButtonPrimary>
+  buttonClose?: ReactElement<InputButtonIconProps>
+  title?: ReactElement<TextProps>
+  status?: ReactElement<TextProps>
+  buttonPrimary?: ReactElement<InputButtonPrimaryProps>
+  buttonSecondary?: ReactElement<InputButtonSecondaryProps>
+  buttonTertiary?: ReactElement<InputButtonTertiaryProps>
   offsetTopOverride?: string
   offsetLeftOverride?: string
   offsetLeftSmallOverride?: string

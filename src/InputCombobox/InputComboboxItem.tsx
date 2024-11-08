@@ -1,8 +1,8 @@
 import { Color } from "@new/Color"
-import { TPlaywright } from "@new/TPlaywright"
+import { Playwright } from "@new/Playwright"
 import { ReactElement } from "react"
 
-export type TInputComboboxItem = TPlaywright & {
+export type TInputComboboxItem = Playwright & {
   value: string
   label: string
   colorBackground: Color

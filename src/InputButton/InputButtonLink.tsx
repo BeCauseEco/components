@@ -2,13 +2,13 @@ import { forwardRef } from "react"
 import { InputButtonProps, InputButton } from "@new/InputButton/internal/InputButton"
 import { Color } from "@new/Color"
 
-export type InputButtonPrimaryProps = Pick<InputButtonProps, "size" | "hug" | "loading" | "disabled" | "onClick"> & {
+export type InputButtonLinkProps = Pick<InputButtonProps, "size" | "hug" | "loading" | "disabled" | "onClick"> & {
   label: string
   iconLeftName?: string
   iconRightName?: string
 }
 
-export const InputButtonPrimary = forwardRef<HTMLButtonElement, InputButtonPrimaryProps>((p, ref) => {
+export const InputButtonLink = forwardRef<HTMLAnchorElement, InputButtonLinkProps>((p, ref) => {
   const iconName = p.iconLeftName || p.iconRightName
   let iconPlacement: InputButtonProps["iconPlacement"] = "labelNotSpecified"
 
@@ -23,7 +23,7 @@ export const InputButtonPrimary = forwardRef<HTMLButtonElement, InputButtonPrima
   return (
     <InputButton
       ref={ref}
-      variant="solid"
+      variant="link"
       size={p.size}
       color={Color.Primary}
       label={p.label}
