@@ -2,9 +2,9 @@
 // import { Composition } from "@new/Composition/Composition"
 // import { PropsWithChildren } from "react"
 // import { LayoutChrome } from "./internal/LayoutChrome"
-// import { EColor } from "@new/Color"
+// import { Color } from "@new/Color"
 // import { EInputButtonVariant, InputButton } from "@new/InputButton/InputButton"
-// import { ESize } from "@new/ESize"
+// import { Size } from "@new/Size"
 // import { Icon } from "@new/Icon/Icon"
 // import { Spacer } from "@new/Spacer/Spacer"
 // import { Breadcrumbs } from "@new/Chrome/Breadcrumbs"
@@ -40,10 +40,10 @@
 //               <InputButton
 //                 key={menuItem.menuPage?.id}
 //                 variant={EInputButtonVariant.Link}
-//                 size={ESize.Medium}
+//                 size={Size.Medium}
 //                 href={menuItem.menuPage?.pageUrl as string}
 //               >
-//                 <Icon name="settings" color={[EColor.White]} size={ESize.Medium} />
+//                 <Icon name="settings" color={[Color.White]} size={Size.Medium} />
 //               </InputButton>
 
 //               <Spacer small />
@@ -56,10 +56,10 @@
 //                   <InputButton
 //                     key={firstSelectedMenuItem?.menuPage.id}
 //                     variant={EInputButtonVariant.Link}
-//                     size={ESize.Medium}
+//                     size={Size.Medium}
 //                     href={menuItem.menuPage.pageUrl}
 //                   >
-//                     <Text size={ESize.Xsmall} color={[EColor.Black, 700]}>
+//                     <Text size={Size.Xsmall} color={[Color.Black, 700]}>
 //                       {menuItem.menuPage.menuTitle}
 //                     </Text>
 //                   </InputButton>
@@ -71,14 +71,14 @@
 //           }
 //           contentTertiaryNavigation={
 //             <>
-//               <InputButton variant={EInputButtonVariant.Solid} color={EColor.Primary} size={ESize.Medium}>
-//                 <Icon name="settings" color={[EColor.White]} size={ESize.Medium} />
+//               <InputButton variant={EInputButtonVariant.Solid} color={Color.Primary} size={Size.Medium}>
+//                 <Icon name="settings" color={[Color.White]} size={Size.Medium} />
 //               </InputButton>
 
 //               <Spacer small />
 
-//               <InputButton variant={EInputButtonVariant.Solid} color={EColor.Primary} size={ESize.Medium}>
-//                 <Icon name="logout" color={[EColor.White]} size={ESize.Medium} />
+//               <InputButton variant={EInputButtonVariant.Solid} color={Color.Primary} size={Size.Medium}>
+//                 <Icon name="logout" color={[Color.White]} size={Size.Medium} />
 //               </InputButton>
 //             </>
 //           }

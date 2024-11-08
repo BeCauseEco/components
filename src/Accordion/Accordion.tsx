@@ -2,12 +2,12 @@ import styled from "@emotion/styled"
 import { ReactElement } from "react"
 import * as RadixAccordion from "@radix-ui/react-accordion"
 import { TAccordionItem } from "./AccordionItem"
-import { ESize } from "@new/ESize"
+import { Size } from "@new/Size"
 import { TPlaywright } from "@new/TPlaywright"
 
 const Container = styled.div({
   display: "flex",
-  borderRadius: ESize.Tiny,
+  borderRadius: Size.Tiny,
   overflow: "clip",
 })
 

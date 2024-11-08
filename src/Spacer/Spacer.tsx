@@ -1,5 +1,5 @@
 import styled from "@emotion/styled"
-import { ESize } from "@new/ESize"
+import { Size } from "@new/Size"
 
 const Container = styled.div<{ size: string }>(p => ({
   display: "flex",
@@ -23,35 +23,35 @@ export const Spacer = ({ tiny, xsmall, small, medium, large, xLarge, xxLarge, hu
   let size = "0"
 
   if (tiny) {
-    size = ESize.Tiny
+    size = Size.Tiny
   }
 
   if (xsmall) {
-    size = ESize.Xsmall
+    size = Size.Xsmall
   }
 
   if (small) {
-    size = ESize.Small
+    size = Size.Small
   }
 
   if (medium) {
-    size = ESize.Medium
+    size = Size.Medium
   }
 
   if (large) {
-    size = ESize.Large
+    size = Size.Large
   }
 
   if (xLarge) {
-    size = ESize.XLarge
+    size = Size.XLarge
   }
 
   if (xxLarge) {
-    size = ESize.XXLarge
+    size = Size.XXLarge
   }
 
   if (huge) {
-    size = ESize.Huge
+    size = Size.Huge
   }
 
   return <Container size={size} />

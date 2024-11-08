@@ -1,6 +1,6 @@
 import { PropsWithChildren, forwardRef } from "react"
 import styled from "@emotion/styled"
-import { TColor, computeColor } from "@new/Color"
+import { ColorLightness, computeColor } from "@new/Color"
 import { TPlaywright } from "@new/TPlaywright"
 
 export const StyleMonospace = {
@@ -112,7 +112,7 @@ export type TText = TPlaywright & {
   xxLarge?: boolean
   huge?: boolean
 
-  fill: TColor
+  fill: ColorLightness
 
   wrap?: boolean
 

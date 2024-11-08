@@ -1,6 +1,6 @@
 import styled from "@emotion/styled"
-import { EColor, computeColor } from "@new/Color"
-import { ESize } from "@new/ESize"
+import { Color, computeColor } from "@new/Color"
+import { Size } from "@new/Size"
 import { Text } from "@new/Text/Text"
 import { TPlaywright } from "@new/TPlaywright"
 import * as DropDownMenu from "@radix-ui/react-dropdown-menu"
@@ -12,7 +12,7 @@ const Item = styled(DropDownMenu.Item)<TProperties>(p => ({
   cursor: "pointer",
   backgroundColor: computeColor([p.colorBackground, 700]),
   padding: "1rem 2rem",
-  borderRadius: ESize.Tiny,
+  borderRadius: Size.Tiny,
 
   "&[data-highlighted]": {
     backgroundColor: computeColor([p.colorHighlightBackground, 700]),
@@ -25,10 +25,10 @@ const Item = styled(DropDownMenu.Item)<TProperties>(p => ({
 
 export type TDropDownMenuItem = TPlaywright & {
   label: string
-  colorBackground: EColor
-  colorForeground: EColor
-  colorHighlightBackground: EColor
-  colorHighlightForeground: EColor
+  colorBackground: Color
+  colorForeground: Color
+  colorHighlightBackground: Color
+  colorHighlightForeground: Color
 }
 
 export const DropDownMenuItem = ({

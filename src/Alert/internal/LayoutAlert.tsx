@@ -1,8 +1,8 @@
 import { ReactNode } from "react"
 import styled from "@emotion/styled"
-import { ESize } from "@new/ESize"
+import { Size } from "@new/Size"
 import { TLayoutBase } from "@new/Composition/TLayoutBase"
-import { computeColor, EColor } from "@new/Color"
+import { computeColor, Color } from "@new/Color"
 
 const Container = styled.div({
   display: "flex",
@@ -30,9 +30,9 @@ const ContentEnd = styled.div({
   display: "flex",
   flexDirection: "row",
   padding: "calc(var(--BU) * 4)",
-  borderTop: `solid 1px ${computeColor([EColor.Black, 100])}`,
-  borderBottomLeftRadius: ESize.Tiny,
-  borderBottomRightRadius: ESize.Tiny,
+  borderTop: `solid 1px ${computeColor([Color.Black, 100])}`,
+  borderBottomLeftRadius: Size.Tiny,
+  borderBottomRightRadius: Size.Tiny,
   justifyContent: "flex-end",
 })
 

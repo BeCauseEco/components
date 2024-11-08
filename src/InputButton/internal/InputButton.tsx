@@ -1,6 +1,6 @@
 import styled from "@emotion/styled"
 import { forwardRef, ReactElement } from "react"
-import { EColor } from "@new/Color"
+import { Color } from "@new/Color"
 import { Stack } from "@new/Stack/Stack"
 import Link, { LinkProps } from "next/link"
 import React from "react"
@@ -188,7 +188,7 @@ export type TInputButton = TPlaywright & {
 
   size: "small" | "large"
 
-  color: EColor
+  color: Color
 
   loading?: boolean
   disabled?: boolean

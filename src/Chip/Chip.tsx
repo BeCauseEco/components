@@ -1,10 +1,10 @@
 import { PropsWithChildren, ReactElement } from "react"
 import { TText } from "@new/Text/Text"
-import { TColor } from "@new/Color"
+import { ColorLightness } from "@new/Color"
 import { BackgroundCard } from "@new/Composition/BackgroundCard"
 import { LayoutChip } from "./internal/LayoutChip"
 import { Composition } from "@new/Composition/Composition"
-import { ESize } from "@new/ESize"
+import { Size } from "@new/Size"
 import styled from "@emotion/styled"
 import { TPlaywright } from "@new/TPlaywright"
 import { TIcon } from "@new/Icon/Icon"
@@ -19,8 +19,8 @@ const Container = styled.div({
 })
 
 export type TChip = TPlaywright & {
-  colorBackground?: TColor
-  colorOutline?: TColor
+  colorBackground?: ColorLightness
+  colorOutline?: ColorLightness
   children:
     | ReactElement<TKeyValuePair>
     | ReactElement<TText>
@@ -39,7 +39,7 @@ export const Chip = ({ colorBackground, colorOutline, children, playwrightTestId
   return (
     <Container data-playwright-testid={playwrightTestId}>
       <Composition>
-        <BackgroundCard colorBackground={colorBackground} colorOutline={colorOutline} borderRadius={ESize.Tiny} />
+        <BackgroundCard colorBackground={colorBackground} colorOutline={colorOutline} borderRadius={Size.Tiny} />
 
         <LayoutChip content={children} />
       </Composition>

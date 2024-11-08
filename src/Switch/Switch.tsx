@@ -1,11 +1,11 @@
 import { ReactElement, useId } from "react"
 import * as RadixSwitch from "@radix-ui/react-switch"
 import styled from "@emotion/styled"
-import { computeColor, EColor } from "@new/Color"
+import { computeColor, Color } from "@new/Color"
 import { TText } from "@new/Text/Text"
 import { KeyValuePair } from "@new/KeyValuePair/KeyValuePair"
 import { EDirection } from "@new/EDirection"
-import { ESize } from "@new/ESize"
+import { Size } from "@new/Size"
 import { TPlaywright } from "@new/TPlaywright"
 
 const Container = styled.div({
@@ -59,9 +59,9 @@ const Label = styled.label({
 export type TSwitch = TPlaywright & {
   value: boolean
   onChange: (value: boolean) => void
-  colorBackground: EColor
-  colorForeground: EColor
-  colorValueTrue: EColor
+  colorBackground: Color
+  colorForeground: Color
+  colorValueTrue: Color
   label?: ReactElement<TText>
 }
 
@@ -78,7 +78,7 @@ export const Switch = ({
 
   return (
     <Container data-playwright-testid={playwrightTestId}>
-      <KeyValuePair direction={EDirection.Horizontal} spacing={ESize.Xsmall}>
+      <KeyValuePair direction={EDirection.Horizontal} spacing={Size.Xsmall}>
         <SwitchRoot
           id={key}
           checked={value}

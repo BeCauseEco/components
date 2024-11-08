@@ -1,9 +1,9 @@
 import styled from "@emotion/styled"
-import { computeColor, TColor } from "@new/Color"
+import { computeColor, ColorLightness } from "@new/Color"
 import React from "react"
 
 export type TDivider = {
-  color: TColor
+  color: ColorLightness
 }
 
 const Container = styled.div<TDivider>(p => ({

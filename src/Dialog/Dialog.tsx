@@ -4,8 +4,8 @@ import * as RadixDialog from "@radix-ui/react-dialog"
 import { TInputButtonPrimary } from "@new/InputButton/InputButtonPrimary"
 import { Composition, TComposition } from "@new/Composition/Composition"
 import { BackgroundCard } from "@new/Composition/BackgroundCard"
-import { ESize } from "@new/ESize"
-import { EColor } from "@new/Color"
+import { Size } from "@new/Size"
+import { Color } from "@new/Color"
 import { LayoutDialog } from "./internal/LayoutDialog"
 import styled from "@emotion/styled"
 import { EOpacity } from "@new/Opacity"
@@ -21,7 +21,7 @@ const Overlay = styled(RadixDialog.Overlay)({
   display: "flex",
   position: "fixed",
   inset: 0,
-  backgroundColor: EColor.Black,
+  backgroundColor: Color.Black,
   opacity: EOpacity.Light,
   zIndex: 99999,
 })
@@ -37,11 +37,11 @@ type TDialogContentProperties = Pick<TDialog, "size" | "collapseHeight">
 const Content = styled(RadixDialog.Content)<TDialogContentProperties>(p => ({
   display: "flex",
   position: "fixed",
-  top: p.size === ESize.Medium ? "50%" : `calc(50% + ${offsetTop} / 2)`,
-  left: p.size === ESize.Medium ? "calc(50% + calc(var(--BU) * 25))" : "50%",
+  top: p.size === Size.Medium ? "50%" : `calc(50% + ${offsetTop} / 2)`,
+  left: p.size === Size.Medium ? "calc(50% + calc(var(--BU) * 25))" : "50%",
   transform: "translate(-50%, -50%)",
-  minWidth: p.size === ESize.Medium ? "calc(var(--BU) * 160)" : "calc(100vw - calc(var(--BU) * 10))",
-  minHeight: p.size === ESize.Medium ? "auto" : `calc(100vh - ${offsetTop} - calc(var(--BU) * 10))`,
+  minWidth: p.size === Size.Medium ? "calc(var(--BU) * 160)" : "calc(100vw - calc(var(--BU) * 10))",
+  minHeight: p.size === Size.Medium ? "auto" : `calc(100vh - ${offsetTop} - calc(var(--BU) * 10))`,
   zIndex: 99999,
   // TO-DO: @cllpe
   // maxHeight: `calc(100vh - ${offsetTop} - calc(var(--BU) * 10))`,
@@ -54,7 +54,7 @@ const TitleAndDescription = styled.div({
 })
 
 export type TDialog = TPlaywright & {
-  size: ESize.Medium | ESize.Huge
+  size: Size.Medium | Size.Huge
   content: ReactElement<TComposition>
   open: boolean
   onOpenChange: (open: boolean) => void
@@ -86,7 +86,7 @@ export const Dialog = ({
 
         <Content size={size} collapseHeight={collapseHeight} data-playwright-testid={playwrightTestId}>
           <Composition>
-            <BackgroundCard colorBackground={[EColor.White]} borderRadius={ESize.Tiny} shadow={EShadow.Large} />
+            <BackgroundCard colorBackground={[Color.White]} borderRadius={Size.Tiny} shadow={EShadow.Large} />
 
             <LayoutDialog
               contentStart={
@@ -123,7 +123,7 @@ export const Dialog = ({
               buttonClose={
                 <RadixDialogClose asChild>
                   {/* <InputButtonPrimary medium>
-                    <Icon name="close" size={ESize.Large} color={[EColor.Black, 700]} />
+                    <Icon name="close" size={Size.Large} color={[Color.Black, 700]} />
                   </InputButtonPrimary> */}
                 </RadixDialogClose>
               }

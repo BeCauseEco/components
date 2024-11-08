@@ -1,4 +1,4 @@
-import { EColor } from "@new/Color"
+import { Color } from "@new/Color"
 import { Text } from "@new/Text/Text"
 import styled from "@emotion/styled"
 import * as RadixRadioGroup from "@radix-ui/react-radio-group"
@@ -48,18 +48,18 @@ export const InputRadioGroupItem = (p: TInputRadioGroupItem) => {
       <Align horizontal left hug>
         <Item id={key} value={p.value}>
           <IndicatorUnchecked>
-            <Icon name="radio_button_unchecked" large fill={[EColor.Transparent]} />
+            <Icon name="radio_button_unchecked" large fill={[Color.Transparent]} />
           </IndicatorUnchecked>
 
           <IndicatorChecked>
-            <Icon name="radio_button_checked" large fill={[EColor.Transparent]} />
+            <Icon name="radio_button_checked" large fill={[Color.Transparent]} />
           </IndicatorChecked>
         </Item>
 
         <Spacer tiny />
 
         <Label htmlFor={key}>
-          <Text huge fill={[EColor.Transparent]}>
+          <Text huge fill={[Color.Transparent]}>
             {p.label}
           </Text>
         </Label>

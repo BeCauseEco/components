@@ -2,7 +2,7 @@ import { ReactNode } from "react"
 import styled from "@emotion/styled"
 import { TLayoutBase } from "@new/Composition/TLayoutBase"
 import { EOverflowContainerAxis, OverflowContainer } from "@new/OverflowContainer/OverflowContainer"
-import { EColor } from "@new/Color"
+import { Color } from "@new/Color"
 
 const Container = styled.div({
   display: "flex",
@@ -31,8 +31,8 @@ export const LayoutCombobox = ({ contentTop, contentBottom }: TLayoutCombobox) =
     <Container className="layout-container">
       <OverflowContainer
         axes={EOverflowContainerAxis.Vertical}
-        colorBackground={[EColor.White]}
-        colorForeground={[EColor.Black, 500]}
+        colorBackground={[Color.White]}
+        colorForeground={[Color.Black, 500]}
         maxHeight={"calc(var(--radix-popover-content-available-height) - calc(var(--BU) * 8))"}
         hug
       >

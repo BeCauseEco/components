@@ -3,7 +3,7 @@ import * as RadixDialog from "@radix-ui/react-dialog"
 import { TInputButtonPrimary } from "@new/InputButton/InputButtonPrimary"
 import { Composition, TComposition } from "@new/Composition/Composition"
 import { BackgroundCard } from "@new/Composition/BackgroundCard"
-import { EColor } from "@new/Color"
+import { Color } from "@new/Color"
 import { LayoutTakeover } from "./internal/LayoutTakeover"
 import styled from "@emotion/styled"
 import { Spacer } from "@new/Spacer/Spacer"
@@ -112,7 +112,7 @@ export const Takeover = ({
           offsetLeftSmallOverride={offsetLeftSmallOverride}
         >
           <Composition explodeHeight>
-            <BackgroundCard colorBackground={[EColor.White]} />
+            <BackgroundCard colorBackground={[Color.White]} />
 
             <LayoutTakeover
               contentStart={title}

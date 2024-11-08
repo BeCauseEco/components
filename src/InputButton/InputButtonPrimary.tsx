@@ -1,6 +1,6 @@
 import { forwardRef } from "react"
 import { TInputButton, InputButton } from "@new/InputButton/internal/InputButton"
-import { EColor } from "@new/Color"
+import { Color } from "@new/Color"
 
 export type TInputButtonPrimary = Pick<TInputButton, "size" | "hug" | "loading" | "disabled" | "onClick"> & {
   label: string
@@ -25,7 +25,7 @@ export const InputButtonPrimary = forwardRef<HTMLButtonElement | HTMLAnchorEleme
       ref={ref}
       variant="solid"
       size={p.size}
-      color={EColor.Primary}
+      color={Color.Primary}
       label={p.label}
       hug={p.hug}
       loading={p.loading}

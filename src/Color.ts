@@ -5,7 +5,7 @@ import { samples, interpolate, formatHex } from "culori"
 //It does not guard against invalid hex values due to an incorrect string such as ##000000, but it does provide a simplistic check, and is a simple solution for now.
 export type THexColor = `#${string}`
 
-export enum EColor {
+export enum Color {
   Black = "#000000",
   White = "#FFFFFF",
   Transparent = "#FFFFFF00",
@@ -36,16 +36,16 @@ export enum EColor {
   Error = "#DF5052",
 }
 
-export type TLightness = 50 | 100 | 200 | 300 | 400 | 500 | 600 | 700 | 800 | 900 | 1000
+export type Lightness = 50 | 100 | 200 | 300 | 400 | 500 | 600 | 700 | 800 | 900 | 1000
 
-export type TColor = [EColor, TLightness] | [EColor.White] | [EColor.Transparent] | [THexColor, TLightness]
+export type ColorLightness = [Color, Lightness] | [Color.White] | [Color.Transparent] | [THexColor, Lightness]
 
-export const computeColor = (color: TColor) => {
+export const computeColor = (color: ColorLightness) => {
   const baseColor = color[0]
   const lightness = color[1] || 700
 
   try {
-    if (baseColor === EColor.Transparent) {
+    if (baseColor === Color.Transparent) {
       return baseColor
     } else {
       const colorsLight = samples(28)
@@ -84,17 +84,17 @@ export const computeColor = (color: TColor) => {
 export const generateColorPallette = () => {
   throw "generateColorPallette: comment out the code before running"
   // console.log("---")
-  // Object.keys(EColor).forEach(key => {
+  // Object.keys(Color).forEach(key => {
   //   console.log(`"${key}":`)
   //   if (key === "White") {
-  //     console.log(EColor.White)
+  //     console.log(Color.White)
   //   } else if (key === "Transparent") {
   //     // ...
   //   } else {
   //     const lightness = [50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000]
   //     lightness.forEach(l => {
   //       try {
-  //         console.log(`lightness ${l}:`, computeColor([EColor[key], l as TLightness]))
+  //         console.log(`lightness ${l}:`, computeColor([Color[key], l as TLightness]))
   //       } catch (e) {
   //         console.error(e)
   //       }

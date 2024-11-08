@@ -1,5 +1,5 @@
 import styled from "@emotion/styled"
-import { ESize } from "@new/ESize"
+import { Size } from "@new/Size"
 import { forwardRef, PropsWithChildren, ReactElement } from "react"
 import { EDirection } from "@new/EDirection"
 import { EDistribution } from "@new/EDistrubution"
@@ -29,7 +29,7 @@ const Content = styled.div({
 
 export type TKeyValuePair = TPlaywright & {
   direction: EDirection
-  spacing: ESize
+  spacing: Size
   children: [ReactElement | null | undefined, ReactElement | null | undefined]
   itemDistribution?: EDistribution
 }

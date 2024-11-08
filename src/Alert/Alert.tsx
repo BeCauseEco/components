@@ -3,11 +3,11 @@ import * as RadixAlertDialog from "@radix-ui/react-alert-dialog"
 import { ReactElement } from "react"
 import { TInputButtonPrimary } from "@new/InputButton/InputButtonPrimary"
 import { EOpacity } from "@new/Opacity"
-import { EColor } from "@new/Color"
+import { Color } from "@new/Color"
 import { Composition } from "@new/Composition/Composition"
 import { BackgroundCard } from "../Composition/BackgroundCard"
 import { LayoutAlert } from "./internal/LayoutAlert"
-import { ESize } from "@new/ESize"
+import { Size } from "@new/Size"
 import { Spacer } from "@new/Spacer/Spacer"
 import { EShadow } from "@new/EShadow"
 import { TText } from "@new/Text/Text"
@@ -17,7 +17,7 @@ const Overlay = styled(RadixAlertDialog.Overlay)({
   display: "flex",
   position: "fixed",
   inset: 0,
-  backgroundColor: EColor.Black,
+  backgroundColor: Color.Black,
   opacity: EOpacity.Light,
   zIndex: 999999,
 })
@@ -47,7 +47,7 @@ export const Alert = ({ open, title, description, buttonPrimary, buttonSecondary
 
       <Content data-playwright-testid={playwrightTestId}>
         <Composition>
-          <BackgroundCard colorBackground={[EColor.White]} borderRadius={ESize.Tiny} shadow={EShadow.Large} />
+          <BackgroundCard colorBackground={[Color.White]} borderRadius={Size.Tiny} shadow={EShadow.Large} />
 
           <LayoutAlert
             contentTop={title}

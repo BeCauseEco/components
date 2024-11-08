@@ -1,6 +1,6 @@
-// import { EColor } from "@new/Color"
+// import { Color } from "@new/Color"
 // import { EInputButtonVariant, InputButton } from "@new/InputButton/InputButton"
-// import { ESize } from "@new/ESize"
+// import { Size } from "@new/Size"
 // import { Text } from "@new/Text/Text"
 // import { Breadcrumb } from "@new/Breadcrumb/Breadcrumb"
 // // import { useGetCurrentMenuPageItem } from "@new/Chrome/hooks/useGetCurrentMenuPageItem"
@@ -13,16 +13,16 @@
 //   const breadcrumbs = [{ id: "", pageUrl: "", menuTitle: "" }]
 
 //   return (
-//     <Breadcrumb color={EColor.Black}>
+//     <Breadcrumb color={Color.Black}>
 //       {breadcrumbs.map(breadcrumb => (
 //         <InputButton
 //           key={breadcrumb.id}
 //           variant={EInputButtonVariant.Link}
-//           size={ESize.Small}
+//           size={Size.Small}
 //           // disabled={!breadcrumb.pageUrl}
 //           href={breadcrumb.pageUrl}
 //         >
-//           <Text size={ESize.Xsmall} color={[EColor.Black, 700]}>
+//           <Text size={Size.Xsmall} color={[Color.Black, 700]}>
 //             {breadcrumb.menuTitle}
 //           </Text>
 //         </InputButton>

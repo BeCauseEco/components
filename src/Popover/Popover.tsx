@@ -2,8 +2,8 @@ import styled from "@emotion/styled"
 import React, { ReactElement } from "react"
 import * as RadixPopover from "@radix-ui/react-popover"
 import { keyframes } from "@emotion/react"
-// import { EColor, computeColor } from "@new/Color"
-// import { ESize } from "@new/ESize"
+// import { Color, computeColor } from "@new/Color"
+// import { Size } from "@new/Size"
 import { EAlignment } from "@new/EAlignment"
 import { TBackgroundCard } from "@new/Composition/BackgroundCard"
 import { TLayoutBase } from "@new/Composition/TLayoutBase"
@@ -80,7 +80,7 @@ const alignTranslate = (alignment: EAlignment) => {
 }
 
 export type TPopover = TPlaywright & {
-  // colorArrow: EColor
+  // colorArrow: Color
   open?: boolean
   onOpenChange?: (value: boolean) => void
   trigger: ReactElement
@@ -102,7 +102,7 @@ export const Popover = ({ open, onOpenChange, trigger, background, layout, align
             {layout}
           </Composition>
 
-          {/* <Arrow colorArrow={colorArrow} width={ESize.Small} height={ESize.Xsmall} /> */}
+          {/* <Arrow colorArrow={colorArrow} width={Size.Small} height={Size.Xsmall} /> */}
         </Content>
       </RadixPopover.Portal>
     </Root>

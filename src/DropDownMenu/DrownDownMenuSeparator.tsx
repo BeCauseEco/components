@@ -1,5 +1,5 @@
 import styled from "@emotion/styled"
-import { EColor, computeColor } from "@new/Color"
+import { Color, computeColor } from "@new/Color"
 import * as DropDownMenu from "@radix-ui/react-dropdown-menu"
 
 const Container = styled(DropDownMenu.Separator)<TDropDownMenuSeparator>(p => ({
@@ -13,7 +13,7 @@ const Container = styled(DropDownMenu.Separator)<TDropDownMenuSeparator>(p => ({
 }))
 
 export type TDropDownMenuSeparator = {
-  color: EColor
+  color: Color
 }
 
 export const DropDownMenuSeparator = ({ color }: TDropDownMenuSeparator) => <Container color={color} />

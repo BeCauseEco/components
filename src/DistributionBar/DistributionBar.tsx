@@ -1,10 +1,10 @@
 import styled from "@emotion/styled"
-import { EColor } from "@new/Color"
+import { Color } from "@new/Color"
 import * as Tooltip from "@radix-ui/react-tooltip"
 import React from "react"
 import { LayoutDistributionBar } from "./internal/LayoutDistributionBar"
 
-const Segment = styled.div<{ color: EColor; width: number }>(props => ({
+const Segment = styled.div<{ color: Color; width: number }>(props => ({
   height: "100%",
   width: `${props.width}%`,
   backgroundColor: props.color,
@@ -27,7 +27,7 @@ const SegmentLabelContainer = styled.div({
 interface SegmentProps {
   label: string
   value: number
-  color: EColor
+  color: Color
 }
 
 interface DistributionBarProps {

@@ -5,7 +5,7 @@ import { keyframes } from "@emotion/react"
 import { Composition } from "@new/Composition/Composition"
 import { LayoutSingle } from "@new/Composition/LayoutSingle"
 import { TText } from "@new/Text/Text"
-import { TColor } from "@new/Color"
+import { ColorLightness } from "@new/Color"
 import { BackgroundCard } from "@new/Composition/BackgroundCard"
 import { TIcon } from "@new/Icon/Icon"
 import { EDirection } from "@new/EDirection"
@@ -63,8 +63,8 @@ export type TAccordionItem = TPlaywright & {
   label: ReactElement<TText> | ReactElement<TIcon>
   value: string
   content: ReactElement | ReactElement[] | undefined
-  colorHead: TColor
-  colorContent: TColor
+  colorHead: ColorLightness
+  colorContent: ColorLightness
 }
 
 export const AccordionItem = ({ label, value, content, colorHead, colorContent, playwrightTestId }: TAccordionItem) => (

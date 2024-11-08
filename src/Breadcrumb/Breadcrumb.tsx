@@ -1,7 +1,7 @@
 import { PropsWithChildren, ReactElement } from "react"
 import { TInputButtonPrimary } from "@new/InputButton/InputButtonPrimary"
 import { Icon } from "@new/Icon/Icon"
-import { EColor } from "@new/Color"
+import { Color } from "@new/Color"
 import React from "react"
 import { Composition } from "@new/Composition/Composition"
 import { LayoutBreadcrumb } from "./internal/LayoutBreadcrumb"
@@ -9,7 +9,7 @@ import { TText } from "@new/Text/Text"
 import { TPlaywright } from "@new/TPlaywright"
 
 export type TBreadcrumb = TPlaywright & {
-  color: EColor
+  color: Color
   omitPadding?: boolean
   children: ReactElement<TInputButtonPrimary | TText> | ReactElement<TInputButtonPrimary | TText>[]
 }
@@ -28,7 +28,7 @@ export const Breadcrumb = ({ color, omitPadding, children, playwrightTestId }: P
   items.pop()
 
   // TO-DO: @cllpse: a little hacky, but stops content shift.
-  items.push(<Icon name="chevron_forward" medium fill={[EColor.Transparent]} key={items.length} />)
+  items.push(<Icon name="chevron_forward" medium fill={[Color.Transparent]} key={items.length} />)
 
   return (
     <Composition playwrightTestId={playwrightTestId}>

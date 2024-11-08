@@ -1,6 +1,6 @@
 import styled from "@emotion/styled"
 import { computeColor } from "@new/Color"
-import { TColor } from "@new/Color"
+import { ColorLightness } from "@new/Color"
 import { TPlaywright } from "@new/TPlaywright"
 
 import { PropsWithChildren, ReactElement } from "react"
@@ -46,8 +46,8 @@ export enum EMaxheightOptions {
 
 export type TOverflowContainer = TPlaywright & {
   axes: EOverflowContainerAxis
-  colorBackground: TColor
-  colorForeground: TColor
+  colorBackground: ColorLightness
+  colorForeground: ColorLightness
   minWidth?: string
   maxWidth?: string
   minHeight?: string

@@ -1,5 +1,5 @@
-import { ESize } from "@new/ESize"
-import { TColor, computeColor } from "@new/Color"
+import { Size } from "@new/Size"
+import { ColorLightness, computeColor } from "@new/Color"
 import styled from "@emotion/styled"
 import { TPlaywright } from "@new/TPlaywright"
 
@@ -7,35 +7,35 @@ const computeSize = (p: TIcon) => {
   let size = "0"
 
   if (p.tiny) {
-    size = ESize.Tiny
+    size = Size.Tiny
   }
 
   if (p.xsmall) {
-    size = ESize.Xsmall
+    size = Size.Xsmall
   }
 
   if (p.small) {
-    size = ESize.Small
+    size = Size.Small
   }
 
   if (p.medium) {
-    size = ESize.Medium
+    size = Size.Medium
   }
 
   if (p.large) {
-    size = ESize.Large
+    size = Size.Large
   }
 
   if (p.xLarge) {
-    size = ESize.XLarge
+    size = Size.XLarge
   }
 
   if (p.xxLarge) {
-    size = ESize.XXLarge
+    size = Size.XXLarge
   }
 
   if (p.huge) {
-    size = ESize.Huge
+    size = Size.Huge
   }
 
   return size
@@ -48,9 +48,9 @@ const computeStyle = (p: TIcon) => {
 }
 
 const computeFontVariantSettings = (p: TIcon) => {
-  // let w = [ESize.Large, ESize.Huge].includes(p.size) ? "700" : "600"
+  // let w = [Size.Large, Size.Huge].includes(p.size) ? "700" : "600"
 
-  // const g = [ESize.Large, ESize.Huge].includes(p.size) ? "0" : "-25"
+  // const g = [Size.Large, Size.Huge].includes(p.size) ? "0" : "-25"
 
   // switch (p.weight) {
   //   case EWeight.Light:
@@ -82,7 +82,7 @@ const Container = styled.i<Pick<TIcon, "fill"> & { size: string; fontVariationSe
 
 export type TIcon = TPlaywright & {
   name: string | "blank"
-  fill: TColor
+  fill: ColorLightness
 
   tiny?: boolean
   xsmall?: boolean

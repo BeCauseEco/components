@@ -1,6 +1,6 @@
 import { ReactNode } from "react"
 import styled from "@emotion/styled"
-import { EColor, computeColor } from "@new/Color"
+import { Color, computeColor } from "@new/Color"
 import { TLayoutBase } from "@new/Composition/TLayoutBase"
 
 const Container = styled.div({
@@ -14,7 +14,7 @@ const ContentStart = styled.div({
   flexDirection: "row",
   justifyContent: "space-between",
   padding: "calc(var(--BU) * 4)",
-  borderBottom: `solid 1px ${computeColor([EColor.Black, 100])}`,
+  borderBottom: `solid 1px ${computeColor([Color.Black, 100])}`,
 })
 
 const ContentStartContent = styled.div({
@@ -34,7 +34,7 @@ const ContentEnd = styled.div({
   display: "flex",
   flexDirection: "row",
   padding: "calc(var(--BU) * 4)",
-  borderTop: `solid 1px ${computeColor([EColor.Black, 100])}`,
+  borderTop: `solid 1px ${computeColor([Color.Black, 100])}`,
   justifyContent: "flex-end",
 })
 

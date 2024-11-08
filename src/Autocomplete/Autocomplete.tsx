@@ -1,11 +1,11 @@
 import styled from "@emotion/styled"
-import { EColor } from "@new/Color"
+import { Color } from "@new/Color"
 import { BackgroundCard } from "@new/Composition/BackgroundCard"
 import { LayoutContextMenu } from "@new/Composition/LayoutContextMenu"
 import { EAlignment } from "@new/EAlignment"
 import { EDirection } from "@new/EDirection"
 import { EShadow } from "@new/EShadow"
-import { ESize } from "@new/ESize"
+import { Size } from "@new/Size"
 import { TInputButtonPrimary } from "@new/InputButton/InputButtonPrimary"
 import { TInputText } from "@new/InputText/InputText"
 import { Popover } from "@new/Popover/Popover"
@@ -23,7 +23,7 @@ export type TAutocomplete = TPlaywright & {
   open: boolean
   onOpenChange: (open: boolean) => void
 
-  colorBackground: EColor
+  colorBackground: Color
 }
 
 export const Autocomplete = forwardRef<HTMLDivElement, PropsWithChildren<TAutocomplete>>((props, ref) => {
@@ -37,7 +37,7 @@ export const Autocomplete = forwardRef<HTMLDivElement, PropsWithChildren<TAutoco
         alignment={EAlignment.Start}
         trigger={input}
         background={
-          <BackgroundCard colorBackground={[colorBackground, 700]} shadow={EShadow.Medium} borderRadius={ESize.Tiny} />
+          <BackgroundCard colorBackground={[colorBackground, 700]} shadow={EShadow.Medium} borderRadius={Size.Tiny} />
         }
         layout={<LayoutContextMenu direction={EDirection.Vertical} content={results} />}
       />

@@ -1,8 +1,8 @@
 import styled from "@emotion/styled"
 import { forwardRef, ReactElement, useId, useState } from "react"
-import { EColor, computeColor } from "@new/Color"
+import { Color, computeColor } from "@new/Color"
 import { StyleFontFamily, StyleBodySmall, Text, StyleBodyMedium } from "@new/Text/Text"
-import { ESize } from "@new/ESize"
+import { Size } from "@new/Size"
 import { TPlaywright } from "@new/TPlaywright"
 import { Stack } from "@new/Stack/Stack"
 import { Align } from "@new/Align/Align"
@@ -26,7 +26,7 @@ const Output = styled.output<Pick<TInputText, "color" | "size" | "rows"> & { foc
   border: "none",
   outline: "none",
   background: "transparent",
-  borderRadius: ESize.Tiny,
+  borderRadius: Size.Tiny,
 
   ...(p.focus && {
     "::-webkit-scrollbar-track": {
@@ -64,7 +64,7 @@ export type TInputText = TPlaywright & {
   size: "small" | "large"
   // rows: 1 | 2 | 3
 
-  color: EColor
+  color: Color
 
   value: string
   onChange: (value: string) => void
@@ -128,7 +128,7 @@ export const InputText = forwardRef<HTMLInputElement | HTMLTextAreaElement, TInp
       horizontal
       colorOutline={[p.color, 700]}
       colorOutlineHover={focus ? [p.color, 700] : [p.color, 900]}
-      colorBackground={[focus ? p.color : EColor.Transparent, 50]}
+      colorBackground={[focus ? p.color : Color.Transparent, 50]}
       borderRadius="small"
       hug
     >

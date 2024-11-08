@@ -1,5 +1,5 @@
 import styled from "@emotion/styled"
-import { EColor } from "@new/Color"
+import { Color } from "@new/Color"
 import * as RadixCheckbox from "@radix-ui/react-checkbox"
 import { Icon } from "@new/Icon/Icon"
 import { Text } from "@new/Text/Text"
@@ -36,7 +36,7 @@ const Label = styled.label({
 export type TInputCheckBox = TPlaywright & {
   size: "small" | "large"
 
-  color: EColor
+  color: Color
 
   label?: string
 

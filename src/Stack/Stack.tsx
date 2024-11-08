@@ -2,7 +2,7 @@ import React, { ReactElement } from "react"
 import styled from "@emotion/styled"
 import { TAlign } from "@new/Align/Align"
 import { containsIlligalChildren } from "@new/Functions"
-import { computeColor, EColor, TColor } from "@new/Color"
+import { computeColor, Color, ColorLightness } from "@new/Color"
 import { TLayoutBase } from "@new/Composition/TLayoutBase"
 import { Loader } from "./internal/Loader"
 import { Spinner } from "./internal/Spinner"
@@ -44,7 +44,7 @@ const Container = styled.div<
   cursor: "inherit",
   position: "relative",
   borderRadius: translateBorderRadius({ borderRadius: p.borderRadius }),
-  backgroundColor: computeColor(p.colorBackground || [EColor.Transparent]),
+  backgroundColor: computeColor(p.colorBackground || [Color.Transparent]),
   transition: "background-color 0.1s ease-in-out",
   willChange: "background-color",
 
@@ -55,14 +55,14 @@ const Container = styled.div<
   outlineOffset: -1,
 
   ...(p.colorOutline && {
-    outline: `solid 1px ${computeColor(p.colorOutline || [EColor.Transparent])}`,
+    outline: `solid 1px ${computeColor(p.colorOutline || [Color.Transparent])}`,
   }),
 
   "&:hover": {
-    ...(p.colorBackgroundHover && { backgroundColor: computeColor(p.colorBackgroundHover || [EColor.Transparent]) }),
+    ...(p.colorBackgroundHover && { backgroundColor: computeColor(p.colorBackgroundHover || [Color.Transparent]) }),
 
     ...(p.colorOutlineHover && {
-      outlineColor: computeColor(p.colorOutlineHover || [EColor.Transparent]),
+      outlineColor: computeColor(p.colorOutlineHover || [Color.Transparent]),
     }),
   },
 }))
@@ -110,11 +110,11 @@ export type TStack = TLayoutBase & {
   loading?: boolean
   disabled?: boolean
 
-  colorBackground?: TColor
-  colorBackgroundHover?: TColor
-  colorOutline?: TColor
-  colorOutlineHover?: TColor
-  colorLoading?: TColor
+  colorBackground?: ColorLightness
+  colorBackgroundHover?: ColorLightness
+  colorOutline?: ColorLightness
+  colorOutlineHover?: ColorLightness
+  colorLoading?: ColorLightness
 
   borderRadius?: "small" | "medium" | "large"
 
