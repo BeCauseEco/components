@@ -112,6 +112,7 @@ type TInputCombobox = TPlaywright & {
    * Enables the virtuoso list for the combobox. Only use this if you have a large number of items.
    */
   enableVirtuoso?: boolean
+  isClearable?: boolean
 }
 
 const LIST_HEIGHT = 360
@@ -135,6 +136,7 @@ export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<TInput
     children,
     playwrightTestId,
     enableVirtuoso,
+    isClearable = false,
   } = props
 
   const [open, setOpen] = useState(false)
@@ -163,6 +165,35 @@ export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<TInput
 
   const generateCurrentValueLabel = (multiple: boolean) => {
     if (!multiple) {
+      const selectedItem = Object.values(items).findLast(item => value === item.value)
+      if (isClearable && selectedItem) {
+        return (
+          <Chip colorBackground={[colorButtonBackground, 100]}>
+            <TextWithOverflow color={[colorButtonForeground, 700]} size={ESize.Xsmall} width={width}>
+              {selectedItem.label}
+            </TextWithOverflow>
+
+            <Spacer tiny />
+
+            <InputButtonCollapse
+              size={ESize.Small}
+              variant={EInputButtonVariant.Transparent}
+              color={colorButtonBackground}
+              omitPadding
+            >
+              <Icon
+                name="close"
+                size={ESize.Medium}
+                color={[colorButtonBackground, 700]}
+                onClick={() => {
+                  onChange("")
+                }}
+              />
+            </InputButtonCollapse>
+          </Chip>
+        )
+      }
+
       return (
         <TextWithOverflow
           color={[colorButtonForeground, 700]}
@@ -170,7 +201,7 @@ export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<TInput
           alignment={EAlignment.Start}
           width={width}
         >
-          {Object.values(items).findLast(item => value === item.value)?.label || textNoSelection}
+          {selectedItem?.label || textNoSelection}
         </TextWithOverflow>
       )
     }
