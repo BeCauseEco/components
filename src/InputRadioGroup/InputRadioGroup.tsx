@@ -2,7 +2,7 @@ import styled from "@emotion/styled"
 import * as RadixRadioGroup from "@radix-ui/react-radio-group"
 import { ReactElement, useId } from "react"
 import { Playwright } from "@new/Playwright"
-import { TInputRadioGroupItem } from "@new/InputRadioGroup/InputRadioGroupItem"
+import { InputRadioGroupItemProps } from "@new/InputRadioGroup/InputRadioGroupItem"
 import { Stack } from "@new/Stack/Stack"
 import { Align } from "@new/Align/Align"
 
@@ -16,7 +16,7 @@ const Root = styled(RadixRadioGroup.Root)<{ marginPosition: "bottom" | "right" }
   },
 }))
 
-export type TInputRadioGroup = Playwright & {
+export type InputRadioGroupProps = Playwright & {
   size: "small" | "large"
 
   vertical?: boolean
@@ -26,10 +26,10 @@ export type TInputRadioGroup = Playwright & {
   value: string
   onChange: (value: string) => void
 
-  children: ReactElement<TInputRadioGroupItem> | ReactElement<TInputRadioGroupItem>[]
+  children: ReactElement<InputRadioGroupItemProps> | ReactElement<InputRadioGroupItemProps>[]
 }
 
-export const InputRadioGroup = (p: TInputRadioGroup) => {
+export const InputRadioGroup = (p: InputRadioGroupProps) => {
   const key = useId()
 
   return (

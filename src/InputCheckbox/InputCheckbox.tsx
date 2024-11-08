@@ -33,7 +33,7 @@ const Label = styled.label({
   cursor: "pointer",
 })
 
-export type TInputCheckBox = Playwright & {
+export type InputCheckboxProps = Playwright & {
   size: "small" | "large"
 
   color: Color
@@ -45,7 +45,7 @@ export type TInputCheckBox = Playwright & {
   onChange: (value: boolean) => void
 }
 
-export const InputCheckbox = (p: TInputCheckBox) => {
+export const InputCheckbox = (p: InputCheckboxProps) => {
   const key = useId()
 
   return (

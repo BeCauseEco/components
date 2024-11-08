@@ -1,5 +1,5 @@
 import styled from "@emotion/styled"
-import { TStack } from "../Stack"
+import { StackProps } from "../Stack"
 import { keyframes } from "@emotion/react"
 import { computeColor, Color } from "@new/Color"
 
@@ -20,7 +20,7 @@ const keyframeB = keyframes({
   "100%": { transform: "scaleY(-1) rotate(-135deg)" },
 })
 
-export const Spinner = styled.div<Pick<TStack, "loading" | "colorLoading">>(p => ({
+export const Spinner = styled.div<Pick<StackProps, "loading" | "colorLoading">>(p => ({
   diplay: "flex",
   height: "100%",
   aspectRatio: "1",

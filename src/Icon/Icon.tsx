@@ -3,7 +3,7 @@ import { ColorLightness, computeColor } from "@new/Color"
 import styled from "@emotion/styled"
 import { Playwright } from "@new/Playwright"
 
-const computeSize = (p: TIcon) => {
+const computeSize = (p: IconProps) => {
   let size = "0"
 
   if (p.tiny) {
@@ -41,13 +41,13 @@ const computeSize = (p: TIcon) => {
   return size
 }
 
-const computeStyle = (p: TIcon) => {
+const computeStyle = (p: IconProps) => {
   console.log("computeStyle", p)
 
   return "1"
 }
 
-const computeFontVariantSettings = (p: TIcon) => {
+const computeFontVariantSettings = (p: IconProps) => {
   // let w = [Size.Large, Size.Huge].includes(p.size) ? "700" : "600"
 
   // const g = [Size.Large, Size.Huge].includes(p.size) ? "0" : "-25"
@@ -68,7 +68,7 @@ const computeFontVariantSettings = (p: TIcon) => {
   return `'FILL' ${computeStyle(p)}, 'wght' ${w}, 'GRAD' ${g}, 'opsz' 48`
 }
 
-const Container = styled.i<Pick<TIcon, "fill"> & { size: string; fontVariationSettings: string }>(p => ({
+const Container = styled.i<Pick<IconProps, "fill"> & { size: string; fontVariationSettings: string }>(p => ({
   display: "flex !important",
   flexShrink: 0,
   width: "fit-content",
@@ -80,7 +80,7 @@ const Container = styled.i<Pick<TIcon, "fill"> & { size: string; fontVariationSe
   userSelect: "none",
 }))
 
-export type TIcon = Playwright & {
+export type IconProps = Playwright & {
   name: string | "blank"
   fill: ColorLightness
 
@@ -98,7 +98,7 @@ export type TIcon = Playwright & {
   onClick?: any
 }
 
-export const Icon = (p: TIcon) => (
+export const Icon = (p: IconProps) => (
   <Container
     size={computeSize(p)}
     fontVariationSettings={computeFontVariantSettings(p)}

@@ -6,7 +6,7 @@ import Link, { LinkProps } from "next/link"
 import React from "react"
 import { Playwright } from "@new/Playwright"
 import { Text, TextProps } from "@new/Text/Text"
-import { Align, TAlign } from "@new/Align/Align"
+import { Align, AlignProps } from "@new/Align/Align"
 import { Icon } from "@new/Icon/Icon"
 import { Spacer } from "@new/Spacer/Spacer"
 
@@ -49,8 +49,8 @@ const NextLink = styled(Link)({
 })
 
 const Children = (p: Omit<InputButtonProps, "onClick">) => {
-  let label: ReactElement<TextProps | TAlign> | null = null
-  let iconBeforeLabel: ReactElement<TAlign> | null = null
+  let label: ReactElement<TextProps | AlignProps> | null = null
+  let iconBeforeLabel: ReactElement<AlignProps> | null = null
   let iconAfterLabel: ReactElement | null = null
   let iconLabelNotSpecified: ReactElement | null = null
 

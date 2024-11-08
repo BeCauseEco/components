@@ -1,7 +1,7 @@
 import styled from "@emotion/styled"
-import { TStack } from "../Stack"
+import { StackProps } from "../Stack"
 
-export const Loader = styled.div<Pick<TStack, "loading">>(p => ({
+export const Loader = styled.div<Pick<StackProps, "loading">>(p => ({
   display: p.loading ? "flex" : "none",
   position: "absolute",
   width: "100%",

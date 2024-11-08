@@ -16,7 +16,7 @@ const Container = styled.div({
   display: "flex",
 })
 
-export type TAutocomplete = Playwright & {
+export type AutocompleteProps = Playwright & {
   input: ReactElement<InputTextSingleProps> | ReactElement<InputButtonPrimaryProps>
   results: ReactElement | ReactElement[]
 
@@ -26,7 +26,7 @@ export type TAutocomplete = Playwright & {
   colorBackground: Color
 }
 
-export const Autocomplete = forwardRef<HTMLDivElement, PropsWithChildren<TAutocomplete>>((props, ref) => {
+export const Autocomplete = forwardRef<HTMLDivElement, PropsWithChildren<AutocompleteProps>>((props, ref) => {
   const { playwrightTestId, input, results, colorBackground, open, onOpenChange } = props
 
   return (

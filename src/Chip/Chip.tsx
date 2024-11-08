@@ -7,8 +7,8 @@ import { Composition } from "@new/Composition/Composition"
 import { Size } from "@new/Size"
 import styled from "@emotion/styled"
 import { Playwright } from "@new/Playwright"
-import { TIcon } from "@new/Icon/Icon"
-import { TSpacer } from "@new/Spacer/Spacer"
+import { IconProps } from "@new/Icon/Icon"
+import { SpacerProps } from "@new/Spacer/Spacer"
 import { TKeyValuePair } from "@new/KeyValuePair/KeyValuePair"
 import { InputButtonTertiaryProps } from "@new/InputButton/InputButtonTertiary"
 
@@ -24,13 +24,13 @@ export type TChip = Playwright & {
   children:
     | ReactElement<TKeyValuePair>
     | ReactElement<TextProps>
-    | [ReactElement<TIcon>, ReactElement<TSpacer>, ReactElement<TextProps>]
-    | [ReactElement<TextProps>, ReactElement<TSpacer>, ReactElement<InputButtonTertiaryProps>]
+    | [ReactElement<IconProps>, ReactElement<SpacerProps>, ReactElement<TextProps>]
+    | [ReactElement<TextProps>, ReactElement<SpacerProps>, ReactElement<InputButtonTertiaryProps>]
     | [
         ReactElement<any>,
-        ReactElement<TSpacer>,
+        ReactElement<SpacerProps>,
         ReactElement<TextProps>,
-        ReactElement<TSpacer>,
+        ReactElement<SpacerProps>,
         ReactElement<InputButtonTertiaryProps>,
       ]
 }

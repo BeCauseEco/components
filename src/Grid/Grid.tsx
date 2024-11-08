@@ -1,9 +1,9 @@
 import { PropsWithChildren, ReactElement } from "react"
 import styled from "@emotion/styled"
 import { TLayoutBase } from "@new/Composition/TLayoutBase"
-import { TStack } from "@new/Stack/Stack"
+import { StackProps } from "@new/Stack/Stack"
 
-const computeGridTemplateColumns = (columns: TGrid["columns"]): string => {
+const computeGridTemplateColumns = (columns: GridProps["columns"]): string => {
   switch (columns) {
     case "two":
       return "1fr 1fr"
@@ -19,7 +19,7 @@ const computeGridTemplateColumns = (columns: TGrid["columns"]): string => {
   }
 }
 
-const Container = styled.div<Pick<TGrid, "columns" | "hug">>(p => ({
+const Container = styled.div<Pick<GridProps, "columns" | "hug">>(p => ({
   display: "grid",
   gap: p.hug ? 0 : "calc(var(--BU) * 4)",
   gridTemplateColumns: computeGridTemplateColumns(p.columns),
@@ -27,15 +27,15 @@ const Container = styled.div<Pick<TGrid, "columns" | "hug">>(p => ({
   height: "inherit",
 }))
 
-export type TGrid = TLayoutBase & {
+export type GridProps = TLayoutBase & {
   columns: "two" | "three" | "four"
 
   hug?: boolean
 
-  children: ReactElement<TStack> | ReactElement<TStack>[]
+  children: ReactElement<StackProps> | ReactElement<StackProps>[]
 }
 
-export const Grid = (p: PropsWithChildren<TGrid>) => {
+export const Grid = (p: PropsWithChildren<GridProps>) => {
   return (
     <Container className="layout-container" columns={p.columns} hug={p.hug} data-playwright-testid={p.playwrightTestId}>
       {p.children}

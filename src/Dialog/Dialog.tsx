@@ -7,7 +7,7 @@ import { Color } from "@new/Color"
 import { LayoutDialog } from "./internal/LayoutDialog"
 import styled from "@emotion/styled"
 import { EOpacity } from "@new/Opacity"
-import { Spacer, TSpacer } from "@new/Spacer/Spacer"
+import { Spacer, SpacerProps } from "@new/Spacer/Spacer"
 import { EShadow } from "@new/EShadow"
 import { TextProps } from "@new/Text/Text"
 // import { Icon } from "@new/Icon/Icon"
@@ -61,7 +61,7 @@ export type TDialog = Playwright & {
   onOpenChange: (open: boolean) => void
   collapseHeight?: boolean
   title?: ReactElement<TextProps>
-  description?: ReactElement<TextProps> | ReactElement<TextProps | TSpacer>[]
+  description?: ReactElement<TextProps> | ReactElement<TextProps | SpacerProps>[]
   buttonPrimary?: ReactElement<InputButtonPrimaryProps>
   buttonSecondary?: ReactElement<InputButtonSecondaryProps>
   buttonTertiary?: ReactElement<InputButtonTertiaryProps>

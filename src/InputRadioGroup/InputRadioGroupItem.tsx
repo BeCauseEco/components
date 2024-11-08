@@ -35,12 +35,12 @@ const Label = styled.label({
   userSelect: "none",
 })
 
-export type TInputRadioGroupItem = Playwright & {
+export type InputRadioGroupItemProps = Playwright & {
   value: string
   label: string
 }
 
-export const InputRadioGroupItem = (p: TInputRadioGroupItem) => {
+export const InputRadioGroupItem = (p: InputRadioGroupItemProps) => {
   const key = useId()
 
   return (

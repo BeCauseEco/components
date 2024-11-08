@@ -1,6 +1,6 @@
 import React, { ReactElement } from "react"
 import styled from "@emotion/styled"
-import { TAlign } from "@new/Align/Align"
+import { AlignProps } from "@new/Align/Align"
 import { TLayoutBase } from "./TLayoutBase"
 import { EDirection } from "@new/EDirection"
 import { containsIlligalChildren } from "@new/Functions"
@@ -13,7 +13,7 @@ const Container = styled.div<Pick<TLayoutStackBase, "omitPadding"> & { direction
 }))
 
 type TLayoutStackBase = TLayoutBase & {
-  children: ReactElement<TAlign> | ReactElement<TAlign>[]
+  children: ReactElement<AlignProps> | ReactElement<AlignProps>[]
 }
 
 type TLayoutStackVertical = TLayoutStackBase & {

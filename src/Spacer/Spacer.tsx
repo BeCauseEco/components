@@ -8,7 +8,7 @@ const Container = styled.div<{ size: string }>(p => ({
   height: p.size,
 }))
 
-export type TSpacer = {
+export type SpacerProps = {
   tiny?: boolean
   xsmall?: boolean
   small?: boolean
@@ -19,7 +19,7 @@ export type TSpacer = {
   huge?: boolean
 }
 
-export const Spacer = ({ tiny, xsmall, small, medium, large, xLarge, xxLarge, huge }: TSpacer) => {
+export const Spacer = ({ tiny, xsmall, small, medium, large, xLarge, xxLarge, huge }: SpacerProps) => {
   let size = "0"
 
   if (tiny) {

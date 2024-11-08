@@ -1,7 +1,7 @@
 import React, { ReactElement } from "react"
 import styled from "@emotion/styled"
 import { Playwright } from "@new/Playwright"
-import { TStack } from "../Stack/Stack"
+import { StackProps } from "../Stack/Stack"
 
 const Outer = styled.div({
   display: "flex",
@@ -17,7 +17,7 @@ const Inner = styled(Outer)({
 })
 
 export type TPageBounds = Playwright & {
-  children: ReactElement<TStack> | ReactElement<TStack>[]
+  children: ReactElement<StackProps> | ReactElement<StackProps>[]
 }
 
 export const PageBounds = ({ children, playwrightTestId }: TPageBounds) => (

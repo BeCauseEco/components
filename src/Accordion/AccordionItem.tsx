@@ -7,7 +7,7 @@ import { LayoutSingle } from "@new/Composition/LayoutSingle"
 import { TextProps } from "@new/Text/Text"
 import { ColorLightness } from "@new/Color"
 import { BackgroundCard } from "@new/Composition/BackgroundCard"
-import { TIcon } from "@new/Icon/Icon"
+import { IconProps } from "@new/Icon/Icon"
 import { EDirection } from "@new/EDirection"
 import { Playwright } from "@new/Playwright"
 
@@ -60,7 +60,7 @@ const Content = styled(Accordion.Content)({
 })
 
 export type TAccordionItem = Playwright & {
-  label: ReactElement<TextProps> | ReactElement<TIcon>
+  label: ReactElement<TextProps> | ReactElement<IconProps>
   value: string
   content: ReactElement | ReactElement[] | undefined
   colorHead: ColorLightness

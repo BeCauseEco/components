@@ -1,14 +1,14 @@
 import React, { ReactElement } from "react"
 import styled from "@emotion/styled"
-import { TAlign } from "@new/Align/Align"
+import { AlignProps } from "@new/Align/Align"
 import { containsIlligalChildren } from "@new/Functions"
 import { computeColor, Color, ColorLightness } from "@new/Color"
 import { TLayoutBase } from "@new/Composition/TLayoutBase"
 import { Loader } from "./internal/Loader"
 import { Spinner } from "./internal/Spinner"
-import { TGrid } from "@new/Grid/Grid"
+import { GridProps } from "@new/Grid/Grid"
 
-const translateBorderRadius = (p?: Pick<TStack, "borderRadius">): string => {
+const translateBorderRadius = (p?: Pick<StackProps, "borderRadius">): string => {
   switch (p?.borderRadius) {
     case "small":
       return "calc(var(--BU) / 2)"
@@ -26,7 +26,7 @@ const translateBorderRadius = (p?: Pick<TStack, "borderRadius">): string => {
 
 const Container = styled.div<
   Pick<
-    TStack,
+    StackProps,
     | "explodeHeight"
     | "overflowHidden"
     | "borderRadius"
@@ -67,43 +67,45 @@ const Container = styled.div<
   },
 }))
 
-const Children = styled.div<Pick<TStack, "loading" | "disabled" | "hug"> & { flexDirection: "column" | "row" }>(p => ({
-  display: "inherit",
-  flexDirection: p.flexDirection,
-  width: "inherit",
-  height: "inherit",
-  padding: p.hug ? (p.hug === "partly" ? "calc(var(--BU) * 2)" : 0) : "calc(var(--BU) * 4)",
-  transition: "opacity 0.2s ease-in-out",
-  willChange: "opacity",
+const Children = styled.div<Pick<StackProps, "loading" | "disabled" | "hug"> & { flexDirection: "column" | "row" }>(
+  p => ({
+    display: "inherit",
+    flexDirection: p.flexDirection,
+    width: "inherit",
+    height: "inherit",
+    padding: p.hug ? (p.hug === "partly" ? "calc(var(--BU) * 2)" : 0) : "calc(var(--BU) * 4)",
+    transition: "opacity 0.2s ease-in-out",
+    willChange: "opacity",
 
-  ...(p.loading
-    ? {
-        // minHeight: "fit-content", TO-DO: @cllpse: perhaps this will break things like text
-        height: "unset",
-        maxHeight: "calc(var(--BU) * 40)",
-        opacity: 0,
-        overflow: "hidden",
-        cursor: "wait",
+    ...(p.loading
+      ? {
+          // minHeight: "fit-content", TO-DO: @cllpse: perhaps this will break things like text
+          height: "unset",
+          maxHeight: "calc(var(--BU) * 40)",
+          opacity: 0,
+          overflow: "hidden",
+          cursor: "wait",
 
-        "& *": {
-          pointerEvents: "none",
-        },
-      }
-    : {}),
+          "& *": {
+            pointerEvents: "none",
+          },
+        }
+      : {}),
 
-  ...(!p.loading && p.disabled
-    ? {
-        opacity: 0.6,
-        cursor: "not-allowed",
+    ...(!p.loading && p.disabled
+      ? {
+          opacity: 0.6,
+          cursor: "not-allowed",
 
-        "& *": {
-          pointerEvents: "none",
-        },
-      }
-    : {}),
-}))
+          "& *": {
+            pointerEvents: "none",
+          },
+        }
+      : {}),
+  }),
+)
 
-export type TStack = TLayoutBase & {
+export type StackProps = TLayoutBase & {
   vertical?: boolean
   horizontal?: boolean
 
@@ -124,10 +126,10 @@ export type TStack = TLayoutBase & {
 
   aspectRatio?: "auto" | "1"
 
-  children: ReactElement<TAlign | null> | ReactElement<TGrid | null> | ReactElement<TAlign | null>[]
+  children: ReactElement<AlignProps | null> | ReactElement<GridProps | null> | ReactElement<AlignProps | null>[]
 }
 
-export const Stack = (p: TStack) => {
+export const Stack = (p: StackProps) => {
   if (containsIlligalChildren(p.children, ["Align"])) {
     return <pre>TStack only accepts children of type: TAlign</pre>
   }
