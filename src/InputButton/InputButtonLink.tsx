@@ -2,28 +2,32 @@ import { forwardRef } from "react"
 import { InputButtonProps, InputButton } from "@new/InputButton/internal/InputButton"
 import { Color } from "@new/Color"
 
-export type InputButtonLinkProps = Pick<InputButtonProps, "size" | "hug" | "loading" | "disabled" | "onClick"> & {
+export type InputButtonLinkProps = Pick<
+  InputButtonProps,
+  "id" | "size" | "hug" | "loading" | "disabled" | "onClick" | "href" | "playwrightTestId"
+> & {
   label: string
-  iconLeftName?: string
-  iconRightName?: string
+  iconNameLeft?: string
+  iconNameRight?: string
 }
 
 export const InputButtonLink = forwardRef<HTMLAnchorElement, InputButtonLinkProps>((p, ref) => {
-  const iconName = p.iconLeftName || p.iconRightName
+  const iconName = p.iconNameLeft || p.iconNameRight
   let iconPlacement: InputButtonProps["iconPlacement"] = "labelNotSpecified"
 
-  if (p.iconLeftName) {
+  if (p.iconNameLeft) {
     iconPlacement = "beforeLabel"
   }
 
-  if (p.iconRightName) {
+  if (p.iconNameRight) {
     iconPlacement = "afterLabel"
   }
 
   return (
     <InputButton
+      id={p.id}
       ref={ref}
-      variant="link"
+      variant="outlined"
       size={p.size}
       color={Color.Primary}
       label={p.label}
@@ -33,6 +37,8 @@ export const InputButtonLink = forwardRef<HTMLAnchorElement, InputButtonLinkProp
       iconName={iconName}
       iconPlacement={iconPlacement}
       onClick={p.onClick}
+      href={p.href}
+      playwrightTestId={p.playwrightTestId}
     />
   )
 })

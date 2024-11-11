@@ -74,8 +74,8 @@ export type InputTextProps = Playwright & {
 
   placeholder?: string
   label?: string
-  iconLeftName?: string
-  iconRightName?: string
+  iconNameLeft?: string
+  iconNameRight?: string
 
   collapse?: boolean
 }
@@ -103,20 +103,20 @@ export const InputText = forwardRef<HTMLInputElement | HTMLTextAreaElement, Inpu
     )
   }
 
-  if (p.iconLeftName && p.rows === 1) {
+  if (p.iconNameLeft && p.rows === 1) {
     iconStart = (
       <Align horizontal center={p.rows === 1} hug="width">
         <Spacer tiny={p.size === "small"} xsmall={p.size === "large"} />
 
-        <Icon name={p.iconLeftName} small={p.size === "small"} large={p.size === "large"} fill={[p.color, 700]} />
+        <Icon name={p.iconNameLeft} small={p.size === "small"} large={p.size === "large"} fill={[p.color, 700]} />
       </Align>
     )
   }
 
-  if (p.iconRightName && p.rows === 1) {
+  if (p.iconNameRight && p.rows === 1) {
     iconEnd = (
       <Align horizontal center hug="width">
-        <Icon name={p.iconRightName} small={p.size === "small"} large={p.size === "large"} fill={[p.color, 700]} />
+        <Icon name={p.iconNameRight} small={p.size === "small"} large={p.size === "large"} fill={[p.color, 700]} />
 
         <Spacer tiny={p.size === "small"} xsmall={p.size === "large"} />
       </Align>
@@ -129,7 +129,7 @@ export const InputText = forwardRef<HTMLInputElement | HTMLTextAreaElement, Inpu
       colorOutline={[p.color, 700]}
       colorOutlineHover={focus ? [p.color, 700] : [p.color, 900]}
       colorBackground={[focus ? p.color : Color.Transparent, 50]}
-      borderRadius="small"
+      cornerRadius="small"
       hug
     >
       {label}

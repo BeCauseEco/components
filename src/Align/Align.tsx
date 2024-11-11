@@ -102,12 +102,30 @@ const computeAlignment = (p: Omit<AlignProps, "spacing" | "hug">) => {
   return r
 }
 
+const computeWidthHeight = (p: AlignProps) => {
+  let width = "100%"
+  let height = "100%"
+
+  if (p.hug === true) {
+    width = "fit-content"
+    height = "fit-content"
+  } else if (p.hug === "width") {
+    width = "fit-content"
+  } else if (p.hug === "height") {
+    height = "fit-content"
+  }
+
+  return { width, height }
+}
+
 const Container = styled.div<AlignProps>(p => ({
   display: "flex",
   flexWrap: "inherit",
   flexDirection: p.vertical ? "column" : "row",
-  width: p.hug ? "auto" : "100%",
-  height: p.hug ? "auto" : "100%",
+  width: computeWidthHeight(p).width,
+  height: computeWidthHeight(p).height,
+  padding: 0,
+  margin: 0,
 
   ...computeAlignment(p),
 }))

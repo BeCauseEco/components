@@ -65,7 +65,7 @@ const Children = (p: Omit<InputButtonProps, "onClick">) => {
       )
     } else {
       label = (
-        <Align horizontal left hug>
+        <Align horizontal left hug="width">
           <Text
             small={p.size === "small"}
             medium={p.size !== "small"}
@@ -90,18 +90,18 @@ const Children = (p: Omit<InputButtonProps, "onClick">) => {
 
     if (p.iconPlacement === "beforeLabel") {
       iconBeforeLabel = (
-        <Align horizontal left hug>
+        <Align horizontal left hug="width">
           {icon}
 
-          <Spacer tiny={p.size === "small"} xsmall={p.size === "large"} />
+          <Spacer xsmall={p.size === "small"} small={p.size === "large"} />
         </Align>
       )
     }
 
     if (p.iconPlacement === "afterLabel") {
       iconAfterLabel = (
-        <Align horizontal left hug>
-          <Spacer tiny={p.size === "small"} xsmall={p.size === "large"} />
+        <Align horizontal right hug="width">
+          <Spacer xsmall={p.size === "small"} small={p.size === "large"} />
 
           {icon}
         </Align>
@@ -110,7 +110,7 @@ const Children = (p: Omit<InputButtonProps, "onClick">) => {
 
     if (p.iconPlacement === "labelNotSpecified") {
       iconLabelNotSpecified = (
-        <Align horizontal center hug>
+        <Align horizontal center>
           {icon}
         </Align>
       )
@@ -119,10 +119,14 @@ const Children = (p: Omit<InputButtonProps, "onClick">) => {
 
   const children = (
     <>
+      {!iconLabelNotSpecified && <Spacer xsmall={p.size === "small"} small={p.size === "large"} />}
+
       {iconBeforeLabel}
       {label}
       {iconAfterLabel}
       {iconLabelNotSpecified}
+
+      {!iconLabelNotSpecified && <Spacer xsmall={p.size === "small"} small={p.size === "large"} />}
     </>
   )
 
@@ -141,11 +145,11 @@ const Children = (p: Omit<InputButtonProps, "onClick">) => {
           colorBackground={[p.color, 700]}
           colorBackgroundHover={[p.color, 800]}
           colorLoading={[p.color, 50]}
-          borderRadius="small"
+          cornerRadius="small"
           loading={p.loading}
           disabled={p.disabled}
           aspectRatio={p.iconPlacement === "labelNotSpecified" ? "1" : "auto"}
-          hug={p.hug}
+          hug
         >
           {children}
         </Stack>
@@ -158,11 +162,11 @@ const Children = (p: Omit<InputButtonProps, "onClick">) => {
           colorOutline={[p.color, 300]}
           colorBackgroundHover={[p.color, 100]}
           colorLoading={[p.color, 700]}
-          borderRadius="small"
+          cornerRadius="small"
           loading={p.loading}
           disabled={p.disabled}
           aspectRatio={p.iconPlacement === "labelNotSpecified" ? "1" : "auto"}
-          hug={p.hug}
+          hug
         >
           {children}
         </Stack>
@@ -175,11 +179,11 @@ const Children = (p: Omit<InputButtonProps, "onClick">) => {
           horizontal
           colorBackgroundHover={[p.color, 100]}
           colorLoading={[p.color, 700]}
-          borderRadius="small"
+          cornerRadius="small"
           loading={p.loading}
           disabled={p.disabled}
           aspectRatio={p.iconPlacement === "labelNotSpecified" ? "1" : "auto"}
-          hug={p.hug}
+          hug
         >
           {children}
         </Stack>
@@ -188,6 +192,8 @@ const Children = (p: Omit<InputButtonProps, "onClick">) => {
 }
 
 export type InputButtonProps = Playwright & {
+  id?: string
+
   variant: "link" | "solid" | "outlined" | "transparent"
 
   size: "small" | "large"
@@ -206,27 +212,30 @@ export type InputButtonProps = Playwright & {
 
   href?: LinkProps["href"]
   onClick?: () => void
+
+  destructive?: boolean
 }
 
 export const InputButton = forwardRef<HTMLButtonElement | HTMLAnchorElement, InputButtonProps>((p, ref) => {
-  const { variant, color, onClick, ...pp } = p
+  const { id, variant, color, destructive, onClick, playwrightTestId, ...pp } = p
 
   return (
     <Output
+      id={id}
       as={variant === "link" ? "span" : "button"}
       // @ts-expect-error TypeScript can't infer the type of the `ref` prop when using as="...".
       ref={ref}
       variant={variant}
-      color={color}
+      color={destructive === true ? Color.Error : color}
       onClick={onClick}
-      data-playwright-testid={p.playwrightTestId}
+      data-playwright-testid={playwrightTestId}
       height={computeHeight(p)}
       {...pp}
     >
       <Children
-        variant={p.variant}
+        variant={variant}
         size={p.size}
-        color={p.color}
+        color={destructive === true ? Color.Error : color}
         href={p.href}
         loading={p.loading}
         disabled={p.disabled}

@@ -1,5 +1,5 @@
 import { Size } from "@new/Size"
-import { ColorLightness, computeColor } from "@new/Color"
+import { ColorWithLightness, computeColor } from "@new/Color"
 import styled from "@emotion/styled"
 import { Playwright } from "@new/Playwright"
 
@@ -42,7 +42,7 @@ const computeSize = (p: IconProps) => {
 }
 
 const computeStyle = (p: IconProps) => {
-  console.log("computeStyle", p)
+  // console.log("computeStyle", p)
 
   return "1"
 }
@@ -82,7 +82,7 @@ const Container = styled.i<Pick<IconProps, "fill"> & { size: string; fontVariati
 
 export type IconProps = Playwright & {
   name: string | "blank"
-  fill: ColorLightness
+  fill: ColorWithLightness
 
   tiny?: boolean
   xsmall?: boolean

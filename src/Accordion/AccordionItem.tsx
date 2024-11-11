@@ -5,7 +5,7 @@ import { keyframes } from "@emotion/react"
 import { Composition } from "@new/Composition/Composition"
 import { LayoutSingle } from "@new/Composition/LayoutSingle"
 import { TextProps } from "@new/Text/Text"
-import { ColorLightness } from "@new/Color"
+import { ColorWithLightness } from "@new/Color"
 import { BackgroundCard } from "@new/Composition/BackgroundCard"
 import { IconProps } from "@new/Icon/Icon"
 import { EDirection } from "@new/EDirection"
@@ -63,8 +63,8 @@ export type TAccordionItem = Playwright & {
   label: ReactElement<TextProps> | ReactElement<IconProps>
   value: string
   content: ReactElement | ReactElement[] | undefined
-  colorHead: ColorLightness
-  colorContent: ColorLightness
+  colorHead: ColorWithLightness
+  colorContent: ColorWithLightness
 }
 
 export const AccordionItem = ({ label, value, content, colorHead, colorContent, playwrightTestId }: TAccordionItem) => (

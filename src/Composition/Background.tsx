@@ -1,4 +1,4 @@
-import { Color, ColorLightness, computeColor } from "@new/Color"
+import { Color, ColorWithLightness, computeColor } from "@new/Color"
 import { EShadow } from "@new/EShadow"
 import { Size } from "@new/Size"
 import styled from "@emotion/styled"
@@ -57,10 +57,10 @@ const Container = styled.div<TBackground>(p => ({
 }))
 
 export type TBackground = Playwright & {
-  colorBackground?: ColorLightness
-  colorBackgroundHover?: ColorLightness
-  colorOutline?: ColorLightness
-  colorOutlineHover?: ColorLightness
+  colorBackground?: ColorWithLightness
+  colorBackgroundHover?: ColorWithLightness
+  colorOutline?: ColorWithLightness
+  colorOutlineHover?: ColorWithLightness
   borderRadius?: Size.Small | Size.Medium | Size.Large
   shadow?: EShadow
   stacked?: boolean

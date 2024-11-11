@@ -38,9 +38,9 @@ export enum Color {
 
 export type Lightness = 50 | 100 | 200 | 300 | 400 | 500 | 600 | 700 | 800 | 900 | 1000
 
-export type ColorLightness = [Color, Lightness] | [Color.White] | [Color.Transparent] | [THexColor, Lightness]
+export type ColorWithLightness = [Color, Lightness] | [Color.White] | [Color.Transparent] | [THexColor, Lightness]
 
-export const computeColor = (color: ColorLightness) => {
+export const computeColor = (color: ColorWithLightness) => {
   const baseColor = color[0]
   const lightness = color[1] || 700
 

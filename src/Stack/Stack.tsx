@@ -1,15 +1,16 @@
 import React, { ReactElement } from "react"
 import styled from "@emotion/styled"
 import { AlignProps } from "@new/Align/Align"
-import { containsIlligalChildren } from "@new/Functions"
-import { computeColor, Color, ColorLightness } from "@new/Color"
+// import { containsIlligalChildren } from "@new/Functions"
+import { computeColor, Color, ColorWithLightness } from "@new/Color"
 import { TLayoutBase } from "@new/Composition/TLayoutBase"
 import { Loader } from "./internal/Loader"
 import { Spinner } from "./internal/Spinner"
 import { GridProps } from "@new/Grid/Grid"
+import { SpacerProps } from "@new/Spacer/Spacer"
 
-const translateBorderRadius = (p?: Pick<StackProps, "borderRadius">): string => {
-  switch (p?.borderRadius) {
+const translateBorderRadius = (cornerRadius: StackProps["cornerRadius"]): string => {
+  switch (cornerRadius) {
     case "small":
       return "calc(var(--BU) / 2)"
 
@@ -29,7 +30,7 @@ const Container = styled.div<
     StackProps,
     | "explodeHeight"
     | "overflowHidden"
-    | "borderRadius"
+    | "cornerRadius"
     | "colorBackground"
     | "colorBackgroundHover"
     | "colorOutline"
@@ -43,7 +44,7 @@ const Container = styled.div<
   overflow: p.overflowHidden ? "hidden" : "visible",
   cursor: "inherit",
   position: "relative",
-  borderRadius: translateBorderRadius({ borderRadius: p.borderRadius }),
+  borderRadius: translateBorderRadius(p.cornerRadius),
   backgroundColor: computeColor(p.colorBackground || [Color.Transparent]),
   transition: "background-color 0.1s ease-in-out",
   willChange: "background-color",
@@ -112,13 +113,13 @@ export type StackProps = TLayoutBase & {
   loading?: boolean
   disabled?: boolean
 
-  colorBackground?: ColorLightness
-  colorBackgroundHover?: ColorLightness
-  colorOutline?: ColorLightness
-  colorOutlineHover?: ColorLightness
-  colorLoading?: ColorLightness
+  colorBackground?: ColorWithLightness
+  colorBackgroundHover?: ColorWithLightness
+  colorOutline?: ColorWithLightness
+  colorOutlineHover?: ColorWithLightness
+  colorLoading?: ColorWithLightness
 
-  borderRadius?: "small" | "medium" | "large"
+  cornerRadius?: "small" | "medium" | "large"
 
   hug?: boolean | "partly"
   explodeHeight?: boolean
@@ -126,13 +127,16 @@ export type StackProps = TLayoutBase & {
 
   aspectRatio?: "auto" | "1"
 
-  children: ReactElement<AlignProps | null> | ReactElement<GridProps | null> | ReactElement<AlignProps | null>[]
+  children:
+    | ReactElement<AlignProps | SpacerProps | null>
+    | ReactElement<AlignProps | SpacerProps | null>[]
+    | ReactElement<GridProps | null>
 }
 
 export const Stack = (p: StackProps) => {
-  if (containsIlligalChildren(p.children, ["Align"])) {
-    return <pre>TStack only accepts children of type: TAlign</pre>
-  }
+  // if (containsIlligalChildren(p.children, ["Align"])) {
+  //   return <pre>TStack only accepts children of type: TAlign</pre>
+  // }
 
   return (
     <Container
@@ -144,7 +148,7 @@ export const Stack = (p: StackProps) => {
       colorOutlineHover={p.colorOutlineHover}
       explodeHeight={p.explodeHeight}
       overflowHidden={p.overflowHidden}
-      borderRadius={p.borderRadius}
+      cornerRadius={p.cornerRadius}
       aspectRatio={p.aspectRatio}
     >
       <Loader loading={p.loading}>

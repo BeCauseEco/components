@@ -1,6 +1,6 @@
 import { PropsWithChildren, forwardRef } from "react"
 import styled from "@emotion/styled"
-import { ColorLightness, computeColor } from "@new/Color"
+import { ColorWithLightness, computeColor } from "@new/Color"
 import { Playwright } from "@new/Playwright"
 
 export const StyleMonospace = {
@@ -112,7 +112,7 @@ export type TextProps = Playwright & {
   xxLarge?: boolean
   huge?: boolean
 
-  fill: ColorLightness
+  fill: ColorWithLightness
 
   wrap?: boolean
 

@@ -10,7 +10,7 @@ import { TLayoutGridDEPRICATED } from "@new/Composition/LayoutGridDEPRICATED"
 import { TLayoutStack } from "@new/Composition/LayoutStack"
 import { TLayoutBase } from "./TLayoutBase"
 import { Playwright } from "@new/Playwright"
-import { computeColor, Color, ColorLightness } from "@new/Color"
+import { computeColor, Color, ColorWithLightness } from "@new/Color"
 import { TBackground } from "./Background"
 
 const Container = styled.div<
@@ -67,7 +67,7 @@ const keyframeB = keyframes({
   "100%": { transform: "scaleY(-1) rotate(-135deg)" },
 })
 
-const Spinner = styled.div<Pick<TComposition, "loading"> & { color: ColorLightness }>(p => ({
+const Spinner = styled.div<Pick<TComposition, "loading"> & { color: ColorWithLightness }>(p => ({
   diplay: "flex",
   height: "100%",
   aspectRatio: "1",

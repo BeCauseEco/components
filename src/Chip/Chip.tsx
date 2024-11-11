@@ -1,6 +1,6 @@
 import { PropsWithChildren, ReactElement } from "react"
 import { TextProps } from "@new/Text/Text"
-import { ColorLightness } from "@new/Color"
+import { ColorWithLightness } from "@new/Color"
 import { BackgroundCard } from "@new/Composition/BackgroundCard"
 import { LayoutChip } from "./internal/LayoutChip"
 import { Composition } from "@new/Composition/Composition"
@@ -19,8 +19,8 @@ const Container = styled.div({
 })
 
 export type TChip = Playwright & {
-  colorBackground?: ColorLightness
-  colorOutline?: ColorLightness
+  colorBackground?: ColorWithLightness
+  colorOutline?: ColorWithLightness
   children:
     | ReactElement<TKeyValuePair>
     | ReactElement<TextProps>

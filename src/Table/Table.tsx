@@ -2,7 +2,7 @@ import styled from "@emotion/styled"
 import { ReactElement } from "react"
 import { TTableRow } from "@new/Table/TableRow"
 import { Size } from "@new/Size"
-import { ColorLightness, computeColor } from "@new/Color"
+import { ColorWithLightness, computeColor } from "@new/Color"
 import { Playwright } from "@new/Playwright"
 
 type TContainerProperties = Omit<TTable, "head" | "body">
@@ -44,9 +44,9 @@ const Body = styled.tbody({
 export type TTable = Playwright & {
   head?: ReactElement<TTableRow>
   body: ReactElement<TTableRow> | ReactElement<TTableRow>[]
-  colorBorder: ColorLightness
-  colorCellSeparator: ColorLightness
-  colorRowHover: ColorLightness
+  colorBorder: ColorWithLightness
+  colorCellSeparator: ColorWithLightness
+  colorRowHover: ColorWithLightness
 }
 
 export const Table = ({ head, body, colorBorder, colorCellSeparator, colorRowHover, playwrightTestId }: TTable) => (

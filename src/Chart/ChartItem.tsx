@@ -1,8 +1,8 @@
-import { ColorLightness } from "@new/Color"
+import { ColorWithLightness } from "@new/Color"
 
 export type TChartItem = {
   dataKey: string
-  color: ColorLightness
+  color: ColorWithLightness
 }
 
 export const ChartItem = ({

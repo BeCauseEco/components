@@ -4,8 +4,10 @@ import { Color } from "@new/Color"
 
 export type InputTextMultipleProps = Pick<
   InputTextProps,
-  "size" | "label" | "placeholder" | "iconLeftName" | "iconRightName" | "loading" | "disabled" | "value" | "onChange"
->
+  "size" | "label" | "placeholder" | "loading" | "disabled" | "value" | "onChange"
+> & {
+  color: Color
+}
 
 export const InputTextMultiple = forwardRef<HTMLTextAreaElement, InputTextMultipleProps>((p, ref) => {
   return (

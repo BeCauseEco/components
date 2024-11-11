@@ -26,6 +26,8 @@ export type InputRadioGroupProps = Playwright & {
   value: string
   onChange: (value: string) => void
 
+  label?: string
+
   children: ReactElement<InputRadioGroupItemProps> | ReactElement<InputRadioGroupItemProps>[]
 }
 

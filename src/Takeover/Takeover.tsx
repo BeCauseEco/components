@@ -8,7 +8,7 @@ import styled from "@emotion/styled"
 import { Spacer } from "@new/Spacer/Spacer"
 import { TextProps } from "@new/Text/Text"
 import { Playwright } from "@new/Playwright"
-import { InputButtonIconProps } from "@new/InputButton/InputButtonIcon"
+import { InputButtonIconTertiaryProps } from "@new/InputButton/InputButtonIconTertiary"
 import { InputButtonPrimaryProps } from "@new/InputButton/InputButtonPrimary"
 import { InputButtonSecondaryProps } from "@new/InputButton/InputButtonSecondary"
 import { InputButtonTertiaryProps } from "@new/InputButton/InputButtonTertiary"
@@ -47,7 +47,7 @@ export type TTakeover = Playwright & {
   content: ReactElement<TComposition>
   open: boolean
   onOpenChange: (open: boolean) => void
-  buttonClose?: ReactElement<InputButtonIconProps>
+  buttonClose?: ReactElement<InputButtonIconTertiaryProps>
   title?: ReactElement<TextProps>
   status?: ReactElement<TextProps>
   buttonPrimary?: ReactElement<InputButtonPrimaryProps>
