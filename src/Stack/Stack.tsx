@@ -140,8 +140,9 @@ export const Stack = (p: StackProps) => {
 
   return (
     <Container
+      data-stack="true"
       data-playwright-testid={p.playwrightTestId}
-      className="layout-container"
+      className="STACK layout-container"
       colorBackground={p.colorBackground}
       colorBackgroundHover={p.colorBackgroundHover}
       colorOutline={p.colorOutline}

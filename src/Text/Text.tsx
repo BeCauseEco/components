@@ -18,43 +18,36 @@ export const StyleFontFamily = {
 export const StyleBodyTiny = {
   fontSize: "12px",
   lineHeight: "16px",
-  letterSpacing: "0.0025em",
 }
 
 export const StyleBodyXsmall = {
   fontSize: "14px",
   lineHeight: "20px",
-  letterSpacing: "0em",
 }
 
 export const StyleBodySmall = {
   fontSize: "16px",
   lineHeight: "24px",
-  letterSpacing: "0em",
 }
 
 export const StyleBodyMedium = {
   fontSize: "20px",
   lineHeight: "28px",
-  letterSpacing: "-0.005em",
 }
 
 export const StyleBodyLarge = {
   fontSize: "24px",
   lineHeight: "30px",
-  letterSpacing: "-0.00625em",
 }
 
 export const StyleBodyXLarge = {
   fontSize: "28px",
   lineHeight: "36px",
-  letterSpacing: "-0.0075em",
 }
 
 export const StyleBodyHuge = {
   fontSize: "35px",
   lineHeight: "40px",
-  letterSpacing: "-0.01em",
 }
 
 const Container = styled.p<TextProps>(p => ({
@@ -70,6 +63,7 @@ const Container = styled.p<TextProps>(p => ({
   textWrap: p.wrap ? "pretty" : "nowrap",
   textAlign: "left",
   alignItems: "inherit",
+  margin: 0,
 
   "& a": {
     color: "inherit",

@@ -20,6 +20,17 @@ import { InputButtonIconTertiary } from "@new/InputButton/InputButtonIconTertiar
 import { Size } from "@new/Size"
 import { InputTextSingle } from "@new/InputText/InputTextSingle"
 
+const debounce = <F extends (...args: Parameters<F>) => ReturnType<F>>(func: F, waitFor: number) => {
+  let timeout: NodeJS.Timeout
+
+  const debounced = (...args: Parameters<F>) => {
+    clearTimeout(timeout)
+    timeout = setTimeout(() => func(...args), waitFor)
+  }
+
+  return debounced
+}
+
 const Container = styled.div({
   display: "flex",
 })
@@ -136,9 +147,7 @@ export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<TInput
 
   const [open, setOpen] = useState(false)
   const [search, setSearch] = useState("")
-
   const [height, setHeight] = useState(1)
-
   const [filteredValues, setFilteredValues] = useState<string[]>([])
 
   const items: { [value: string]: TInputComboboxItem } = useMemo(() => {
@@ -236,9 +245,11 @@ export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<TInput
 
     const onSelectMultiple = (selectedItemId: string, newValue: boolean) => {
       const currentValue = value as string[]
+
       const selectedItemsIds = newValue
         ? [...currentValue, selectedItemId]
         : currentValue.filter(item => item !== selectedItemId)
+
       onChange(selectedItemsIds)
     }
 
@@ -277,6 +288,37 @@ export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<TInput
     )
   }
 
+  const handleRemoveItem = (label: string) => {
+    // event.preventDefault()
+
+    const item = Object.values(items).findLast(item => item.label.toLowerCase() === label.toLowerCase())
+    if (!item) {
+      return
+    }
+
+    const updatedItems = (value as string[]).filter(id => id !== item.value)
+
+    onChange(updatedItems)
+
+    return false
+  }
+
+  const filterResults = useCallback(
+    (value: string) => {
+      if (value === "") {
+        setFilteredValues(Object.values(items).map(item => item.value))
+        return
+      }
+
+      const itemsFiltered = Object.values(items).filter(item => item.label.toLowerCase().includes(value.toLowerCase()))
+
+      setFilteredValues(itemsFiltered.map(item => item.value))
+    },
+    [items],
+  )
+
+  const filterWithDebounce = useMemo(() => debounce(filterResults, 300), [filterResults])
+
   const filteredItems = useMemo(() => {
     const filteredItemIdsSet = new Set(filteredValues)
 
@@ -286,6 +328,7 @@ export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<TInput
   }, [filteredValues, items])
 
   let commandListItems: ReactElement | null = null
+
   if (enableVirtuoso) {
     commandListItems = (
       <Virtuoso
@@ -304,34 +347,6 @@ export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<TInput
   } else {
     commandListItems = <>{filteredItems.map((item, index) => getCommandItem(index, item))}</>
   }
-
-  const handleRemoveItem = (label: string) => {
-    // event.preventDefault()
-
-    const item = Object.values(items).findLast(item => item.label.toLowerCase() === label.toLowerCase())
-    if (!item) {
-      return
-    }
-
-    const updatedItems = (value as string[]).filter(id => id !== item.value)
-    onChange(updatedItems)
-  }
-
-  const filterResults = useCallback(
-    (value: string) => {
-      if (value === "") {
-        setFilteredValues(Object.values(items).map(item => item.value))
-        return
-      }
-
-      const itemsFiltered = Object.values(items).filter(item => item.label.toLowerCase().includes(value.toLowerCase()))
-
-      setFilteredValues(itemsFiltered.map(item => item.value))
-    },
-    [items],
-  )
-
-  const filterWithDebounce = useMemo(() => debounce(filterResults, 300), [filterResults])
 
   return (
     <Container ref={ref} id={id} data-playwright-testid={playwrightTestId}>
@@ -414,14 +429,3 @@ export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<TInput
     </Container>
   )
 })
-
-const debounce = <F extends (...args: Parameters<F>) => ReturnType<F>>(func: F, waitFor: number) => {
-  let timeout: NodeJS.Timeout
-
-  const debounced = (...args: Parameters<F>) => {
-    clearTimeout(timeout)
-    timeout = setTimeout(() => func(...args), waitFor)
-  }
-
-  return debounced
-}

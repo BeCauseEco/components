@@ -15,15 +15,15 @@ const computeSize = (p: IconProps) => {
   }
 
   if (p.small) {
-    size = Size.Small
+    size = "16px"
   }
 
   if (p.medium) {
-    size = Size.Medium
+    size = "20px"
   }
 
   if (p.large) {
-    size = Size.Large
+    size = "24px"
   }
 
   if (p.xLarge) {
@@ -41,6 +41,7 @@ const computeSize = (p: IconProps) => {
   return size
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const computeStyle = (p: IconProps) => {
   // console.log("computeStyle", p)
 

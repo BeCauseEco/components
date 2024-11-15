@@ -9,10 +9,29 @@ import { Align } from "@new/Align/Align"
 import { Icon } from "@new/Icon/Icon"
 import { Spacer } from "@new/Spacer/Spacer"
 
-const Output = styled.output<Pick<InputTextProps, "color" | "size" | "rows"> & { focus: boolean }>(p => ({
+const calculateWidth = (rows: InputTextProps["rows"], width: InputTextProps["width"]) => {
+  if (rows !== 1) {
+    return "calc(100% - 1px)"
+  }
+
+  switch (width) {
+    case "quarter":
+      return "25%"
+    case "half":
+      return "50%"
+    case "full":
+      return "calc(100% - 1px)"
+  }
+}
+
+const Output = styled.output<Pick<InputTextProps, "color" | "size" | "rows" | "width"> & { focus: boolean }>(p => ({
   display: "flex",
-  width: p.rows === 1 ? "100%" : "calc(100% - 1px)",
-  height: p.rows === 1 ? "calc(var(--BU) * 8)" : `calc(var(--BU) * 8 * ${p.rows - 1} + calc(var(--BU) * 3) - 2px)`,
+  width: calculateWidth(p.rows, p.width),
+  minWidth: p.size === "small" ? "calc(var(--BU) * 40)" : "calc(var(--BU) * 48)",
+  height:
+    p.rows === 1
+      ? `calc(var(--BU) * ${p.size === "small" ? 8 : 10})`
+      : `calc(var(--BU) * ${p.size === "small" ? 8 : 10}) * ${p.rows - 1} + calc(var(--BU) * 3) - 2px)`,
 
   ...(p.rows !== 1 && {
     marginTop: "1px",
@@ -62,6 +81,8 @@ const Label = styled.label({
 
 export type InputTextProps = Playwright & {
   size: "small" | "large"
+  width: "quarter" | "half" | "full"
+
   rows: 1 | 2 | 3
 
   color: Color
@@ -73,11 +94,13 @@ export type InputTextProps = Playwright & {
   disabled?: boolean
 
   placeholder?: string
-  label?: string
+  label?: [string, "outside" | "inside"]
+  hint?: string
+
   iconNameLeft?: string
   iconNameRight?: string
 
-  collapse?: boolean
+  hug?: boolean
 }
 
 export const InputText = forwardRef<HTMLInputElement | HTMLTextAreaElement, InputTextProps>((p, ref) => {
@@ -85,30 +108,71 @@ export const InputText = forwardRef<HTMLInputElement | HTMLTextAreaElement, Inpu
 
   const [focus, setFocus] = useState(false)
 
-  let label: ReactElement = <></>
+  let labelInside: ReactElement = <></>
+  let labelOutside: ReactElement = <></>
+  let hintInside: ReactElement = <></>
+  let hintOutside: ReactElement = <></>
   let iconStart: ReactElement = <></>
   let iconEnd: ReactElement = <></>
 
-  if (p.label) {
-    label = (
-      <Align horizontal left hug>
+  if (p.label && p.label[1] === "inside") {
+    labelInside = (
+      <Align horizontal left hug="width">
         <Spacer xsmall={p.size === "small"} small={p.size === "large"} />
 
         <Label htmlFor={key}>
           <Text xsmall={p.size === "small"} small={p.size !== "small"} fill={[p.color, 700]}>
-            {p.label}
+            {p.label[0]}
           </Text>
         </Label>
       </Align>
     )
+
+    if (p.hint) {
+      hintInside = (
+        <Align vertical left hug>
+          <Spacer tiny={p.size === "small"} xsmall={p.size === "large"} />
+
+          <Text tiny={p.size === "small"} xsmall={p.size !== "small"} fill={[p.color, 700]}>
+            {p.hint}
+          </Text>
+        </Align>
+      )
+    }
+  }
+
+  if (p.label && p.label[1] === "outside") {
+    labelOutside = (
+      <Align vertical left hug="width">
+        <Label htmlFor={key}>
+          <Text xsmall={p.size === "small"} small={p.size !== "small"} fill={[p.color, 700]}>
+            {p.label[0]}
+          </Text>
+        </Label>
+
+        <Spacer xsmall={p.size === "small"} small={p.size === "large"} />
+      </Align>
+    )
+
+    if (p.hint) {
+      hintOutside = (
+        <Align vertical left hug>
+          <Text tiny={p.size === "small"} xsmall={p.size !== "small"} fill={[p.color, 700]}>
+            {p.hint}
+          </Text>
+
+          <Spacer xsmall={p.size === "small"} small={p.size === "large"} />
+        </Align>
+      )
+    }
   }
 
   if (p.iconNameLeft && p.rows === 1) {
     iconStart = (
-      <Align horizontal center={p.rows === 1} hug="width">
-        <Spacer tiny={p.size === "small"} xsmall={p.size === "large"} />
+      <Align horizontal center hug="width">
+        <Spacer xsmall={p.size === "small"} small={p.size === "large"} />
 
-        <Icon name={p.iconNameLeft} small={p.size === "small"} large={p.size === "large"} fill={[p.color, 700]} />
+        <Icon name={p.iconNameLeft} medium={p.size === "small"} large={p.size === "large"} fill={[p.color, 700]} />
       </Align>
     )
   }
@@ -116,49 +180,63 @@ export const InputText = forwardRef<HTMLInputElement | HTMLTextAreaElement, Inpu
   if (p.iconNameRight && p.rows === 1) {
     iconEnd = (
       <Align horizontal center hug="width">
-        <Icon name={p.iconNameRight} small={p.size === "small"} large={p.size === "large"} fill={[p.color, 700]} />
+        <Icon name={p.iconNameRight} medium={p.size === "small"} large={p.size === "large"} fill={[p.color, 700]} />
 
-        <Spacer tiny={p.size === "small"} xsmall={p.size === "large"} />
+        <Spacer xsmall={p.size === "small"} small={p.size === "large"} />
       </Align>
     )
   }
 
   return (
-    <Stack
-      horizontal
-      colorOutline={[p.color, 700]}
-      colorOutlineHover={focus ? [p.color, 700] : [p.color, 900]}
-      colorBackground={[focus ? p.color : Color.Transparent, 50]}
-      cornerRadius="small"
-      hug
-    >
-      {label}
+    <Stack vertical>
+      {labelOutside}
 
-      {iconStart}
+      {hintOutside}
 
       <Align horizontal left>
-        <Output
-          as={p.rows === 1 ? "input" : "textarea"}
-          // @ts-expect-error TypeScript can't infer the type of the `ref` prop when using as="...".
-          ref={ref}
-          id={key}
-          value={p.value}
-          rows={p.rows || 1}
-          color={p.color}
-          size={p.size}
-          focus={focus}
-          placeholder={p.placeholder}
-          onFocus={() => setFocus(true)}
-          onBlur={() => setFocus(false)}
-          onChange={event => {
-            if (p.onChange) {
-              p.onChange(event?.target?.["value"])
-            }
-          }}
-        />
+        <Stack
+          horizontal
+          colorOutline={[p.color, 700]}
+          colorOutlineHover={focus ? [p.color, 700] : [p.color, 900]}
+          colorBackground={[focus ? p.color : Color.Transparent, 50]}
+          cornerRadius="small"
+          disabled={p.disabled}
+          loading={p.loading}
+          colorLoading={[p.color, 700]}
+          hug
+        >
+          {labelInside}
+
+          {iconStart}
+
+          <Align horizontal left>
+            <Output
+              as={p.rows === 1 ? "input" : "textarea"}
+              // @ts-expect-error TypeScript can't infer the type of the `ref` prop when using as="...".
+              ref={ref}
+              id={key}
+              value={p.value}
+              rows={p.rows || 1}
+              color={p.color}
+              size={p.size}
+              focus={focus}
+              placeholder={p.placeholder}
+              onFocus={() => setFocus(true)}
+              onBlur={() => setFocus(false)}
+              width={p.width}
+              onChange={event => {
+                if (p.onChange) {
+                  p.onChange(event?.target?.["value"])
+                }
+              }}
+            />
+          </Align>
+
+          {iconEnd}
+        </Stack>
       </Align>
 
-      {iconEnd}
+      {hintInside}
     </Stack>
   )
 })

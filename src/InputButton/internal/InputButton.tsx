@@ -56,16 +56,10 @@ const Children = (p: Omit<InputButtonProps, "onClick">) => {
 
   if (p.label) {
     if (p.variant === "link" && p.href) {
-      return (
-        <NextLink href={p.href}>
-          <Text small={p.size === "small"} medium={p.size !== "small"} fill={[p.color, 700]}>
-            {p.label}
-          </Text>
-        </NextLink>
-      )
+      label = <></>
     } else {
       label = (
-        <Align horizontal left hug="width">
+        <Align horizontal left>
           <Text
             small={p.size === "small"}
             medium={p.size !== "small"}
@@ -90,7 +84,7 @@ const Children = (p: Omit<InputButtonProps, "onClick">) => {
 
     if (p.iconPlacement === "beforeLabel") {
       iconBeforeLabel = (
-        <Align horizontal left hug="width">
+        <Align horizontal left>
           {icon}
 
           <Spacer xsmall={p.size === "small"} small={p.size === "large"} />
@@ -100,7 +94,7 @@ const Children = (p: Omit<InputButtonProps, "onClick">) => {
 
     if (p.iconPlacement === "afterLabel") {
       iconAfterLabel = (
-        <Align horizontal right hug="width">
+        <Align horizontal right>
           <Spacer xsmall={p.size === "small"} small={p.size === "large"} />
 
           {icon}
