@@ -9,6 +9,7 @@ import { Text, TextProps } from "@new/Text/Text"
 import { Align, AlignProps } from "@new/Align/Align"
 import { Icon } from "@new/Icon/Icon"
 import { Spacer } from "@new/Spacer/Spacer"
+import { useRouter } from "next/router"
 
 const computeHeight = (p: InputButtonProps): string => {
   if (p.size === "small") {
@@ -18,14 +19,14 @@ const computeHeight = (p: InputButtonProps): string => {
   }
 }
 
-const Output = styled.output<Pick<InputButtonProps, "variant"> & { height: string }>(p => ({
+const Output = styled.output<InputButtonProps>(p => ({
   display: "flex",
   border: 0,
   background: "none",
   userSelect: "none",
   textDecorationColor: "inherit",
   width: "fit-content",
-  height: p.height,
+  height: computeHeight(p),
   lineHeight: 1,
   cursor: "pointer",
 
@@ -48,14 +49,14 @@ const NextLink = styled(Link)({
   textDecoration: "none",
 })
 
-const Children = (p: Omit<InputButtonProps, "onClick">) => {
+const Children = (p: InputButtonProps) => {
   let label: ReactElement<TextProps | AlignProps> | null = null
   let iconBeforeLabel: ReactElement<AlignProps> | null = null
   let iconAfterLabel: ReactElement | null = null
   let iconLabelNotSpecified: ReactElement | null = null
 
   if (p.label) {
-    if (p.variant === "link" && p.href) {
+    if (p.variant === "link") {
       label = (
         <Align horizontal left>
           <Text small={p.size === "small"} medium={p.size !== "small"} fill={[p.color, 700]}>
@@ -135,7 +136,7 @@ const Children = (p: Omit<InputButtonProps, "onClick">) => {
       if (p.href) {
         return <NextLink href={p.href}>{label}</NextLink>
       } else {
-        return null
+        return <a onClick={p.onClick}>{label}</a>
       }
 
     case "solid":
@@ -218,25 +219,32 @@ export type InputButtonProps = Playwright & {
 
 export const InputButton = forwardRef<HTMLButtonElement | HTMLAnchorElement, InputButtonProps>((p, ref) => {
   const { id, variant, color, destructive, onClick, playwrightTestId, ...pp } = p
+  const router = useRouter()
+
+  const click = () => {
+    if (p.href) {
+      router.push(p.href)
+    } else if (onClick) {
+      onClick()
+    }
+  }
 
   return (
     <Output
-      id={id}
-      as={variant === "link" ? "span" : "button"}
       // @ts-expect-error TypeScript can't infer the type of the `ref` prop when using as="...".
       ref={ref}
+      id={id}
+      as={variant === "link" ? "span" : "button"}
       variant={variant}
-      color={destructive === true ? Color.Error : color}
-      onClick={onClick}
-      data-playwright-testid={playwrightTestId}
+      onClick={click}
       height={computeHeight(p)}
+      data-playwright-testid={playwrightTestId}
       {...pp}
     >
       <Children
         variant={variant}
         size={p.size}
         color={destructive === true ? Color.Error : color}
-        href={p.href}
         loading={p.loading}
         disabled={p.disabled}
         label={p.label}
