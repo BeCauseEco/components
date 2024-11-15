@@ -56,7 +56,13 @@ const Children = (p: Omit<InputButtonProps, "onClick">) => {
 
   if (p.label) {
     if (p.variant === "link" && p.href) {
-      label = <></>
+      label = (
+        <Align horizontal left>
+          <Text small={p.size === "small"} medium={p.size !== "small"} fill={[p.color, 700]}>
+            {p.label}
+          </Text>
+        </Align>
+      )
     } else {
       label = (
         <Align horizontal left>

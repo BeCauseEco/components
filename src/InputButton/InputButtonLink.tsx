@@ -27,7 +27,7 @@ export const InputButtonLink = forwardRef<HTMLAnchorElement, InputButtonLinkProp
     <InputButton
       id={p.id}
       ref={ref}
-      variant="outlined"
+      variant="link"
       size={p.size}
       color={Color.Primary}
       label={p.label}
