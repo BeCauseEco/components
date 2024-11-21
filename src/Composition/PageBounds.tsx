@@ -1,7 +1,7 @@
 import React, { ReactElement } from "react"
 import styled from "@emotion/styled"
 import { TComposition } from "./Composition"
-import { Playwright } from "@new/Playwright"
+import { PlaywrightProps } from "@new/Playwright"
 
 const Container = styled.div({
   display: "flex",
@@ -11,7 +11,7 @@ const Container = styled.div({
   margin: "0 auto",
 })
 
-export type TPageBounds = Playwright & {
+export type TPageBounds = PlaywrightProps & {
   children: ReactElement<TComposition>
 }
 

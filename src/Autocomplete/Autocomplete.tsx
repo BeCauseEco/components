@@ -8,7 +8,7 @@ import { EShadow } from "@new/EShadow"
 import { Size } from "@new/Size"
 import { InputTextSingleProps } from "@new/InputText/InputTextSingle"
 import { Popover } from "@new/Popover/Popover"
-import { Playwright } from "@new/Playwright"
+import { PlaywrightProps } from "@new/Playwright"
 import { forwardRef, PropsWithChildren, ReactElement } from "react"
 import { InputButtonPrimaryProps } from "@new/InputButton/InputButtonPrimary"
 
@@ -16,7 +16,7 @@ const Container = styled.div({
   display: "flex",
 })
 
-export type AutocompleteProps = Playwright & {
+export type AutocompleteProps = PlaywrightProps & {
   input: ReactElement<InputTextSingleProps> | ReactElement<InputButtonPrimaryProps>
   results: ReactElement | ReactElement[]
 

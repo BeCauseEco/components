@@ -8,7 +8,7 @@ import { EAlignment } from "@new/EAlignment"
 import { TBackgroundCard } from "@new/Composition/BackgroundCard"
 import { TLayoutBase } from "@new/Composition/TLayoutBase"
 import { Composition } from "@new/Composition/Composition"
-import { Playwright } from "@new/Playwright"
+import { PlaywrightProps } from "@new/Playwright"
 
 const slideUpAndFade = keyframes({
   from: { opacity: 0, transform: "translateY(2px)" },
@@ -79,7 +79,7 @@ const alignTranslate = (alignment: EAlignment) => {
   }
 }
 
-export type TPopover = Playwright & {
+export type TPopover = PlaywrightProps & {
   // colorArrow: Color
   open?: boolean
   onOpenChange?: (value: boolean) => void

@@ -6,9 +6,9 @@ import React from "react"
 import { Composition } from "@new/Composition/Composition"
 import { LayoutBreadcrumb } from "./internal/LayoutBreadcrumb"
 import { TextProps } from "@new/Text/Text"
-import { Playwright } from "@new/Playwright"
+import { PlaywrightProps } from "@new/Playwright"
 
-export type TBreadcrumb = Playwright & {
+export type TBreadcrumb = PlaywrightProps & {
   color: Color
   omitPadding?: boolean
   children: ReactElement<InputButtonLinkProps | TextProps> | ReactElement<InputButtonLinkProps | TextProps>[]

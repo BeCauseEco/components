@@ -1,7 +1,7 @@
 import styled from "@emotion/styled"
 import * as RadixRadioGroup from "@radix-ui/react-radio-group"
 import { ReactElement, useId } from "react"
-import { Playwright } from "@new/Playwright"
+import { PlaywrightProps } from "@new/Playwright"
 import { InputRadioGroupItemProps } from "@new/InputRadioGroup/InputRadioGroupItem"
 import { Stack } from "@new/Stack/Stack"
 import { Align } from "@new/Align/Align"
@@ -16,7 +16,7 @@ const Root = styled(RadixRadioGroup.Root)<{ marginPosition: "bottom" | "right" }
   },
 }))
 
-export type InputRadioGroupProps = Playwright & {
+export type InputRadioGroupProps = PlaywrightProps & {
   size: "small" | "large"
 
   vertical?: boolean

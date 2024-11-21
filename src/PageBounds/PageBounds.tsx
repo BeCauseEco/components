@@ -1,6 +1,6 @@
 import React, { ReactElement } from "react"
 import styled from "@emotion/styled"
-import { Playwright } from "@new/Playwright"
+import { PlaywrightProps } from "@new/Playwright"
 import { StackProps } from "../Stack/Stack"
 
 const Outer = styled.div({
@@ -16,7 +16,7 @@ const Inner = styled(Outer)({
   padding: "0 calc(var(--BU) * 4)",
 })
 
-export type TPageBounds = Playwright & {
+export type TPageBounds = PlaywrightProps & {
   children: ReactElement<StackProps> | ReactElement<StackProps>[]
 }
 

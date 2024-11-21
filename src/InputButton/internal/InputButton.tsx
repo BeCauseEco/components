@@ -4,7 +4,7 @@ import { Color } from "@new/Color"
 import { Stack } from "@new/Stack/Stack"
 import Link, { LinkProps } from "next/link"
 import React from "react"
-import { Playwright } from "@new/Playwright"
+import { PlaywrightProps } from "@new/Playwright"
 import { Text, TextProps } from "@new/Text/Text"
 import { Align, AlignProps } from "@new/Align/Align"
 import { Icon } from "@new/Icon/Icon"
@@ -83,7 +83,7 @@ const Children = (p: InputButtonProps) => {
     const icon = (
       <Icon
         name={p.iconName}
-        fill={[p.color, p.variant === "solid" ? 50 : 700]}
+        fill={[p.color, p.variant === "solid" || p.variant === "blank" ? 50 : 700]}
         medium={p.size === "small"}
         large={p.size === "large"}
       />
@@ -211,7 +211,7 @@ const Children = (p: InputButtonProps) => {
   }
 }
 
-export type InputButtonProps = Playwright & {
+export type InputButtonProps = PlaywrightProps & {
   id?: string
 
   variant: "link" | "solid" | "outlined" | "transparent" | "blank"

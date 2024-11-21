@@ -1,7 +1,7 @@
 import { PropsWithChildren, forwardRef } from "react"
 import styled from "@emotion/styled"
 import { ColorWithLightness, computeColor } from "@new/Color"
-import { Playwright } from "@new/Playwright"
+import { PlaywrightProps } from "@new/Playwright"
 
 export const StyleMonospace = {
   fontFamily: "monospace",
@@ -96,7 +96,7 @@ const Container = styled.p<TextProps>(p => ({
   ...(!p.wrap && p.huge && { lineHeight: StyleBodyHuge.fontSize }),
 }))
 
-export type TextProps = Playwright & {
+export type TextProps = PlaywrightProps & {
   tiny?: boolean
   xsmall?: boolean
   small?: boolean

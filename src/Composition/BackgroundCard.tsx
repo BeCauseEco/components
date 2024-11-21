@@ -3,7 +3,7 @@ import { EShadow } from "@new/EShadow"
 import { Size } from "@new/Size"
 import styled from "@emotion/styled"
 import { css, Global } from "@emotion/react"
-import { Playwright } from "@new/Playwright"
+import { PlaywrightProps } from "@new/Playwright"
 
 const Container = styled.div<TBackgroundCard>(p => ({
   position: "relative",
@@ -40,7 +40,7 @@ const Container = styled.div<TBackgroundCard>(p => ({
   // }),
 }))
 
-export type TBackgroundCard = Playwright & {
+export type TBackgroundCard = PlaywrightProps & {
   colorBackground?: ColorWithLightness
   colorBackgroundHover?: ColorWithLightness
   colorOutline?: ColorWithLightness

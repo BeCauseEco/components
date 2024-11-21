@@ -4,7 +4,7 @@ import * as RadixCheckbox from "@radix-ui/react-checkbox"
 import { Icon } from "@new/Icon/Icon"
 import { Text } from "@new/Text/Text"
 import { useId } from "react"
-import { Playwright } from "@new/Playwright"
+import { PlaywrightProps } from "@new/Playwright"
 import { Stack } from "@new/Stack/Stack"
 import { Spacer } from "@new/Spacer/Spacer"
 import { Align } from "@new/Align/Align"
@@ -33,7 +33,7 @@ const Label = styled.label({
   cursor: "pointer",
 })
 
-export type InputCheckboxProps = Playwright & {
+export type InputCheckboxProps = PlaywrightProps & {
   size: "small" | "large"
 
   color: Color

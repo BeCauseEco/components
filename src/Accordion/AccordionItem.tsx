@@ -9,7 +9,7 @@ import { ColorWithLightness } from "@new/Color"
 import { BackgroundCard } from "@new/Composition/BackgroundCard"
 import { IconProps } from "@new/Icon/Icon"
 import { EDirection } from "@new/EDirection"
-import { Playwright } from "@new/Playwright"
+import { PlaywrightProps } from "@new/Playwright"
 
 type TContainerProperties = Omit<TAccordionItem, "content" | "label" | "colorHead" | "colorContent">
 
@@ -59,7 +59,7 @@ const Content = styled(Accordion.Content)({
   },
 })
 
-export type TAccordionItem = Playwright & {
+export type TAccordionItem = PlaywrightProps & {
   label: ReactElement<TextProps> | ReactElement<IconProps>
   value: string
   content: ReactElement | ReactElement[] | undefined

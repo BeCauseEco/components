@@ -3,7 +3,7 @@ import { EShadow } from "@new/EShadow"
 import { Size } from "@new/Size"
 import styled from "@emotion/styled"
 import { css, Global } from "@emotion/react"
-import { Playwright } from "@new/Playwright"
+import { PlaywrightProps } from "@new/Playwright"
 
 const calculateBorderRadius = (size?: Size): string => {
   switch (size) {
@@ -56,7 +56,7 @@ const Container = styled.div<TBackground>(p => ({
   // }),
 }))
 
-export type TBackground = Playwright & {
+export type TBackground = PlaywrightProps & {
   colorBackground?: ColorWithLightness
   colorBackgroundHover?: ColorWithLightness
   colorOutline?: ColorWithLightness

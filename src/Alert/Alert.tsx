@@ -10,7 +10,7 @@ import { Size } from "@new/Size"
 import { Spacer } from "@new/Spacer/Spacer"
 import { EShadow } from "@new/EShadow"
 import { TextProps } from "@new/Text/Text"
-import { Playwright } from "@new/Playwright"
+import { PlaywrightProps } from "@new/Playwright"
 import { InputButtonPrimaryProps } from "@new/InputButton/InputButtonPrimary"
 
 const Overlay = styled(RadixAlertDialog.Overlay)({
@@ -32,7 +32,7 @@ const Content = styled(RadixAlertDialog.Content)({
   zIndex: 9999999,
 })
 
-export type TAlertDialog = Playwright & {
+export type TAlertDialog = PlaywrightProps & {
   open: boolean
   title?: ReactElement<TextProps>
   description?: ReactElement<TextProps>

@@ -6,7 +6,7 @@ import { TextProps } from "@new/Text/Text"
 import { KeyValuePair } from "@new/KeyValuePair/KeyValuePair"
 import { EDirection } from "@new/EDirection"
 import { Size } from "@new/Size"
-import { Playwright } from "@new/Playwright"
+import { PlaywrightProps } from "@new/Playwright"
 
 const Container = styled.div({
   display: "flex",
@@ -56,7 +56,7 @@ const Label = styled.label({
   cursor: "pointer",
 })
 
-export type TSwitch = Playwright & {
+export type TSwitch = PlaywrightProps & {
   value: boolean
   onChange: (value: boolean) => void
   colorBackground: Color

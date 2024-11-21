@@ -1,7 +1,7 @@
 import styled from "@emotion/styled"
 import { computeColor } from "@new/Color"
 import { ColorWithLightness } from "@new/Color"
-import { Playwright } from "@new/Playwright"
+import { PlaywrightProps } from "@new/Playwright"
 
 import { PropsWithChildren, ReactElement } from "react"
 
@@ -44,7 +44,7 @@ export enum EMaxheightOptions {
   RadixPopoverContentAvailableHeight = "var(--radix-popover-content-available-height)",
 }
 
-export type TOverflowContainer = Playwright & {
+export type TOverflowContainer = PlaywrightProps & {
   axes: EOverflowContainerAxis
   colorBackground: ColorWithLightness
   colorForeground: ColorWithLightness

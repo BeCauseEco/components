@@ -3,7 +3,7 @@ import { forwardRef, ReactElement, useId, useState } from "react"
 import { Color, computeColor } from "@new/Color"
 import { StyleFontFamily, StyleBodySmall, Text, StyleBodyMedium } from "@new/Text/Text"
 import { Size } from "@new/Size"
-import { Playwright } from "@new/Playwright"
+import { PlaywrightProps } from "@new/Playwright"
 import { Stack } from "@new/Stack/Stack"
 import { Align, AlignProps } from "@new/Align/Align"
 import { Icon } from "@new/Icon/Icon"
@@ -81,7 +81,7 @@ const Label = styled.label({
   cursor: "pointer",
 })
 
-export type InputTextProps = Playwright & {
+export type InputTextProps = PlaywrightProps & {
   size: "small" | "large"
   width: "quarter" | "half" | "full"
 

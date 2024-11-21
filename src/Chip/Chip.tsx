@@ -6,7 +6,7 @@ import { LayoutChip } from "./internal/LayoutChip"
 import { Composition } from "@new/Composition/Composition"
 import { Size } from "@new/Size"
 import styled from "@emotion/styled"
-import { Playwright } from "@new/Playwright"
+import { PlaywrightProps } from "@new/Playwright"
 import { IconProps } from "@new/Icon/Icon"
 import { SpacerProps } from "@new/Spacer/Spacer"
 import { TKeyValuePair } from "@new/KeyValuePair/KeyValuePair"
@@ -18,7 +18,7 @@ const Container = styled.div({
   cursor: "inherit",
 })
 
-export type TChip = Playwright & {
+export type TChip = PlaywrightProps & {
   colorBackground?: ColorWithLightness
   colorOutline?: ColorWithLightness
   children:

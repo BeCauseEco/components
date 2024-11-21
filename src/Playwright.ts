@@ -1,4 +1,4 @@
-export type Playwright = {
+export type PlaywrightProps = {
   /**
    * If defined: outputs attribute: data-playwright-testid={playwrightTestId}
    */

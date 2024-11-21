@@ -3,7 +3,7 @@ import { ReactElement } from "react"
 import { TTableRow } from "@new/Table/TableRow"
 import { Size } from "@new/Size"
 import { ColorWithLightness, computeColor } from "@new/Color"
-import { Playwright } from "@new/Playwright"
+import { PlaywrightProps } from "@new/Playwright"
 
 type TContainerProperties = Omit<TTable, "head" | "body">
 
@@ -41,7 +41,7 @@ const Body = styled.tbody({
   display: "table-row-group",
 })
 
-export type TTable = Playwright & {
+export type TTable = PlaywrightProps & {
   head?: ReactElement<TTableRow>
   body: ReactElement<TTableRow> | ReactElement<TTableRow>[]
   colorBorder: ColorWithLightness

@@ -11,7 +11,7 @@ import { Spacer, SpacerProps } from "@new/Spacer/Spacer"
 import { EShadow } from "@new/EShadow"
 import { TextProps } from "@new/Text/Text"
 // import { Icon } from "@new/Icon/Icon"
-import { Playwright } from "@new/Playwright"
+import { PlaywrightProps } from "@new/Playwright"
 import { InputButtonPrimaryProps } from "@new/InputButton/InputButtonPrimary"
 import { InputButtonSecondaryProps } from "@new/InputButton/InputButtonSecondary"
 import { InputButtonTertiaryProps } from "@new/InputButton/InputButtonTertiary"
@@ -54,7 +54,7 @@ const TitleAndDescription = styled.div({
   justifyContent: "center",
 })
 
-export type TDialog = Playwright & {
+export type TDialog = PlaywrightProps & {
   size: Size.Medium | Size.Huge
   content: ReactElement<TComposition>
   open: boolean

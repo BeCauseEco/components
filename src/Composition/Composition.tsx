@@ -9,7 +9,7 @@ import { TLayoutGrid } from "@new/Composition/LayoutGrid"
 import { TLayoutGridDEPRICATED } from "@new/Composition/LayoutGridDEPRICATED"
 import { TLayoutStack } from "@new/Composition/LayoutStack"
 import { TLayoutBase } from "./TLayoutBase"
-import { Playwright } from "@new/Playwright"
+import { PlaywrightProps } from "@new/Playwright"
 import { computeColor, Color, ColorWithLightness } from "@new/Color"
 import { TBackground } from "./Background"
 
@@ -138,7 +138,7 @@ type TAllowedLayouts =
   | TLayoutStack
   | TLayoutBase
 
-export type TComposition = Playwright & {
+export type TComposition = PlaywrightProps & {
   children: ReactElement<TAllowedLayouts> | [ReactElement<AllowedBackgrounds>, ReactElement<TAllowedLayouts>]
   loading?: boolean
   disabled?: boolean

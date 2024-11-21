@@ -7,7 +7,7 @@ import { LayoutTakeover } from "./internal/LayoutTakeover"
 import styled from "@emotion/styled"
 import { Spacer } from "@new/Spacer/Spacer"
 import { TextProps } from "@new/Text/Text"
-import { Playwright } from "@new/Playwright"
+import { PlaywrightProps } from "@new/Playwright"
 import { InputButtonIconTertiaryProps } from "@new/InputButton/InputButtonIconTertiary"
 import { InputButtonPrimaryProps } from "@new/InputButton/InputButtonPrimary"
 import { InputButtonSecondaryProps } from "@new/InputButton/InputButtonSecondary"
@@ -43,7 +43,7 @@ const RadixDialogClose = styled(RadixDialog.Close)({
   height: "fit-content",
 })
 
-export type TTakeover = Playwright & {
+export type TTakeover = PlaywrightProps & {
   content: ReactElement<TComposition>
   open: boolean
   onOpenChange: (open: boolean) => void

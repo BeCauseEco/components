@@ -4,7 +4,7 @@ import { TextProps } from "@new/Text/Text"
 import styled from "@emotion/styled"
 import * as Tabs from "@radix-ui/react-tabs"
 import { PropsWithChildren, ReactElement, RefAttributes, forwardRef } from "react"
-import { Playwright } from "@new/Playwright"
+import { PlaywrightProps } from "@new/Playwright"
 
 const Trigger = styled(Tabs.Trigger)({
   display: "flex",
@@ -24,7 +24,7 @@ const Trigger = styled(Tabs.Trigger)({
   },
 })
 
-export type TTabsNavigationItem = Playwright & {
+export type TTabsNavigationItem = PlaywrightProps & {
   contentTargetId: string
   children: ReactElement<IconProps | TextProps | SpacerProps> | ReactElement<IconProps | TextProps | SpacerProps>[]
   onClick?: () => void
