@@ -150,6 +150,7 @@ const Children = (p: InputButtonProps) => {
           loading={p.loading}
           disabled={p.disabled}
           aspectRatio={p.iconPlacement === "labelNotSpecified" ? "1" : "auto"}
+          explodeHeight
           hug
         >
           {children}
@@ -167,6 +168,7 @@ const Children = (p: InputButtonProps) => {
           loading={p.loading}
           disabled={p.disabled}
           aspectRatio={p.iconPlacement === "labelNotSpecified" ? "1" : "auto"}
+          explodeHeight
           hug
         >
           {children}
@@ -184,6 +186,23 @@ const Children = (p: InputButtonProps) => {
           loading={p.loading}
           disabled={p.disabled}
           aspectRatio={p.iconPlacement === "labelNotSpecified" ? "1" : "auto"}
+          explodeHeight
+          hug
+        >
+          {children}
+        </Stack>
+      )
+
+    case "blank":
+      return (
+        <Stack
+          horizontal
+          colorLoading={[p.color, 700]}
+          cornerRadius="small"
+          loading={p.loading}
+          disabled={p.disabled}
+          aspectRatio={p.iconPlacement === "labelNotSpecified" ? "1" : "auto"}
+          explodeHeight
           hug
         >
           {children}
@@ -195,7 +214,7 @@ const Children = (p: InputButtonProps) => {
 export type InputButtonProps = Playwright & {
   id?: string
 
-  variant: "link" | "solid" | "outlined" | "transparent"
+  variant: "link" | "solid" | "outlined" | "transparent" | "blank"
 
   size: "small" | "large"
 

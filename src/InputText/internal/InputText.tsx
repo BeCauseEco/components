@@ -5,9 +5,11 @@ import { StyleFontFamily, StyleBodySmall, Text, StyleBodyMedium } from "@new/Tex
 import { Size } from "@new/Size"
 import { Playwright } from "@new/Playwright"
 import { Stack } from "@new/Stack/Stack"
-import { Align } from "@new/Align/Align"
+import { Align, AlignProps } from "@new/Align/Align"
 import { Icon } from "@new/Icon/Icon"
 import { Spacer } from "@new/Spacer/Spacer"
+import { Divider } from "@new/Divider/Divider"
+import { InputButton } from "@new/InputButton/internal/InputButton"
 
 const calculateWidth = (rows: InputTextProps["rows"], width: InputTextProps["width"]) => {
   if (rows !== 1) {
@@ -108,12 +110,12 @@ export const InputText = forwardRef<HTMLInputElement | HTMLTextAreaElement, Inpu
 
   const [focus, setFocus] = useState(false)
 
-  let labelInside: ReactElement = <></>
-  let labelOutside: ReactElement = <></>
-  let hintInside: ReactElement = <></>
-  let hintOutside: ReactElement = <></>
-  let iconStart: ReactElement = <></>
-  let iconEnd: ReactElement = <></>
+  let labelInside: ReactElement<AlignProps> = <></>
+  let labelOutside: ReactElement<AlignProps> = <></>
+  let hintInside: ReactElement<AlignProps> = <></>
+  let hintOutside: ReactElement<AlignProps> = <></>
+  let iconStart: ReactElement<AlignProps> = <></>
+  let iconEnd: ReactElement<AlignProps> = <></>
 
   if (p.label && p.label[1] === "inside") {
     labelInside = (
@@ -211,9 +213,9 @@ export const InputText = forwardRef<HTMLInputElement | HTMLTextAreaElement, Inpu
 
           <Align horizontal left>
             <Output
-              as={p.rows === 1 ? "input" : "textarea"}
               // @ts-expect-error TypeScript can't infer the type of the `ref` prop when using as="...".
               ref={ref}
+              as={p.rows === 1 ? "input" : "textarea"}
               id={key}
               value={p.value}
               rows={p.rows || 1}
@@ -231,6 +233,37 @@ export const InputText = forwardRef<HTMLInputElement | HTMLTextAreaElement, Inpu
               }}
             />
           </Align>
+
+          <Align horizontal center hug="width">
+            <InputButton
+              variant="blank"
+              size={p.size}
+              color={p.color}
+              iconName="clear"
+              iconPlacement="labelNotSpecified"
+              onClick={() => {
+                if (p.onChange) {
+                  p.onChange("")
+                }
+              }}
+            />
+          </Align>
+
+          {p.iconNameRight ? (
+            <>
+              <Align vertical center>
+                <Spacer xsmall />
+
+                <Divider vertical fill={[p.color, 300]} />
+
+                <Spacer xsmall />
+              </Align>
+
+              <Spacer tiny={p.size === "small"} xsmall={p.size === "large"} />
+            </>
+          ) : (
+            <></>
+          )}
 
           {iconEnd}
         </Stack>

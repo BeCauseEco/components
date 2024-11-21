@@ -40,7 +40,7 @@ const Container = styled.div<
 >(p => ({
   display: "flex",
   width: "100%",
-  height: p.explodeHeight ? "100%" : "inherit",
+  height: p.explodeHeight ? "100%" : "auto",
   overflow: p.overflowHidden ? "hidden" : "visible",
   cursor: "inherit",
   position: "relative",

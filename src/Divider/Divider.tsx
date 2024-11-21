@@ -1,21 +1,18 @@
 import styled from "@emotion/styled"
 import { computeColor, ColorWithLightness } from "@new/Color"
-import React from "react"
 
-export type TDivider = {
-  color: ColorWithLightness
+export type DividerProps = {
+  vertical?: boolean
+  horizontal?: boolean
+
+  fill: ColorWithLightness
 }
 
-const Container = styled.div<TDivider>(p => ({
+const Container = styled.div<DividerProps>(p => ({
   display: "flex",
-  width: "100%",
-  height: "1px",
-  backgroundColor: computeColor(p.color),
+  width: p.vertical ? "1px" : "100%",
+  height: p.vertical ? "100%" : "1px",
+  backgroundColor: computeColor(p.fill),
 }))
 
-export const Divider = ({ color }: TDivider) => (
-  <Container
-    // @ts-expect-error color is reserved by styled components, and complains when it's overwritten
-    color={color}
-  />
-)
+export const Divider = (p: DividerProps) => <Container fill={p.fill} vertical={p.vertical} horizontal={p.horizontal} />
