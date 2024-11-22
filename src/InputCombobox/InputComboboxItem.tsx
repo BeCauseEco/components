@@ -5,9 +5,6 @@ import { ReactElement } from "react"
 export type TInputComboboxItem = PlaywrightProps & {
   value: string
   label: string
-  colorBackground: Color
-  colorBackgroundHover: Color
-  colorForeground: Color
   icon?: ReactElement
 }
 

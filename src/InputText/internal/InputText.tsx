@@ -190,7 +190,7 @@ export const InputText = forwardRef<HTMLInputElement | HTMLTextAreaElement, Inpu
   }
 
   return (
-    <Stack vertical>
+    <Stack vertical hug>
       {labelOutside}
 
       {hintOutside}
@@ -238,7 +238,7 @@ export const InputText = forwardRef<HTMLInputElement | HTMLTextAreaElement, Inpu
             <InputButton
               variant="blank"
               size={p.size}
-              color={p.color}
+              colorForeground={p.value ? [p.color, 700] : [Color.Transparent]}
               iconName="clear"
               iconPlacement="labelNotSpecified"
               onClick={() => {
@@ -254,7 +254,7 @@ export const InputText = forwardRef<HTMLInputElement | HTMLTextAreaElement, Inpu
               <Align vertical center>
                 <Spacer xsmall />
 
-                <Divider vertical fill={[p.color, 300]} />
+                <Divider vertical fill={p.value ? [p.color, 300] : [Color.Transparent]} />
 
                 <Spacer xsmall />
               </Align>

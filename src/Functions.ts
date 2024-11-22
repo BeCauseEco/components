@@ -1,8 +1,6 @@
 import React from "react"
 import { ReactElement } from "react"
 
-const check = () => {}
-
 export const containsIlligalChildren = (
   children: ReactElement | ReactElement[] | null,
   allowedTypes: string[],

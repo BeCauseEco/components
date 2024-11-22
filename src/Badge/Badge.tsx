@@ -60,15 +60,19 @@ export const Badge = (p: BadgeProps) => {
   if (p.onClear) {
     button = (
       <Align horizontal right hug="width">
+        <Spacer tiny={p.size === "small"} xsmall={p.size === "large"} />
+
         <InputButton
           variant="blank"
           size={p.size}
-          color={p.color}
+          colorForeground={[p.color, p.variant === "solid" ? 50 : 700]}
           iconName="close"
           iconPlacement="labelNotSpecified"
           onClick={p.onClear}
           hug
         />
+
+        <Spacer xsmall={p.size === "small"} small={p.size === "large"} />
       </Align>
     )
   }

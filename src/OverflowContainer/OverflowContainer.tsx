@@ -15,7 +15,7 @@ const Container = styled.div<
   flexDirection: "inherit",
   width: "100%",
   height: "inherit",
-  padding: p.hug ? 0 : "calc(var(--BU) * 4)",
+  padding: p.hug ? (p.hug === "partly" ? "calc(var(--BU) * 2)" : 0) : "calc(var(--BU) * 4)",
   ...(p.minWidth && { minWidth: p.minWidth }),
   ...(p.maxWidth && { maxWidth: p.maxWidth }),
   ...(p.minHeight && { minHeight: p.minHeight }),
@@ -52,7 +52,7 @@ export type TOverflowContainer = PlaywrightProps & {
   maxWidth?: string
   minHeight?: string
   maxHeight?: EMaxheightOptions | string
-  hug?: boolean
+  hug?: boolean | "partly"
   children: ReactElement | ReactElement[]
   className?: string
 }

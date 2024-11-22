@@ -1,7 +1,7 @@
 import styled from "@emotion/styled"
 import { forwardRef, ReactElement } from "react"
-import { Color } from "@new/Color"
-import { Stack } from "@new/Stack/Stack"
+import { Color, ColorWithLightness, replaceColorComponent } from "@new/Color"
+import { Stack, StackProps } from "@new/Stack/Stack"
 import Link, { LinkProps } from "next/link"
 import React from "react"
 import { PlaywrightProps } from "@new/Playwright"
@@ -19,6 +19,17 @@ const computeHeight = (p: InputButtonProps): string => {
   }
 }
 
+const computeColorDestructive = (
+  colorWithLightness?: ColorWithLightness,
+  destructive?: boolean,
+): ColorWithLightness | undefined => {
+  if (colorWithLightness && colorWithLightness.length === 2) {
+    return replaceColorComponent(colorWithLightness, destructive ? Color.Error : (colorWithLightness[0] as Color))
+  } else {
+    return undefined
+  }
+}
+
 const Output = styled.output<InputButtonProps>(p => ({
   display: "flex",
   border: 0,
@@ -26,7 +37,7 @@ const Output = styled.output<InputButtonProps>(p => ({
   userSelect: "none",
   textDecorationColor: "inherit",
   width: "fit-content",
-  height: computeHeight(p),
+  height: p.hug ? "fit-content" : computeHeight(p),
   lineHeight: 1,
   cursor: "pointer",
 
@@ -59,7 +70,7 @@ const Children = (p: InputButtonProps) => {
     if (p.variant === "link") {
       label = (
         <Align horizontal left>
-          <Text small={p.size === "small"} medium={p.size !== "small"} fill={[p.color, 700]}>
+          <Text small={p.size === "small"} medium={p.size !== "small"} fill={p.colorForeground}>
             {p.label}
           </Text>
         </Align>
@@ -67,11 +78,7 @@ const Children = (p: InputButtonProps) => {
     } else {
       label = (
         <Align horizontal left>
-          <Text
-            small={p.size === "small"}
-            medium={p.size !== "small"}
-            fill={[p.color, p.variant === "solid" ? 50 : 700]}
-          >
+          <Text small={p.size === "small"} medium={p.size !== "small"} fill={p.colorForeground}>
             {p.label}
           </Text>
         </Align>
@@ -81,12 +88,7 @@ const Children = (p: InputButtonProps) => {
 
   if (p.iconName) {
     const icon = (
-      <Icon
-        name={p.iconName}
-        fill={[p.color, p.variant === "solid" || p.variant === "blank" ? 50 : 700]}
-        medium={p.size === "small"}
-        large={p.size === "large"}
-      />
+      <Icon name={p.iconName} fill={p.colorForeground} medium={p.size === "small"} large={p.size === "large"} />
     )
 
     if (p.iconPlacement === "beforeLabel") {
@@ -124,6 +126,9 @@ const Children = (p: InputButtonProps) => {
 
       {iconBeforeLabel}
       {label}
+
+      {p.content}
+
       {iconAfterLabel}
       {iconLabelNotSpecified}
 
@@ -131,83 +136,31 @@ const Children = (p: InputButtonProps) => {
     </>
   )
 
-  switch (p.variant) {
-    case "link":
-      if (p.href) {
-        return <NextLink href={p.href}>{label}</NextLink>
-      } else {
-        return <a onClick={p.onClick}>{label}</a>
-      }
-
-    case "solid":
-      return (
-        <Stack
-          horizontal
-          colorBackground={[p.color, 700]}
-          colorBackgroundHover={[p.color, 800]}
-          colorLoading={[p.color, 50]}
-          cornerRadius="small"
-          loading={p.loading}
-          disabled={p.disabled}
-          aspectRatio={p.iconPlacement === "labelNotSpecified" ? "1" : "auto"}
-          explodeHeight
-          hug
-        >
-          {children}
-        </Stack>
-      )
-
-    case "outlined":
-      return (
-        <Stack
-          horizontal
-          colorOutline={[p.color, 300]}
-          colorBackgroundHover={[p.color, 100]}
-          colorLoading={[p.color, 700]}
-          cornerRadius="small"
-          loading={p.loading}
-          disabled={p.disabled}
-          aspectRatio={p.iconPlacement === "labelNotSpecified" ? "1" : "auto"}
-          explodeHeight
-          hug
-        >
-          {children}
-        </Stack>
-      )
-      break
-
-    case "transparent":
-      return (
-        <Stack
-          horizontal
-          colorBackgroundHover={[p.color, 100]}
-          colorLoading={[p.color, 700]}
-          cornerRadius="small"
-          loading={p.loading}
-          disabled={p.disabled}
-          aspectRatio={p.iconPlacement === "labelNotSpecified" ? "1" : "auto"}
-          explodeHeight
-          hug
-        >
-          {children}
-        </Stack>
-      )
-
-    case "blank":
-      return (
-        <Stack
-          horizontal
-          colorLoading={[p.color, 700]}
-          cornerRadius="small"
-          loading={p.loading}
-          disabled={p.disabled}
-          aspectRatio={p.iconPlacement === "labelNotSpecified" ? "1" : "auto"}
-          explodeHeight
-          hug
-        >
-          {children}
-        </Stack>
-      )
+  if (p.variant === "link") {
+    if (p.href) {
+      return <NextLink href={p.href}>{label}</NextLink>
+    } else {
+      return <a onClick={p.onClick}>{label}</a>
+    }
+  } else {
+    return (
+      <Stack
+        horizontal
+        colorBackground={p.colorBackground}
+        colorBackgroundHover={p.colorBackgroundHover}
+        colorOutline={p.colorOutline}
+        colorOutlineHover={p.colorOutlineHover}
+        colorLoading={p.colorLoading}
+        cornerRadius="small"
+        loading={p.loading}
+        disabled={p.disabled}
+        aspectRatio={p.iconPlacement === "labelNotSpecified" ? "1" : "auto"}
+        explodeHeight
+        hug
+      >
+        {children}
+      </Stack>
+    )
   }
 }
 
@@ -218,7 +171,12 @@ export type InputButtonProps = PlaywrightProps & {
 
   size: "small" | "large"
 
-  color: Color
+  colorForeground: ColorWithLightness
+  colorBackground?: ColorWithLightness
+  colorBackgroundHover?: ColorWithLightness
+  colorOutline?: ColorWithLightness
+  colorOutlineHover?: ColorWithLightness
+  colorLoading?: ColorWithLightness
 
   loading?: boolean
   disabled?: boolean
@@ -234,26 +192,26 @@ export type InputButtonProps = PlaywrightProps & {
   onClick?: () => void
 
   destructive?: boolean
+
+  content?: ReactElement<StackProps> | null | undefined
 }
 
 export const InputButton = forwardRef<HTMLButtonElement | HTMLAnchorElement, InputButtonProps>((p, ref) => {
-  const { id, variant, color, destructive, onClick, playwrightTestId, ...pp } = p
+  const { id, variant, onClick, href, playwrightTestId, ...pp } = p
   const router = useRouter()
 
-  const click = () => {
-    if (p.href) {
-      router.push(p.href)
-    } else if (onClick) {
-      onClick()
+  const click = href
+    ? () => {
+      router.push(href)
     }
-  }
+    : onClick
 
   return (
     <Output
-      // @ts-expect-error TypeScript can't infer the type of the `ref` prop when using as="...".
+      // @ts-expect-error TypeScript can't infer the type of the `ref` prop when using as="..."
       ref={ref}
       id={id}
-      as={variant === "link" ? "span" : "button"}
+      as={variant === "link" ? "span" : "div"} // TO-DO: @cllpse: should render a button, but React is retarded
       variant={variant}
       onClick={click}
       height={computeHeight(p)}
@@ -263,12 +221,18 @@ export const InputButton = forwardRef<HTMLButtonElement | HTMLAnchorElement, Inp
       <Children
         variant={variant}
         size={p.size}
-        color={destructive === true ? Color.Error : color}
         loading={p.loading}
         disabled={p.disabled}
         label={p.label}
         iconName={p.iconName}
         iconPlacement={p.iconPlacement}
+        colorForeground={computeColorDestructive(p.colorForeground, p.destructive) || p.colorForeground}
+        colorBackground={computeColorDestructive(p.colorBackground, p.destructive)}
+        colorBackgroundHover={computeColorDestructive(p.colorBackgroundHover, p.destructive)}
+        colorOutline={computeColorDestructive(p.colorOutline, p.destructive)}
+        colorOutlineHover={computeColorDestructive(p.colorOutlineHover, p.destructive)}
+        colorLoading={p.colorLoading}
+        content={p.content}
         hug={p.hug}
       />
     </Output>

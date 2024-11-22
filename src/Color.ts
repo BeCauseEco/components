@@ -41,23 +41,23 @@ export type Lightness = 50 | 100 | 200 | 300 | 400 | 500 | 600 | 700 | 800 | 900
 export type ColorWithLightness = [Color, Lightness] | [Color.White] | [Color.Transparent] | [THexColor, Lightness]
 
 export const computeColor = (color: ColorWithLightness) => {
-  const baseColor = color[0]
-  const lightness = color[1] || 700
+  const c = color[0]
+  const l = color[1] || 700
 
   try {
-    if (baseColor === Color.Transparent) {
-      return baseColor
+    if (c === Color.Transparent) {
+      return c
     } else {
       const colorsLight = samples(28)
-        .map(interpolate<"oklab">(["#ffffff", baseColor]))
+        .map(interpolate<"oklab">(["#ffffff", c]))
         .map(formatHex)
 
       const colorsMedium = samples(18)
-        .map(interpolate<"oklab">(["#ffffff", baseColor]))
+        .map(interpolate<"oklab">(["#ffffff", c]))
         .map(formatHex)
 
       const colorsDark = samples(8)
-        .map(interpolate<"oklab">([baseColor, "#000000"]))
+        .map(interpolate<"oklab">([c, "#000000"]))
         .map(formatHex)
 
       const combined = [
@@ -74,11 +74,25 @@ export const computeColor = (color: ColorWithLightness) => {
         colorsDark[3],
       ]
 
-      return combined[lightness === 50 ? 0 : lightness / 100]
+      return combined[l === 50 ? 0 : l / 100]
     }
   } catch (e) {
-    throw "Color.ts - missing color* property on component. Run a local build (`yarn build`) to type-check for missing color properties."
+    // eslint-disable-next-line no-console
+    console.error(
+      "Color.ts - missing color* property on component. Run a local build (`yarn build`) to type-check for missing color properties.",
+    )
   }
+}
+
+export const replaceColorComponent = (colorWithLightness: ColorWithLightness, color: Color): ColorWithLightness => {
+  return [color, colorWithLightness[1] || 700]
+}
+
+export const replaceLightnessComponent = (
+  colorWithLightness: ColorWithLightness,
+  lightness: Lightness,
+): ColorWithLightness => {
+  return [colorWithLightness[0], lightness]
 }
 
 export const generateColorPallette = () => {
