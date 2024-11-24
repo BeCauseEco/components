@@ -1,4 +1,3 @@
-import { Color } from "@new/Color"
 import { PlaywrightProps } from "@new/Playwright"
 import { ReactElement } from "react"
 
