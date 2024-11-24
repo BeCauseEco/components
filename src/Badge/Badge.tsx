@@ -99,7 +99,7 @@ export const Badge = (p: BadgeProps) => {
     case "solid":
       return (
         <Container size={p.size} title={p.title}>
-          <Stack horizontal colorBackground={[p.color, 700]} cornerRadius="small" disabled={p.disabled} hug>
+          <Stack horizontal colorBackground={[p.color, 700]} cornerRadius="medium" disabled={p.disabled} hug>
             {children}
           </Stack>
         </Container>
@@ -108,7 +108,7 @@ export const Badge = (p: BadgeProps) => {
     case "outlined":
       return (
         <Container size={p.size} title={p.title}>
-          <Stack horizontal colorOutline={[p.color, 300]} cornerRadius="small" disabled={p.disabled} hug>
+          <Stack horizontal colorOutline={[p.color, 300]} cornerRadius="medium" disabled={p.disabled} hug>
             {children}
           </Stack>
         </Container>
@@ -118,7 +118,7 @@ export const Badge = (p: BadgeProps) => {
     case "transparent":
       return (
         <Container size={p.size} title={p.title}>
-          <Stack horizontal colorBackground={[p.color, 100]} cornerRadius="small" disabled={p.disabled} hug>
+          <Stack horizontal colorBackground={[p.color, 100]} cornerRadius="medium" disabled={p.disabled} hug>
             {children}
           </Stack>
         </Container>

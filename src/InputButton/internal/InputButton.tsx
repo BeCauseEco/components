@@ -151,7 +151,7 @@ const Children = (p: InputButtonProps) => {
         colorOutline={p.colorOutline}
         colorOutlineHover={p.colorOutlineHover}
         colorLoading={p.colorLoading}
-        cornerRadius="small"
+        cornerRadius="medium"
         loading={p.loading}
         disabled={p.disabled}
         aspectRatio={p.iconPlacement === "labelNotSpecified" ? "1" : "auto"}
@@ -202,8 +202,8 @@ export const InputButton = forwardRef<HTMLButtonElement | HTMLAnchorElement, Inp
 
   const click = href
     ? () => {
-      router.push(href)
-    }
+        router.push(href)
+      }
     : onClick
 
   return (

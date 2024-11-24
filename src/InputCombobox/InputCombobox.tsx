@@ -45,18 +45,18 @@ const CommandItemStyled = styled(CommandItem)<{
 
   ...(p.selected &&
     !p.multiple && {
-    ":after": {
-      content: `""`,
-      display: "flex",
-      position: "absolute",
-      width: "calc(var(--BU) * 1.5)",
-      height: "calc(var(--BU) * 1.5)",
-      top: "calc(50% - calc(var(--BU) / 1.5))",
-      left: "0",
-      borderRadius: "var(--BU)",
-      backgroundColor: computeColor(p.colorSelected),
-    },
-  }),
+      ":after": {
+        content: `""`,
+        display: "flex",
+        position: "absolute",
+        width: "calc(var(--BU) * 1.5)",
+        height: "calc(var(--BU) * 1.5)",
+        top: "calc(50% - calc(var(--BU) / 1.5))",
+        left: "0",
+        borderRadius: "var(--BU)",
+        backgroundColor: computeColor(p.colorSelected),
+      },
+    }),
 }))
 
 const CommandEmptyStyled = styled(CommandEmpty)({
@@ -192,9 +192,13 @@ export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<TInput
               size={p.size}
               variant="solid"
               color={Color.Primary}
-              onClear={p.clearable ? () => {
-                handleRemoveItem(item)
-              } : undefined}
+              onClear={
+                p.clearable
+                  ? () => {
+                      handleRemoveItem(item)
+                    }
+                  : undefined
+              }
             />
 
             {visibleItems.length >= index ? <Spacer tiny /> : null}
@@ -239,7 +243,7 @@ export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<TInput
         key={index}
         multiple={p.multiple}
         value={item.label}
-        onSelect={value => (p.multiple ? () => { } : onSelectSingle(value))}
+        onSelect={value => (p.multiple ? () => {} : onSelectSingle(value))}
         selected={p.multiple ? (p.value as string[]).includes(item.value) : p.value === item.value}
         colorSelected={[Color.Primary, 400]}
         colorBackgroundHover={[Color.Primary, 100]}
@@ -337,7 +341,7 @@ export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<TInput
     <Container ref={ref} id={p.id} data-playwright-testid={p.playwrightTestId}>
       <Popover
         open={p.disabled || p.loading ? false : open}
-        onOpenChange={p.disabled || p.loading ? () => { } : setOpen}
+        onOpenChange={p.disabled || p.loading ? () => {} : setOpen}
         alignment={EAlignment.Start}
         trigger={
           <InputButton
