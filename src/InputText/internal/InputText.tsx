@@ -12,18 +12,20 @@ import { Divider } from "@new/Divider/Divider"
 import { InputButton } from "@new/InputButton/internal/InputButton"
 
 const calculateWidth = (rows: InputTextProps["rows"], width: InputTextProps["width"]) => {
-  if (rows !== 1) {
-    return "calc(100% - 1px)"
-  }
+  return "calc(100% - 1px)"
 
-  switch (width) {
-    case "quarter":
-      return "25%"
-    case "half":
-      return "50%"
-    case "full":
-      return "calc(100% - 1px)"
-  }
+  // if (rows !== 1) {
+  //   return "calc(100% - 1px)"
+  // }
+
+  // switch (width) {
+  //   case "quarter":
+  //     return "25%"
+  //   case "half":
+  //     return "50%"
+  //   default:
+  //     return "calc(100% - 1px)"
+  // }
 }
 
 const Output = styled.output<Pick<InputTextProps, "color" | "size" | "rows" | "width"> & { focus: boolean }>(p => ({
@@ -200,7 +202,7 @@ export const InputText = forwardRef<HTMLInputElement | HTMLTextAreaElement, Inpu
           horizontal
           colorOutline={[p.color, 700]}
           colorOutlineHover={focus ? [p.color, 700] : [p.color, 900]}
-          colorBackground={[focus ? p.color : Color.Transparent, 50]}
+          colorBackground={[focus ? p.color : Color.Transparent, 100]}
           cornerRadius="medium"
           disabled={p.disabled}
           loading={p.loading}

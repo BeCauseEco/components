@@ -348,7 +348,7 @@ export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<TInput
             size={p.size}
             variant="outlined"
             colorForeground={[Color.Primary, 700]}
-            colorOutline={[Color.Primary, 300]}
+            colorOutline={[Color.Primary, 700]}
             colorBackgroundHover={[Color.Primary, 100]}
             colorLoading={[Color.Primary, 700]}
             iconName={open ? "keyboard_arrow_up" : "keyboard_arrow_down"}
@@ -370,7 +370,7 @@ export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<TInput
             }
           />
         }
-        background={<BackgroundCard colorBackground={[Color.White]} shadow={EShadow.Medium} borderRadius={Size.Tiny} />}
+        background={<BackgroundCard colorBackground={[Color.White]} shadow={EShadow.Large} borderRadius={Size.Tiny} />}
         layout={
           <LayoutCombobox
             contentTop={

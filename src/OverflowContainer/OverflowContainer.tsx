@@ -20,8 +20,8 @@ const Container = styled.div<
   ...(p.maxWidth && { maxWidth: p.maxWidth }),
   ...(p.minHeight && { minHeight: p.minHeight }),
   ...(p.maxHeight !== undefined && { maxHeight: p.maxHeight }),
-  overflowX: p.axes === EOverflowContainerAxis.Both || p.axes === EOverflowContainerAxis.Horizontal ? "auto" : "hidden",
-  overflowY: p.axes === EOverflowContainerAxis.Both || p.axes === EOverflowContainerAxis.Vertical ? "auto" : "hidden",
+  overflowX: p.axes === "both" || p.axes === "horizontal" ? "auto" : "hidden",
+  overflowY: p.axes === "both" || p.axes === "vertical" ? "auto" : "hidden",
 
   "::-webkit-scrollbar-track": {
     backgroundColor: computeColor(p.colorBackground),
@@ -33,19 +33,13 @@ const Container = styled.div<
   },
 }))
 
-export enum EOverflowContainerAxis {
-  Vertical,
-  Horizontal,
-  Both,
-}
-
 export enum EMaxheightOptions {
   RadixAccordionContentHeight = "var(--radix-accordion-content-height)",
   RadixPopoverContentAvailableHeight = "var(--radix-popover-content-available-height)",
 }
 
 export type TOverflowContainer = PlaywrightProps & {
-  axes: EOverflowContainerAxis
+  axes: "vertical" | "horizontal" | "both"
   colorBackground: ColorWithLightness
   colorForeground: ColorWithLightness
   minWidth?: string
