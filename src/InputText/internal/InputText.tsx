@@ -11,6 +11,7 @@ import { Spacer } from "@new/Spacer/Spacer"
 import { Divider } from "@new/Divider/Divider"
 import { InputButton } from "@new/InputButton/internal/InputButton"
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const calculateWidth = (rows: InputTextProps["rows"], width: InputTextProps["width"]) => {
   return "calc(100% - 1px)"
 
