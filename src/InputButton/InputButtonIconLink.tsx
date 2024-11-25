@@ -17,6 +17,7 @@ export const InputButtonIconLink = forwardRef<HTMLButtonElement, InputButtonIcon
       ref={ref}
       variant="link"
       size={p.size}
+      width="auto"
       colorForeground={[Color.Quarternary, 700]}
       hug={p.hug}
       loading={p.loading}

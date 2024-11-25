@@ -86,7 +86,7 @@ const Label = styled.label({
 
 export type InputTextProps = PlaywrightProps & {
   size: "small" | "large"
-  width: "quarter" | "half" | "full"
+  width: "auto" | "quarter" | "half" | "full"
 
   rows: 1 | 2 | 3
 
@@ -240,6 +240,7 @@ export const InputText = forwardRef<HTMLInputElement | HTMLTextAreaElement, Inpu
           <Align horizontal center hug="width">
             <InputButton
               variant="blank"
+              width="auto"
               size={p.size}
               colorForeground={p.value ? [p.color, 700] : [Color.Transparent]}
               iconName="clear"

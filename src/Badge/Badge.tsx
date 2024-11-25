@@ -64,6 +64,7 @@ export const Badge = (p: BadgeProps) => {
 
         <InputButton
           variant="blank"
+          width="auto"
           size={p.size}
           colorForeground={[p.color, p.variant === "solid" ? 50 : 700]}
           iconName="close"

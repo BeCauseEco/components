@@ -4,7 +4,7 @@ import { Color } from "@new/Color"
 
 export type InputButtonPrimaryProps = Pick<
   InputButtonProps,
-  "id" | "size" | "hug" | "loading" | "disabled" | "onClick" | "href" | "destructive" | "playwrightTestId"
+  "id" | "size" | "width" | "hug" | "loading" | "disabled" | "onClick" | "href" | "destructive" | "playwrightTestId"
 > & {
   label: string
   iconNameLeft?: string
@@ -29,6 +29,7 @@ export const InputButtonPrimary = forwardRef<HTMLButtonElement, InputButtonPrima
       ref={ref}
       variant="solid"
       size={p.size}
+      width={p.width}
       colorForeground={[Color.Primary, 50]}
       colorBackground={[Color.Primary, 700]}
       colorBackgroundHover={[Color.Primary, 800]}

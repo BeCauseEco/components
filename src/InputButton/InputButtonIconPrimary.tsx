@@ -16,6 +16,7 @@ export const InputButtonIconPrimary = forwardRef<HTMLButtonElement, InputButtonI
       ref={ref}
       variant="solid"
       size={p.size}
+      width="auto"
       colorForeground={[Color.Primary, 50]}
       colorBackground={[Color.Primary, 700]}
       colorBackgroundHover={[Color.Primary, 800]}

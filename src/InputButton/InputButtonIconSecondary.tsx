@@ -16,6 +16,7 @@ export const InputButtonIconSecondary = forwardRef<HTMLButtonElement, InputButto
       ref={ref}
       variant="outlined"
       size={p.size}
+      width="auto"
       colorForeground={[Color.Primary, 700]}
       colorOutline={[Color.Primary, 300]}
       colorBackgroundHover={[Color.Primary, 100]}

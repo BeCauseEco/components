@@ -36,7 +36,7 @@ const Output = styled.output<InputButtonProps>(p => ({
   background: "none",
   userSelect: "none",
   textDecorationColor: "inherit",
-  width: "fit-content",
+  width: p.width === "auto" ? "fit-content" : p.width === "half" ? "50%" : "100%",
   height: p.hug ? "fit-content" : computeHeight(p),
   lineHeight: 1,
   cursor: "pointer",
@@ -60,7 +60,7 @@ const NextLink = styled(Link)({
   textDecoration: "none",
 })
 
-const Children = (p: InputButtonProps) => {
+const Children = (p: Omit<InputButtonProps, "width">) => {
   let label: ReactElement<TextProps | AlignProps> | null = null
   let iconBeforeLabel: ReactElement<AlignProps> | null = null
   let iconAfterLabel: ReactElement | null = null
@@ -171,6 +171,8 @@ export type InputButtonProps = PlaywrightProps & {
 
   size: "small" | "large"
 
+  width: "auto" | "half" | "full"
+
   colorForeground: ColorWithLightness
   colorBackground?: ColorWithLightness
   colorBackgroundHover?: ColorWithLightness
@@ -197,7 +199,7 @@ export type InputButtonProps = PlaywrightProps & {
 }
 
 export const InputButton = forwardRef<HTMLButtonElement | HTMLAnchorElement, InputButtonProps>((p, ref) => {
-  const { id, variant, onClick, href, playwrightTestId, ...pp } = p
+  const { id, variant, onClick, href, playwrightTestId, width, ...pp } = p
   const router = useRouter()
 
   const click = href
@@ -214,6 +216,7 @@ export const InputButton = forwardRef<HTMLButtonElement | HTMLAnchorElement, Inp
       as={variant === "link" ? "span" : "div"} // TO-DO: @cllpse: should render a button, but React is retarded
       variant={variant}
       onClick={click}
+      width={width}
       height={computeHeight(p)}
       data-playwright-testid={playwrightTestId}
       {...pp}

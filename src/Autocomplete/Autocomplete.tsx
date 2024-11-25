@@ -14,6 +14,7 @@ import { InputButtonPrimaryProps } from "@new/InputButton/InputButtonPrimary"
 
 const Container = styled.div({
   display: "flex",
+  width: "100%",
 })
 
 export type AutocompleteProps = PlaywrightProps & {

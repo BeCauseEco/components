@@ -346,6 +346,7 @@ export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<TInput
         trigger={
           <InputButton
             size={p.size}
+            width="full"
             variant="outlined"
             colorForeground={[Color.Primary, 700]}
             colorOutline={[Color.Primary, 700]}
