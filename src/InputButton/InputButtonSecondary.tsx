@@ -13,7 +13,7 @@ export type InputButtonSecondaryProps = Pick<
 
 export const InputButtonSecondary = forwardRef<HTMLButtonElement, InputButtonSecondaryProps>((p, ref) => {
   const iconName = p.iconNameLeft || p.iconNameRight
-  let iconPlacement: InputButtonProps["iconPlacement"] = "labelNotSpecified"
+  let iconPlacement: InputButtonProps["iconPlacement"] = "beforeLabel"
 
   if (p.iconNameLeft) {
     iconPlacement = "beforeLabel"
@@ -32,7 +32,7 @@ export const InputButtonSecondary = forwardRef<HTMLButtonElement, InputButtonSec
       size={p.size}
       width={p.width}
       colorForeground={[Color.Primary, 700]}
-      colorOutline={[Color.Primary, 300]}
+      colorOutline={[Color.Primary, 700]}
       colorBackgroundHover={[Color.Primary, 100]}
       colorLoading={[Color.Primary, 700]}
       label={p.label}

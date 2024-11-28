@@ -49,10 +49,8 @@ const Container = styled.div<
   backgroundColor: computeColor(p.colorBackground || [Color.Transparent]),
   transition: "background-color 0.1s ease-in-out",
   willChange: "background-color",
-
-  ...(p.aspectRatio && {
-    aspectRatio: p.aspectRatio,
-  }),
+  aspectRatio: p.aspectRatio || "auto",
+  content: `'${p.aspectRatio}'`,
 
   outlineOffset: -1,
 

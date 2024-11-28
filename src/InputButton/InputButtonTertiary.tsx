@@ -13,7 +13,7 @@ export type InputButtonTertiaryProps = Pick<
 
 export const InputButtonTertiary = forwardRef<HTMLButtonElement, InputButtonTertiaryProps>((p, ref) => {
   const iconName = p.iconNameLeft || p.iconNameRight
-  let iconPlacement: InputButtonProps["iconPlacement"] = "labelNotSpecified"
+  let iconPlacement: InputButtonProps["iconPlacement"] = "beforeLabel"
 
   if (p.iconNameLeft) {
     iconPlacement = "beforeLabel"

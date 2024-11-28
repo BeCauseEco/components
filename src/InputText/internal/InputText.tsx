@@ -207,9 +207,9 @@ export const InputText = forwardRef<HTMLInputElement | HTMLTextAreaElement, Inpu
       <Align horizontal left>
         <Stack
           horizontal
-          colorOutline={[p.color, 700]}
-          colorOutlineHover={focus ? [p.color, 700] : [p.color, 900]}
-          colorBackground={[focus ? p.color : Color.White, 50]}
+          colorOutline={p.disabled ? [p.color, 100] : [p.color, 300]}
+          colorOutlineHover={p.disabled ? [p.color, 100] : focus ? [p.color, 700] : [p.color, 700]}
+          colorBackground={p.disabled ? [p.color, 50] : [focus ? p.color : Color.White, 50]}
           cornerRadius="medium"
           disabled={p.disabled}
           loading={p.loading}

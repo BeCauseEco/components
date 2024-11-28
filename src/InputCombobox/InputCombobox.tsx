@@ -142,9 +142,9 @@ export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<InputC
         return (
           <Badge
             size={p.size}
-            variant="solid"
+            variant={p.disabled ? "opaque" : "solid"}
             label={selectedItem.label}
-            color={Color.Quarternary}
+            color={p.disabled ? p.color : Color.Primary}
             onClear={() => {
               p.onChange("")
             }}
@@ -189,8 +189,8 @@ export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<InputC
               key={index}
               label={item}
               size={p.size}
-              variant="solid"
-              color={Color.Quarternary}
+              variant={p.disabled ? "opaque" : "solid"}
+              color={p.disabled ? p.color : Color.Primary}
               onClear={
                 p.clearable
                   ? () => {
@@ -209,8 +209,8 @@ export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<InputC
             key={remainingCount}
             label={`+${remainingCount}`}
             size={p.size}
-            variant="solid"
-            color={Color.Quarternary}
+            variant={p.disabled ? "opaque" : "solid"}
+            color={p.disabled ? p.color : Color.Primary}
           />
         )}
       </>
@@ -264,7 +264,7 @@ export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<InputC
                 size={p.size}
                 value={p.multiple ? (p.value as string[]).includes(item.value) : p.value === item.value}
                 onChange={value => onSelectMultiple(item.value, value)}
-                color={p.color}
+                color={Color.Primary}
                 label={item.label}
               />
             </Align>
@@ -348,9 +348,9 @@ export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<InputC
             width="full"
             variant="outlined"
             colorForeground={[p.color, 700]}
-            colorOutline={[p.color, 700]}
-            colorBackground={[Color.White, 700]}
-            colorBackgroundHover={[p.color, 50]}
+            colorOutline={p.disabled ? [p.color, 100] : [p.color, 300]}
+            colorOutlineHover={p.disabled ? [p.color, 100] : [p.color, 700]}
+            colorBackground={p.disabled ? [p.color, 50] : [p.color, 50]}
             colorLoading={[p.color, 700]}
             iconName={open ? "keyboard_arrow_up" : "keyboard_arrow_down"}
             iconPlacement="afterLabel"

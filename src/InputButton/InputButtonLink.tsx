@@ -13,7 +13,7 @@ export type InputButtonLinkProps = Pick<
 
 export const InputButtonLink = forwardRef<HTMLAnchorElement, InputButtonLinkProps>((p, ref) => {
   const iconName = p.iconNameLeft || p.iconNameRight
-  let iconPlacement: InputButtonProps["iconPlacement"] = "labelNotSpecified"
+  let iconPlacement: InputButtonProps["iconPlacement"] = "beforeLabel"
 
   if (p.iconNameLeft) {
     iconPlacement = "beforeLabel"
