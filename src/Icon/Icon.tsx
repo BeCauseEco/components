@@ -45,7 +45,7 @@ const computeSize = (p: IconProps) => {
 const computeStyle = (p: IconProps) => {
   // console.log("computeStyle", p)
 
-  return "1"
+  return p.style === "outlined" ? "0" : "1"
 }
 
 const computeFontVariantSettings = (p: IconProps) => {
@@ -69,14 +69,14 @@ const computeFontVariantSettings = (p: IconProps) => {
   return `'FILL' ${computeStyle(p)}, 'wght' ${w}, 'GRAD' ${g}, 'opsz' 48`
 }
 
-const Container = styled.i<Pick<IconProps, "fill"> & { size: string; fontVariationSettings: string }>(p => ({
+const Container = styled.i<{ size: string; fontVariationSettings: string; _fill: IconProps["fill"] }>(p => ({
   display: "flex !important",
   flexShrink: 0,
   width: "fit-content",
   height: p.size,
   lineHeight: `${p.size} !important`,
-  fontSize: `${p.size} !important`,
-  color: computeColor(p.fill),
+  fontSize: `calc(${p.size} * 0.875) !important`,
+  color: computeColor(p._fill),
   "font-variation-settings": p.fontVariationSettings,
   userSelect: "none",
 }))
@@ -101,10 +101,10 @@ export type IconProps = PlaywrightProps & {
 
 export const Icon = (p: IconProps) => (
   <Container
+    className="<Icon /> - material-symbols-rounded"
     size={computeSize(p)}
     fontVariationSettings={computeFontVariantSettings(p)}
-    fill={p.fill as any}
-    className="material-symbols-rounded"
+    _fill={p.fill}
     onClick={p.onClick}
     data-playwright-testid={p.playwrightTestId}
   >

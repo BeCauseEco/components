@@ -4,22 +4,17 @@ import { ReactElement } from "react"
 import { PlaywrightProps } from "@new/Playwright"
 import { InputRadioGroupItemProps } from "@new/InputRadioGroup/InputRadioGroupItem"
 import { Stack } from "@new/Stack/Stack"
-import { Align } from "@new/Align/Align"
+import { Align } from "@new/Stack/Align"
 import { Color } from "@new/Color"
 import { Icon } from "@new/Icon/Icon"
-import { Spacer } from "@new/Spacer/Spacer"
+import { Spacer } from "@new/Stack/Spacer"
 import { Text } from "@new/Text/Text"
 import React from "react"
 
-const Root = styled(RadixRadioGroup.Root)<{ marginPosition: "bottom" | "right" }>(p => ({
+const Root = styled(RadixRadioGroup.Root)({
   display: "flex",
   flexDirection: "inherit",
-
-  "& > *:not(:last-child)": {
-    ...(p.marginPosition === "bottom" && { marginBottom: "var(--BU)" }),
-    ...(p.marginPosition === "right" && { marginRight: "calc(var(--BU) * 4)" }),
-  },
-}))
+})
 
 const Item = styled(RadixRadioGroup.Item)({
   all: "unset",
@@ -27,6 +22,8 @@ const Item = styled(RadixRadioGroup.Item)({
   flexDirection: "row",
   position: "relative",
   cursor: "pointer",
+  padding: 0,
+  height: "fit-content",
 
   "&:focus": {
     // boxShadow: "0 0 0 2px currentColor",
@@ -57,39 +54,48 @@ export type InputRadioGroupProps = PlaywrightProps & {
 export const InputRadioGroup = (p: InputRadioGroupProps) => {
   const items: ReactElement[] = []
 
+  let i = 0
+
   React.Children.forEach(p.children, child => {
+    i = i + 1
+
     if (React.isValidElement(child)) {
+      const renderSpacer = React.Children.count(p.children) > i && p.size === "large"
+
       items.push(
-        <Align horizontal left hug>
-          <Item id={child.props.value} value={child.props.value}>
-            {p.value === child.props.value ? (
-              <Icon name="radio_button_checked" large fill={[p.color, 700]} />
-            ) : (
-              <Icon name="radio_button_unchecked" large fill={[p.color, 700]} />
-            )}
-          </Item>
+        <>
+          <Align horizontal left hug>
+            <Item id={child.props.value} value={child.props.value}>
+              {p.value === child.props.value ? (
+                <Icon name="radio_button_checked" large fill={[p.color, 700]} />
+              ) : (
+                <Icon name="radio_button_unchecked" large style="outlined" fill={[p.color, 300]} />
+              )}
+            </Item>
 
-          <Spacer tiny />
+            <Spacer tiny={p.size === "small"} xsmall={p.size === "large"} />
 
-          <Label htmlFor={child.props.value}>
-            <Text small={p.size === "small"} medium={p.size !== "small"} fill={[p.color, 700]}>
-              {child.props.label}
-            </Text>
-          </Label>
-        </Align>,
+            <Label htmlFor={child.props.value}>
+              <Text xsmall={p.size === "small"} small={p.size !== "small"} fill={[p.color, 700]}>
+                {child.props.label}
+              </Text>
+            </Label>
+          </Align>
+
+          {renderSpacer && <Spacer tiny />}
+        </>,
       )
     }
   })
 
   return (
-    <Stack vertical playwrightTestId={p.playwrightTestId} hug>
+    <Stack vertical playwrightTestId={p.playwrightTestId} hug className="<InputRadioGroup /> -">
       <Align hug left vertical>
         <Root
           defaultValue={p.defaultValue}
           value={p.value}
           onValueChange={p.onChange}
           data-playwright-test-id={p.playwrightTestId}
-          marginPosition={p["vertical"] && !p["horizontal"] ? "bottom" : "right"}
         >
           <Stack vertical hug>
             {items}

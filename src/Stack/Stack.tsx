@@ -1,13 +1,13 @@
 import React, { ReactElement } from "react"
 import styled from "@emotion/styled"
-import { AlignProps } from "@new/Align/Align"
+import { AlignProps } from "@new/Stack/Align"
 // import { containsIlligalChildren } from "@new/Functions"
 import { computeColor, Color, ColorWithLightness } from "@new/Color"
-import { TLayoutBase } from "@new/Composition/TLayoutBase"
+import { ComponentBaseProps } from "@new/ComponentBaseProps"
 import { Loader } from "./internal/Loader"
 import { Spinner } from "./internal/Spinner"
 import { GridProps } from "@new/Grid/Grid"
-import { SpacerProps } from "@new/Spacer/Spacer"
+import { SpacerProps } from "@new/Stack/Spacer"
 
 const translateBorderRadius = (cornerRadius: StackProps["cornerRadius"]): string => {
   switch (cornerRadius) {
@@ -39,6 +39,7 @@ const Container = styled.div<
   >
 >(p => ({
   display: "flex",
+  flexShrink: 1,
   width: "100%",
   height: p.explodeHeight ? "100%" : "auto",
   overflow: p.overflowHidden ? "hidden" : "visible",
@@ -106,7 +107,7 @@ const Children = styled.div<Pick<StackProps, "loading" | "disabled" | "hug"> & {
   }),
 )
 
-export type StackProps = TLayoutBase & {
+export type StackProps = ComponentBaseProps & {
   vertical?: boolean
   horizontal?: boolean
 
@@ -140,9 +141,8 @@ export const Stack = (p: StackProps) => {
 
   return (
     <Container
-      data-stack="true"
+      className={p.className || "<Stack /> - "}
       data-playwright-testid={p.playwrightTestId}
-      className="STACK layout-container"
       colorBackground={p.colorBackground}
       colorBackgroundHover={p.colorBackgroundHover}
       colorOutline={p.colorOutline}
@@ -152,11 +152,12 @@ export const Stack = (p: StackProps) => {
       cornerRadius={p.cornerRadius}
       aspectRatio={p.aspectRatio}
     >
-      <Loader loading={p.loading}>
+      <Loader className="<Stack: loader />" loading={p.loading}>
         <Spinner colorLoading={p.colorLoading} loading={p.loading} />
       </Loader>
 
       <Children
+        className="<Stack: children />"
         flexDirection={p["horizontal"] && !p["vertical"] ? "row" : "column"}
         hug={p.hug}
         disabled={p.disabled}

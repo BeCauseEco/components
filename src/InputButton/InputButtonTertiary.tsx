@@ -25,6 +25,7 @@ export const InputButtonTertiary = forwardRef<HTMLButtonElement, InputButtonTert
 
   return (
     <InputButton
+      className="<InputButtonTertiary /> -"
       id={p.id}
       ref={ref}
       variant="transparent"

@@ -12,7 +12,7 @@ const Outer = styled.div({
 })
 
 const Inner = styled(Outer)({
-  maxWidth: "1024px",
+  maxWidth: "1280px",
   padding: "0 calc(var(--BU) * 4)",
 })
 
@@ -21,7 +21,10 @@ export type TPageBounds = PlaywrightProps & {
 }
 
 export const PageBounds = ({ children, playwrightTestId }: TPageBounds) => (
-  <Outer className="component-page_bounds component-composition-reset" data-playwright-testid={playwrightTestId}>
-    <Inner>{children}</Inner>
+  <Outer
+    className="<PageBounds /> - component-page_bounds component-composition-reset"
+    data-playwright-testid={playwrightTestId}
+  >
+    <Inner className="<PageBounds: children /> - ">{children}</Inner>
   </Outer>
 )

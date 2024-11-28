@@ -6,7 +6,7 @@ import { samples, interpolate, formatHex } from "culori"
 export type THexColor = `#${string}`
 
 export enum Color {
-  Black = "#000000",
+  Black = "#333333",
   White = "#FFFFFF",
   Transparent = "#FFFFFF00",
   Primary = "#4E4073",

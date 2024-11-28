@@ -1,6 +1,6 @@
 import React, { ReactElement } from "react"
 import styled from "@emotion/styled"
-import { AlignProps } from "@new/Align/Align"
+import { AlignProps } from "@new/Stack/Align"
 import { TLayoutBase } from "./TLayoutBase"
 import { EDirection } from "@new/EDirection"
 import { containsIlligalChildren } from "@new/Functions"

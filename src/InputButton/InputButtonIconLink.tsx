@@ -13,6 +13,7 @@ export type InputButtonIconLinkProps = Pick<
 export const InputButtonIconLink = forwardRef<HTMLButtonElement, InputButtonIconLinkProps>((p, ref) => {
   return (
     <InputButton
+      className="<InputButtonIconLink /> -"
       id={p.id}
       ref={ref}
       variant="link"

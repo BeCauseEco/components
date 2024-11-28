@@ -25,6 +25,7 @@ export const InputButtonPrimary = forwardRef<HTMLButtonElement, InputButtonPrima
 
   return (
     <InputButton
+      className="<InputButtonPrimary /> -"
       id={p.id}
       ref={ref}
       variant="solid"

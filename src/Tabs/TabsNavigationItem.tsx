@@ -1,5 +1,5 @@
 import { IconProps } from "@new/Icon/Icon"
-import { SpacerProps } from "@new/Spacer/Spacer"
+import { SpacerProps } from "@new/Stack/Spacer"
 import { TextProps } from "@new/Text/Text"
 import styled from "@emotion/styled"
 import * as Tabs from "@radix-ui/react-tabs"

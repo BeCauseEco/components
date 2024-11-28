@@ -6,8 +6,8 @@ import { Text } from "@new/Text/Text"
 import { useId } from "react"
 import { PlaywrightProps } from "@new/Playwright"
 import { Stack } from "@new/Stack/Stack"
-import { Spacer } from "@new/Spacer/Spacer"
-import { Align } from "@new/Align/Align"
+import { Spacer } from "@new/Stack/Spacer"
+import { Align } from "@new/Stack/Align"
 
 const Container = styled.div({
   display: "flex",
@@ -49,7 +49,7 @@ export const InputCheckbox = (p: InputCheckboxProps) => {
   const key = useId()
 
   return (
-    <Container>
+    <Container className="<InputCheckbox /> -">
       <Stack horizontal hug>
         <Align horizontal left hug>
           <Root id={key} checked={p.value} onCheckedChange={checked => p.onChange(checked === true)}>
@@ -57,15 +57,15 @@ export const InputCheckbox = (p: InputCheckboxProps) => {
 
             {p.value === true && <Icon name="check_box" large fill={[p.color, 700]} />}
 
-            {p.value === false && <Icon name="check_box_outline_blank" large fill={[p.color, 700]} />}
+            {p.value === false && <Icon name="check_box_outline_blank" large style="outlined" fill={[p.color, 300]} />}
           </Root>
 
           {p.label && (
             <>
-              <Spacer tiny />
+              <Spacer tiny={p.size === "small"} xsmall={p.size === "large"} />
 
               <Label htmlFor={key}>
-                <Text small={p.size === "small"} medium={p.size !== "small"} fill={[p.color, 700]}>
+                <Text xsmall={p.size === "small"} small={p.size !== "small"} fill={[Color.Black, 700]}>
                   {p.label}
                 </Text>
               </Label>

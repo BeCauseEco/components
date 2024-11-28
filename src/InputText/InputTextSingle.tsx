@@ -21,9 +21,10 @@ export type InputTextSingleProps = Pick<
 export const InputTextSingle = forwardRef<HTMLInputElement, InputTextSingleProps>((p, ref) => {
   return (
     <InputText
+      className="<InputTextSingle /> -"
       ref={ref}
       size={p.size}
-      color={Color.Primary}
+      color={p.color}
       label={p.label}
       loading={p.loading}
       onChange={p.onChange}
@@ -34,7 +35,7 @@ export const InputTextSingle = forwardRef<HTMLInputElement, InputTextSingleProps
       rows={1}
       disabled={p.disabled}
       value={p.value}
-      width="half"
+      width="auto"
     />
   )
 })

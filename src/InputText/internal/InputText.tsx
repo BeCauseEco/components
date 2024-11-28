@@ -1,15 +1,15 @@
 import styled from "@emotion/styled"
 import { forwardRef, ReactElement, useId, useState } from "react"
 import { Color, computeColor } from "@new/Color"
-import { StyleFontFamily, StyleBodySmall, Text, StyleBodyMedium } from "@new/Text/Text"
+import { StyleFontFamily, StyleBodySmall, Text, StyleBodyXsmall } from "@new/Text/Text"
 import { Size } from "@new/Size"
-import { PlaywrightProps } from "@new/Playwright"
 import { Stack } from "@new/Stack/Stack"
-import { Align, AlignProps } from "@new/Align/Align"
+import { Align, AlignProps } from "@new/Stack/Align"
 import { Icon } from "@new/Icon/Icon"
-import { Spacer } from "@new/Spacer/Spacer"
+import { Spacer } from "@new/Stack/Spacer"
 import { Divider } from "@new/Divider/Divider"
 import { InputButton } from "@new/InputButton/internal/InputButton"
+import { ComponentBaseProps } from "@new/ComponentBaseProps"
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const calculateWidth = (rows: InputTextProps["rows"], width: InputTextProps["width"]) => {
@@ -44,7 +44,10 @@ const Output = styled.output<Pick<InputTextProps, "color" | "size" | "rows" | "w
     marginBottom: "1px",
   }),
 
-  padding: p.rows === 1 ? "0 calc(var(--BU) * 2)" : "calc(var(--BU) * 2)",
+  padding:
+    p.rows === 1
+      ? `0 calc(var(--BU) * ${p.size === "small" ? 2 : 3})`
+      : `calc(var(--BU) * ${p.size === "small" ? 2 : 3})`,
   resize: "none",
   color: computeColor([p.color, 700]),
   border: "none",
@@ -67,7 +70,7 @@ const Output = styled.output<Pick<InputTextProps, "color" | "size" | "rows" | "w
   }),
 
   ...StyleFontFamily,
-  ...(p.size === "small" ? StyleBodySmall : StyleBodyMedium),
+  ...(p.size === "small" ? StyleBodyXsmall : StyleBodySmall),
 
   "&::selection": {
     background: computeColor([p.color, 200]),
@@ -84,7 +87,7 @@ const Label = styled.label({
   cursor: "pointer",
 })
 
-export type InputTextProps = PlaywrightProps & {
+export type InputTextProps = ComponentBaseProps & {
   size: "small" | "large"
   width: "auto" | "quarter" | "half" | "full"
 
@@ -101,11 +104,14 @@ export type InputTextProps = PlaywrightProps & {
   placeholder?: string
   label?: [string, "outside" | "inside"]
   hint?: string
+  error?: string
 
   iconNameLeft?: string
   iconNameRight?: string
 
   hug?: boolean
+
+  component?: string
 }
 
 export const InputText = forwardRef<HTMLInputElement | HTMLTextAreaElement, InputTextProps>((p, ref) => {
@@ -126,7 +132,7 @@ export const InputText = forwardRef<HTMLInputElement | HTMLTextAreaElement, Inpu
         <Spacer xsmall={p.size === "small"} small={p.size === "large"} />
 
         <Label htmlFor={key}>
-          <Text xsmall={p.size === "small"} small={p.size !== "small"} fill={[p.color, 700]}>
+          <Text xsmall={p.size === "small"} small={p.size === "large"} fill={[p.color, 500]}>
             {p.label[0]}
           </Text>
         </Label>
@@ -151,17 +157,17 @@ export const InputText = forwardRef<HTMLInputElement | HTMLTextAreaElement, Inpu
       <Align vertical left hug="width">
         <Label htmlFor={key}>
           <Text xsmall={p.size === "small"} small={p.size !== "small"} fill={[p.color, 700]}>
-            {p.label[0]}
+            <b>{p.label[0]}</b>
           </Text>
         </Label>
-
-        <Spacer xsmall={p.size === "small"} small={p.size === "large"} />
       </Align>
     )
 
     if (p.hint) {
       hintOutside = (
         <Align vertical left hug>
+          <Spacer tiny={p.size === "small"} xsmall={p.size === "large"} />
+
           <Text tiny={p.size === "small"} xsmall={p.size !== "small"} fill={[p.color, 700]}>
             {p.hint}
           </Text>
@@ -193,7 +199,7 @@ export const InputText = forwardRef<HTMLInputElement | HTMLTextAreaElement, Inpu
   }
 
   return (
-    <Stack vertical hug>
+    <Stack className={p.className} vertical hug>
       {labelOutside}
 
       {hintOutside}
@@ -203,7 +209,7 @@ export const InputText = forwardRef<HTMLInputElement | HTMLTextAreaElement, Inpu
           horizontal
           colorOutline={[p.color, 700]}
           colorOutlineHover={focus ? [p.color, 700] : [p.color, 900]}
-          colorBackground={[focus ? p.color : Color.Transparent, 100]}
+          colorBackground={[focus ? p.color : Color.White, 50]}
           cornerRadius="medium"
           disabled={p.disabled}
           loading={p.loading}
@@ -251,16 +257,18 @@ export const InputText = forwardRef<HTMLInputElement | HTMLTextAreaElement, Inpu
                 }
               }}
             />
+
+            {/* <Spacer xsmall={p.size === "small"} small={p.size === "large"} /> */}
           </Align>
 
           {p.iconNameRight ? (
             <>
               <Align vertical center>
-                <Spacer xsmall />
+                <Spacer xsmall overrideWidth="1px" />
 
                 <Divider vertical fill={p.value ? [p.color, 300] : [Color.Transparent]} />
 
-                <Spacer xsmall />
+                <Spacer xsmall overrideWidth="1px" />
               </Align>
 
               <Spacer tiny={p.size === "small"} xsmall={p.size === "large"} />

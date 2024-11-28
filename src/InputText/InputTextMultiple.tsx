@@ -12,9 +12,10 @@ export type InputTextMultipleProps = Pick<
 export const InputTextMultiple = forwardRef<HTMLTextAreaElement, InputTextMultipleProps>((p, ref) => {
   return (
     <InputText
+      className="<InputTextMultiple /> -"
       ref={ref}
       size={p.size}
-      color={Color.Primary}
+      color={p.color}
       label={p.label}
       placeholder={p.placeholder}
       hint={p.hint}
@@ -23,7 +24,7 @@ export const InputTextMultiple = forwardRef<HTMLTextAreaElement, InputTextMultip
       rows={3}
       disabled={p.disabled}
       value={p.value}
-      width="full"
+      width="auto"
     />
   )
 })

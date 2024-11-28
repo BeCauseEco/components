@@ -15,4 +15,6 @@ const Container = styled.div<DividerProps>(p => ({
   backgroundColor: computeColor(p.fill),
 }))
 
-export const Divider = (p: DividerProps) => <Container fill={p.fill} vertical={p.vertical} horizontal={p.horizontal} />
+export const Divider = (p: DividerProps) => (
+  <Container className="<Divider /> -" fill={p.fill} vertical={p.vertical} horizontal={p.horizontal} />
+)

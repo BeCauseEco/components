@@ -12,6 +12,7 @@ export type InputButtonIconSecondaryProps = Pick<
 export const InputButtonIconSecondary = forwardRef<HTMLButtonElement, InputButtonIconSecondaryProps>((p, ref) => {
   return (
     <InputButton
+      className="<InputButtonIconSecondary /> -"
       id={p.id}
       ref={ref}
       variant="outlined"

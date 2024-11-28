@@ -2,12 +2,13 @@ import { ReactElement } from "react"
 import { PlaywrightProps } from "@new/Playwright"
 import { Color } from "@new/Color"
 import { Stack } from "@new/Stack/Stack"
-import { Text } from "@new/Text/Text"
+import { Text, TextProps } from "@new/Text/Text"
 import { Icon, IconProps } from "@new/Icon/Icon"
 import { InputButton, InputButtonProps } from "@new/InputButton/internal/InputButton"
-import { Align } from "@new/Align/Align"
-import { Spacer } from "@new/Spacer/Spacer"
+import { Align } from "@new/Stack/Align"
+import { Spacer } from "@new/Stack/Spacer"
 import styled from "@emotion/styled"
+import { ComponentBaseProps } from "@new/ComponentBaseProps"
 
 const Container = styled.div<Pick<BadgeProps, "size">>(p => ({
   display: "flex",
@@ -19,22 +20,22 @@ const Container = styled.div<Pick<BadgeProps, "size">>(p => ({
   },
 }))
 
-export type BadgeProps = PlaywrightProps & {
-  disabled?: boolean
+export type BadgeProps = ComponentBaseProps &
+  Pick<TextProps, "maxWidth"> &
+  PlaywrightProps & {
+    disabled?: boolean
 
-  size: "small" | "large"
+    size: "small" | "large"
 
-  variant: "solid" | "outlined" | "transparent"
+    variant: "solid" | "outlined" | "opaque" | "transparent"
 
-  label: string
+    label: string
 
-  title?: string
+    color: Color
+    iconName?: string
 
-  color: Color
-  iconName?: string
-
-  onClear?: () => void
-}
+    onClear?: () => void
+  }
 
 export const Badge = (p: BadgeProps) => {
   let icon: ReactElement<IconProps> | null = null
@@ -85,7 +86,12 @@ export const Badge = (p: BadgeProps) => {
       <Align horizontal center hug="width">
         {p.iconName ? null : <Spacer xsmall={p.size === "small"} small={p.size === "large"} />}
 
-        <Text tiny={p.size === "small"} xsmall={p.size !== "small"} fill={[p.color, p.variant === "solid" ? 50 : 700]}>
+        <Text
+          tiny={p.size === "small"}
+          xsmall={p.size !== "small"}
+          fill={[p.color, p.variant === "solid" ? 50 : 700]}
+          maxWidth={p.maxWidth}
+        >
           {p.label}
         </Text>
 
@@ -99,7 +105,7 @@ export const Badge = (p: BadgeProps) => {
   switch (p.variant) {
     case "solid":
       return (
-        <Container size={p.size} title={p.title}>
+        <Container className="// Badge -- " size={p.size}>
           <Stack horizontal colorBackground={[p.color, 700]} cornerRadius="medium" disabled={p.disabled} hug>
             {children}
           </Stack>
@@ -108,8 +114,17 @@ export const Badge = (p: BadgeProps) => {
 
     case "outlined":
       return (
-        <Container size={p.size} title={p.title}>
+        <Container className="// Badge -- " size={p.size}>
           <Stack horizontal colorOutline={[p.color, 300]} cornerRadius="medium" disabled={p.disabled} hug>
+            {children}
+          </Stack>
+        </Container>
+      )
+
+    case "opaque":
+      return (
+        <Container className="// Badge -- " size={p.size}>
+          <Stack horizontal colorBackground={[p.color, 100]} cornerRadius="medium" disabled={p.disabled} hug>
             {children}
           </Stack>
         </Container>
@@ -118,8 +133,8 @@ export const Badge = (p: BadgeProps) => {
 
     case "transparent":
       return (
-        <Container size={p.size} title={p.title}>
-          <Stack horizontal colorBackground={[p.color, 100]} cornerRadius="medium" disabled={p.disabled} hug>
+        <Container className="// Badge -- " size={p.size}>
+          <Stack horizontal cornerRadius="medium" disabled={p.disabled} hug>
             {children}
           </Stack>
         </Container>

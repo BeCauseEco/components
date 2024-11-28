@@ -50,20 +50,24 @@ export const StyleBodyHuge = {
   lineHeight: "40px",
 }
 
-const Container = styled.p<TextProps>(p => ({
+const Container = styled.p<Omit<TextProps, "fill"> & { _fill: TextProps["fill"] }>(p => ({
   display: "inline",
 
   ...(p.monospace ? StyleMonospace : StyleFontFamily),
 
-  color: computeColor(p.fill),
+  color: computeColor(p._fill),
   fontStyle: "normal",
   fontWeight: 400,
   textDecoration: "inherit",
   textTransform: "inherit",
-  textWrap: p.wrap ? "pretty" : "nowrap",
+  textWrap: !p.maxWidth && p.wrap ? "pretty" : "nowrap",
   textAlign: "left",
   alignItems: "inherit",
   margin: 0,
+
+  "& strong, & b": {
+    fontWeight: 600,
+  },
 
   "& a": {
     color: "inherit",
@@ -78,6 +82,15 @@ const Container = styled.p<TextProps>(p => ({
     background: "rgba(0, 0, 0, 0.2)",
     // filter: "brightness(0.8)",
   },
+
+  ...(p.maxWidth && {
+    overflowX: "hidden",
+    overflowY: "hidden",
+    textOverflow: "ellipsis",
+    textWrap: "nowrap",
+    display: "inline-block",
+    maxWidth: p.maxWidth,
+  }),
 
   ...(p.tiny && StyleBodyTiny),
   ...(p.xsmall && StyleBodyXsmall),
@@ -110,6 +123,12 @@ export type TextProps = PlaywrightProps & {
 
   wrap?: boolean
 
+  /**
+   * Last resort for triggering ellipsis text overflow.
+   * @maxWidth: pixel value
+   */
+  maxWidth?: string
+
   monospace?: boolean
 }
 
@@ -127,6 +146,7 @@ export const Text = forwardRef<HTMLHeadingElement | HTMLParagraphElement, PropsW
     fill,
 
     wrap = false,
+    maxWidth,
 
     monospace = false,
 
@@ -139,6 +159,7 @@ export const Text = forwardRef<HTMLHeadingElement | HTMLParagraphElement, PropsW
 
   return (
     <Container
+      className="<Text /> -"
       ref={ref}
       tiny={tiny}
       xsmall={xsmall}
@@ -148,8 +169,9 @@ export const Text = forwardRef<HTMLHeadingElement | HTMLParagraphElement, PropsW
       xLarge={xLarge}
       xxLarge={xxLarge}
       huge={huge}
-      fill={fill}
+      _fill={fill}
       wrap={wrap}
+      maxWidth={maxWidth}
       monospace={monospace}
       data-playwright-testid={playwrightTestId}
       {...rest}

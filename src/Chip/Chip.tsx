@@ -8,7 +8,7 @@ import { Size } from "@new/Size"
 import styled from "@emotion/styled"
 import { PlaywrightProps } from "@new/Playwright"
 import { IconProps } from "@new/Icon/Icon"
-import { SpacerProps } from "@new/Spacer/Spacer"
+import { SpacerProps } from "@new/Stack/Spacer"
 import { TKeyValuePair } from "@new/KeyValuePair/KeyValuePair"
 import { InputButtonTertiaryProps } from "@new/InputButton/InputButtonTertiary"
 

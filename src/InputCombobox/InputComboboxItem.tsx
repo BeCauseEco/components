@@ -1,7 +1,7 @@
 import { PlaywrightProps } from "@new/Playwright"
 import { ReactElement } from "react"
 
-export type TInputComboboxItem = PlaywrightProps & {
+export type InputComboboxItemProps = PlaywrightProps & {
   value: string
   label: string
   icon?: ReactElement
@@ -14,4 +14,4 @@ export const InputComboboxItem = ({
   label,
   // eslint-disable-next-line
   icon,
-}: TInputComboboxItem) => null
+}: InputComboboxItemProps) => null

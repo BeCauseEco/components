@@ -25,6 +25,7 @@ export const InputButtonLink = forwardRef<HTMLAnchorElement, InputButtonLinkProp
 
   return (
     <InputButton
+      className="<InputButtonLink /> -"
       id={p.id}
       ref={ref}
       variant="link"

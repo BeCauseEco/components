@@ -6,7 +6,7 @@
 // import { EInputButtonVariant, InputButton } from "@new/InputButton/InputButton"
 // import { Size } from "@new/Size"
 // import { Icon } from "@new/Icon/Icon"
-// import { Spacer } from "@new/Spacer/Spacer"
+// import { Spacer } from "@new/Stack/Spacer"
 // import { Breadcrumbs } from "@new/Chrome/Breadcrumbs"
 // // import { useActiveMenuStructure } from "@new/Chrome/hooks/useActiveMenuStructure"
 // // import { useGetCurrentMenuPageItem } from "@new/Chrome/hooks/useGetCurrentMenuPageItem"

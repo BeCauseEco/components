@@ -1,5 +1,6 @@
 import { PropsWithChildren } from "react"
 import styled from "@emotion/styled"
+import { ComponentBaseProps } from "@new/ComponentBaseProps"
 
 const computeAlignment = (p: Omit<AlignProps, "spacing" | "hug">) => {
   const r = {
@@ -141,34 +142,37 @@ const computeAlignment = (p: Omit<AlignProps, "spacing" | "hug">) => {
 }
 
 const computeWidthHeight = (p: AlignProps) => {
-  let width = "100%"
-  let height = "100%"
+  let w = "100%"
+  let h = "100%"
 
   if (p.hug === true) {
-    width = "min-content"
-    height = "min-content"
+    w = "min-content"
+    h = "min-content"
   } else if (p.hug === "width") {
-    width = "min-content"
+    w = "min-content"
   } else if (p.hug === "height") {
-    height = "min-content"
+    h = "min-content"
   }
 
-  return { width, height }
+  return { width: w, height: h }
 }
 
 const Container = styled.div<AlignProps>(p => ({
   display: "flex",
-  flexWrap: "inherit",
+  flexWrap: p.wrap ? "wrap" : "nowrap",
   flexDirection: p.vertical ? "column" : "row",
-  width: computeWidthHeight(p).width,
-  height: computeWidthHeight(p).height,
   padding: 0,
   margin: 0,
 
+  ...(p.wrap && {
+    gap: "calc(var(--BU) * 4)",
+  }),
+
+  ...computeWidthHeight(p),
   ...computeAlignment(p),
 }))
 
-export type AlignProps = {
+export type AlignProps = ComponentBaseProps & {
   vertical?: boolean
   horizontal?: boolean
 
@@ -183,11 +187,13 @@ export type AlignProps = {
   bottomRight?: boolean
 
   hug?: boolean | "width" | "height"
+
+  wrap?: boolean
 }
 
 export const Align = (p: PropsWithChildren<AlignProps>) => (
   <Container
-    data-align="true"
+    className={`<Align /> -`}
     topLeft={p.topLeft}
     topCenter={p.topCenter}
     topRight={p.topRight}
@@ -200,7 +206,7 @@ export const Align = (p: PropsWithChildren<AlignProps>) => (
     vertical={p.vertical}
     horizontal={p.horizontal}
     hug={p.hug}
-    className="ALIGN"
+    wrap={p.wrap}
   >
     {p.children}
   </Container>

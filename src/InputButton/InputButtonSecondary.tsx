@@ -25,6 +25,7 @@ export const InputButtonSecondary = forwardRef<HTMLButtonElement, InputButtonSec
 
   return (
     <InputButton
+      className="<InputButtonSecondary /> -"
       id={p.id}
       ref={ref}
       variant="outlined"

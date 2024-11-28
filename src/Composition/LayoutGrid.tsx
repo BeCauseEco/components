@@ -1,7 +1,7 @@
 import { PropsWithChildren, ReactElement } from "react"
 import styled from "@emotion/styled"
 import { TLayoutBase } from "./TLayoutBase"
-import { AlignProps } from "@new/Align/Align"
+import { AlignProps } from "@new/Stack/Align"
 
 const Container = styled.div<Pick<TLayoutGrid, "rows" | "columns">>(p => ({
   display: "grid",

@@ -12,6 +12,7 @@ export type InputButtonIconTertiaryProps = Pick<
 export const InputButtonIconTertiary = forwardRef<HTMLButtonElement, InputButtonIconTertiaryProps>((p, ref) => {
   return (
     <InputButton
+      className="<InputButtonIconTertiary /> -"
       id={p.id}
       ref={ref}
       variant="transparent"

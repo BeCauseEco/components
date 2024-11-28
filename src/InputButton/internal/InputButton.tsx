@@ -6,10 +6,11 @@ import Link, { LinkProps } from "next/link"
 import React from "react"
 import { PlaywrightProps } from "@new/Playwright"
 import { Text, TextProps } from "@new/Text/Text"
-import { Align, AlignProps } from "@new/Align/Align"
+import { Align, AlignProps } from "@new/Stack/Align"
 import { Icon } from "@new/Icon/Icon"
-import { Spacer } from "@new/Spacer/Spacer"
+import { Spacer } from "@new/Stack/Spacer"
 import { useRouter } from "next/router"
+import { ComponentBaseProps } from "@new/ComponentBaseProps"
 
 const computeHeight = (p: InputButtonProps): string => {
   if (p.size === "small") {
@@ -30,13 +31,13 @@ const computeColorDestructive = (
   }
 }
 
-const Output = styled.output<InputButtonProps>(p => ({
+const Output = styled.output<InputButtonProps & { _width: string; hug: boolean }>(p => ({
   display: "flex",
   border: 0,
   background: "none",
   userSelect: "none",
   textDecorationColor: "inherit",
-  width: p.width === "auto" ? "fit-content" : p.width === "half" ? "50%" : "100%",
+  width: p._width === "auto" ? "fit-content" : p._width === "half" ? "50%" : "100%",
   height: p.hug ? "fit-content" : computeHeight(p),
   lineHeight: 1,
   cursor: "pointer",
@@ -70,7 +71,7 @@ const Children = (p: Omit<InputButtonProps, "width">) => {
     if (p.variant === "link") {
       label = (
         <Align horizontal left>
-          <Text small={p.size === "small"} medium={p.size !== "small"} fill={p.colorForeground}>
+          <Text xsmall={p.size === "small"} small={p.size === "large"} fill={p.colorForeground}>
             {p.label}
           </Text>
         </Align>
@@ -78,7 +79,7 @@ const Children = (p: Omit<InputButtonProps, "width">) => {
     } else {
       label = (
         <Align horizontal left>
-          <Text small={p.size === "small"} medium={p.size !== "small"} fill={p.colorForeground}>
+          <Text xsmall={p.size === "small"} small={p.size === "large"} fill={p.colorForeground}>
             {p.label}
           </Text>
         </Align>
@@ -88,7 +89,7 @@ const Children = (p: Omit<InputButtonProps, "width">) => {
 
   if (p.iconName) {
     const icon = (
-      <Icon name={p.iconName} fill={p.colorForeground} medium={p.size === "small"} large={p.size === "large"} />
+      <Icon name={p.iconName} fill={p.colorForeground} small={p.size === "small"} medium={p.size === "large"} />
     )
 
     if (p.iconPlacement === "beforeLabel") {
@@ -164,39 +165,38 @@ const Children = (p: Omit<InputButtonProps, "width">) => {
   }
 }
 
-export type InputButtonProps = PlaywrightProps & {
-  id?: string
+export type InputButtonProps = ComponentBaseProps &
+  PlaywrightProps & {
+    variant: "link" | "solid" | "outlined" | "transparent" | "blank"
 
-  variant: "link" | "solid" | "outlined" | "transparent" | "blank"
+    size: "small" | "large"
 
-  size: "small" | "large"
+    width: "auto" | "half" | "full"
 
-  width: "auto" | "half" | "full"
+    colorForeground: ColorWithLightness
+    colorBackground?: ColorWithLightness
+    colorBackgroundHover?: ColorWithLightness
+    colorOutline?: ColorWithLightness
+    colorOutlineHover?: ColorWithLightness
+    colorLoading?: ColorWithLightness
 
-  colorForeground: ColorWithLightness
-  colorBackground?: ColorWithLightness
-  colorBackgroundHover?: ColorWithLightness
-  colorOutline?: ColorWithLightness
-  colorOutlineHover?: ColorWithLightness
-  colorLoading?: ColorWithLightness
+    loading?: boolean
+    disabled?: boolean
 
-  loading?: boolean
-  disabled?: boolean
+    label?: string
 
-  label?: string
+    iconName?: string
+    iconPlacement?: "beforeLabel" | "afterLabel" | "labelNotSpecified"
 
-  iconName?: string
-  iconPlacement?: "beforeLabel" | "afterLabel" | "labelNotSpecified"
+    hug?: boolean
 
-  hug?: boolean
+    href?: LinkProps["href"]
+    onClick?: () => void
 
-  href?: LinkProps["href"]
-  onClick?: () => void
+    destructive?: boolean
 
-  destructive?: boolean
-
-  content?: ReactElement<StackProps> | null | undefined
-}
+    content?: ReactElement<StackProps> | null | undefined
+  }
 
 export const InputButton = forwardRef<HTMLButtonElement | HTMLAnchorElement, InputButtonProps>((p, ref) => {
   const { id, variant, onClick, href, playwrightTestId, width, ...pp } = p
@@ -216,8 +216,8 @@ export const InputButton = forwardRef<HTMLButtonElement | HTMLAnchorElement, Inp
       as={variant === "link" ? "span" : "div"} // TO-DO: @cllpse: should render a button, but React is retarded
       variant={variant}
       onClick={click}
-      width={width}
-      height={computeHeight(p)}
+      _width={width}
+      _height={computeHeight(p)}
       data-playwright-testid={playwrightTestId}
       {...pp}
     >

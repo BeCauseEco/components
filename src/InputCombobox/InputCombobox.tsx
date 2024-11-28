@@ -1,7 +1,7 @@
 import styled from "@emotion/styled"
 import { Command, CommandEmpty, CommandItem, CommandList } from "cmdk"
 import { PropsWithChildren, ReactElement, forwardRef, useCallback, useEffect, useMemo, useState } from "react"
-import { TInputComboboxItem } from "./InputComboboxItem"
+import { InputComboboxItemProps } from "./InputComboboxItem"
 import React from "react"
 import { Text } from "@new/Text/Text"
 import { Size } from "@new/Size"
@@ -13,13 +13,13 @@ import { EShadow } from "@new/EShadow"
 import { InputTextSingle } from "@new/InputText/InputTextSingle"
 import { LayoutCombobox } from "./internal/LayoutInputCombobox"
 import { EAlignment } from "@new/EAlignment"
-import { Spacer } from "@new/Spacer/Spacer"
+import { Spacer } from "@new/Stack/Spacer"
 import { InputCheckbox } from "@new/InputCheckbox/InputCheckbox"
 import { PlaywrightProps } from "@new/Playwright"
 import { Virtuoso } from "react-virtuoso"
 import { Badge } from "@new/Badge/Badge"
 import { Stack } from "@new/Stack/Stack"
-import { Align } from "@new/Align/Align"
+import { Align } from "@new/Stack/Align"
 
 const Container = styled.div({
   display: "flex",
@@ -33,7 +33,7 @@ const CommandItemStyled = styled(CommandItem)<{
   colorForeground: ColorWithLightness
 }>(p => ({
   position: "relative",
-  padding: p.multiple ? "calc(var(--BU) * 1.5) 0" : "calc(var(--BU) * 1.5) calc(var(--BU) * 3)",
+  padding: p.multiple ? "calc(var(--BU) * 1)" : "calc(var(--BU) * 1.5) ",
   borderRadius: "var(--BU)",
   cursor: "pointer",
   userSelect: "none",
@@ -43,20 +43,20 @@ const CommandItemStyled = styled(CommandItem)<{
     backgroundColor: computeColor(p.colorBackgroundHover),
   },
 
-  ...(p.selected &&
-    !p.multiple && {
-      ":after": {
-        content: `""`,
-        display: "flex",
-        position: "absolute",
-        width: "calc(var(--BU) * 1.5)",
-        height: "calc(var(--BU) * 1.5)",
-        top: "calc(50% - calc(var(--BU) / 1.5))",
-        left: "0",
-        borderRadius: "var(--BU)",
-        backgroundColor: computeColor(p.colorSelected),
-      },
-    }),
+  // ...(p.selected &&
+  //   !p.multiple && {
+  //     ":after": {
+  //       content: `""`,
+  //       display: "flex",
+  //       position: "absolute",
+  //       width: "calc(var(--BU) * 1.5)",
+  //       height: "calc(var(--BU) * 1.5)",
+  //       top: "calc(50% - calc(var(--BU) / 1.5))",
+  //       left: "0",
+  //       borderRadius: "var(--BU)",
+  //       backgroundColor: computeColor(p.colorSelected),
+  //     },
+  //   }),
 }))
 
 const CommandEmptyStyled = styled(CommandEmpty)({
@@ -64,21 +64,12 @@ const CommandEmptyStyled = styled(CommandEmpty)({
   userSelect: "none",
 })
 
-const TextWithOverflow = styled(Text)({
-  // maxWidth: p.width === Size.Small ? "150px" : "300px",
-  overflowX: "hidden",
-  overflowY: "hidden",
-  textOverflow: "ellipsis",
-  textWrap: "nowrap",
-  display: "block",
-})
-
 export type TInputComboBoxFilterOptions = {
   textFilterNoResults: string
   textFilterPlaceholder: string
 }
 
-type TInputCombobox = PlaywrightProps & {
+export type InputComboboxProps = PlaywrightProps & {
   id?: string
 
   size: "small" | "large"
@@ -92,6 +83,8 @@ type TInputCombobox = PlaywrightProps & {
 
   multiple?: boolean
 
+  color: Color
+
   /**
    * When InputCombobox.multiple is set to true; "value" parameter is of type string[].
    *
@@ -100,7 +93,7 @@ type TInputCombobox = PlaywrightProps & {
 
   onChange: (value: string | string[]) => void
 
-  children: ReactElement<TInputComboboxItem> | ReactElement<TInputComboboxItem>[]
+  children: ReactElement<InputComboboxItemProps> | ReactElement<InputComboboxItemProps>[]
 
   /**
    * Enables the virtuoso list for the combobox. Only use this if you have a large number of items.
@@ -116,14 +109,14 @@ type TInputCombobox = PlaywrightProps & {
 const LIST_HEIGHT = 360
 const LIST_WIDTH = 260
 
-export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<TInputCombobox>>((p, ref) => {
+export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<InputComboboxProps>>((p, ref) => {
   const [open, setOpen] = useState(false)
   const [search, setSearch] = useState("")
   const [height, setHeight] = useState(1)
   const [filteredValues, setFilteredValues] = useState<string[]>([])
 
-  const items: { [value: string]: TInputComboboxItem } = useMemo(() => {
-    const output: { [value: string]: TInputComboboxItem } = {}
+  const items: { [value: string]: InputComboboxItemProps } = useMemo(() => {
+    const output: { [value: string]: InputComboboxItemProps } = {}
 
     React.Children.forEach(p.children, child => {
       if (React.isValidElement(child)) {
@@ -160,20 +153,26 @@ export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<TInput
       }
 
       return (
-        <TextWithOverflow fill={[Color.Primary, 700]} small={p.size === "small"} medium={p.size !== "small"}>
+        <Text
+          fill={[p.color, 700]}
+          xsmall={p.size === "small"}
+          small={p.size === "large"}
+          maxWidth={p.size === "small" ? "100px" : "150px"}
+        >
           {selectedItem?.label || p.textNoSelection}
-        </TextWithOverflow>
+        </Text>
       )
     }
 
     const selectedValuesSet = new Set(p.value)
+
     const selectedItems = Object.entries(items)
       .filter(([id]) => selectedValuesSet.has(id))
       .flatMap(([, value]) => value.label)
 
     if (selectedItems.length === 0) {
       return (
-        <Text small={p.size === "small"} medium={p.size !== "small"} fill={[Color.Primary, 700]}>
+        <Text xsmall={p.size === "small"} small={p.size === "large"} fill={[Color.Black, 700]}>
           {p.textNoSelection}
         </Text>
       )
@@ -218,7 +217,7 @@ export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<TInput
     )
   }
 
-  const getCommandItem = (index: number, item: TInputComboboxItem): React.ReactNode => {
+  const getCommandItem = (index: number, item: InputComboboxItemProps): React.ReactNode => {
     const onSelectSingle = (value: string) => {
       setOpen(false)
 
@@ -245,9 +244,9 @@ export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<TInput
         value={item.label}
         onSelect={value => (p.multiple ? () => {} : onSelectSingle(value))}
         selected={p.multiple ? (p.value as string[]).includes(item.value) : p.value === item.value}
-        colorSelected={[Color.Primary, 400]}
-        colorBackgroundHover={[Color.Primary, 100]}
-        colorForeground={[Color.Primary, 700]}
+        colorSelected={[p.color, 400]}
+        colorBackgroundHover={[p.color, 50]}
+        colorForeground={[p.color, 700]}
         data-playwright-testid={item.playwrightTestId}
       >
         {p.multiple ? (
@@ -265,13 +264,13 @@ export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<TInput
                 size={p.size}
                 value={p.multiple ? (p.value as string[]).includes(item.value) : p.value === item.value}
                 onChange={value => onSelectMultiple(item.value, value)}
-                color={Color.Primary}
+                color={p.color}
                 label={item.label}
               />
             </Align>
           </Stack>
         ) : (
-          <Text small={p.size === "small"} medium={p.size !== "small"} fill={[Color.Primary, 700]} wrap>
+          <Text xsmall={p.size === "small"} small={p.size === "large"} fill={[p.color, 700]}>
             {item.label}
           </Text>
         )}
@@ -338,7 +337,7 @@ export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<TInput
   const filterWithDebounce = useMemo(() => debounce(filterResults, 300), [filterResults])
 
   return (
-    <Container ref={ref} id={p.id} data-playwright-testid={p.playwrightTestId}>
+    <Container ref={ref} id={p.id} data-playwright-testid={p.playwrightTestId} className="<InputCombobox /> - ">
       <Popover
         open={p.disabled || p.loading ? false : open}
         onOpenChange={p.disabled || p.loading ? () => {} : setOpen}
@@ -348,10 +347,11 @@ export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<TInput
             size={p.size}
             width="full"
             variant="outlined"
-            colorForeground={[Color.Primary, 700]}
-            colorOutline={[Color.Primary, 700]}
-            colorBackgroundHover={[Color.Primary, 100]}
-            colorLoading={[Color.Primary, 700]}
+            colorForeground={[p.color, 700]}
+            colorOutline={[p.color, 700]}
+            colorBackground={[Color.White, 700]}
+            colorBackgroundHover={[p.color, 50]}
+            colorLoading={[p.color, 700]}
             iconName={open ? "keyboard_arrow_up" : "keyboard_arrow_down"}
             iconPlacement="afterLabel"
             disabled={p.disabled}
@@ -359,7 +359,7 @@ export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<TInput
             content={
               <Stack horizontal hug>
                 <Align horizontal left>
-                  <Text xsmall={p.size === "small"} small={p.size !== "small"} fill={[Color.Primary, 700]}>
+                  <Text xsmall={p.size === "small"} small={p.size === "large"} fill={[p.color, 500]}>
                     {p.label}
                   </Text>
 
@@ -378,8 +378,8 @@ export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<TInput
               <>
                 {p.filterOptions && Object.keys(items).length > 9 && (
                   <InputTextSingle
-                    size={p.size}
-                    color={Color.Primary}
+                    size="small"
+                    color={p.color}
                     value={search}
                     placeholder={p.filterOptions.textFilterPlaceholder}
                     onChange={value => {
@@ -396,7 +396,7 @@ export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<TInput
               <Command loop>
                 {p.filterOptions && (
                   <CommandEmptyStyled>
-                    <Text fill={[Color.Primary, 700]} xsmall={p.size === "small"} small={p.size !== "small"}>
+                    <Text fill={[p.color, 700]} xsmall={p.size === "small"} small={p.size !== "small"}>
                       {p.filterOptions.textFilterNoResults}
                     </Text>
                   </CommandEmptyStyled>
