@@ -49,6 +49,8 @@ export type InputRadioGroupProps = PlaywrightProps & {
   label?: string
 
   children: ReactElement<InputRadioGroupItemProps> | ReactElement<InputRadioGroupItemProps>[]
+
+  disabled?: boolean
 }
 
 export const InputRadioGroup = (p: InputRadioGroupProps) => {
@@ -89,7 +91,7 @@ export const InputRadioGroup = (p: InputRadioGroupProps) => {
   })
 
   return (
-    <Stack vertical playwrightTestId={p.playwrightTestId} hug className="<InputRadioGroup /> -">
+    <Stack vertical playwrightTestId={p.playwrightTestId} hug className="<InputRadioGroup /> -" disabled={p.disabled}>
       <Align hug left vertical>
         <Root
           defaultValue={p.defaultValue}

@@ -345,7 +345,7 @@ export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<InputC
         trigger={
           <InputButton
             size={p.size}
-            width="full"
+            width="auto"
             variant="outlined"
             colorForeground={[p.color, 700]}
             colorOutline={p.disabled ? [p.color, 100] : [p.color, 300]}

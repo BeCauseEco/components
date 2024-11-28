@@ -43,6 +43,8 @@ export type InputCheckboxProps = PlaywrightProps & {
   value: boolean | "indeterminate"
 
   onChange: (value: boolean) => void
+
+  disabled?: boolean
 }
 
 export const InputCheckbox = (p: InputCheckboxProps) => {
@@ -50,7 +52,7 @@ export const InputCheckbox = (p: InputCheckboxProps) => {
 
   return (
     <Container className="<InputCheckbox /> -">
-      <Stack horizontal hug>
+      <Stack horizontal hug disabled={p.disabled}>
         <Align horizontal left hug>
           <Root id={key} checked={p.value} onCheckedChange={checked => p.onChange(checked === true)}>
             {p.value === "indeterminate" && <Icon name="indeterminate_check_box" large fill={[p.color, 700]} />}
