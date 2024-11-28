@@ -59,7 +59,7 @@
 //                     size={Size.Medium}
 //                     href={menuItem.menuPage.pageUrl}
 //                   >
-//                     <Text size={Size.Xsmall} color={[Color.Black, 700]}>
+//                     <Text size={Size.Xsmall} color={[Color.Neutral, 700]}>
 //                       {menuItem.menuPage.menuTitle}
 //                     </Text>
 //                   </InputButton>

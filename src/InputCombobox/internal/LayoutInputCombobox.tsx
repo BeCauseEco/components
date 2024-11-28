@@ -32,7 +32,7 @@ export const LayoutCombobox = ({ contentTop, contentBottom }: TLayoutCombobox) =
       <OverflowContainer
         axes="vertical"
         colorBackground={[Color.White]}
-        colorForeground={[Color.Black, 500]}
+        colorForeground={[Color.Neutral, 500]}
         maxHeight={"calc(var(--radix-popover-content-available-height) - calc(var(--BU) * 8))"}
         hug="partly"
       >

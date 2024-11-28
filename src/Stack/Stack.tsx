@@ -18,7 +18,7 @@ const translateBorderRadius = (cornerRadius: StackProps["cornerRadius"]): string
       return "calc(var(--BU) * 1)"
 
     case "large":
-      return "calc(var(--BU) * 1.5)"
+      return "calc(var(--BU) * 2)"
 
     default:
       return "0"

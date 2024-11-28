@@ -72,7 +72,7 @@ const Spinner = styled.div<Pick<TComposition, "loading"> & { color: ColorWithLig
   height: "100%",
   aspectRatio: "1",
   borderRadius: "50%",
-  border: `2px solid ${computeColor([Color.Black, 700])}`,
+  border: `2px solid ${computeColor([Color.Neutral, 700])}`,
   animation: `${keyframeA} 0.8s infinite linear alternate, ${keyframeB} 1.6s infinite linear;`,
   opacity: p.loading ? 1 : 0,
 
@@ -160,7 +160,7 @@ export const Composition = forwardRef<HTMLDivElement, PropsWithChildren<TComposi
 
   const c = React.Children.toArray(children)
 
-  let colorSpinner = [Color.Black, 700]
+  let colorSpinner = [Color.Neutral, 700]
 
   if (c.length > 1) {
     const colorBackgroundBase = c[0]?.["props"]?.["colorBackground"]?.[0]

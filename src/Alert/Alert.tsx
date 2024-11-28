@@ -17,7 +17,7 @@ const Overlay = styled(RadixAlertDialog.Overlay)({
   display: "flex",
   position: "fixed",
   inset: 0,
-  backgroundColor: Color.Black,
+  backgroundColor: Color.Neutral,
   opacity: EOpacity.Light,
   zIndex: 999999,
 })

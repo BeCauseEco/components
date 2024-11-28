@@ -42,21 +42,6 @@ const CommandItemStyled = styled(CommandItem)<{
   "&[data-selected='true']": {
     backgroundColor: computeColor(p.colorBackgroundHover),
   },
-
-  // ...(p.selected &&
-  //   !p.multiple && {
-  //     ":after": {
-  //       content: `""`,
-  //       display: "flex",
-  //       position: "absolute",
-  //       width: "calc(var(--BU) * 1.5)",
-  //       height: "calc(var(--BU) * 1.5)",
-  //       top: "calc(50% - calc(var(--BU) / 1.5))",
-  //       left: "0",
-  //       borderRadius: "var(--BU)",
-  //       backgroundColor: computeColor(p.colorSelected),
-  //     },
-  //   }),
 }))
 
 const CommandEmptyStyled = styled(CommandEmpty)({
@@ -153,12 +138,7 @@ export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<InputC
       }
 
       return (
-        <Text
-          fill={[p.color, 700]}
-          xsmall={p.size === "small"}
-          small={p.size === "large"}
-          maxWidth={p.size === "small" ? "100px" : "150px"}
-        >
+        <Text fill={[p.color, 700]} xsmall={p.size === "small"} small={p.size === "large"}>
           {selectedItem?.label || p.textNoSelection}
         </Text>
       )
@@ -172,7 +152,7 @@ export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<InputC
 
     if (selectedItems.length === 0) {
       return (
-        <Text xsmall={p.size === "small"} small={p.size === "large"} fill={[Color.Black, 700]}>
+        <Text xsmall={p.size === "small"} small={p.size === "large"} fill={[Color.Neutral, 700]}>
           {p.textNoSelection}
         </Text>
       )
@@ -350,7 +330,8 @@ export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<InputC
             colorForeground={[p.color, 700]}
             colorOutline={p.disabled ? [p.color, 100] : [p.color, 300]}
             colorOutlineHover={p.disabled ? [p.color, 100] : [p.color, 700]}
-            colorBackground={p.disabled ? [p.color, 50] : [p.color, 50]}
+            colorBackground={p.disabled ? [p.color, 50] : [Color.White]}
+            colorBackgroundHover={[p.color, 50]}
             colorLoading={[p.color, 700]}
             iconName={open ? "keyboard_arrow_up" : "keyboard_arrow_down"}
             iconPlacement="afterLabel"

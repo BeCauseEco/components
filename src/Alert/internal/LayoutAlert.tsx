@@ -30,7 +30,7 @@ const ContentEnd = styled.div({
   display: "flex",
   flexDirection: "row",
   padding: "calc(var(--BU) * 4)",
-  borderTop: `solid 1px ${computeColor([Color.Black, 100])}`,
+  borderTop: `solid 1px ${computeColor([Color.Neutral, 100])}`,
   borderBottomLeftRadius: Size.Tiny,
   borderBottomRightRadius: Size.Tiny,
   justifyContent: "flex-end",

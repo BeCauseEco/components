@@ -17,7 +17,7 @@ const Container = styled.div({
 const Breadcrumbs = styled.div({
   display: "flex",
   flexDirection: "row",
-  borderBottom: `solid 1px ${computeColor([Color.Black, 100])}`,
+  borderBottom: `solid 1px ${computeColor([Color.Neutral, 100])}`,
   height: "calc(var(--BU) * 12)",
 })
 
@@ -105,7 +105,7 @@ export const LayoutChrome = ({
       <CombinedOuter>
         <SidebarSecondary>
           <Composition>
-            <BackgroundCard colorBackground={[Color.Black, 50]} />
+            <BackgroundCard colorBackground={[Color.Neutral, 50]} />
 
             <LayoutSidebarSecondary>{contentSecondaryNavigation}</LayoutSidebarSecondary>
           </Composition>

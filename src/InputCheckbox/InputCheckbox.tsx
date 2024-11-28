@@ -67,7 +67,7 @@ export const InputCheckbox = (p: InputCheckboxProps) => {
               <Spacer tiny={p.size === "small"} xsmall={p.size === "large"} />
 
               <Label htmlFor={key}>
-                <Text xsmall={p.size === "small"} small={p.size !== "small"} fill={[Color.Black, 700]}>
+                <Text xsmall={p.size === "small"} small={p.size !== "small"} fill={[Color.Neutral, 700]}>
                   {p.label}
                 </Text>
               </Label>
