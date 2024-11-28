@@ -1,7 +1,7 @@
 import { ReactElement } from "react"
 import { PlaywrightProps } from "@new/Playwright"
 import { Color } from "@new/Color"
-import { Stack } from "@new/Stack/Stack"
+import { Stack, StackProps } from "@new/Stack/Stack"
 import { Text, TextProps } from "@new/Text/Text"
 import { Icon, IconProps } from "@new/Icon/Icon"
 import { InputButton, InputButtonProps } from "@new/InputButton/internal/InputButton"
@@ -40,6 +40,7 @@ export type BadgeProps = ComponentBaseProps &
 export const Badge = (p: BadgeProps) => {
   let icon: ReactElement<IconProps> | null = null
   let button: ReactElement<InputButtonProps> | null = null
+  let stack: ReactElement<StackProps> | null = null
 
   if (p.iconName) {
     icon = (
@@ -104,40 +105,41 @@ export const Badge = (p: BadgeProps) => {
 
   switch (p.variant) {
     case "solid":
-      return (
-        <Container className="// Badge -- " size={p.size}>
-          <Stack horizontal colorBackground={[p.color, 700]} cornerRadius="medium" disabled={p.disabled} hug>
-            {children}
-          </Stack>
-        </Container>
+      stack = (
+        <Stack horizontal colorBackground={[p.color, 700]} cornerRadius="medium" disabled={p.disabled} hug>
+          {children}
+        </Stack>
       )
+      break
 
     case "outlined":
-      return (
-        <Container className="// Badge -- " size={p.size}>
-          <Stack horizontal colorOutline={[p.color, 300]} cornerRadius="medium" disabled={p.disabled} hug>
-            {children}
-          </Stack>
-        </Container>
+      stack = (
+        <Stack horizontal colorOutline={[p.color, 300]} cornerRadius="medium" disabled={p.disabled} hug>
+          {children}
+        </Stack>
       )
+      break
 
     case "opaque":
-      return (
-        <Container className="// Badge -- " size={p.size}>
-          <Stack horizontal colorBackground={[p.color, 100]} cornerRadius="medium" disabled={p.disabled} hug>
-            {children}
-          </Stack>
-        </Container>
+      stack = (
+        <Stack horizontal colorBackground={[p.color, 100]} cornerRadius="medium" disabled={p.disabled} hug>
+          {children}
+        </Stack>
       )
       break
 
     case "transparent":
-      return (
-        <Container className="// Badge -- " size={p.size}>
-          <Stack horizontal cornerRadius="medium" disabled={p.disabled} hug>
-            {children}
-          </Stack>
-        </Container>
+      stack = (
+        <Stack horizontal cornerRadius="medium" disabled={p.disabled} hug>
+          {children}
+        </Stack>
       )
+      break
   }
+
+  return (
+    <Container className="<Badge /> -" size={p.size}>
+      {stack}
+    </Container>
+  )
 }

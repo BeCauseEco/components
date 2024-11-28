@@ -141,7 +141,7 @@ export const Stack = (p: StackProps) => {
 
   return (
     <Container
-      className={p.className || "<Stack /> - "}
+      className={p.className || "<Stack /> -"}
       data-playwright-testid={p.playwrightTestId}
       colorBackground={p.colorBackground}
       colorBackgroundHover={p.colorBackgroundHover}

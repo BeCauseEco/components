@@ -144,7 +144,7 @@ export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<InputC
             size={p.size}
             variant="solid"
             label={selectedItem.label}
-            color={Color.Primary}
+            color={Color.Quarternary}
             onClear={() => {
               p.onChange("")
             }}
@@ -190,7 +190,7 @@ export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<InputC
               label={item}
               size={p.size}
               variant="solid"
-              color={Color.Primary}
+              color={Color.Quarternary}
               onClear={
                 p.clearable
                   ? () => {
@@ -210,7 +210,7 @@ export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<InputC
             label={`+${remainingCount}`}
             size={p.size}
             variant="solid"
-            color={Color.Primary}
+            color={Color.Quarternary}
           />
         )}
       </>

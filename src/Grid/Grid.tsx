@@ -1,7 +1,7 @@
 import { PropsWithChildren, ReactElement } from "react"
 import styled from "@emotion/styled"
-import { TLayoutBase } from "@new/Composition/TLayoutBase"
 import { StackProps } from "@new/Stack/Stack"
+import { ComponentBaseProps } from "@new/ComponentBaseProps"
 
 const computeGridTemplateColumns = (columns: GridProps["columns"]): string => {
   switch (columns) {
@@ -27,7 +27,7 @@ const Container = styled.div<Pick<GridProps, "columns" | "hug">>(p => ({
   height: "inherit",
 }))
 
-export type GridProps = TLayoutBase & {
+export type GridProps = ComponentBaseProps & {
   columns: "two" | "three" | "four"
 
   hug?: boolean
@@ -37,7 +37,12 @@ export type GridProps = TLayoutBase & {
 
 export const Grid = (p: PropsWithChildren<GridProps>) => {
   return (
-    <Container className="layout-container" columns={p.columns} hug={p.hug} data-playwright-testid={p.playwrightTestId}>
+    <Container
+      className="<Grid /> - layout-container"
+      columns={p.columns}
+      hug={p.hug}
+      data-playwright-testid={p.playwrightTestId}
+    >
       {p.children}
     </Container>
   )

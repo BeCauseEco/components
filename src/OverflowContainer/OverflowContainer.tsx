@@ -65,6 +65,7 @@ export const OverflowContainer = ({
   className,
 }: PropsWithChildren<TOverflowContainer>) => (
   <Container
+    className={`<OverflowContainer /> -${className || ""}`}
     axes={axes}
     colorBackground={colorBackground}
     colorForeground={colorForeground}
@@ -74,7 +75,6 @@ export const OverflowContainer = ({
     maxHeight={maxHeight}
     hug={hug}
     data-playwright-testid={playwrightTestId}
-    className={className}
   >
     {children}
   </Container>
