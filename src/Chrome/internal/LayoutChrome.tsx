@@ -4,7 +4,7 @@ import { TLayoutBase } from "@new/Composition/TLayoutBase"
 import { computeColor, Color } from "@new/Color"
 import { Composition } from "@new/Composition/Composition"
 import { BackgroundCard } from "@new/Composition/BackgroundCard"
-import { Align } from "@new/Align/Align"
+import { Align } from "@new/Stack/Align"
 
 const Container = styled.div({
   display: "flex",
