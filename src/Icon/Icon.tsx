@@ -1,62 +1,113 @@
-import { ESize } from "@new/ESize"
-import { TColor, computeColor } from "@new/Color"
+import { Size } from "@new/Size"
+import { ColorWithLightness, computeColor } from "@new/Color"
 import styled from "@emotion/styled"
-import { EWeight } from "@new/EWeight"
-import { TPlaywright } from "@new/TPlaywright"
+import { PlaywrightProps } from "@new/Playwright"
 
-const calculateFontVariantSettings = (size: ESize, weight: EWeight, fill: boolean) => {
-  let w = [ESize.Large, ESize.Huge].includes(size) ? "700" : "600"
+const computeSize = (p: IconProps) => {
+  let size = "0"
 
-  const g = [ESize.Large, ESize.Huge].includes(size) ? "0" : "-25"
-
-  switch (weight) {
-    case EWeight.Light:
-      w = "200"
-      break
-
-    case EWeight.Heavy:
-      w = "900"
-      break
+  if (p.tiny) {
+    size = "10px"
   }
 
-  return `'FILL' ${fill ? "1" : "0"}, 'wght' ${w}, 'GRAD' ${g}, 'opsz' 48`
+  if (p.xsmall) {
+    size = "12px"
+  }
+
+  if (p.small) {
+    size = "16px"
+  }
+
+  if (p.medium) {
+    size = "20px"
+  }
+
+  if (p.large) {
+    size = "24px"
+  }
+
+  if (p.xLarge) {
+    size = Size.XLarge
+  }
+
+  if (p.xxLarge) {
+    size = Size.XXLarge
+  }
+
+  if (p.huge) {
+    size = Size.Huge
+  }
+
+  return size
 }
 
-const Container = styled.i<Omit<TIcon, "name">>(p => ({
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const computeStyle = (p: IconProps) => {
+  // console.log("computeStyle", p)
+
+  return p.style === "outlined" ? "0" : "1"
+}
+
+const computeFontVariantSettings = (p: IconProps) => {
+  // let w = [Size.Large, Size.Huge].includes(p.size) ? "700" : "600"
+
+  // const g = [Size.Large, Size.Huge].includes(p.size) ? "0" : "-25"
+
+  // switch (p.weight) {
+  //   case EWeight.Light:
+  //     w = "200"
+  //     break
+
+  //   case EWeight.Heavy:
+  //     w = "900"
+  //     break
+  // }
+
+  const w = "600"
+  const g = "0"
+
+  return `'FILL' ${computeStyle(p)}, 'wght' ${w}, 'GRAD' ${g}, 'opsz' 48`
+}
+
+const Container = styled.i<{ size: string; fontVariationSettings: string; _fill: IconProps["fill"] }>(p => ({
   display: "flex !important",
   flexShrink: 0,
   width: "fit-content",
   height: p.size,
   lineHeight: `${p.size} !important`,
-  fontSize: `${p.size} !important`,
-  color: computeColor(p.color),
-  "font-variation-settings": calculateFontVariantSettings(p.size, p.weight || EWeight.Normal, p.fill || false),
+  fontSize: `calc(${p.size} * 0.875) !important`,
+  color: computeColor(p._fill),
+  "font-variation-settings": p.fontVariationSettings,
   userSelect: "none",
 }))
 
-export type TIcon = TPlaywright & {
+export type IconProps = PlaywrightProps & {
   name: string | "blank"
-  size: ESize
-  color: TColor
-  weight?: EWeight
-  fill?: boolean
+  fill: ColorWithLightness
+
+  tiny?: boolean
+  xsmall?: boolean
+  small?: boolean
+  medium?: boolean
+  large?: boolean
+  xLarge?: boolean
+  xxLarge?: boolean
+  huge?: boolean
+
+  style?: "filled" | "outlined" | "rounded" | "twotone" | "sharp"
+
   onClick?: any
 }
 
-export const Icon = ({ name, size, color, weight, fill, onClick = undefined, playwrightTestId }: TIcon) => {
-  const noop = () => {}
-
-  return (
-    <Container
-      size={size}
-      weight={weight}
-      fill={fill}
-      color={color as any}
-      className="material-symbols-rounded"
-      onClick={onClick || noop}
-      data-playwright-testid={playwrightTestId}
-    >
-      {name === "blank" ? null : name}
-    </Container>
-  )
-}
+export const Icon = (p: IconProps) => (
+  <Container
+    className="<Icon /> - material-symbols-rounded"
+    size={computeSize(p)}
+    fontVariationSettings={computeFontVariantSettings(p)}
+    _fill={p.fill}
+    onClick={p.onClick}
+    data-playwright-testid={p.playwrightTestId}
+  >
+    {p.name === "blank" ? null : p.name}
+  </Container>
+)

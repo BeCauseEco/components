@@ -1,10 +1,10 @@
-import { TIcon } from "@new/Icon/Icon"
-import { TSpacer } from "@new/Spacer/Spacer"
-import { TText } from "@new/Text/Text"
+import { IconProps } from "@new/Icon/Icon"
+import { SpacerProps } from "@new/Stack/Spacer"
+import { TextProps } from "@new/Text/Text"
 import styled from "@emotion/styled"
 import * as Tabs from "@radix-ui/react-tabs"
 import { PropsWithChildren, ReactElement, RefAttributes, forwardRef } from "react"
-import { TPlaywright } from "@new/TPlaywright"
+import { PlaywrightProps } from "@new/Playwright"
 
 const Trigger = styled(Tabs.Trigger)({
   display: "flex",
@@ -24,9 +24,9 @@ const Trigger = styled(Tabs.Trigger)({
   },
 })
 
-export type TTabsNavigationItem = TPlaywright & {
+export type TTabsNavigationItem = PlaywrightProps & {
   contentTargetId: string
-  children: ReactElement<TIcon | TText | TSpacer> | ReactElement<TIcon | TText | TSpacer>[]
+  children: ReactElement<IconProps | TextProps | SpacerProps> | ReactElement<IconProps | TextProps | SpacerProps>[]
   onClick?: () => void
 }
 

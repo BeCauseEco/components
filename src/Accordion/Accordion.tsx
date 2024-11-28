@@ -2,12 +2,12 @@ import styled from "@emotion/styled"
 import { ReactElement } from "react"
 import * as RadixAccordion from "@radix-ui/react-accordion"
 import { TAccordionItem } from "./AccordionItem"
-import { ESize } from "@new/ESize"
-import { TPlaywright } from "@new/TPlaywright"
+import { Size } from "@new/Size"
+import { PlaywrightProps } from "@new/Playwright"
 
 const Container = styled.div({
   display: "flex",
-  borderRadius: ESize.Tiny,
+  borderRadius: Size.Tiny,
   overflow: "clip",
 })
 
@@ -15,7 +15,7 @@ const Root = styled(RadixAccordion.Root)({
   width: "100%",
 })
 
-export type TAccordion = TPlaywright & {
+export type TAccordion = PlaywrightProps & {
   items: ReactElement<TAccordionItem> | ReactElement<TAccordionItem>[]
   defaultValue: string
 }

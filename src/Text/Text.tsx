@@ -1,27 +1,7 @@
 import { PropsWithChildren, forwardRef } from "react"
 import styled from "@emotion/styled"
-import { TColor, computeColor } from "@new/Color"
-import { ESize } from "@new/ESize"
-import { EAlignment } from "@new/EAlignment"
-import { TPlaywright } from "@new/TPlaywright"
-
-type TContainerProperties = TText & { color: TColor; alignment?: EAlignment }
-
-const computeAlignment = (alignment?: EAlignment) => {
-  switch (alignment) {
-    case EAlignment.Start:
-      return "left"
-
-    case EAlignment.Middle:
-      return "center"
-
-    case EAlignment.End:
-      return "right"
-
-    default:
-      return "inherit"
-  }
-}
+import { ColorWithLightness, computeColor } from "@new/Color"
+import { PlaywrightProps } from "@new/Playwright"
 
 export const StyleMonospace = {
   fontFamily: "monospace",
@@ -38,56 +18,56 @@ export const StyleFontFamily = {
 export const StyleBodyTiny = {
   fontSize: "12px",
   lineHeight: "16px",
-  letterSpacing: "0.0025em",
 }
 
 export const StyleBodyXsmall = {
   fontSize: "14px",
   lineHeight: "20px",
-  letterSpacing: "0em",
 }
 
 export const StyleBodySmall = {
   fontSize: "16px",
   lineHeight: "24px",
-  letterSpacing: "0em",
 }
 
 export const StyleBodyMedium = {
   fontSize: "20px",
   lineHeight: "28px",
-  letterSpacing: "-0.005em",
 }
 
 export const StyleBodyLarge = {
   fontSize: "24px",
   lineHeight: "30px",
-  letterSpacing: "-0.00625em",
 }
 
 export const StyleBodyXLarge = {
   fontSize: "28px",
   lineHeight: "36px",
-  letterSpacing: "-0.0075em",
 }
 
 export const StyleBodyHuge = {
   fontSize: "35px",
   lineHeight: "40px",
-  letterSpacing: "-0.01em",
 }
 
-const Container = styled.p<TContainerProperties>(p => ({
+const Container = styled.p<Omit<TextProps, "fill"> & { _fill: TextProps["fill"] }>(p => ({
   display: "inline",
+
   ...(p.monospace ? StyleMonospace : StyleFontFamily),
-  color: computeColor(p.color),
-  fontStyle: p.italicize ? "italic" : "normal",
-  fontWeight: p.emphasize ? 600 : 500,
-  textDecoration: p.underline ? "underline" : "inherit",
-  textTransform: p.capitalize ? "uppercase" : "inherit",
-  textWrap: p.wrap ? "pretty" : "nowrap",
-  textAlign: computeAlignment(p.alignment),
+
+  color: computeColor(p._fill),
+  fontStyle: "normal",
+  fontWeight: 400,
+  textDecoration: "inherit",
+  textTransform: "inherit",
+  textWrap: !p.maxWidth && p.wrap ? "pretty" : "nowrap",
+  textAlign: "left",
   alignItems: "inherit",
+  margin: 0,
+
+  "& strong, & b": {
+    fontWeight: 600,
+  },
 
   "& a": {
     color: "inherit",
@@ -103,67 +83,98 @@ const Container = styled.p<TContainerProperties>(p => ({
     // filter: "brightness(0.8)",
   },
 
-  ...(p.size === ESize.Tiny && StyleBodyTiny),
-  ...(p.size === ESize.Xsmall && StyleBodyXsmall),
-  ...(p.size === ESize.Small && StyleBodySmall),
-  ...(p.size === ESize.Medium && StyleBodyMedium),
-  ...(p.size === ESize.Large && StyleBodyLarge),
-  ...(p.size === ESize.XLarge && StyleBodyXLarge),
-  ...(p.size === ESize.Huge && StyleBodyHuge),
+  ...(p.maxWidth && {
+    overflowX: "hidden",
+    overflowY: "hidden",
+    textOverflow: "ellipsis",
+    textWrap: "nowrap",
+    display: "inline-block",
+    maxWidth: p.maxWidth,
+  }),
 
-  ...(!p.wrap && p.size === ESize.Tiny && { lineHeight: StyleBodyTiny.fontSize }),
-  ...(!p.wrap && p.size === ESize.Xsmall && { lineHeight: StyleBodyXsmall.fontSize }),
-  ...(!p.wrap && p.size === ESize.Small && { lineHeight: StyleBodySmall.fontSize }),
-  ...(!p.wrap && p.size === ESize.Medium && { lineHeight: StyleBodyMedium.fontSize }),
-  ...(!p.wrap && p.size === ESize.Large && { lineHeight: StyleBodyLarge.fontSize }),
-  ...(!p.wrap && p.size === ESize.XLarge && { lineHeight: StyleBodyXLarge.fontSize }),
-  ...(!p.wrap && p.size === ESize.Huge && { lineHeight: StyleBodyHuge.fontSize }),
+  ...(p.tiny && StyleBodyTiny),
+  ...(p.xsmall && StyleBodyXsmall),
+  ...(p.small && StyleBodySmall),
+  ...(p.medium && StyleBodyMedium),
+  ...(p.large && StyleBodyLarge),
+  ...(p.xLarge && StyleBodyXLarge),
+  ...(p.huge && StyleBodyHuge),
+
+  ...(!p.wrap && p.tiny && { lineHeight: StyleBodyTiny.fontSize }),
+  ...(!p.wrap && p.xsmall && { lineHeight: StyleBodyXsmall.fontSize }),
+  ...(!p.wrap && p.small && { lineHeight: StyleBodySmall.fontSize }),
+  ...(!p.wrap && p.medium && { lineHeight: StyleBodyMedium.fontSize }),
+  ...(!p.wrap && p.large && { lineHeight: StyleBodyLarge.fontSize }),
+  ...(!p.wrap && p.xLarge && { lineHeight: StyleBodyXLarge.fontSize }),
+  ...(!p.wrap && p.huge && { lineHeight: StyleBodyHuge.fontSize }),
 }))
 
-export type TText = TPlaywright & {
-  size: ESize
-  color: TColor
-  emphasize?: boolean
-  italicize?: boolean
-  underline?: boolean
-  capitalize?: boolean
-  alignment?: EAlignment
+export type TextProps = PlaywrightProps & {
+  tiny?: boolean
+  xsmall?: boolean
+  small?: boolean
+  medium?: boolean
+  large?: boolean
+  xLarge?: boolean
+  xxLarge?: boolean
+  huge?: boolean
+
+  fill: ColorWithLightness
+
   wrap?: boolean
+
+  /**
+   * Last resort for triggering ellipsis text overflow.
+   * @maxWidth: pixel value
+   */
+  maxWidth?: string
+
   monospace?: boolean
-  title?: string
 }
 
-export const Text = forwardRef<HTMLHeadingElement | HTMLParagraphElement, PropsWithChildren<TText>>((props, ref) => {
+export const Text = forwardRef<HTMLHeadingElement | HTMLParagraphElement, PropsWithChildren<TextProps>>((p, ref) => {
   const {
-    size,
-    color,
-    emphasize = false,
-    italicize = false,
-    underline = false,
-    capitalize = false,
-    alignment = undefined,
+    tiny,
+    xsmall,
+    small,
+    medium,
+    large,
+    xLarge,
+    xxLarge,
+    huge,
+
+    fill,
+
     wrap = false,
+    maxWidth,
+
     monospace = false,
+
     children,
-    title,
+
     playwrightTestId,
-  } = props
+
+    ...rest
+  } = p
 
   return (
     <Container
+      className="<Text /> -"
       ref={ref}
-      size={size}
-      color={color}
-      emphasize={emphasize}
-      italicize={italicize}
-      underline={underline}
-      capitalize={capitalize}
+      tiny={tiny}
+      xsmall={xsmall}
+      small={small}
+      medium={medium}
+      large={large}
+      xLarge={xLarge}
+      xxLarge={xxLarge}
+      huge={huge}
+      _fill={fill}
       wrap={wrap}
+      maxWidth={maxWidth}
       monospace={monospace}
-      textAlign={computeAlignment(alignment)}
-      title={title}
       data-playwright-testid={playwrightTestId}
-      {...(props as any)}
+      {...rest}
     >
       {children}
     </Container>

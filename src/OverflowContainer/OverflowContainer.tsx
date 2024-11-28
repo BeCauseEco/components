@@ -1,7 +1,7 @@
 import styled from "@emotion/styled"
 import { computeColor } from "@new/Color"
-import { TColor } from "@new/Color"
-import { TPlaywright } from "@new/TPlaywright"
+import { ColorWithLightness } from "@new/Color"
+import { PlaywrightProps } from "@new/Playwright"
 
 import { PropsWithChildren, ReactElement } from "react"
 
@@ -15,13 +15,13 @@ const Container = styled.div<
   flexDirection: "inherit",
   width: "100%",
   height: "inherit",
-  padding: p.hug ? 0 : "calc(var(--BU) * 4)",
+  padding: p.hug ? (p.hug === "partly" ? "calc(var(--BU) * 2)" : 0) : "calc(var(--BU) * 4)",
   ...(p.minWidth && { minWidth: p.minWidth }),
   ...(p.maxWidth && { maxWidth: p.maxWidth }),
   ...(p.minHeight && { minHeight: p.minHeight }),
   ...(p.maxHeight !== undefined && { maxHeight: p.maxHeight }),
-  overflowX: p.axes === EOverflowContainerAxis.Both || p.axes === EOverflowContainerAxis.Horizontal ? "auto" : "hidden",
-  overflowY: p.axes === EOverflowContainerAxis.Both || p.axes === EOverflowContainerAxis.Vertical ? "auto" : "hidden",
+  overflowX: p.axes === "both" || p.axes === "horizontal" ? "auto" : "hidden",
+  overflowY: p.axes === "both" || p.axes === "vertical" ? "auto" : "hidden",
 
   "::-webkit-scrollbar-track": {
     backgroundColor: computeColor(p.colorBackground),
@@ -33,26 +33,20 @@ const Container = styled.div<
   },
 }))
 
-export enum EOverflowContainerAxis {
-  Vertical,
-  Horizontal,
-  Both,
-}
-
 export enum EMaxheightOptions {
   RadixAccordionContentHeight = "var(--radix-accordion-content-height)",
   RadixPopoverContentAvailableHeight = "var(--radix-popover-content-available-height)",
 }
 
-export type TOverflowContainer = TPlaywright & {
-  axes: EOverflowContainerAxis
-  colorBackground: TColor
-  colorForeground: TColor
+export type TOverflowContainer = PlaywrightProps & {
+  axes: "vertical" | "horizontal" | "both"
+  colorBackground: ColorWithLightness
+  colorForeground: ColorWithLightness
   minWidth?: string
   maxWidth?: string
   minHeight?: string
   maxHeight?: EMaxheightOptions | string
-  hug?: boolean
+  hug?: boolean | "partly"
   children: ReactElement | ReactElement[]
   className?: string
 }
@@ -71,6 +65,7 @@ export const OverflowContainer = ({
   className,
 }: PropsWithChildren<TOverflowContainer>) => (
   <Container
+    className={`<OverflowContainer /> -${className || ""}`}
     axes={axes}
     colorBackground={colorBackground}
     colorForeground={colorForeground}
@@ -80,7 +75,6 @@ export const OverflowContainer = ({
     maxHeight={maxHeight}
     hug={hug}
     data-playwright-testid={playwrightTestId}
-    className={className}
   >
     {children}
   </Container>

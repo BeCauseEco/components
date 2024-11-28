@@ -1,7 +1,7 @@
 import { ReactNode } from "react"
 import styled from "@emotion/styled"
 import { TLayoutBase } from "@new/Composition/TLayoutBase"
-import { computeColor, EColor } from "@new/Color"
+import { computeColor, Color } from "@new/Color"
 import { Composition } from "@new/Composition/Composition"
 import { BackgroundCard } from "@new/Composition/BackgroundCard"
 import { Align } from "@new/Align/Align"
@@ -17,7 +17,7 @@ const Container = styled.div({
 const Breadcrumbs = styled.div({
   display: "flex",
   flexDirection: "row",
-  borderBottom: `solid 1px ${computeColor([EColor.Black, 100])}`,
+  borderBottom: `solid 1px ${computeColor([Color.Black, 100])}`,
   height: "calc(var(--BU) * 12)",
 })
 
@@ -90,7 +90,7 @@ export const LayoutChrome = ({
     <Container>
       <SidebarPrimaryAndTertiary>
         <Composition>
-          <BackgroundCard colorBackground={[EColor.Primary, 700]} />
+          <BackgroundCard colorBackground={[Color.Primary, 700]} />
 
           <LayoutSidebarPrimaryAndTertiary>
             <>
@@ -105,7 +105,7 @@ export const LayoutChrome = ({
       <CombinedOuter>
         <SidebarSecondary>
           <Composition>
-            <BackgroundCard colorBackground={[EColor.Black, 50]} />
+            <BackgroundCard colorBackground={[Color.Black, 50]} />
 
             <LayoutSidebarSecondary>{contentSecondaryNavigation}</LayoutSidebarSecondary>
           </Composition>

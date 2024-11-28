@@ -1,23 +1,23 @@
 import styled from "@emotion/styled"
 import * as RadixAlertDialog from "@radix-ui/react-alert-dialog"
 import { ReactElement } from "react"
-import { TInputButton } from "@new/InputButton/InputButton"
 import { EOpacity } from "@new/Opacity"
-import { EColor } from "@new/Color"
+import { Color } from "@new/Color"
 import { Composition } from "@new/Composition/Composition"
 import { BackgroundCard } from "../Composition/BackgroundCard"
 import { LayoutAlert } from "./internal/LayoutAlert"
-import { ESize } from "@new/ESize"
-import { Spacer } from "@new/Spacer/Spacer"
+import { Size } from "@new/Size"
+import { Spacer } from "@new/Stack/Spacer"
 import { EShadow } from "@new/EShadow"
-import { TText } from "@new/Text/Text"
-import { TPlaywright } from "@new/TPlaywright"
+import { TextProps } from "@new/Text/Text"
+import { PlaywrightProps } from "@new/Playwright"
+import { InputButtonPrimaryProps } from "@new/InputButton/InputButtonPrimary"
 
 const Overlay = styled(RadixAlertDialog.Overlay)({
   display: "flex",
   position: "fixed",
   inset: 0,
-  backgroundColor: EColor.Black,
+  backgroundColor: Color.Black,
   opacity: EOpacity.Light,
   zIndex: 999999,
 })
@@ -32,12 +32,12 @@ const Content = styled(RadixAlertDialog.Content)({
   zIndex: 9999999,
 })
 
-export type TAlertDialog = TPlaywright & {
+export type TAlertDialog = PlaywrightProps & {
   open: boolean
-  title?: ReactElement<TText>
-  description?: ReactElement<TText>
-  buttonPrimary: ReactElement<TInputButton>
-  buttonSecondary: ReactElement<TInputButton>
+  title?: ReactElement<TextProps>
+  description?: ReactElement<TextProps>
+  buttonPrimary: ReactElement<InputButtonPrimaryProps>
+  buttonSecondary: ReactElement<InputButtonPrimaryProps>
 }
 
 export const Alert = ({ open, title, description, buttonPrimary, buttonSecondary, playwrightTestId }: TAlertDialog) => (
@@ -47,7 +47,7 @@ export const Alert = ({ open, title, description, buttonPrimary, buttonSecondary
 
       <Content data-playwright-testid={playwrightTestId}>
         <Composition>
-          <BackgroundCard colorBackground={[EColor.White]} borderRadius={ESize.Tiny} shadow={EShadow.Large} />
+          <BackgroundCard colorBackground={[Color.White]} borderRadius={Size.Tiny} shadow={EShadow.Large} />
 
           <LayoutAlert
             contentTop={title}

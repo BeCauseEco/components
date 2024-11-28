@@ -1,7 +1,7 @@
 import React, { ReactElement } from "react"
 import styled from "@emotion/styled"
-import { TPlaywright } from "@new/TPlaywright"
-import { TStack } from "@new/Stack/Stack"
+import { PlaywrightProps } from "@new/Playwright"
+import { StackProps } from "../Stack/Stack"
 
 const Outer = styled.div({
   display: "flex",
@@ -12,16 +12,19 @@ const Outer = styled.div({
 })
 
 const Inner = styled(Outer)({
-  maxWidth: "1024px",
+  maxWidth: "1280px",
   padding: "0 calc(var(--BU) * 4)",
 })
 
-export type TPageBounds = TPlaywright & {
-  children: ReactElement<TStack> | ReactElement<TStack>[]
+export type TPageBounds = PlaywrightProps & {
+  children: ReactElement<StackProps> | ReactElement<StackProps>[]
 }
 
 export const PageBounds = ({ children, playwrightTestId }: TPageBounds) => (
-  <Outer className="component-page_bounds component-composition-reset" data-playwright-testid={playwrightTestId}>
-    <Inner>{children}</Inner>
+  <Outer
+    className="<PageBounds /> - component-page_bounds component-composition-reset"
+    data-playwright-testid={playwrightTestId}
+  >
+    <Inner className="<PageBounds: children /> - ">{children}</Inner>
   </Outer>
 )

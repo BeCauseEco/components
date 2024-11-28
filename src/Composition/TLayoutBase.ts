@@ -1,8 +1,8 @@
-import { ESize } from "@new/ESize"
-import { TPlaywright } from "@new/TPlaywright"
+import { Size } from "@new/Size"
+import { PlaywrightProps } from "@new/Playwright"
 
-export type TLayoutBase = TPlaywright & {
+export type TLayoutBase = PlaywrightProps & {
   id?: string
   omitPadding?: boolean
-  spacing?: ESize
+  spacing?: Size
 }

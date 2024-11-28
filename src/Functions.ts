@@ -1,20 +1,18 @@
-// import React from "react"
+import React from "react"
 import { ReactElement } from "react"
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-export const containsIlligalChildren = (children: ReactElement | ReactElement[], allowedTypes: string[]): boolean => {
-  // const a = React.Children.toArray(children).flatMap(a => a["type"]["name"])
-  // const b = allowedTypes
+export const containsIlligalChildren = (
+  children: ReactElement | ReactElement[] | null,
+  allowedTypes: string[],
+): boolean => {
+  const typeNames = React.Children.toArray(children).flatMap(a => a["type"]["name"])
+  const types = React.Children.toArray(children).flatMap(a => a["type"]?.toString())
 
-  // console.log(
-  //   a,
-  //   b,
-  //   a.some(v => b.includes(v)),
-  // )
+  types.forEach(type => {
+    console.log(1, type)
+  })
 
-  // return a.some(r => allowedTypes.includes(r))
-
-  // console.log(11, types, allowedTypes)
+  console.log("containsIlligalChildren", typeNames, types, allowedTypes)
 
   return false
 }

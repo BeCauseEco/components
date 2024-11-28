@@ -1,14 +1,17 @@
 import { ReactElement, useEffect } from "react"
 import * as RadixDialog from "@radix-ui/react-dialog"
-import { TInputButton } from "@new/InputButton/InputButton"
 import { Composition, TComposition } from "@new/Composition/Composition"
 import { BackgroundCard } from "@new/Composition/BackgroundCard"
-import { EColor } from "@new/Color"
+import { Color } from "@new/Color"
 import { LayoutTakeover } from "./internal/LayoutTakeover"
 import styled from "@emotion/styled"
-import { Spacer } from "@new/Spacer/Spacer"
-import { TText } from "@new/Text/Text"
-import { TPlaywright } from "@new/TPlaywright"
+import { Spacer } from "@new/Stack/Spacer"
+import { TextProps } from "@new/Text/Text"
+import { PlaywrightProps } from "@new/Playwright"
+import { InputButtonIconTertiaryProps } from "@new/InputButton/InputButtonIconTertiary"
+import { InputButtonPrimaryProps } from "@new/InputButton/InputButtonPrimary"
+import { InputButtonSecondaryProps } from "@new/InputButton/InputButtonSecondary"
+import { InputButtonTertiaryProps } from "@new/InputButton/InputButtonTertiary"
 
 const offsetTop = "64px"
 const offsetLeft = "76px"
@@ -40,16 +43,16 @@ const RadixDialogClose = styled(RadixDialog.Close)({
   height: "fit-content",
 })
 
-export type TTakeover = TPlaywright & {
+export type TTakeover = PlaywrightProps & {
   content: ReactElement<TComposition>
   open: boolean
   onOpenChange: (open: boolean) => void
-  buttonClose?: ReactElement<TInputButton>
-  title?: ReactElement<TText>
-  status?: ReactElement<TText>
-  buttonPrimary?: ReactElement<TInputButton>
-  buttonSecondary?: ReactElement<TInputButton>
-  buttonTertiary?: ReactElement<TInputButton>
+  buttonClose?: ReactElement<InputButtonIconTertiaryProps>
+  title?: ReactElement<TextProps>
+  status?: ReactElement<TextProps>
+  buttonPrimary?: ReactElement<InputButtonPrimaryProps>
+  buttonSecondary?: ReactElement<InputButtonSecondaryProps>
+  buttonTertiary?: ReactElement<InputButtonTertiaryProps>
   offsetTopOverride?: string
   offsetLeftOverride?: string
   offsetLeftSmallOverride?: string
@@ -112,7 +115,7 @@ export const Takeover = ({
           offsetLeftSmallOverride={offsetLeftSmallOverride}
         >
           <Composition explodeHeight>
-            <BackgroundCard colorBackground={[EColor.White]} />
+            <BackgroundCard colorBackground={[Color.White]} />
 
             <LayoutTakeover
               contentStart={title}

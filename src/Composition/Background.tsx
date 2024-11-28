@@ -1,19 +1,19 @@
-import { EColor, TColor, computeColor } from "@new/Color"
+import { Color, ColorWithLightness, computeColor } from "@new/Color"
 import { EShadow } from "@new/EShadow"
-import { ESize } from "@new/ESize"
+import { Size } from "@new/Size"
 import styled from "@emotion/styled"
 import { css, Global } from "@emotion/react"
-import { TPlaywright } from "@new/TPlaywright"
+import { PlaywrightProps } from "@new/Playwright"
 
-const calculateBorderRadius = (size?: ESize): string => {
+const calculateBorderRadius = (size?: Size): string => {
   switch (size) {
-    case ESize.Small:
+    case Size.Small:
       return "var(--BU)"
 
-    case ESize.Medium:
+    case Size.Medium:
       return "calc(var(--BU) * 1.5)"
 
-    case ESize.Large:
+    case Size.Large:
       return "calc(var(--BU) * 2)"
 
     default:
@@ -56,12 +56,12 @@ const Container = styled.div<TBackground>(p => ({
   // }),
 }))
 
-export type TBackground = TPlaywright & {
-  colorBackground?: TColor
-  colorBackgroundHover?: TColor
-  colorOutline?: TColor
-  colorOutlineHover?: TColor
-  borderRadius?: ESize.Small | ESize.Medium | ESize.Large
+export type TBackground = PlaywrightProps & {
+  colorBackground?: ColorWithLightness
+  colorBackgroundHover?: ColorWithLightness
+  colorOutline?: ColorWithLightness
+  colorOutlineHover?: ColorWithLightness
+  borderRadius?: Size.Small | Size.Medium | Size.Large
   shadow?: EShadow
   stacked?: boolean
 }
@@ -81,13 +81,13 @@ export const Background = ({
 
   const c = css`
     .component-composition > .component-composition-background > .component-backgroundcard-${id} {
-      background-color: ${computeColor(colorBackground || [EColor.Transparent])};
-      outline: solid 1px ${computeColor(colorOutline || [EColor.Transparent])};
+      background-color: ${computeColor(colorBackground || [Color.Transparent])};
+      outline: solid 1px ${computeColor(colorOutline || [Color.Transparent])};
     }
 
     .component-composition:hover > .component-composition-background > .component-backgroundcard-${id} {
-      background-color: ${computeColor(colorBackgroundHover || colorBackground || [EColor.Transparent])} !important;
-      outlinecolor: ${computeColor(colorOutlineHover || colorOutline || [EColor.Transparent])} !important;
+      background-color: ${computeColor(colorBackgroundHover || colorBackground || [Color.Transparent])} !important;
+      outlinecolor: ${computeColor(colorOutlineHover || colorOutline || [Color.Transparent])} !important;
     }
   `
 

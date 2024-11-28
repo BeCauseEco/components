@@ -1,7 +1,7 @@
 import { ReactNode } from "react"
 import styled from "@emotion/styled"
 import { EDirection } from "@new/EDirection"
-import { ESize } from "@new/ESize"
+import { Size } from "@new/Size"
 import { TLayoutBase } from "./TLayoutBase"
 
 type TContainerProperties = Pick<TLayoutSplit, "omitPadding" | "direction" | "spacing">
@@ -52,7 +52,7 @@ export type TLayoutSplit = TLayoutBase & {
   contentEnd: ReactNode | ReactNode[]
   direction: EDirection
   omitPadding?: boolean
-  spacing?: ESize
+  spacing?: Size
   collapse?: ELayoutSplitCollapse
 }
 

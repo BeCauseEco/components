@@ -1,5 +1,5 @@
 import styled from "@emotion/styled"
-import { TPlaywright } from "@new/TPlaywright"
+import { PlaywrightProps } from "@new/Playwright"
 import { ReactElement } from "react"
 
 type TContainerProperties = Omit<TTableCell, "children">
@@ -11,7 +11,7 @@ const Container = styled.td<TContainerProperties>(p => ({
   width: p.width || "auto",
 }))
 
-export type TTableCell = TPlaywright & {
+export type TTableCell = PlaywrightProps & {
   children?: ReactElement | ReactElement[]
   width?: string
   omitPadding?: boolean

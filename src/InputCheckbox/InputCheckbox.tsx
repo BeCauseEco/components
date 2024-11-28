@@ -1,29 +1,21 @@
 import styled from "@emotion/styled"
-import { ESize } from "@new/ESize"
-import { EColor } from "@new/Color"
+import { Color } from "@new/Color"
 import * as RadixCheckbox from "@radix-ui/react-checkbox"
 import { Icon } from "@new/Icon/Icon"
-import { TText } from "@new/Text/Text"
-import { ReactElement, useId } from "react"
-import { EDirection } from "@new/EDirection"
-import { EWeight } from "@new/EWeight"
-import { Composition } from "@new/Composition/Composition"
-import { BackgroundCard } from "@new/Composition/BackgroundCard"
-import { KeyValuePair } from "@new/KeyValuePair/KeyValuePair"
-import { LayoutSingle } from "@new/Composition/LayoutSingle"
-import { TPlaywright } from "@new/TPlaywright"
+import { Text } from "@new/Text/Text"
+import { useId } from "react"
+import { PlaywrightProps } from "@new/Playwright"
+import { Stack } from "@new/Stack/Stack"
+import { Spacer } from "@new/Stack/Spacer"
+import { Align } from "@new/Stack/Align"
 
 const Container = styled.div({
   display: "flex",
-  height: `calc(var(--BU) * 4)`,
 
   "& button": {
     all: "unset",
     display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    width: `calc(var(--BU) * 4)`,
-    height: `calc(var(--BU) * 4)`,
+    cursor: "pointer",
   },
 })
 
@@ -41,53 +33,48 @@ const Label = styled.label({
   cursor: "pointer",
 })
 
-export type TInputCheckBox = TPlaywright & {
+export type InputCheckboxProps = PlaywrightProps & {
+  size: "small" | "large"
+
+  color: Color
+
+  label?: string
+
   value: boolean | "indeterminate"
-  id?: string
+
   onChange: (value: boolean) => void
-  colorBackground: EColor
-  colorForeground: EColor
-  label?: ReactElement<TText>
+
+  disabled?: boolean
 }
 
-export const InputCheckbox = ({
-  value,
-  id,
-  onChange,
-  colorBackground,
-  colorForeground,
-  label,
-  playwrightTestId,
-}: TInputCheckBox) => {
+export const InputCheckbox = (p: InputCheckboxProps) => {
   const key = useId()
 
   return (
-    <Container id={id} data-playwright-testid={playwrightTestId}>
-      <KeyValuePair direction={EDirection.Horizontal} spacing={ESize.Xsmall}>
-        <Composition>
-          <BackgroundCard colorBackground={[colorBackground, 700]} borderRadius={ESize.Tiny} />
+    <Container className="<InputCheckbox /> -">
+      <Stack horizontal hug disabled={p.disabled}>
+        <Align horizontal left hug>
+          <Root id={key} checked={p.value} onCheckedChange={checked => p.onChange(checked === true)}>
+            {p.value === "indeterminate" && <Icon name="indeterminate_check_box" large fill={[p.color, 700]} />}
 
-          <LayoutSingle
-            direction={EDirection.Vertical}
-            omitPadding
-            content={
-              <Root id={key} checked={value} onCheckedChange={checked => onChange(checked === true)}>
-                <RadixCheckbox.Indicator>
-                  {value === "indeterminate" && (
-                    <Icon name="remove" size={ESize.Small} color={[colorForeground, 700]} weight={EWeight.Heavy} />
-                  )}
+            {p.value === true && <Icon name="check_box" large fill={[p.color, 700]} />}
 
-                  {value === true && (
-                    <Icon name="check" size={ESize.Small} color={[colorForeground, 700]} weight={EWeight.Heavy} />
-                  )}
-                </RadixCheckbox.Indicator>
-              </Root>
-            }
-          />
-        </Composition>
+            {p.value === false && <Icon name="check_box_outline_blank" large style="outlined" fill={[p.color, 300]} />}
+          </Root>
 
-        <Label htmlFor={key}>{label}</Label>
-      </KeyValuePair>
+          {p.label && (
+            <>
+              <Spacer tiny={p.size === "small"} xsmall={p.size === "large"} />
+
+              <Label htmlFor={key}>
+                <Text xsmall={p.size === "small"} small={p.size !== "small"} fill={[Color.Black, 700]}>
+                  {p.label}
+                </Text>
+              </Label>
+            </>
+          )}
+        </Align>
+      </Stack>
     </Container>
   )
 }

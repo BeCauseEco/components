@@ -1,15 +1,16 @@
 import React, { ReactElement } from "react"
 import styled from "@emotion/styled"
-import { TAlign } from "@new/Align/Align"
-import { containsIlligalChildren } from "@new/Functions"
-import { computeColor, EColor, TColor } from "@new/Color"
-import { TLayoutBase } from "@new/Composition/TLayoutBase"
+import { AlignProps } from "@new/Stack/Align"
+// import { containsIlligalChildren } from "@new/Functions"
+import { computeColor, Color, ColorWithLightness } from "@new/Color"
+import { ComponentBaseProps } from "@new/ComponentBaseProps"
 import { Loader } from "./internal/Loader"
 import { Spinner } from "./internal/Spinner"
-import { TGrid } from "@new/Grid/Grid"
+import { GridProps } from "@new/Grid/Grid"
+import { SpacerProps } from "@new/Stack/Spacer"
 
-const translateBorderRadius = (p?: Pick<TStack, "borderRadius">): string => {
-  switch (p?.borderRadius) {
+const translateBorderRadius = (cornerRadius: StackProps["cornerRadius"]): string => {
+  switch (cornerRadius) {
     case "small":
       return "calc(var(--BU) / 2)"
 
@@ -26,10 +27,10 @@ const translateBorderRadius = (p?: Pick<TStack, "borderRadius">): string => {
 
 const Container = styled.div<
   Pick<
-    TStack,
+    StackProps,
     | "explodeHeight"
     | "overflowHidden"
-    | "borderRadius"
+    | "cornerRadius"
     | "colorBackground"
     | "colorBackgroundHover"
     | "colorOutline"
@@ -38,85 +39,86 @@ const Container = styled.div<
   >
 >(p => ({
   display: "flex",
+  flexShrink: 1,
   width: "100%",
-  height: p.explodeHeight ? "100%" : "inherit",
+  height: p.explodeHeight ? "100%" : "auto",
   overflow: p.overflowHidden ? "hidden" : "visible",
   cursor: "inherit",
   position: "relative",
-  borderRadius: translateBorderRadius({ borderRadius: p.borderRadius }),
-  backgroundColor: computeColor(p.colorBackground || [EColor.Transparent]),
+  borderRadius: translateBorderRadius(p.cornerRadius),
+  backgroundColor: computeColor(p.colorBackground || [Color.Transparent]),
   transition: "background-color 0.1s ease-in-out",
   willChange: "background-color",
-
-  ...(p.aspectRatio && {
-    aspectRatio: p.aspectRatio,
-  }),
+  aspectRatio: p.aspectRatio || "auto",
+  content: `'${p.aspectRatio}'`,
 
   outlineOffset: -1,
 
   ...(p.colorOutline && {
-    outline: `solid 1px ${computeColor(p.colorOutline || [EColor.Transparent])}`,
+    outline: `solid 1px ${computeColor(p.colorOutline || [Color.Transparent])}`,
   }),
 
   "&:hover": {
-    ...(p.colorBackgroundHover && { backgroundColor: computeColor(p.colorBackgroundHover || [EColor.Transparent]) }),
+    ...(p.colorBackgroundHover && { backgroundColor: computeColor(p.colorBackgroundHover || [Color.Transparent]) }),
 
     ...(p.colorOutlineHover && {
-      outlineColor: computeColor(p.colorOutlineHover || [EColor.Transparent]),
+      outlineColor: computeColor(p.colorOutlineHover || [Color.Transparent]),
     }),
   },
 }))
 
-const Children = styled.div<Pick<TStack, "loading" | "disabled" | "hug"> & { flexDirection: "column" | "row" }>(p => ({
-  display: "inherit",
-  flexDirection: p.flexDirection,
-  width: "inherit",
-  height: "inherit",
-  padding: p.hug ? (p.hug === "partly" ? "calc(var(--BU) * 2)" : 0) : "calc(var(--BU) * 4)",
-  transition: "opacity 0.2s ease-in-out",
-  willChange: "opacity",
+const Children = styled.div<Pick<StackProps, "loading" | "disabled" | "hug"> & { flexDirection: "column" | "row" }>(
+  p => ({
+    display: "inherit",
+    flexDirection: p.flexDirection,
+    width: "inherit",
+    height: "inherit",
+    padding: p.hug ? (p.hug === "partly" ? "calc(var(--BU) * 2)" : 0) : "calc(var(--BU) * 4)",
+    transition: "opacity 0.2s ease-in-out",
+    willChange: "opacity",
 
-  ...(p.loading
-    ? {
-        // minHeight: "fit-content", TO-DO: @cllpse: perhaps this will break things like text
-        height: "unset",
-        maxHeight: "calc(var(--BU) * 40)",
-        opacity: 0,
-        overflow: "hidden",
-        cursor: "wait",
+    ...(p.loading
+      ? {
+          // minHeight: "fit-content", TO-DO: @cllpse: perhaps this will break things like text
+          height: "unset",
+          maxHeight: "calc(var(--BU) * 40)",
+          opacity: 0,
+          overflow: "hidden",
+          cursor: "wait",
 
-        "& *": {
-          pointerEvents: "none",
-        },
-      }
-    : {}),
+          "& *": {
+            pointerEvents: "none",
+          },
+        }
+      : {}),
 
-  ...(!p.loading && p.disabled
-    ? {
-        opacity: 0.6,
-        cursor: "not-allowed",
+    ...(!p.loading && p.disabled
+      ? {
+          opacity: 0.6,
+          cursor: "not-allowed",
 
-        "& *": {
-          pointerEvents: "none",
-        },
-      }
-    : {}),
-}))
+          "& *": {
+            pointerEvents: "none",
+          },
+        }
+      : {}),
+  }),
+)
 
-export type TStack = TLayoutBase & {
+export type StackProps = ComponentBaseProps & {
   vertical?: boolean
   horizontal?: boolean
 
   loading?: boolean
   disabled?: boolean
 
-  colorBackground?: TColor
-  colorBackgroundHover?: TColor
-  colorOutline?: TColor
-  colorOutlineHover?: TColor
-  colorLoading?: TColor
+  colorBackground?: ColorWithLightness
+  colorBackgroundHover?: ColorWithLightness
+  colorOutline?: ColorWithLightness
+  colorOutlineHover?: ColorWithLightness
+  colorLoading?: ColorWithLightness
 
-  borderRadius?: "small" | "medium" | "large"
+  cornerRadius?: "small" | "medium" | "large"
 
   hug?: boolean | "partly"
   explodeHeight?: boolean
@@ -124,32 +126,36 @@ export type TStack = TLayoutBase & {
 
   aspectRatio?: "auto" | "1"
 
-  children: ReactElement<TAlign | null> | ReactElement<TGrid | null> | ReactElement<TAlign | null>[]
+  children:
+    | ReactElement<AlignProps | SpacerProps | null>
+    | ReactElement<AlignProps | SpacerProps | null>[]
+    | ReactElement<GridProps | null>
 }
 
-export const Stack = (p: TStack) => {
-  if (containsIlligalChildren(p.children, ["Align"])) {
-    return <pre>TStack only accepts children of type: TAlign</pre>
-  }
+export const Stack = (p: StackProps) => {
+  // if (containsIlligalChildren(p.children, ["Align"])) {
+  //   return <pre>TStack only accepts children of type: TAlign</pre>
+  // }
 
   return (
     <Container
+      className={p.className || "<Stack /> -"}
       data-playwright-testid={p.playwrightTestId}
-      className="layout-container"
       colorBackground={p.colorBackground}
       colorBackgroundHover={p.colorBackgroundHover}
       colorOutline={p.colorOutline}
       colorOutlineHover={p.colorOutlineHover}
       explodeHeight={p.explodeHeight}
       overflowHidden={p.overflowHidden}
-      borderRadius={p.borderRadius}
+      cornerRadius={p.cornerRadius}
       aspectRatio={p.aspectRatio}
     >
-      <Loader loading={p.loading}>
+      <Loader className="<Stack: loader />" loading={p.loading}>
         <Spinner colorLoading={p.colorLoading} loading={p.loading} />
       </Loader>
 
       <Children
+        className="<Stack: children />"
         flexDirection={p["horizontal"] && !p["vertical"] ? "row" : "column"}
         hug={p.hug}
         disabled={p.disabled}

@@ -1,43 +1,109 @@
-import { EDirection } from "@new/EDirection"
-import { ESize } from "@new/ESize"
-import { KeyValuePair } from "@new/KeyValuePair/KeyValuePair"
-import { TText } from "@new/Text/Text"
 import styled from "@emotion/styled"
 import * as RadixRadioGroup from "@radix-ui/react-radio-group"
-import { PropsWithChildren, ReactElement, useId } from "react"
-import { TPlaywright } from "@new/TPlaywright"
+import { ReactElement } from "react"
+import { PlaywrightProps } from "@new/Playwright"
+import { InputRadioGroupItemProps } from "@new/InputRadioGroup/InputRadioGroupItem"
+import { Stack } from "@new/Stack/Stack"
+import { Align } from "@new/Stack/Align"
+import { Color } from "@new/Color"
+import { Icon } from "@new/Icon/Icon"
+import { Spacer } from "@new/Stack/Spacer"
+import { Text } from "@new/Text/Text"
+import React from "react"
 
 const Root = styled(RadixRadioGroup.Root)({
   display: "flex",
-  flexDirection: "column",
+  flexDirection: "inherit",
 })
 
-export type TInputRadioGroup = TPlaywright & {
+const Item = styled(RadixRadioGroup.Item)({
+  all: "unset",
+  display: "flex",
+  flexDirection: "row",
+  position: "relative",
+  cursor: "pointer",
+  padding: 0,
+  height: "fit-content",
+
+  "&:focus": {
+    // boxShadow: "0 0 0 2px currentColor",
+  },
+})
+
+const Label = styled.label({
+  display: "flex",
+  cursor: "pointer",
+  userSelect: "none",
+})
+
+export type InputRadioGroupProps = PlaywrightProps & {
+  size: "small" | "large"
+
+  color: Color
+
   defaultValue: string
   value: string
-  label?: ReactElement<TText>
-  id?: string
-  onChange?: (value: string) => void
+
+  onChange: (value: string) => void
+
+  label?: string
+
+  children: ReactElement<InputRadioGroupItemProps> | ReactElement<InputRadioGroupItemProps>[]
+
+  disabled?: boolean
 }
 
-export const InputRadioGroup = ({
-  defaultValue,
-  value,
-  label,
-  id,
-  onChange,
-  children,
-  playwrightTestId,
-}: PropsWithChildren<TInputRadioGroup>) => {
-  const key = useId()
+export const InputRadioGroup = (p: InputRadioGroupProps) => {
+  const items: ReactElement[] = []
+
+  let i = 0
+
+  React.Children.forEach(p.children, child => {
+    i = i + 1
+
+    if (React.isValidElement(child)) {
+      const renderSpacer = React.Children.count(p.children) > i && p.size === "large"
+
+      items.push(
+        <>
+          <Align horizontal left hug>
+            <Item id={child.props.value} value={child.props.value}>
+              {p.value === child.props.value ? (
+                <Icon name="radio_button_checked" large fill={[p.color, 700]} />
+              ) : (
+                <Icon name="radio_button_unchecked" large style="outlined" fill={[p.color, 300]} />
+              )}
+            </Item>
+
+            <Spacer tiny={p.size === "small"} xsmall={p.size === "large"} />
+
+            <Label htmlFor={child.props.value}>
+              <Text xsmall={p.size === "small"} small={p.size !== "small"} fill={[p.color, 700]}>
+                {child.props.label}
+              </Text>
+            </Label>
+          </Align>
+
+          {renderSpacer && <Spacer tiny />}
+        </>,
+      )
+    }
+  })
 
   return (
-    <KeyValuePair direction={EDirection.Vertical} spacing={ESize.Xsmall} playwrightTestId={playwrightTestId}>
-      <label htmlFor={id ?? key}>{label}</label>
-
-      <Root id={id ?? key} defaultValue={defaultValue} value={value} onValueChange={onChange}>
-        {children}
-      </Root>
-    </KeyValuePair>
+    <Stack vertical playwrightTestId={p.playwrightTestId} hug className="<InputRadioGroup /> -" disabled={p.disabled}>
+      <Align hug left vertical>
+        <Root
+          defaultValue={p.defaultValue}
+          value={p.value}
+          onValueChange={p.onChange}
+          data-playwright-test-id={p.playwrightTestId}
+        >
+          <Stack vertical hug>
+            {items}
+          </Stack>
+        </Root>
+      </Align>
+    </Stack>
   )
 }

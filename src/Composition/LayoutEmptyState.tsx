@@ -1,10 +1,10 @@
 import styled from "@emotion/styled"
 import { TLayoutBase } from "./TLayoutBase"
-import { TText } from "@new/Text/Text"
-import { Spacer } from "@new/Spacer/Spacer"
+import { TextProps } from "@new/Text/Text"
+import { Spacer } from "@new/Stack/Spacer"
 import { ReactElement } from "react"
-import { TInputButton } from "@new/InputButton/InputButton"
-import { TInputComboboxItem } from "@new/InputCombobox/InputComboboxItem"
+import { InputButtonPrimaryProps } from "@new/InputButton/InputButtonPrimary"
+import { InputComboboxProps } from "@new/InputCombobox/InputCombobox"
 
 const Container = styled.div({
   display: "flex",
@@ -15,9 +15,9 @@ const Container = styled.div({
 })
 
 export type TLayoutEmptyState = TLayoutBase & {
-  head: ReactElement<TText>
-  body: ReactElement<TText>
-  content?: ReactElement<TInputButton | TInputComboboxItem>
+  head: ReactElement<TextProps>
+  body: ReactElement<TextProps>
+  content?: ReactElement<InputButtonPrimaryProps | InputComboboxProps>
 }
 
 export const LayoutEmptyState = ({ head, body, content, playwrightTestId }: TLayoutEmptyState) => {

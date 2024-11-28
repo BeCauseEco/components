@@ -5,8 +5,8 @@ import { samples, interpolate, formatHex } from "culori"
 //It does not guard against invalid hex values due to an incorrect string such as ##000000, but it does provide a simplistic check, and is a simple solution for now.
 export type THexColor = `#${string}`
 
-export enum EColor {
-  Black = "#000000",
+export enum Color {
+  Black = "#333333",
   White = "#FFFFFF",
   Transparent = "#FFFFFF00",
   Primary = "#4E4073",
@@ -36,28 +36,28 @@ export enum EColor {
   Error = "#DF5052",
 }
 
-export type TLightness = 50 | 100 | 200 | 300 | 400 | 500 | 600 | 700 | 800 | 900 | 1000
+export type Lightness = 50 | 100 | 200 | 300 | 400 | 500 | 600 | 700 | 800 | 900 | 1000
 
-export type TColor = [EColor, TLightness] | [EColor.White] | [EColor.Transparent] | [THexColor, TLightness]
+export type ColorWithLightness = [Color, Lightness] | [Color.White] | [Color.Transparent] | [THexColor, Lightness]
 
-export const computeColor = (color: TColor) => {
-  const baseColor = color[0]
-  const lightness = color[1] || 700
+export const computeColor = (color: ColorWithLightness) => {
+  const c = color[0]
+  const l = color[1] || 700
 
   try {
-    if (baseColor === EColor.Transparent) {
-      return baseColor
+    if (c === Color.Transparent) {
+      return c
     } else {
       const colorsLight = samples(28)
-        .map(interpolate<"oklab">(["#ffffff", baseColor]))
+        .map(interpolate<"oklab">(["#ffffff", c]))
         .map(formatHex)
 
       const colorsMedium = samples(18)
-        .map(interpolate<"oklab">(["#ffffff", baseColor]))
+        .map(interpolate<"oklab">(["#ffffff", c]))
         .map(formatHex)
 
       const colorsDark = samples(8)
-        .map(interpolate<"oklab">([baseColor, "#000000"]))
+        .map(interpolate<"oklab">([c, "#000000"]))
         .map(formatHex)
 
       const combined = [
@@ -74,27 +74,41 @@ export const computeColor = (color: TColor) => {
         colorsDark[3],
       ]
 
-      return combined[lightness === 50 ? 0 : lightness / 100]
+      return combined[l === 50 ? 0 : l / 100]
     }
   } catch (e) {
-    throw "Color.ts - missing color* property on component. Run a local build (`yarn build`) to type-check for missing color properties."
+    // eslint-disable-next-line no-console
+    console.error(
+      "Color.ts - missing color* property on component. Run a local build (`yarn build`) to type-check for missing color properties.",
+    )
   }
+}
+
+export const replaceColorComponent = (colorWithLightness: ColorWithLightness, color: Color): ColorWithLightness => {
+  return [color, colorWithLightness[1] || 700]
+}
+
+export const replaceLightnessComponent = (
+  colorWithLightness: ColorWithLightness,
+  lightness: Lightness,
+): ColorWithLightness => {
+  return [colorWithLightness[0], lightness]
 }
 
 export const generateColorPallette = () => {
   throw "generateColorPallette: comment out the code before running"
   // console.log("---")
-  // Object.keys(EColor).forEach(key => {
+  // Object.keys(Color).forEach(key => {
   //   console.log(`"${key}":`)
   //   if (key === "White") {
-  //     console.log(EColor.White)
+  //     console.log(Color.White)
   //   } else if (key === "Transparent") {
   //     // ...
   //   } else {
   //     const lightness = [50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000]
   //     lightness.forEach(l => {
   //       try {
-  //         console.log(`lightness ${l}:`, computeColor([EColor[key], l as TLightness]))
+  //         console.log(`lightness ${l}:`, computeColor([Color[key], l as TLightness]))
   //       } catch (e) {
   //         console.error(e)
   //       }

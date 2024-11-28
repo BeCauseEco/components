@@ -1,9 +1,9 @@
-import { EColor, TColor, computeColor } from "@new/Color"
+import { Color, ColorWithLightness, computeColor } from "@new/Color"
 import { EShadow } from "@new/EShadow"
-import { ESize } from "@new/ESize"
+import { Size } from "@new/Size"
 import styled from "@emotion/styled"
 import { css, Global } from "@emotion/react"
-import { TPlaywright } from "@new/TPlaywright"
+import { PlaywrightProps } from "@new/Playwright"
 
 const Container = styled.div<TBackgroundCard>(p => ({
   position: "relative",
@@ -40,12 +40,12 @@ const Container = styled.div<TBackgroundCard>(p => ({
   // }),
 }))
 
-export type TBackgroundCard = TPlaywright & {
-  colorBackground?: TColor
-  colorBackgroundHover?: TColor
-  colorOutline?: TColor
-  colorOutlineHover?: TColor
-  borderRadius?: ESize.Tiny | ESize.Small | ESize.Medium
+export type TBackgroundCard = PlaywrightProps & {
+  colorBackground?: ColorWithLightness
+  colorBackgroundHover?: ColorWithLightness
+  colorOutline?: ColorWithLightness
+  colorOutlineHover?: ColorWithLightness
+  borderRadius?: Size.Tiny | Size.Small | Size.Medium
   shadow?: EShadow
   stacked?: boolean
 }
@@ -65,13 +65,13 @@ export const BackgroundCard = ({
 
   const c = css`
     .component-composition > .component-composition-background > .component-backgroundcard-${id} {
-      background-color: ${computeColor(colorBackground || [EColor.Transparent])};
-      outline: solid 1px ${computeColor(colorOutline || [EColor.Transparent])};
+      background-color: ${computeColor(colorBackground || [Color.Transparent])};
+      outline: solid 1px ${computeColor(colorOutline || [Color.Transparent])};
     }
 
     .component-composition:hover > .component-composition-background > .component-backgroundcard-${id} {
-      background-color: ${computeColor(colorBackgroundHover || colorBackground || [EColor.Transparent])} !important;
-      outlinecolor: ${computeColor(colorOutlineHover || colorOutline || [EColor.Transparent])} !important;
+      background-color: ${computeColor(colorBackgroundHover || colorBackground || [Color.Transparent])} !important;
+      outlinecolor: ${computeColor(colorOutlineHover || colorOutline || [Color.Transparent])} !important;
     }
   `
 

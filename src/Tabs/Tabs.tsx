@@ -3,8 +3,8 @@ import * as RadixTabs from "@radix-ui/react-tabs"
 import { TTabsNavigationItem } from "@new/Tabs/TabsNavigationItem"
 import { TTabsContentItem } from "@new/Tabs/TabsContentItem"
 import styled from "@emotion/styled"
-import { computeColor, EColor } from "@new/Color"
-import { TPlaywright } from "@new/TPlaywright"
+import { computeColor, Color } from "@new/Color"
+import { PlaywrightProps } from "@new/Playwright"
 
 const Root = styled(RadixTabs.Root)({
   display: "flex",
@@ -15,10 +15,10 @@ const Root = styled(RadixTabs.Root)({
 const List = styled(RadixTabs.List)({
   display: "flex",
   flexDirection: "row",
-  borderBottom: `solid 1px ${computeColor([EColor.Black, 100])}`,
+  borderBottom: `solid 1px ${computeColor([Color.Black, 100])}`,
 })
 
-export type TTabs = TPlaywright & {
+export type TTabs = PlaywrightProps & {
   contentTargetId?: string
   defaultContentTargetId: string
   navigationItems: ReactElement<TTabsNavigationItem> | ReactElement<TTabsNavigationItem>[]
