@@ -13,7 +13,7 @@
 //   const breadcrumbs = [{ id: "", pageUrl: "", menuTitle: "" }]
 
 //   return (
-//     <Breadcrumb color={Color.Black}>
+//     <Breadcrumb color={Color.Neutral}>
 //       {breadcrumbs.map(breadcrumb => (
 //         <InputButton
 //           key={breadcrumb.id}
@@ -22,7 +22,7 @@
 //           // disabled={!breadcrumb.pageUrl}
 //           href={breadcrumb.pageUrl}
 //         >
-//           <Text size={Size.Xsmall} color={[Color.Black, 700]}>
+//           <Text size={Size.Xsmall} color={[Color.Neutral, 700]}>
 //             {breadcrumb.menuTitle}
 //           </Text>
 //         </InputButton>

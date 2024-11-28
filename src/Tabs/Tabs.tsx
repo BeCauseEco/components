@@ -15,7 +15,7 @@ const Root = styled(RadixTabs.Root)({
 const List = styled(RadixTabs.List)({
   display: "flex",
   flexDirection: "row",
-  borderBottom: `solid 1px ${computeColor([Color.Black, 100])}`,
+  borderBottom: `solid 1px ${computeColor([Color.Neutral, 100])}`,
 })
 
 export type TTabs = PlaywrightProps & {

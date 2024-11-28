@@ -22,7 +22,7 @@ const Overlay = styled(RadixDialog.Overlay)({
   display: "flex",
   position: "fixed",
   inset: 0,
-  backgroundColor: Color.Black,
+  backgroundColor: Color.Neutral,
   opacity: EOpacity.Light,
   zIndex: 99999,
 })
@@ -124,7 +124,7 @@ export const Dialog = ({
               buttonClose={
                 <RadixDialogClose asChild>
                   {/* <InputButtonPrimary medium>
-                    <Icon name="close" size={Size.Large} color={[Color.Black, 700]} />
+                    <Icon name="close" size={Size.Large} color={[Color.Neutral, 700]} />
                   </InputButtonPrimary> */}
                 </RadixDialogClose>
               }
