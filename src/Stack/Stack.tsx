@@ -31,10 +31,10 @@ const Container = styled.div<
     | "explodeHeight"
     | "overflowHidden"
     | "cornerRadius"
-    | "colorBackground"
-    | "colorBackgroundHover"
-    | "colorOutline"
-    | "colorOutlineHover"
+    | "fill"
+    | "fillHover"
+    | "stroke"
+    | "strokeHover"
     | "aspectRatio"
   >
 >(p => ({
@@ -46,7 +46,7 @@ const Container = styled.div<
   cursor: "inherit",
   position: "relative",
   borderRadius: translateBorderRadius(p.cornerRadius),
-  backgroundColor: computeColor(p.colorBackground || [Color.Transparent]),
+  backgroundColor: computeColor(p.fill || [Color.Transparent]),
   transition: "background-color 0.1s ease-in-out",
   willChange: "background-color",
   aspectRatio: p.aspectRatio || "auto",
@@ -54,15 +54,15 @@ const Container = styled.div<
 
   outlineOffset: -1,
 
-  ...(p.colorOutline && {
-    outline: `solid 1px ${computeColor(p.colorOutline || [Color.Transparent])}`,
+  ...(p.stroke && {
+    outline: `solid 1px ${computeColor(p.stroke || [Color.Transparent])}`,
   }),
 
   "&:hover": {
-    ...(p.colorBackgroundHover && { backgroundColor: computeColor(p.colorBackgroundHover || [Color.Transparent]) }),
+    ...(p.fillHover && { backgroundColor: computeColor(p.fillHover || [Color.Transparent]) }),
 
-    ...(p.colorOutlineHover && {
-      outlineColor: computeColor(p.colorOutlineHover || [Color.Transparent]),
+    ...(p.strokeHover && {
+      outlineColor: computeColor(p.strokeHover || [Color.Transparent]),
     }),
   },
 }))
@@ -112,10 +112,10 @@ export type StackProps = ComponentBaseProps & {
   loading?: boolean
   disabled?: boolean
 
-  colorBackground?: ColorWithLightness
-  colorBackgroundHover?: ColorWithLightness
-  colorOutline?: ColorWithLightness
-  colorOutlineHover?: ColorWithLightness
+  fill?: ColorWithLightness
+  fillHover?: ColorWithLightness
+  stroke?: ColorWithLightness
+  strokeHover?: ColorWithLightness
   colorLoading?: ColorWithLightness
 
   cornerRadius?: "small" | "medium" | "large"
@@ -141,10 +141,10 @@ export const Stack = (p: StackProps) => {
     <Container
       className={p.className || "<Stack /> -"}
       data-playwright-testid={p.playwrightTestId}
-      colorBackground={p.colorBackground}
-      colorBackgroundHover={p.colorBackgroundHover}
-      colorOutline={p.colorOutline}
-      colorOutlineHover={p.colorOutlineHover}
+      fill={p.fill}
+      fillHover={p.fillHover}
+      stroke={p.stroke}
+      strokeHover={p.strokeHover}
       explodeHeight={p.explodeHeight}
       overflowHidden={p.overflowHidden}
       cornerRadius={p.cornerRadius}

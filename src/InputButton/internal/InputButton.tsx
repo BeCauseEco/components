@@ -147,10 +147,10 @@ const Children = (p: Omit<InputButtonProps, "width">) => {
     return (
       <Stack
         horizontal
-        colorBackground={p.colorBackground}
-        colorBackgroundHover={p.colorBackgroundHover}
-        colorOutline={p.colorOutline}
-        colorOutlineHover={p.colorOutlineHover}
+        fill={p.colorBackground}
+        fillHover={p.colorBackgroundHover}
+        stroke={p.colorOutline}
+        strokeHover={p.colorOutlineHover}
         colorLoading={p.colorLoading}
         cornerRadius="medium"
         loading={p.loading}
