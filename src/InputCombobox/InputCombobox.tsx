@@ -21,9 +21,10 @@ import { Badge } from "@new/Badge/Badge"
 import { Stack } from "@new/Stack/Stack"
 import { Align } from "@new/Stack/Align"
 
-const Container = styled.div({
+const Container = styled.div<Pick<InputComboboxProps, "width">>(p => ({
   display: "flex",
-})
+  width: p.width === "auto" ? "100%" : "calc(var(--BU) * 80)",
+}))
 
 const CommandItemStyled = styled(CommandItem)<{
   multiple?: boolean
@@ -58,6 +59,7 @@ export type InputComboboxProps = PlaywrightProps & {
   id?: string
 
   size: "small" | "large"
+  width: "auto" | "fixed"
 
   textNoSelection: string
 
@@ -317,7 +319,13 @@ export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<InputC
   const filterWithDebounce = useMemo(() => debounce(filterResults, 300), [filterResults])
 
   return (
-    <Container ref={ref} id={p.id} data-playwright-testid={p.playwrightTestId} className="<InputCombobox /> - ">
+    <Container
+      ref={ref}
+      id={p.id}
+      data-playwright-testid={p.playwrightTestId}
+      className="<InputCombobox /> - "
+      width={p.width}
+    >
       <Popover
         open={p.disabled || p.loading ? false : open}
         onOpenChange={p.disabled || p.loading ? () => {} : setOpen}
@@ -325,7 +333,7 @@ export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<InputC
         trigger={
           <InputButton
             size={p.size}
-            width="auto"
+            width="full"
             variant="outlined"
             colorForeground={[p.color, 700]}
             colorOutline={p.disabled ? [p.color, 100] : [p.color, 300]}
@@ -346,7 +354,9 @@ export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<InputC
 
                   <Spacer xsmall={p.size === "small"} small={p.size === "large"} />
 
-                  {generateCurrentValueLabel(p.multiple)}
+                  <div style={{ display: "flex", width: "100%", flexShrink: 1, flexGrow: 1, overflow: "hidden" }}>
+                    {generateCurrentValueLabel(p.multiple)}
+                  </div>
                 </Align>
               </Stack>
             }

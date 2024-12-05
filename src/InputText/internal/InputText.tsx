@@ -13,20 +13,11 @@ import { ComponentBaseProps } from "@new/ComponentBaseProps"
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const calculateWidth = (rows: InputTextProps["rows"], width: InputTextProps["width"]) => {
-  return "calc(100% - 1px)"
+  if (rows !== 1) {
+    return "calc(100% - 1px)"
+  }
 
-  // if (rows !== 1) {
-  //   return "calc(100% - 1px)"
-  // }
-
-  // switch (width) {
-  //   case "quarter":
-  //     return "25%"
-  //   case "half":
-  //     return "50%"
-  //   default:
-  //     return "calc(100% - 1px)"
-  // }
+  return width === "auto" ? "100%" : "calc(var(--BU) * 40)"
 }
 
 const Output = styled.output<Pick<InputTextProps, "color" | "size" | "rows" | "width"> & { focus: boolean }>(p => ({
@@ -89,7 +80,7 @@ const Label = styled.label({
 
 export type InputTextProps = ComponentBaseProps & {
   size: "small" | "large"
-  width: "auto" | "quarter" | "half" | "full"
+  width: "auto" | "fixed"
 
   rows: 1 | 2 | 3
 

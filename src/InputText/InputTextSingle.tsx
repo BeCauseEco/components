@@ -35,7 +35,7 @@ export const InputTextSingle = forwardRef<HTMLInputElement, InputTextSingleProps
       rows={1}
       disabled={p.disabled}
       value={p.value}
-      width="auto"
+      width="fixed"
     />
   )
 })

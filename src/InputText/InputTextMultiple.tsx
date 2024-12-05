@@ -24,7 +24,7 @@ export const InputTextMultiple = forwardRef<HTMLTextAreaElement, InputTextMultip
       rows={3}
       disabled={p.disabled}
       value={p.value}
-      width="auto"
+      width="fixed"
     />
   )
 })

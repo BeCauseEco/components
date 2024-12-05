@@ -8,22 +8,7 @@ import { Loader } from "./internal/Loader"
 import { Spinner } from "./internal/Spinner"
 import { GridProps } from "@new/Grid/Grid"
 import { SpacerProps } from "@new/Stack/Spacer"
-
-const translateBorderRadius = (cornerRadius: StackProps["cornerRadius"]): string => {
-  switch (cornerRadius) {
-    case "small":
-      return "calc(var(--BU) / 2)"
-
-    case "medium":
-      return "calc(var(--BU) * 1)"
-
-    case "large":
-      return "calc(var(--BU) * 2)"
-
-    default:
-      return "0"
-  }
-}
+import { translateBorderRadius } from "./internal/Functions"
 
 const Container = styled.div<
   Pick<
@@ -79,7 +64,6 @@ const Children = styled.div<Pick<StackProps, "loading" | "disabled" | "hug"> & {
 
     ...(p.loading
       ? {
-          // minHeight: "fit-content", TO-DO: @cllpse: perhaps this will break things like text
           height: "unset",
           maxHeight: "calc(var(--BU) * 40)",
           opacity: 0,
@@ -105,10 +89,7 @@ const Children = styled.div<Pick<StackProps, "loading" | "disabled" | "hug"> & {
   }),
 )
 
-export type StackProps = ComponentBaseProps & {
-  vertical?: boolean
-  horizontal?: boolean
-
+type StackBaseProps = ComponentBaseProps & {
   loading?: boolean
   disabled?: boolean
 
@@ -121,9 +102,21 @@ export type StackProps = ComponentBaseProps & {
   cornerRadius?: "small" | "medium" | "large"
 
   hug?: boolean | "partly"
+
+  /**
+   * INTERNAL PROPERTY
+   */
   explodeHeight?: boolean
+
+  /**
+   * INTERNAL PROPERTY
+   */
   overflowHidden?: boolean
 
+  /**
+   * INTERNAL PROPERTY
+   * Only used in combination with InputButtonIcon
+   */
   aspectRatio?: "auto" | "1"
 
   children:
@@ -131,6 +124,22 @@ export type StackProps = ComponentBaseProps & {
     | ReactElement<AlignProps | SpacerProps | null>[]
     | ReactElement<GridProps | null>
 }
+
+type StackVerticalProps = StackBaseProps & {
+  /**
+   * Only one of "vertical" or "horizontal" can be true
+   */
+  vertical: boolean
+}
+
+type StackHorizontalProps = StackBaseProps & {
+  /**
+   * Only one of "vertical" or "horizontal" can be true
+   */
+  horizontal: boolean
+}
+
+export type StackProps = StackVerticalProps | StackHorizontalProps
 
 export const Stack = (p: StackProps) => {
   // if (containsIlligalChildren(p.children, ["Align"])) {

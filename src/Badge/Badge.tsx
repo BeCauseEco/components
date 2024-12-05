@@ -138,7 +138,7 @@ export const Badge = (p: BadgeProps) => {
   }
 
   return (
-    <Container className="<Badge /> -" size={p.size}>
+    <Container className={`<Badge /> - ${p.className}`} size={p.size}>
       {stack}
     </Container>
   )
