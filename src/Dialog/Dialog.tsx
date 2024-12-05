@@ -9,12 +9,14 @@ import styled from "@emotion/styled"
 import { EOpacity } from "@new/Opacity"
 import { Spacer, SpacerProps } from "@new/Stack/Spacer"
 import { EShadow } from "@new/EShadow"
-import { TextProps } from "@new/Text/Text"
+import { Text, TextProps } from "@new/Text/Text"
 // import { Icon } from "@new/Icon/Icon"
 import { PlaywrightProps } from "@new/Playwright"
 import { InputButtonPrimaryProps } from "@new/InputButton/InputButtonPrimary"
 import { InputButtonSecondaryProps } from "@new/InputButton/InputButtonSecondary"
 import { InputButtonTertiaryProps } from "@new/InputButton/InputButtonTertiary"
+import { Stack } from "@new/Stack/Stack"
+import { Align } from "@new/Stack/Align"
 
 const offsetTop = "128px"
 
@@ -62,6 +64,7 @@ export type TDialog = PlaywrightProps & {
   collapseHeight?: boolean
   title?: ReactElement<TextProps>
   description?: ReactElement<TextProps> | ReactElement<TextProps | SpacerProps>[]
+  message?: ["notice" | "warning" | "error" | "nothing", string]
   buttonPrimary?: ReactElement<InputButtonPrimaryProps>
   buttonSecondary?: ReactElement<InputButtonSecondaryProps>
   buttonTertiary?: ReactElement<InputButtonTertiaryProps>
@@ -75,6 +78,7 @@ export const Dialog = ({
   title,
   collapseHeight,
   description,
+  message,
   buttonPrimary,
   buttonSecondary,
   buttonTertiary,
@@ -99,7 +103,20 @@ export const Dialog = ({
                   {description}
                 </TitleAndDescription>
               }
-              contentMiddle={content}
+              contentMiddle={
+                message ? (
+                  <>
+                    {content}
+                    <Stack vertical colorBackground={[Color.Error, 50]}>
+                      <Align vertical>
+                        <Text fill={[Color.Error, 700]}>{message[1]}</Text>
+                      </Align>
+                    </Stack>
+                  </>
+                ) : (
+                  content
+                )
+              }
               contentEnd={
                 <>
                   {buttonTertiary && buttonTertiary}

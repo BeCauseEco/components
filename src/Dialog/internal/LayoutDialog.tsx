@@ -25,7 +25,7 @@ const ContentStartContent = styled.div({
 
 const ContentMiddle = styled.div({
   display: "flex",
-  flexDirection: "row",
+  flexDirection: "column",
   justifyContent: "space-between",
   flexGrow: 1,
 })
