@@ -104,18 +104,17 @@ export const Dialog = ({
                 </TitleAndDescription>
               }
               contentMiddle={
-                message ? (
-                  <>
-                    {content}
+                <>
+                  {content}
+
+                  {message && message[0] !== "nothing" && (
                     <Stack vertical colorBackground={[Color.Error, 50]}>
                       <Align vertical>
                         <Text fill={[Color.Error, 700]}>{message[1]}</Text>
                       </Align>
                     </Stack>
-                  </>
-                ) : (
-                  content
-                )
+                  )}
+                </>
               }
               contentEnd={
                 <>
