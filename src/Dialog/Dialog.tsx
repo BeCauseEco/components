@@ -17,6 +17,7 @@ import { InputButtonSecondaryProps } from "@new/InputButton/InputButtonSecondary
 import { InputButtonTertiaryProps } from "@new/InputButton/InputButtonTertiary"
 import { Stack } from "@new/Stack/Stack"
 import { Align } from "@new/Stack/Align"
+import { Divider } from "@new/Divider/Divider"
 
 const computeMessageColor = (message?: TDialog["message"]) => {
   if (!message) {
@@ -81,7 +82,7 @@ export type TDialog = PlaywrightProps & {
   collapseHeight?: boolean
   title?: ReactElement<TextProps>
   description?: ReactElement<TextProps> | ReactElement<TextProps | SpacerProps>[]
-  message?: ["notice" | "warning" | "error" | "nothing", string]
+  message?: ["notice" | "warning" | "error" | "hidden", string]
   buttonPrimary?: ReactElement<InputButtonPrimaryProps>
   buttonSecondary?: ReactElement<InputButtonSecondaryProps>
   buttonTertiary?: ReactElement<InputButtonTertiaryProps>
@@ -124,13 +125,21 @@ export const Dialog = ({
                 <>
                   {content}
 
-                  {message && message[0] !== "nothing" && (
-                    <Stack vertical colorBackground={[computeMessageColor(message), 50]}>
-                      <Align vertical>
-                        <Text fill={[computeMessageColor(message), 700]}>{message[1]}</Text>
-                      </Align>
-                    </Stack>
+                  {message && message[0] !== "hidden" && (
+                    <>
+                      <Divider fill={[computeMessageColor(message), 200]} />
+
+                      <Stack vertical colorBackground={[computeMessageColor(message), 100]}>
+                        <Align vertical>
+                          <Text xsmall fill={[computeMessageColor(message), 700]}>
+                            {message[1]}
+                          </Text>
+                        </Align>
+                      </Stack>
+                    </>
                   )}
+
+                  <Divider fill={[computeMessageColor(message), message && message[0] !== "hidden" ? 200 : 100]} />
                 </>
               }
               contentEnd={
