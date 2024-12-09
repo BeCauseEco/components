@@ -18,6 +18,23 @@ import { InputButtonTertiaryProps } from "@new/InputButton/InputButtonTertiary"
 import { Stack } from "@new/Stack/Stack"
 import { Align } from "@new/Stack/Align"
 
+const computeMessageColor = (message?: TDialog["message"]) => {
+  if (!message) {
+    return Color.Neutral
+  }
+
+  switch (message[0]) {
+    case "notice":
+      return Color.Quarternary
+    case "warning":
+      return Color.Warning
+    case "error":
+      return Color.Error
+    default:
+      return Color.Neutral
+  }
+}
+
 const offsetTop = "128px"
 
 const Overlay = styled(RadixDialog.Overlay)({
@@ -108,9 +125,9 @@ export const Dialog = ({
                   {content}
 
                   {message && message[0] !== "nothing" && (
-                    <Stack vertical colorBackground={[Color.Error, 50]}>
+                    <Stack vertical colorBackground={[computeMessageColor(message), 50]}>
                       <Align vertical>
-                        <Text fill={[Color.Error, 700]}>{message[1]}</Text>
+                        <Text fill={[computeMessageColor(message), 700]}>{message[1]}</Text>
                       </Align>
                     </Stack>
                   )}
