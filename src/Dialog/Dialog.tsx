@@ -66,6 +66,7 @@ const Content = styled(RadixDialog.Content)<TDialogContentProperties>(p => ({
   zIndex: 99999,
   // TO-DO: @cllpe
   // maxHeight: `calc(100vh - ${offsetTop} - calc(var(--BU) * 10))`,
+  outline: "none",
 }))
 
 const TitleAndDescription = styled.div({
