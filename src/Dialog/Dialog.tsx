@@ -108,7 +108,11 @@ export type TDialog = PlaywrightProps & {
   collapseHeight?: boolean
   title?: ReactElement<TextProps>
   description?: ReactElement<TextProps> | ReactElement<TextProps | SpacerProps>[]
+<<<<<<< HEAD
   message?: ["notice" | "warning" | "error" | "hidden", string]
+=======
+  message?: ["notice" | "warning" | "error" | "nothing", string]
+>>>>>>> 23fe7c30336e6f429f5cce3d656002260f98f04b
   buttonPrimary?: ReactElement<InputButtonPrimaryProps>
   buttonSecondary?: ReactElement<InputButtonSecondaryProps>
   buttonTertiary?: ReactElement<InputButtonTertiaryProps>
@@ -151,6 +155,7 @@ export const Dialog = ({
                 <>
                   {content}
 
+<<<<<<< HEAD
                   {message && message[0] !== "hidden" && (
                     <>
                       <Divider fill={[computeMessageColor(message), 200]} />
@@ -178,6 +183,15 @@ export const Dialog = ({
                   )}
 
                   <Divider fill={[computeMessageColor(message), message && message[0] !== "hidden" ? 200 : 100]} />
+=======
+                  {message && message[0] !== "nothing" && (
+                    <Stack vertical colorBackground={[Color.Error, 50]}>
+                      <Align vertical>
+                        <Text fill={[Color.Error, 700]}>{message[1]}</Text>
+                      </Align>
+                    </Stack>
+                  )}
+>>>>>>> 23fe7c30336e6f429f5cce3d656002260f98f04b
                 </>
               }
               contentEnd={
