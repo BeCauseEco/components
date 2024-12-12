@@ -89,8 +89,8 @@ const computeAlignment = (p: Omit<AlignProps, "spacing" | "hug">) => {
     }
 
     if (p.topRight) {
-      r.justifyContent = "flex-end"
-      r.justifySelf = "flex-end"
+      r.justifyContent = "flex-start"
+      r.justifySelf = "flex-start"
       r.alignItems = "flex-start"
       r.alignSelf = "flex-start"
     }

@@ -160,6 +160,8 @@ export const InputText = forwardRef<HTMLInputElement | HTMLTextAreaElement, Inpu
             <b>{p.label[0]}</b>
           </Text>
         </Label>
+
+        <Spacer xsmall={p.size === "small"} small={p.size === "large"} />
       </Align>
     )
 
