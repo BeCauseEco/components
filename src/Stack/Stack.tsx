@@ -10,6 +10,53 @@ import { GridProps } from "@new/Grid/Grid"
 import { SpacerProps } from "@new/Stack/Spacer"
 import { translateBorderRadius } from "./internal/Functions"
 
+export type StackProps = ComponentBaseProps & {
+  loading?: boolean
+  disabled?: boolean
+
+  /**
+   * Only one of "vertical" or "horizontal" can be true
+   */
+  vertical?: boolean
+  horizontal?: boolean
+
+  fill?: ColorWithLightness
+  fillHover?: ColorWithLightness
+  stroke?: ColorWithLightness
+  strokeHover?: ColorWithLightness
+  fillLoading?: ColorWithLightness
+  dropShadow?: "small" | "medium" | "large"
+
+  cornerRadius?: "small" | "medium" | "large"
+
+  hug?: boolean | "partly"
+
+  /**
+   * WARNING: internal properties - only to be used within /components
+   */
+  explodeHeight?: boolean
+  overflowHidden?: boolean
+  aspectRatio?: "auto" | "1"
+
+  children:
+    | ReactElement<AlignProps | SpacerProps | null>
+    | ReactElement<AlignProps | SpacerProps | null>[]
+    | ReactElement<GridProps | null>
+}
+
+const computeShadow = (shadow?: StackProps["dropShadow"]): string => {
+  switch (shadow) {
+    case "small":
+      return "0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24)"
+    case "medium":
+      return "0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23)"
+    case "large":
+      return "0 14px 28px rgba(0, 0, 0, 0.25), 0 10px 10px rgba(0, 0, 0, 0.22)"
+    default:
+      return "none"
+  }
+}
+
 const Container = styled.div<
   Pick<
     StackProps,
@@ -20,6 +67,7 @@ const Container = styled.div<
     | "fillHover"
     | "stroke"
     | "strokeHover"
+    | "dropShadow"
     | "aspectRatio"
   >
 >(p => ({
@@ -36,6 +84,7 @@ const Container = styled.div<
   willChange: "background-color",
   aspectRatio: p.aspectRatio || "auto",
   content: `'${p.aspectRatio}'`,
+  boxShadow: computeShadow(p.dropShadow),
 
   outlineOffset: -1,
 
@@ -89,58 +138,6 @@ const Children = styled.div<Pick<StackProps, "loading" | "disabled" | "hug"> & {
   }),
 )
 
-type StackBaseProps = ComponentBaseProps & {
-  loading?: boolean
-  disabled?: boolean
-
-  fill?: ColorWithLightness
-  fillHover?: ColorWithLightness
-  stroke?: ColorWithLightness
-  strokeHover?: ColorWithLightness
-  colorLoading?: ColorWithLightness
-
-  cornerRadius?: "small" | "medium" | "large"
-
-  hug?: boolean | "partly"
-
-  /**
-   * INTERNAL PROPERTY
-   */
-  explodeHeight?: boolean
-
-  /**
-   * INTERNAL PROPERTY
-   */
-  overflowHidden?: boolean
-
-  /**
-   * INTERNAL PROPERTY
-   * Only used in combination with InputButtonIcon
-   */
-  aspectRatio?: "auto" | "1"
-
-  children:
-    | ReactElement<AlignProps | SpacerProps | null>
-    | ReactElement<AlignProps | SpacerProps | null>[]
-    | ReactElement<GridProps | null>
-}
-
-type StackVerticalProps = StackBaseProps & {
-  /**
-   * Only one of "vertical" or "horizontal" can be true
-   */
-  vertical: boolean
-}
-
-type StackHorizontalProps = StackBaseProps & {
-  /**
-   * Only one of "vertical" or "horizontal" can be true
-   */
-  horizontal: boolean
-}
-
-export type StackProps = StackVerticalProps | StackHorizontalProps
-
 export const Stack = (p: StackProps) => {
   // if (containsIlligalChildren(p.children, ["Align"])) {
   //   return <pre>TStack only accepts children of type: TAlign</pre>
@@ -154,13 +151,14 @@ export const Stack = (p: StackProps) => {
       fillHover={p.fillHover}
       stroke={p.stroke}
       strokeHover={p.strokeHover}
+      dropShadow={p.dropShadow}
       explodeHeight={p.explodeHeight}
       overflowHidden={p.overflowHidden}
       cornerRadius={p.cornerRadius}
       aspectRatio={p.aspectRatio}
     >
       <Loader className="<Stack: loader />" loading={p.loading}>
-        <Spinner colorLoading={p.colorLoading} loading={p.loading} />
+        <Spinner fillLoading={p.fillLoading} loading={p.loading} />
       </Loader>
 
       <Children

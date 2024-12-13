@@ -65,7 +65,7 @@ export const InputRadioGroup = (p: InputRadioGroupProps) => {
       const renderSpacer = React.Children.count(p.children) > i && p.size === "large"
 
       items.push(
-        <>
+        <Stack key={i} horizontal hug>
           <Align horizontal left hug>
             <Item id={child.props.value} value={child.props.value}>
               {p.value === child.props.value ? (
@@ -84,8 +84,8 @@ export const InputRadioGroup = (p: InputRadioGroupProps) => {
             </Label>
           </Align>
 
-          {renderSpacer && <Spacer tiny />}
-        </>,
+          {renderSpacer ? <Spacer tiny /> : <></>}
+        </Stack>,
       )
     }
   })

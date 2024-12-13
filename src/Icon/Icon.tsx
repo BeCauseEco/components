@@ -26,8 +26,6 @@ const computeSize = (p: IconProps) => {
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const computeStyle = (p: IconProps) => {
-  // console.log("computeStyle", p)
-
   return p.style === "outlined" ? "0" : "1"
 }
 
@@ -60,7 +58,7 @@ const Container = styled.i<{ size: string; fontVariationSettings: string; _fill:
   lineHeight: `${p.size} !important`,
   fontSize: `calc(${p.size} * 0.875) !important`,
   color: computeColor(p._fill),
-  "font-variation-settings": p.fontVariationSettings,
+  fontVariationSettings: p.fontVariationSettings,
   userSelect: "none",
 }))
 
@@ -76,6 +74,8 @@ export type IconProps = PlaywrightProps & {
 
   style?: "filled" | "outlined" | "rounded" | "twotone" | "sharp"
 
+  // TODO: @cllpse: fix it
+  // eslint-disable-next-line
   onClick?: any
 }
 

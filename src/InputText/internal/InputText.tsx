@@ -11,19 +11,48 @@ import { Divider } from "@new/Divider/Divider"
 import { InputButton } from "@new/InputButton/internal/InputButton"
 import { ComponentBaseProps } from "@new/ComponentBaseProps"
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const calculateWidth = (rows: InputTextProps["rows"], width: InputTextProps["width"]) => {
-  if (rows !== 1) {
-    return "calc(100% - 1px)"
-  }
+export type InputTextProps = ComponentBaseProps & {
+  size: "small" | "large"
+  width: "auto" | "fixed"
 
-  return width === "auto" ? "100%" : "calc(var(--BU) * 40)"
+  rows: 1 | 2 | 3
+
+  color: Color
+
+  value: string
+  onChange: (value: string) => void
+
+  loading?: boolean
+  disabled?: boolean
+
+  placeholder?: string
+  label?: ["outside" | "inside", string]
+  hint?: string
+  error?: string
+
+  iconNameLeft?: string
+  iconNameRight?: string
+
+  hug?: boolean
+
+  component?: string
 }
 
-const Output = styled.output<Pick<InputTextProps, "color" | "size" | "rows" | "width"> & { focus: boolean }>(p => ({
+const calculateWidth = (rows: InputTextProps["rows"], width: InputTextProps["width"], size: InputTextProps["size"]) => {
+  if (rows !== 1) {
+    return width === "auto"
+      ? "calc(100% - 1px)"
+      : size === "small"
+        ? "calc(var(--BU) * 70 - 1px)"
+        : "calc(var(--BU) * 80 - 1px)"
+  }
+
+  return width === "auto" ? "100%" : size === "small" ? "calc(var(--BU) * 70)" : "calc(var(--BU) * 80)"
+}
+
+const Output = styled.output<Pick<InputTextProps, "color" | "size" | "rows"> & { focus: boolean }>(p => ({
   display: "flex",
-  width: calculateWidth(p.rows, p.width),
-  minWidth: p.size === "small" ? "calc(var(--BU) * 40)" : "calc(var(--BU) * 48)",
+  width: "100%",
   height:
     p.rows === 1
       ? `calc(var(--BU) * ${p.size === "small" ? 8 : 10})`
@@ -37,8 +66,9 @@ const Output = styled.output<Pick<InputTextProps, "color" | "size" | "rows" | "w
 
   padding:
     p.rows === 1
-      ? `0 calc(var(--BU) * ${p.size === "small" ? 2 : 3})`
-      : `calc(var(--BU) * ${p.size === "small" ? 2 : 3})`,
+      ? `0 calc(var(--BU) * ${p.size === "small" ? 2 : 2})`
+      : `calc(var(--BU) * ${p.size === "small" ? 2 : 2})`,
+
   resize: "none",
   color: computeColor([p.color, 700]),
   border: "none",
@@ -72,59 +102,37 @@ const Output = styled.output<Pick<InputTextProps, "color" | "size" | "rows" | "w
   },
 }))
 
+const StackWidthOverride = styled(Stack)<Pick<InputTextProps, "size" | "rows" | "width">>(p => ({
+  width: calculateWidth(p["rows"], p["width"], p["size"]),
+}))
+
 const Label = styled.label({
   display: "flex",
   userSelect: "none",
   cursor: "pointer",
 })
 
-export type InputTextProps = ComponentBaseProps & {
-  size: "small" | "large"
-  width: "auto" | "fixed"
-
-  rows: 1 | 2 | 3
-
-  color: Color
-
-  value: string
-  onChange: (value: string) => void
-
-  loading?: boolean
-  disabled?: boolean
-
-  placeholder?: string
-  label?: [string, "outside" | "inside"]
-  hint?: string
-  error?: string
-
-  iconNameLeft?: string
-  iconNameRight?: string
-
-  hug?: boolean
-
-  component?: string
-}
-
 export const InputText = forwardRef<HTMLInputElement | HTMLTextAreaElement, InputTextProps>((p, ref) => {
   const key = useId()
 
-  const [focus, setFocus] = useState(false)
+  const [focusCapture, setFocusCapture] = useState(false)
 
   let labelInside: ReactElement<AlignProps> = <></>
   let labelOutside: ReactElement<AlignProps> = <></>
   let hintInside: ReactElement<AlignProps> = <></>
   let hintOutside: ReactElement<AlignProps> = <></>
+  let errorEitherSide: ReactElement<AlignProps> = <></>
   let iconStart: ReactElement<AlignProps> = <></>
   let iconEnd: ReactElement<AlignProps> = <></>
 
-  if (p.label && p.label[1] === "inside") {
+  if (p.label && p.label[0] === "inside") {
     labelInside = (
       <Align horizontal left hug="width">
         <Spacer xsmall={p.size === "small"} small={p.size === "large"} />
 
         <Label htmlFor={key}>
-          <Text xsmall={p.size === "small"} small={p.size === "large"} fill={[p.color, 500]}>
-            {p.label[0]}
+          <Text xsmall={p.size === "small"} small={p.size === "large"} fill={[p.error ? Color.Error : p.color, 500]}>
+            {p.label[1]}
           </Text>
         </Label>
       </Align>
@@ -133,7 +141,7 @@ export const InputText = forwardRef<HTMLInputElement | HTMLTextAreaElement, Inpu
     if (p.hint) {
       hintInside = (
         <Align vertical left hug>
-          <Spacer tiny={p.size === "small"} xsmall={p.size === "large"} />
+          <Spacer xsmall={p.size === "small"} small={p.size === "large"} />
 
           <Text tiny={p.size === "small"} xsmall={p.size !== "small"} fill={[p.color, 700]}>
             {p.hint}
@@ -143,12 +151,12 @@ export const InputText = forwardRef<HTMLInputElement | HTMLTextAreaElement, Inpu
     }
   }
 
-  if (p.label && p.label[1] === "outside") {
+  if (p.label && p.label[0] === "outside") {
     labelOutside = (
       <Align vertical left hug="width">
         <Label htmlFor={key}>
           <Text xsmall={p.size === "small"} small={p.size !== "small"} fill={[p.color, 700]}>
-            <b>{p.label[0]}</b>
+            <b>{p.label[1]}</b>
           </Text>
         </Label>
       </Align>
@@ -157,7 +165,7 @@ export const InputText = forwardRef<HTMLInputElement | HTMLTextAreaElement, Inpu
     if (p.hint) {
       hintOutside = (
         <Align vertical left hug>
-          <Spacer tiny={p.size === "small"} xsmall={p.size === "large"} />
+          <Spacer xsmall={p.size === "small"} small={p.size === "large"} />
 
           <Text tiny={p.size === "small"} xsmall={p.size !== "small"} fill={[p.color, 700]}>
             {p.hint}
@@ -174,7 +182,12 @@ export const InputText = forwardRef<HTMLInputElement | HTMLTextAreaElement, Inpu
       <Align horizontal center hug="width">
         <Spacer xsmall={p.size === "small"} small={p.size === "large"} />
 
-        <Icon name={p.iconNameLeft} medium={p.size === "small"} large={p.size === "large"} fill={[p.color, 700]} />
+        <Icon
+          name={p.iconNameLeft}
+          medium={p.size === "small"}
+          large={p.size === "large"}
+          fill={[p.error ? Color.Error : p.color, 700]}
+        />
       </Align>
     )
   }
@@ -182,15 +195,32 @@ export const InputText = forwardRef<HTMLInputElement | HTMLTextAreaElement, Inpu
   if (p.iconNameRight && p.rows === 1) {
     iconEnd = (
       <Align horizontal center hug="width">
-        <Icon name={p.iconNameRight} medium={p.size === "small"} large={p.size === "large"} fill={[p.color, 700]} />
+        <Icon
+          name={p.iconNameRight}
+          medium={p.size === "small"}
+          large={p.size === "large"}
+          fill={[p.error ? Color.Error : p.color, 700]}
+        />
 
         <Spacer xsmall={p.size === "small"} small={p.size === "large"} />
       </Align>
     )
   }
 
+  if (p.error) {
+    errorEitherSide = (
+      <Align vertical left hug="width">
+        <Spacer xsmall={p.size === "small"} small={p.size === "large"} />
+
+        <Text tiny={p.size === "small"} xsmall={p.size !== "small"} fill={[Color.Error, 700]}>
+          {p.error}
+        </Text>
+      </Align>
+    )
+  }
+
   return (
-    <Stack className={p.className} vertical hug>
+    <StackWidthOverride className={p.className} rows={p.rows} width={p.width} size={p.size} vertical hug>
       {labelOutside}
 
       {hintOutside}
@@ -198,13 +228,19 @@ export const InputText = forwardRef<HTMLInputElement | HTMLTextAreaElement, Inpu
       <Align horizontal left>
         <Stack
           horizontal
-          stroke={p.disabled ? [p.color, 100] : [p.color, 300]}
-          strokeHover={p.disabled ? [p.color, 100] : focus ? [p.color, 700] : [p.color, 700]}
-          fill={p.disabled ? [p.color, 50] : [focus ? p.color : Color.White, 50]}
+          stroke={p.disabled ? [p.color, 100] : [p.error ? Color.Error : p.color, 300]}
+          strokeHover={
+            p.disabled
+              ? [p.color, 100]
+              : focusCapture
+                ? [p.error ? Color.Error : p.color, 700]
+                : [p.error ? Color.Error : p.color, 700]
+          }
+          fill={p.disabled ? [p.color, 50] : [focusCapture ? (p.error ? Color.Error : p.color) : Color.White, 50]}
           cornerRadius="medium"
-          disabled={p.disabled}
-          loading={p.loading}
-          colorLoading={[p.color, 700]}
+          disabled={p.disabled ? true : undefined}
+          loading={p.loading ? true : undefined}
+          fillLoading={[p.color, 700]}
           hug
         >
           {labelInside}
@@ -219,12 +255,12 @@ export const InputText = forwardRef<HTMLInputElement | HTMLTextAreaElement, Inpu
               id={key}
               value={p.value}
               rows={p.rows || 1}
-              color={p.color}
+              color={p.error ? Color.Error : p.color}
               size={p.size}
-              focus={focus}
+              focus={focusCapture}
               placeholder={p.placeholder}
-              onFocus={() => setFocus(true)}
-              onBlur={() => setFocus(false)}
+              onFocusCapture={() => setFocusCapture(true)}
+              onBlur={() => setFocusCapture(false)}
               width={p.width}
               onChange={event => {
                 if (p.onChange) {
@@ -234,27 +270,31 @@ export const InputText = forwardRef<HTMLInputElement | HTMLTextAreaElement, Inpu
             />
           </Align>
 
-          <Align horizontal center hug="width">
-            <InputButton
-              variant="blank"
-              width="auto"
-              size={p.size}
-              colorForeground={p.value ? [p.color, 700] : [Color.Transparent]}
-              iconName="clear"
-              iconPlacement="labelNotSpecified"
-              onClick={() => {
-                if (p.onChange) {
-                  p.onChange("")
-                }
-              }}
-            />
+          {p.rows === 1 ? (
+            <Align horizontal center hug="width">
+              <InputButton
+                variant="blank"
+                width="auto"
+                size={p.size}
+                colorForeground={p.value ? [p.color, 700] : [Color.Transparent]}
+                iconName="clear"
+                iconPlacement="labelNotSpecified"
+                onClick={() => {
+                  if (p.onChange) {
+                    p.onChange("")
+                  }
+                }}
+              />
 
-            {/* <Spacer xsmall={p.size === "small"} small={p.size === "large"} /> */}
-          </Align>
+              {/* <Spacer xsmall={p.size === "small"} small={p.size === "large"} /> */}
+            </Align>
+          ) : (
+            <></>
+          )}
 
           {p.iconNameRight ? (
             <>
-              <Align vertical center>
+              <Align vertical center hug="width">
                 <Spacer xsmall overrideWidth="1px" />
 
                 <Divider vertical fill={p.value ? [p.color, 300] : [Color.Transparent]} />
@@ -262,7 +302,7 @@ export const InputText = forwardRef<HTMLInputElement | HTMLTextAreaElement, Inpu
                 <Spacer xsmall overrideWidth="1px" />
               </Align>
 
-              <Spacer tiny={p.size === "small"} xsmall={p.size === "large"} />
+              <Spacer xsmall={p.size === "small"} small={p.size === "large"} />
             </>
           ) : (
             <></>
@@ -272,7 +312,9 @@ export const InputText = forwardRef<HTMLInputElement | HTMLTextAreaElement, Inpu
         </Stack>
       </Align>
 
+      {errorEitherSide}
+
       {hintInside}
-    </Stack>
+    </StackWidthOverride>
   )
 })

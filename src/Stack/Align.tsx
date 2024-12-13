@@ -3,6 +3,32 @@ import styled from "@emotion/styled"
 import { ComponentBaseProps } from "@new/ComponentBaseProps"
 import { computeAlignment, computeWidthHeight } from "./internal/Functions"
 
+export type AlignProps = ComponentBaseProps & {
+  key?: string
+
+  /**
+   * Only one of "vertical" or "horizontal" or "wrap" can be true
+   */
+  vertical?: boolean
+  horizontal?: boolean
+  wrap?: boolean | "partly"
+
+  /**
+   * Only one of "topLeft" or "topCenter" or "topRight" {...} or "bottomRight" can be true
+   */
+  topLeft?: boolean
+  topCenter?: boolean
+  topRight?: boolean
+  left?: boolean
+  center?: boolean
+  right?: boolean
+  bottomLeft?: boolean
+  bottomCenter?: boolean
+  bottomRight?: boolean
+
+  hug?: boolean | "width" | "height"
+}
+
 const Container = styled.div<AlignProps>(p => ({
   display: "flex",
   flexWrap: p["wrap"] ? "wrap" : "nowrap",
@@ -11,114 +37,12 @@ const Container = styled.div<AlignProps>(p => ({
   margin: 0,
 
   ...(p["wrap"] && {
-    gap: "calc(var(--BU) * 4)",
+    gap: p["wrap"] === "partly" ? "calc(var(--BU) * 2)" : "calc(var(--BU) * 4)",
   }),
 
   ...computeWidthHeight(p),
   ...computeAlignment(p),
 }))
-
-type AlignBaseProps = ComponentBaseProps & {
-  hug?: boolean | "width" | "height"
-}
-
-type AlignVerticalProps = AlignBaseProps & {
-  /**
-   * Only one of "vertical" or "horizontal" or "wrap" can be true
-   */
-  vertical: boolean
-}
-
-type AlignHorizontalProps = AlignBaseProps & {
-  /**
-   * Only one of "vertical" or "horizontal" or "wrap" can be true
-   */
-  horizontal: boolean
-}
-
-type AlignWrapProps = AlignBaseProps & {
-  /**
-   * Only one of "vertical" or "horizontal" or "wrap" can be true
-   */
-  wrap: boolean
-}
-
-type AlignTopLeftProps = AlignBaseProps & {
-  /**
-   * Only one of "topLeft" or "topCenter" or "topRight" {...} or "bottomRight" can be true
-   */
-  topLeft: boolean
-}
-
-type AlignTopCenterProps = AlignBaseProps & {
-  /**
-   * Only one of "topLeft" or "topCenter" or "topRight" {...} or "bottomRight" can be true
-   */
-  topCenter: boolean
-}
-
-type AlignTopRightProps = AlignBaseProps & {
-  /**
-   * Only one of "topLeft" or "topCenter" or "topRight" {...} or "bottomRight" can be true
-   */
-  topRight: boolean
-}
-
-type AlignLeftProps = AlignBaseProps & {
-  /**
-   * Only one of "topLeft" or "topCenter" or "topRight" {...} or "bottomRight" can be true
-   */
-  left: boolean
-}
-
-type AlignCenterProps = AlignBaseProps & {
-  /**
-   * Only one of "topLeft" or "topCenter" or "topRight" {...} or "bottomRight" can be true
-   */
-  center: boolean
-}
-
-type AlignRightProps = AlignBaseProps & {
-  /**
-   * Only one of "topLeft" or "topCenter" or "topRight" {...} or "bottomRight" can be true
-   */
-  right: boolean
-}
-
-type AlignBottomLeftProps = AlignBaseProps & {
-  /**
-   * Only one of "topLeft" or "topCenter" or "topRight" {...} or "bottomRight" can be true
-   */
-  bottomLeft: boolean
-}
-
-type AlignBottomCenterProps = AlignBaseProps & {
-  /**
-   * Only one of "topLeft" or "topCenter" or "topRight" {...} or "bottomRight" can be true
-   */
-  bottomCenter: boolean
-}
-
-type AlignBottomRightProps = AlignBaseProps & {
-  /**
-   * Only one of "topLeft" or "topCenter" or "topRight" {...} or "bottomRight" can be true
-   */
-  bottomRight: boolean
-}
-
-export type AlignProps =
-  | AlignVerticalProps
-  | AlignHorizontalProps
-  | AlignWrapProps
-  | AlignTopLeftProps
-  | AlignTopCenterProps
-  | AlignTopRightProps
-  | AlignLeftProps
-  | AlignCenterProps
-  | AlignRightProps
-  | AlignBottomLeftProps
-  | AlignBottomCenterProps
-  | AlignBottomRightProps
 
 export const Align = (p: PropsWithChildren<AlignProps>) => (
   <Container

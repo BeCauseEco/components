@@ -4,67 +4,26 @@ import { PropsWithChildren, ReactElement, forwardRef, useCallback, useEffect, us
 import { InputComboboxItemProps } from "./InputComboboxItem"
 import React from "react"
 import { Text } from "@new/Text/Text"
-import { Size } from "@new/Size"
 import { computeColor, Color, ColorWithLightness } from "@new/Color"
 import { Popover } from "@new/Popover/Popover"
 import { InputButton } from "@new/InputButton/internal/InputButton"
-import { BackgroundCard } from "@new/Composition/BackgroundCard"
-import { EShadow } from "@new/EShadow"
 import { InputTextSingle } from "@new/InputText/InputTextSingle"
-import { LayoutCombobox } from "./internal/LayoutInputCombobox"
-import { EAlignment } from "@new/EAlignment"
 import { Spacer } from "@new/Stack/Spacer"
 import { InputCheckbox } from "@new/InputCheckbox/InputCheckbox"
-import { PlaywrightProps } from "@new/Playwright"
 import { Virtuoso } from "react-virtuoso"
 import { Badge } from "@new/Badge/Badge"
 import { Stack } from "@new/Stack/Stack"
 import { Align } from "@new/Stack/Align"
+import { ComponentBaseProps } from "@new/ComponentBaseProps"
+import { OverflowContainer } from "@new/OverflowContainer/OverflowContainer"
 
-const Container = styled.div<Pick<InputComboboxProps, "width">>(p => ({
-  display: "flex",
-  width: p.width === "auto" ? "100%" : "calc(var(--BU) * 80)",
-}))
-
-const CommandItemStyled = styled(CommandItem)<{
-  multiple?: boolean
-  selected: boolean
-  colorSelected: ColorWithLightness
-  colorBackgroundHover: ColorWithLightness
-  colorForeground: ColorWithLightness
-}>(p => ({
-  position: "relative",
-  padding: p.multiple ? "calc(var(--BU) * 1)" : "calc(var(--BU) * 1.5) ",
-  borderRadius: "var(--BU)",
-  cursor: "pointer",
-  userSelect: "none",
-  backgroundColor: "transparent",
-
-  "&[data-selected='true']": {
-    backgroundColor: computeColor(p.colorBackgroundHover),
-  },
-}))
-
-const CommandEmptyStyled = styled(CommandEmpty)({
-  padding: "calc(var(--BU) * 1.5) 0",
-  userSelect: "none",
-})
-
-export type TInputComboBoxFilterOptions = {
-  textFilterNoResults: string
-  textFilterPlaceholder: string
-}
-
-export type InputComboboxProps = PlaywrightProps & {
-  id?: string
-
+export type InputComboboxProps = ComponentBaseProps & {
   size: "small" | "large"
-  width: "auto" | "fixed"
 
   textNoSelection: string
 
   /** Enables filtering, if supplied. */
-  filterOptions?: TInputComboBoxFilterOptions
+  filterOptions?: { textFilterNoResults: string; textFilterPlaceholder: string }
 
   label?: string
 
@@ -92,6 +51,35 @@ export type InputComboboxProps = PlaywrightProps & {
   disabled?: boolean
   loading?: boolean
 }
+
+const Container = styled.div({
+  display: "flex",
+  width: "fit-content",
+})
+
+const CommandItemStyled = styled(CommandItem)<{
+  multiple?: boolean
+  selected: boolean
+  colorSelected: ColorWithLightness
+  colorBackgroundHover: ColorWithLightness
+  colorForeground: ColorWithLightness
+}>(p => ({
+  position: "relative",
+  padding: p.multiple ? "calc(var(--BU) * 1)" : "calc(var(--BU) * 1.5) ",
+  borderRadius: "var(--BU)",
+  cursor: "pointer",
+  userSelect: "none",
+  backgroundColor: "transparent",
+
+  "&[data-selected='true']": {
+    backgroundColor: computeColor(p.colorBackgroundHover),
+  },
+}))
+
+const CommandEmptyStyled = styled(CommandEmpty)({
+  padding: "calc(var(--BU) * 1.5) 0",
+  userSelect: "none",
+})
 
 const LIST_HEIGHT = 360
 const LIST_WIDTH = 260
@@ -132,6 +120,7 @@ export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<InputC
             variant={p.disabled ? "opaque" : "solid"}
             label={selectedItem.label}
             color={p.disabled ? p.color : Color.Primary}
+            maxWidth="160px"
             onClear={() => {
               p.onChange("")
             }}
@@ -140,7 +129,7 @@ export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<InputC
       }
 
       return (
-        <Text fill={[p.color, 700]} xsmall={p.size === "small"} small={p.size === "large"}>
+        <Text fill={[p.color, 700]} xsmall={p.size === "small"} small={p.size === "large"} maxWidth="160px">
           {selectedItem?.label || p.textNoSelection}
         </Text>
       )
@@ -166,24 +155,26 @@ export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<InputC
     return (
       <>
         {visibleItems?.map((item, index) => (
-          <>
-            <Badge
-              key={index}
-              label={item}
-              size={p.size}
-              variant={p.disabled ? "opaque" : "solid"}
-              color={p.disabled ? p.color : Color.Primary}
-              onClear={
-                p.clearable
-                  ? () => {
-                      handleRemoveItem(item)
-                    }
-                  : undefined
-              }
-            />
+          <Stack key={index} horizontal hug>
+            <Align horizontal>
+              <Badge
+                label={item}
+                size={p.size}
+                variant={p.disabled ? "opaque" : "solid"}
+                color={p.disabled ? p.color : Color.Primary}
+                maxWidth="160px"
+                onClear={
+                  p.clearable
+                    ? () => {
+                        handleRemoveItem(item)
+                      }
+                    : undefined
+                }
+              />
+            </Align>
 
-            {visibleItems.length >= index ? <Spacer tiny /> : null}
-          </>
+            {visibleItems.length >= index ? <Spacer tiny /> : <></>}
+          </Stack>
         ))}
 
         {remainingCount > 0 && (
@@ -248,11 +239,12 @@ export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<InputC
                 onChange={value => onSelectMultiple(item.value, value)}
                 color={Color.Primary}
                 label={item.label}
+                maxWidth="320px"
               />
             </Align>
           </Stack>
         ) : (
-          <Text xsmall={p.size === "small"} small={p.size === "large"} fill={[p.color, 700]}>
+          <Text xsmall={p.size === "small"} small={p.size === "large"} fill={[p.color, 700]} maxWidth="320px">
             {item.label}
           </Text>
         )}
@@ -319,17 +311,11 @@ export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<InputC
   const filterWithDebounce = useMemo(() => debounce(filterResults, 300), [filterResults])
 
   return (
-    <Container
-      ref={ref}
-      id={p.id}
-      data-playwright-testid={p.playwrightTestId}
-      className="<InputCombobox /> - "
-      width={p.width}
-    >
+    <Container ref={ref} id={p.id} data-playwright-testid={p.playwrightTestId} className="<InputCombobox /> - ">
       <Popover
+        alignment="start"
         open={p.disabled || p.loading ? false : open}
         onOpenChange={p.disabled || p.loading ? () => {} : setOpen}
-        alignment={EAlignment.Start}
         trigger={
           <InputButton
             size={p.size}
@@ -343,8 +329,8 @@ export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<InputC
             colorLoading={[p.color, 700]}
             iconName={open ? "keyboard_arrow_up" : "keyboard_arrow_down"}
             iconPlacement="afterLabel"
-            disabled={p.disabled}
-            loading={p.loading}
+            disabled={p.disabled ? true : undefined}
+            loading={p.loading ? true : undefined}
             content={
               <Stack horizontal hug>
                 <Align horizontal left>
@@ -362,43 +348,45 @@ export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<InputC
             }
           />
         }
-        background={<BackgroundCard colorBackground={[Color.White]} shadow={EShadow.Large} borderRadius={Size.Tiny} />}
-        layout={
-          <LayoutCombobox
-            contentTop={
-              <>
-                {p.filterOptions && Object.keys(items).length > 9 && (
-                  <InputTextSingle
-                    size="small"
-                    color={p.color}
-                    value={search}
-                    placeholder={p.filterOptions.textFilterPlaceholder}
-                    onChange={value => {
-                      setSearch(value)
-                      filterWithDebounce(value)
-                    }}
-                  />
-                )}
+      >
+        <Align vertical topLeft>
+          {p.filterOptions && Object.keys(items).length > 9 && (
+            <InputTextSingle
+              size="small"
+              width="auto"
+              color={p.color}
+              value={search}
+              placeholder={p.filterOptions.textFilterPlaceholder}
+              onChange={value => {
+                setSearch(value)
+                filterWithDebounce(value)
+              }}
+            />
+          )}
 
-                <Spacer tiny={p.size === "small"} xsmall={p.size === "large"} />
-              </>
-            }
-            contentBottom={
-              <Command loop>
-                {p.filterOptions && (
-                  <CommandEmptyStyled>
-                    <Text fill={[p.color, 700]} xsmall={p.size === "small"} small={p.size !== "small"}>
-                      {p.filterOptions.textFilterNoResults}
-                    </Text>
-                  </CommandEmptyStyled>
-                )}
+          <Spacer tiny={p.size === "small"} xsmall={p.size === "large"} />
 
-                <CommandList>{commandListItems}</CommandList>
-              </Command>
-            }
-          />
-        }
-      />
+          <OverflowContainer
+            axes="vertical"
+            colorBackground={[Color.White]}
+            colorForeground={[Color.Neutral, 600]}
+            maxHeight="radix-popover-content-available-height-SAFE-AREA-INPUTTEXT"
+            hug
+          >
+            <Command loop>
+              {p.filterOptions && (
+                <CommandEmptyStyled>
+                  <Text fill={[p.color, 700]} xsmall={p.size === "small"} small={p.size !== "small"}>
+                    {p.filterOptions.textFilterNoResults}
+                  </Text>
+                </CommandEmptyStyled>
+              )}
+
+              <CommandList>{commandListItems}</CommandList>
+            </Command>
+          </OverflowContainer>
+        </Align>
+      </Popover>
     </Container>
   )
 })
