@@ -47,24 +47,28 @@ const Container = styled.div<AlignProps>(p => ({
   ...p?.childrenValidationResult?.styles,
 }))
 
-export const Align = (p: PropsWithChildren<AlignProps>) => (
-  <Container
-    className={`<Align /> -`}
-    vertical={p["vertical"]}
-    horizontal={p["horizontal"]}
-    wrap={p["wrap"]}
-    topLeft={p["topLeft"]}
-    topCenter={p["topCenter"]}
-    topRight={p["topRight"]}
-    left={p["left"]}
-    center={p["center"]}
-    right={p["right"]}
-    bottomLeft={p["bottomLeft"]}
-    bottomCenter={p["bottomCenter"]}
-    bottomRight={p["bottomRight"]}
-    hug={p.hug}
-    childrenValidationResult={validateChildren("disallow", ["Align"], p.children)}
-  >
-    {p.children}
-  </Container>
-)
+export const Align = (p: PropsWithChildren<AlignProps>) => {
+  const validationResult = validateChildren("disallow", ["Align"], p.children)
+
+  return (
+    <Container
+      className={`${validationResult.valid ? "" : "*** INVALID CHILDREN *** "}<Align /> -`}
+      vertical={p["vertical"]}
+      horizontal={p["horizontal"]}
+      wrap={p["wrap"]}
+      topLeft={p["topLeft"]}
+      topCenter={p["topCenter"]}
+      topRight={p["topRight"]}
+      left={p["left"]}
+      center={p["center"]}
+      right={p["right"]}
+      bottomLeft={p["bottomLeft"]}
+      bottomCenter={p["bottomCenter"]}
+      bottomRight={p["bottomRight"]}
+      hug={p.hug}
+      childrenValidationResult={validationResult}
+    >
+      {p.children}
+    </Container>
+  )
+}

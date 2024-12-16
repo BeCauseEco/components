@@ -17,7 +17,7 @@ const getComponentTypeNames = (children: Children): string[] => {
 
   if (Array.isArray(children)) {
     for (const child of children) {
-      if (child?.["type"].toString() === "Symbol(react.fragment)") {
+      if (child?.["type"]?.toString() === "Symbol(react.fragment)") {
         r.push(
           ...getComponentTypeNames(
             React.Children.toArray(child?.["props"]?.["children"]).filter(c => React.isValidElement(c)),

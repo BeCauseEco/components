@@ -147,9 +147,11 @@ const Children = styled.div<Pick<StackProps, "loading" | "disabled" | "hug"> & {
 )
 
 export const Stack = (p: StackProps) => {
+  const validationResult = validateChildren("whitelist", ["Align", "Spacer", "Grid"], p.children)
+
   return (
     <Container
-      className={p.className || "<Stack /> -"}
+      className={p.className || validationResult.valid ? "<Stack /> -" : "*** INVALID CHILDREN *** <Stack /> -"}
       data-playwright-testid={p.playwrightTestId}
       fill={p.fill}
       fillHover={p.fillHover}
@@ -160,7 +162,7 @@ export const Stack = (p: StackProps) => {
       overflowHidden={p.overflowHidden}
       cornerRadius={p.cornerRadius}
       aspectRatio={p.aspectRatio}
-      childrenValidationResult={validateChildren("whitelist", ["Align", "Spacer", "Grid"], p.children)}
+      childrenValidationResult={validationResult}
     >
       <Loader className="<Stack: loader />" loading={p.loading}>
         <Spinner fillLoading={p.fillLoading} loading={p.loading} />
