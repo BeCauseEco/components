@@ -35,7 +35,13 @@ export type StackProps = ComponentBaseProps & {
    * WARNING: internal properties - only to be used within /components
    */
   explodeHeight?: boolean
+  /**
+   * WARNING: internal property - only to be used within /components
+   */
   overflowHidden?: boolean
+  /**
+   * WARNING: internal property - only to be used within /components
+   */
   aspectRatio?: "auto" | "1"
 
   children:

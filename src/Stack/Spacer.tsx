@@ -16,12 +16,24 @@ export type SpacerProps = ComponentBaseProps & {
   huge?: boolean
 
   /**
-   * WARNING: internal properties - only to be used within /components
+   * WARNING: internal property - only to be used within /components
    */
   explodeHeight?: boolean
+  /**
+   * WARNING: internal property - only to be used within /components
+   */
   overflowHidden?: boolean
+  /**
+   * WARNING: internal property - only to be used within /components
+   */
   aspectRatio?: "auto" | "1"
+  /**
+   * WARNING: internal property - only to be used within /components
+   */
   overrideWidth?: string
+  /**
+   * WARNING: internal property - only to be used within /components
+   */
   overrideHeight?: string
 }
 
