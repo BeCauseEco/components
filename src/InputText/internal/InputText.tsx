@@ -197,8 +197,6 @@ export const InputText = forwardRef<HTMLInputElement | HTMLTextAreaElement, Inpu
     if (p.hint) {
       hintOutside = (
         <Align vertical left hug>
-          <Spacer xsmall={p.size === "small"} small={p.size === "large"} />
-
           <Text tiny={p.size === "small"} xsmall={p.size !== "small"} fill={[p.color, 700]}>
             {p.hint}
           </Text>
