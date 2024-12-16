@@ -3,7 +3,7 @@ import React, { ReactElement } from "react"
 import * as RadixPopover from "@radix-ui/react-popover"
 import { keyframes } from "@emotion/react"
 import { ComponentBaseProps } from "@new/ComponentBaseProps"
-import { Align, AlignProps } from "@new/Stack/Align"
+import { AlignProps } from "@new/Stack/Align"
 import { Stack } from "@new/Stack/Stack"
 import { Color } from "@new/Color"
 
@@ -87,9 +87,7 @@ export const Popover = (p: PopoverProps) => {
           data-playwright-testid={p.playwrightTestId}
         >
           <Stack vertical fill={[Color.White]} hug="partly" dropShadow="medium" cornerRadius="medium">
-            <Align vertical topLeft>
-              {p.children}
-            </Align>
+            {p.children}
           </Stack>
 
           {/* <Arrow colorArrow={colorArrow} width={Size.Small} height={Size.Xsmall} /> */}

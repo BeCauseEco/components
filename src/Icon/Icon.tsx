@@ -60,6 +60,7 @@ const Container = styled.i<{ size: string; fontVariationSettings: string; _fill:
   color: computeColor(p._fill),
   fontVariationSettings: p.fontVariationSettings,
   userSelect: "none",
+  cursor: "inherit",
 }))
 
 export type IconProps = PlaywrightProps & {

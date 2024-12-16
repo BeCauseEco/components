@@ -100,7 +100,9 @@ export const InputRadioGroup = (p: InputRadioGroupProps) => {
           data-playwright-test-id={p.playwrightTestId}
         >
           <Stack vertical hug>
-            {items}
+            <Align vertical left hug>
+              {items}
+            </Align>
           </Stack>
         </Root>
       </Align>

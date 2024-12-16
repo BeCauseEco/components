@@ -1,7 +1,6 @@
 import React, { ReactElement } from "react"
 import styled from "@emotion/styled"
 import { AlignProps } from "@new/Stack/Align"
-// import { containsIlligalChildren } from "@new/Functions"
 import { computeColor, Color, ColorWithLightness } from "@new/Color"
 import { ComponentBaseProps } from "@new/ComponentBaseProps"
 import { Loader } from "./internal/Loader"
@@ -9,6 +8,7 @@ import { Spinner } from "./internal/Spinner"
 import { GridProps } from "@new/Grid/Grid"
 import { SpacerProps } from "@new/Stack/Spacer"
 import { translateBorderRadius } from "./internal/Functions"
+import { validateChildren } from "@new/Functions"
 
 export type StackProps = ComponentBaseProps & {
   loading?: boolean
@@ -69,6 +69,7 @@ const Container = styled.div<
     | "strokeHover"
     | "dropShadow"
     | "aspectRatio"
+    | "childrenValidationResult"
   >
 >(p => ({
   display: "flex",
@@ -85,7 +86,6 @@ const Container = styled.div<
   aspectRatio: p.aspectRatio || "auto",
   content: `'${p.aspectRatio}'`,
   boxShadow: computeShadow(p.dropShadow),
-
   outlineOffset: -1,
 
   ...(p.stroke && {
@@ -99,6 +99,8 @@ const Container = styled.div<
       outlineColor: computeColor(p.strokeHover || [Color.Transparent]),
     }),
   },
+
+  ...p?.childrenValidationResult?.styles,
 }))
 
 const Children = styled.div<Pick<StackProps, "loading" | "disabled" | "hug"> & { flexDirection: "column" | "row" }>(
@@ -139,10 +141,6 @@ const Children = styled.div<Pick<StackProps, "loading" | "disabled" | "hug"> & {
 )
 
 export const Stack = (p: StackProps) => {
-  // if (containsIlligalChildren(p.children, ["Align"])) {
-  //   return <pre>TStack only accepts children of type: TAlign</pre>
-  // }
-
   return (
     <Container
       className={p.className || "<Stack /> -"}
@@ -156,6 +154,7 @@ export const Stack = (p: StackProps) => {
       overflowHidden={p.overflowHidden}
       cornerRadius={p.cornerRadius}
       aspectRatio={p.aspectRatio}
+      childrenValidationResult={validateChildren("whitelist", ["Align", "Spacer", "Grid"], p.children)}
     >
       <Loader className="<Stack: loader />" loading={p.loading}>
         <Spinner fillLoading={p.fillLoading} loading={p.loading} />

@@ -12,6 +12,8 @@ import { InputButton } from "@new/InputButton/internal/InputButton"
 import { ComponentBaseProps } from "@new/ComponentBaseProps"
 
 export type InputTextProps = ComponentBaseProps & {
+  type: "text" | "date"
+
   size: "small" | "large"
   width: "auto" | "fixed"
 
@@ -29,6 +31,7 @@ export type InputTextProps = ComponentBaseProps & {
   label?: ["outside" | "inside", string]
   hint?: string
   error?: string
+  required?: boolean
 
   iconNameLeft?: string
   iconNameRight?: string
@@ -52,6 +55,7 @@ const calculateWidth = (rows: InputTextProps["rows"], width: InputTextProps["wid
 
 const Output = styled.output<Pick<InputTextProps, "color" | "size" | "rows"> & { focus: boolean }>(p => ({
   display: "flex",
+  position: "relative",
   width: "100%",
   height:
     p.rows === 1
@@ -100,6 +104,15 @@ const Output = styled.output<Pick<InputTextProps, "color" | "size" | "rows"> & {
   "&::placeholder": {
     color: computeColor([p.color, 300]),
   },
+
+  "&::-webkit-calendar-picker-indicator": {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    width: 0,
+    height: 0,
+    opacity: 0,
+  },
 }))
 
 const StackWidthOverride = styled(Stack)<Pick<InputTextProps, "size" | "rows" | "width">>(p => ({
@@ -110,6 +123,7 @@ const Label = styled.label({
   display: "flex",
   userSelect: "none",
   cursor: "pointer",
+  alignItems: "center",
 })
 
 export const InputText = forwardRef<HTMLInputElement | HTMLTextAreaElement, InputTextProps>((p, ref) => {
@@ -134,6 +148,14 @@ export const InputText = forwardRef<HTMLInputElement | HTMLTextAreaElement, Inpu
           <Text xsmall={p.size === "small"} small={p.size === "large"} fill={[p.error ? Color.Error : p.color, 500]}>
             {p.label[1]}
           </Text>
+
+          {p.required && (
+            <>
+              <Spacer tiny={p.size === "small"} xsmall={p.size === "large"} />
+
+              <Icon name="asterisk" small={p.size === "small"} medium={p.size === "large"} fill={[Color.Error, 700]} />
+            </>
+          )}
         </Label>
       </Align>
     )
@@ -158,6 +180,14 @@ export const InputText = forwardRef<HTMLInputElement | HTMLTextAreaElement, Inpu
           <Text xsmall={p.size === "small"} small={p.size !== "small"} fill={[p.color, 700]}>
             <b>{p.label[1]}</b>
           </Text>
+
+          {p.required && (
+            <>
+              <Spacer tiny={p.size === "small"} xsmall={p.size === "large"} />
+
+              <Icon name="asterisk" small={p.size === "small"} medium={p.size === "large"} fill={[Color.Error, 700]} />
+            </>
+          )}
         </Label>
       </Align>
     )
@@ -201,6 +231,27 @@ export const InputText = forwardRef<HTMLInputElement | HTMLTextAreaElement, Inpu
           large={p.size === "large"}
           fill={[p.error ? Color.Error : p.color, 700]}
         />
+
+        <Spacer xsmall={p.size === "small"} small={p.size === "large"} />
+      </Align>
+    )
+  }
+
+  if (p.type === "date") {
+    iconEnd = (
+      <Align horizontal center hug="width">
+        {/* TODO: @cllpse: this is a bit of a hack. Will fix at a later point. */}
+        <div style={{ display: "flex", width: "fit-content", height: "fit-content", cursor: "pointer" }}>
+          <Icon
+            name="calendar_month"
+            medium={p.size === "small"}
+            large={p.size === "large"}
+            fill={[p.error ? Color.Error : p.color, 700]}
+            onClick={event => {
+              event?.target?.parentElement?.parentElement?.parentElement?.querySelectorAll("input")?.[0]?.showPicker()
+            }}
+          />
+        </div>
 
         <Spacer xsmall={p.size === "small"} small={p.size === "large"} />
       </Align>
@@ -252,6 +303,7 @@ export const InputText = forwardRef<HTMLInputElement | HTMLTextAreaElement, Inpu
               // @ts-expect-error TypeScript can't infer the type of the `ref` prop when using as="...".
               ref={ref}
               as={p.rows === 1 ? "input" : "textarea"}
+              type={p.type}
               id={key}
               value={p.value}
               rows={p.rows || 1}
@@ -285,14 +337,12 @@ export const InputText = forwardRef<HTMLInputElement | HTMLTextAreaElement, Inpu
                   }
                 }}
               />
-
-              {/* <Spacer xsmall={p.size === "small"} small={p.size === "large"} /> */}
             </Align>
           ) : (
             <></>
           )}
 
-          {p.iconNameRight ? (
+          {p.iconNameRight || p.type === "date" ? (
             <>
               <Align vertical center hug="width">
                 <Spacer xsmall overrideWidth="1px" />

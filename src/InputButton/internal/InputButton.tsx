@@ -161,7 +161,13 @@ const Children = (p: Omit<InputButtonProps, "width">) => {
       {iconBeforeLabel}
       {label}
 
-      {p.content}
+      {p.content ? (
+        <Align horizontal center>
+          {p.content}
+        </Align>
+      ) : (
+        <></>
+      )}
 
       {iconAfterLabel}
       {iconLabelNotSpecified}

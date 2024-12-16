@@ -2,6 +2,7 @@ import { PropsWithChildren } from "react"
 import styled from "@emotion/styled"
 import { ComponentBaseProps } from "@new/ComponentBaseProps"
 import { computeAlignment, computeWidthHeight } from "./internal/Functions"
+import { validateChildren } from "@new/Functions"
 
 export type AlignProps = ComponentBaseProps & {
   key?: string
@@ -42,6 +43,8 @@ const Container = styled.div<AlignProps>(p => ({
 
   ...computeWidthHeight(p),
   ...computeAlignment(p),
+
+  ...p?.childrenValidationResult?.styles,
 }))
 
 export const Align = (p: PropsWithChildren<AlignProps>) => (
@@ -60,6 +63,7 @@ export const Align = (p: PropsWithChildren<AlignProps>) => (
     bottomCenter={p["bottomCenter"]}
     bottomRight={p["bottomRight"]}
     hug={p.hug}
+    childrenValidationResult={validateChildren("disallow", ["Align"], p.children)}
   >
     {p.children}
   </Container>
