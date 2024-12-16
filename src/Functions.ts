@@ -42,50 +42,52 @@ export const validateChildren = (
   // eslint-disable-next-line
   children: Children,
 ): ChildrenValidationResult => {
-  return {
-    valid: true,
-    invalidChildren: [],
-    styles: {},
+  if (process?.env?.NODE_ENV === "development") {
+    const validChildren = React.Children.toArray(children)
+    const componentTypeNames = getComponentTypeNames(validChildren)
+
+    let invalidChildren: string[] = []
+
+    if (method === "whitelist") {
+      invalidChildren = componentTypeNames.filter(
+        typeName => ![...allowedTypes, "__SENTRY_WRAPPING_TARGET_FILE__"].includes(typeName),
+      )
+    } else {
+      invalidChildren = componentTypeNames.filter(typeName => allowedTypes.includes(typeName))
+    }
+
+    const valid = invalidChildren.length === 0
+
+    return {
+      valid,
+      invalidChildren,
+      styles: valid
+        ? {
+            "&::before": {},
+          }
+        : {
+            position: "relative",
+            outline: "solid 2px red",
+
+            "&::before": {
+              content: `"INVALID CHILDREN: ${invalidChildren.join(", ")}"`,
+              position: "absolute",
+              top: "100%",
+              left: 0,
+              backgroundColor: "red",
+              color: "white",
+              fontSize: "16px",
+              lineHeight: "16px",
+              zIndex: 999999999,
+              padding: "2px 4px",
+            },
+          },
+    }
+  } else {
+    return {
+      valid: true,
+      invalidChildren: [],
+      styles: {},
+    }
   }
-
-  // const validChildren = React.Children.toArray(children)
-  // const componentTypeNames = getComponentTypeNames(validChildren)
-
-  // let invalidChildren: string[] = []
-
-  // if (method === "whitelist") {
-  //   invalidChildren = componentTypeNames.filter(
-  //     typeName => ![...allowedTypes, "__SENTRY_WRAPPING_TARGET_FILE__"].includes(typeName),
-  //   )
-  // } else {
-  //   invalidChildren = componentTypeNames.filter(typeName => allowedTypes.includes(typeName))
-  // }
-
-  // const valid = invalidChildren.length === 0
-
-  // return {
-  //   valid,
-  //   invalidChildren,
-  //   styles: valid
-  //     ? {
-  //         "&::before": {},
-  //       }
-  //     : {
-  //         position: "relative",
-  //         outline: "solid 2px red",
-
-  //         "&::before": {
-  //           content: `"INVALID CHILDREN: ${invalidChildren.join(", ")}"`,
-  //           position: "absolute",
-  //           top: "100%",
-  //           left: 0,
-  //           backgroundColor: "red",
-  //           color: "white",
-  //           fontSize: "16px",
-  //           lineHeight: "16px",
-  //           zIndex: 999999999,
-  //           padding: "2px 4px",
-  //         },
-  //       },
-  // }
 }
