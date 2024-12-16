@@ -157,7 +157,7 @@ export const Dialog = ({
                     <>
                       <Divider fill={[computeMessageColor(message), 200]} />
 
-                      <Stack horizontal colorBackground={[computeMessageColor(message), 100]}>
+                      <Stack horizontal fill={[computeMessageColor(message), 100]}>
                         <Align horizontal hug="width" left>
                           {message[0] === "notice" && (
                             <Icon large name="info" fill={[computeMessageColor(message), 800]} style="filled" />
