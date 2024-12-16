@@ -1,6 +1,6 @@
 import styled from "@emotion/styled"
 import * as RadixRadioGroup from "@radix-ui/react-radio-group"
-import { ReactElement } from "react"
+import { ReactElement, useId } from "react"
 import { PlaywrightProps } from "@new/Playwright"
 import { InputRadioGroupItemProps } from "@new/InputRadioGroup/InputRadioGroupItem"
 import { Stack } from "@new/Stack/Stack"
@@ -55,6 +55,8 @@ export type InputRadioGroupProps = PlaywrightProps & {
 
 export const InputRadioGroup = (p: InputRadioGroupProps) => {
   const items: ReactElement[] = []
+  let labelOutside: ReactElement<InputRadioGroupProps> = <></>
+  const key = useId()
 
   let i = 0
 
@@ -90,9 +92,24 @@ export const InputRadioGroup = (p: InputRadioGroupProps) => {
     }
   })
 
+  if (p.label) {
+    labelOutside = (
+      <Align vertical left hug="width">
+        <Label htmlFor={key}>
+          <Text xsmall={p.size === "small"} small={p.size !== "small"} fill={[p.color, 700]}>
+            <b>{p.label}</b>
+          </Text>
+        </Label>
+
+        <Spacer xsmall={p.size === "small"} small={p.size === "large"} />
+      </Align>
+    )
+  }
+
   return (
     <Stack vertical playwrightTestId={p.playwrightTestId} hug className="<InputRadioGroup /> -" disabled={p.disabled}>
       <Align hug left vertical>
+        {labelOutside}
         <Root
           defaultValue={p.defaultValue}
           value={p.value}

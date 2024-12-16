@@ -189,6 +189,8 @@ export const InputText = forwardRef<HTMLInputElement | HTMLTextAreaElement, Inpu
             </>
           )}
         </Label>
+
+        <Spacer xsmall={p.size === "small"} small={p.size === "large"} />
       </Align>
     )
 
