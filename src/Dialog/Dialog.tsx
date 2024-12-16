@@ -149,6 +149,8 @@ export const Dialog = ({
               }
               contentMiddle={
                 <>
+                  <Divider fill={[Color.Neutral, 100]} />
+
                   {content}
 
                   {message && message[0] !== "hidden" && (
