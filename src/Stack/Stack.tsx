@@ -147,7 +147,7 @@ const Children = styled.div<Pick<StackProps, "loading" | "disabled" | "hug"> & {
 )
 
 export const Stack = (p: StackProps) => {
-  const validationResult = validateChildren("whitelist", ["Align", "Spacer", "Grid"], p.children)
+  const validationResult = validateChildren("whitelist", ["Align", "Spacer", "Grid", "Divider"], p.children)
 
   return (
     <Container

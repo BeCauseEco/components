@@ -145,7 +145,7 @@ export const InputText = forwardRef<HTMLInputElement | HTMLTextAreaElement, Inpu
         <Spacer xsmall={p.size === "small"} small={p.size === "large"} />
 
         <Label htmlFor={key}>
-          <Text xsmall={p.size === "small"} small={p.size === "large"} fill={[p.error ? Color.Error : p.color, 500]}>
+          <Text xsmall={p.size === "small"} small={p.size === "large"} fill={[p.color, 500]}>
             {p.label[1]}
           </Text>
 
