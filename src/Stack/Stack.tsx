@@ -164,9 +164,13 @@ export const Stack = (p: StackProps) => {
       aspectRatio={p.aspectRatio}
       childrenValidationResult={validationResult}
     >
-      <Loader className="<Stack: loader />" loading={p.loading}>
-        <Spinner fillLoading={p.fillLoading} loading={p.loading} />
-      </Loader>
+      {p.loading !== undefined ? (
+        <Loader className="<Stack: loader />" loading={p.loading}>
+          <Spinner fillLoading={p.fillLoading} loading={p.loading} />
+        </Loader>
+      ) : (
+        <></>
+      )}
 
       <Children
         className="<Stack: children />"

@@ -46,6 +46,8 @@ export type InputCheckboxProps = ComponentBaseProps &
     onChange: (value: boolean) => void
 
     disabled?: boolean
+
+    alternateAppearance?: boolean
   }
 
 export const InputCheckbox = (p: InputCheckboxProps) => {
@@ -56,11 +58,26 @@ export const InputCheckbox = (p: InputCheckboxProps) => {
       <Stack horizontal hug disabled={p.disabled}>
         <Align horizontal left hug>
           <Root id={key} checked={p.value} onCheckedChange={checked => p.onChange(checked === true)}>
-            {p.value === "indeterminate" && <Icon name="indeterminate_check_box" large fill={[p.color, 700]} />}
+            {p.value === "indeterminate" && (
+              <Icon
+                name={p.alternateAppearance ? "radio_button_partial" : "indeterminate_check_box"}
+                large
+                fill={[p.color, 700]}
+              />
+            )}
 
-            {p.value === true && <Icon name="check_box" large fill={[p.color, 700]} />}
+            {p.value === true && (
+              <Icon name={p.alternateAppearance ? "radio_button_checked" : "check_box"} large fill={[p.color, 700]} />
+            )}
 
-            {p.value === false && <Icon name="check_box_outline_blank" large style="outlined" fill={[p.color, 300]} />}
+            {p.value === false && (
+              <Icon
+                name={p.alternateAppearance ? "radio_button_unchecked" : "check_box_outline_blank"}
+                large
+                style="outlined"
+                fill={[p.color, 300]}
+              />
+            )}
           </Root>
 
           {p.label && (
