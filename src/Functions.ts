@@ -68,8 +68,10 @@ export const validateChildren = (
         : {
             position: "relative",
             outline: "solid 2px red",
+            outlineOffset: "-2px",
+            backgroundColor: "rgba(255, 0, 0, 0.2)",
 
-            "&::before": {
+            "&::after": {
               content: `"INVALID CHILDREN: ${invalidChildren.join(", ")}"`,
               position: "absolute",
               top: "100%",
