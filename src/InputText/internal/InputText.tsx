@@ -117,6 +117,8 @@ const Output = styled.output<Pick<InputTextProps, "color" | "size" | "rows"> & {
 
 const StackWidthOverride = styled(Stack)<Pick<InputTextProps, "size" | "rows" | "width">>(p => ({
   width: calculateWidth(p["rows"], p["width"], p["size"]),
+  minWidth: calculateWidth(p["rows"], p["width"], p["size"]),
+  flexShrink: 0,
 }))
 
 const Label = styled.label({
