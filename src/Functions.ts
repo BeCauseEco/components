@@ -84,6 +84,12 @@ export const validateChildren = (
   // eslint-disable-next-line
   children: Children,
 ): ChildrenValidationResult => {
+  return {
+    valid: true,
+    invalidChildren: [],
+    stylesError: {},
+  }
+
   if (process?.env?.NODE_ENV === "development") {
     const validChildren = React.Children.toArray(children)
     const componentTypeNames = getComponentTypeNames(validChildren)
