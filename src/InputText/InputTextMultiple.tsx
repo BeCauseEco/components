@@ -4,7 +4,18 @@ import { Color } from "@new/Color"
 
 export type InputTextMultipleProps = Pick<
   InputTextProps,
-  "size" | "label" | "placeholder" | "hint" | "loading" | "disabled" | "value" | "onChange"
+  | "size"
+  | "width"
+  | "label"
+  | "placeholder"
+  | "hint"
+  | "error"
+  | "required"
+  | "loading"
+  | "disabled"
+  | "value"
+  | "onChange"
+  | "playwrightTestId"
 > & {
   color: Color
 }
@@ -13,18 +24,22 @@ export const InputTextMultiple = forwardRef<HTMLTextAreaElement, InputTextMultip
   return (
     <InputText
       className="<InputTextMultiple /> -"
+      type="text"
       ref={ref}
       size={p.size}
+      width={p.width}
       color={p.color}
       label={p.label}
       placeholder={p.placeholder}
       hint={p.hint}
-      loading={p.loading}
+      error={p.error}
+      required={p.required}
+      loading={p.loading ? true : undefined}
       onChange={p.onChange}
       rows={3}
-      disabled={p.disabled}
+      disabled={p.disabled ? true : undefined}
       value={p.value}
-      width="auto"
+      playwrightTestId={p.playwrightTestId}
     />
   )
 })
