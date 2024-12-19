@@ -2,7 +2,7 @@ import { forwardRef } from "react"
 import { InputTextProps, InputText } from "@new/InputText/internal/InputText"
 import { Color } from "@new/Color"
 
-export type InputTextSingleProps = Pick<
+export type InputTextDateProps = Pick<
   InputTextProps,
   | "size"
   | "width"
@@ -11,8 +11,6 @@ export type InputTextSingleProps = Pick<
   | "hint"
   | "error"
   | "required"
-  | "iconNameLeft"
-  | "iconNameRight"
   | "loading"
   | "disabled"
   | "value"
@@ -21,11 +19,11 @@ export type InputTextSingleProps = Pick<
   color: Color
 }
 
-export const InputTextSingle = forwardRef<HTMLInputElement, InputTextSingleProps>((p, ref) => {
+export const InputTextDate = forwardRef<HTMLInputElement, InputTextDateProps>((p, ref) => {
   return (
     <InputText
       className="<InputTextSingle /> -"
-      type="text"
+      type="date"
       ref={ref}
       size={p.size}
       width={p.width}
@@ -37,8 +35,6 @@ export const InputTextSingle = forwardRef<HTMLInputElement, InputTextSingleProps
       hint={p.hint}
       error={p.error}
       required={p.required}
-      iconNameLeft={p.iconNameLeft}
-      iconNameRight={p.iconNameRight}
       rows={1}
       disabled={p.disabled}
       value={p.value}

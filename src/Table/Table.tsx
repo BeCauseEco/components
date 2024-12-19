@@ -14,6 +14,7 @@ const Container = styled.table<TContainerProperties>(p => ({
   outlineOffset: -1,
   border: "solid 1px transparent",
   borderRadius: Size.Tiny,
+  width: "100%",
 
   "& thead td": {
     borderBottom: `solid 1px ${computeColor(p.colorBorder)}`,

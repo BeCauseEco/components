@@ -2,12 +2,12 @@ import styled from "@emotion/styled"
 import { Color } from "@new/Color"
 import * as RadixCheckbox from "@radix-ui/react-checkbox"
 import { Icon } from "@new/Icon/Icon"
-import { Text } from "@new/Text/Text"
+import { Text, TextProps } from "@new/Text/Text"
 import { useId } from "react"
-import { PlaywrightProps } from "@new/Playwright"
 import { Stack } from "@new/Stack/Stack"
 import { Spacer } from "@new/Stack/Spacer"
 import { Align } from "@new/Stack/Align"
+import { ComponentBaseProps } from "@new/ComponentBaseProps"
 
 const Container = styled.div({
   display: "flex",
@@ -33,19 +33,22 @@ const Label = styled.label({
   cursor: "pointer",
 })
 
-export type InputCheckboxProps = PlaywrightProps & {
-  size: "small" | "large"
+export type InputCheckboxProps = ComponentBaseProps &
+  Pick<TextProps, "maxWidth"> & {
+    size: "small" | "large"
 
-  color: Color
+    color: Color
 
-  label?: string
+    label?: string
 
-  value: boolean | "indeterminate"
+    value: boolean | "indeterminate"
 
-  onChange: (value: boolean) => void
+    onChange: (value: boolean) => void
 
-  disabled?: boolean
-}
+    disabled?: boolean
+
+    alternateAppearance?: boolean
+  }
 
 export const InputCheckbox = (p: InputCheckboxProps) => {
   const key = useId()
@@ -55,11 +58,26 @@ export const InputCheckbox = (p: InputCheckboxProps) => {
       <Stack horizontal hug disabled={p.disabled}>
         <Align horizontal left hug>
           <Root id={key} checked={p.value} onCheckedChange={checked => p.onChange(checked === true)}>
-            {p.value === "indeterminate" && <Icon name="indeterminate_check_box" large fill={[p.color, 700]} />}
+            {p.value === "indeterminate" && (
+              <Icon
+                name={p.alternateAppearance ? "radio_button_partial" : "indeterminate_check_box"}
+                large
+                fill={[p.color, 700]}
+              />
+            )}
 
-            {p.value === true && <Icon name="check_box" large fill={[p.color, 700]} />}
+            {p.value === true && (
+              <Icon name={p.alternateAppearance ? "radio_button_checked" : "check_box"} large fill={[p.color, 700]} />
+            )}
 
-            {p.value === false && <Icon name="check_box_outline_blank" large style="outlined" fill={[p.color, 300]} />}
+            {p.value === false && (
+              <Icon
+                name={p.alternateAppearance ? "radio_button_unchecked" : "check_box_outline_blank"}
+                large
+                style="outlined"
+                fill={[p.color, 300]}
+              />
+            )}
           </Root>
 
           {p.label && (
@@ -67,7 +85,12 @@ export const InputCheckbox = (p: InputCheckboxProps) => {
               <Spacer tiny={p.size === "small"} xsmall={p.size === "large"} />
 
               <Label htmlFor={key}>
-                <Text xsmall={p.size === "small"} small={p.size !== "small"} fill={[Color.Neutral, 700]}>
+                <Text
+                  xsmall={p.size === "small"}
+                  small={p.size !== "small"}
+                  fill={[Color.Neutral, 700]}
+                  maxWidth={p.maxWidth}
+                >
                   {p.label}
                 </Text>
               </Label>

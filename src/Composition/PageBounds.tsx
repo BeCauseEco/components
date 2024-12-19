@@ -2,6 +2,7 @@ import React, { ReactElement } from "react"
 import styled from "@emotion/styled"
 import { TComposition } from "./Composition"
 import { PlaywrightProps } from "@new/Playwright"
+import { StackProps } from "@new/Stack/Stack"
 
 const Container = styled.div({
   display: "flex",
@@ -12,7 +13,7 @@ const Container = styled.div({
 })
 
 export type TPageBounds = PlaywrightProps & {
-  children: ReactElement<TComposition>
+  children: ReactElement<TComposition> | ReactElement<StackProps>
 }
 
 export const PageBounds = ({ children, playwrightTestId }: TPageBounds) => (

@@ -100,13 +100,14 @@ const Container = styled.p<Omit<TextProps, "fill"> & { _fill: TextProps["fill"] 
   ...(p.xLarge && StyleBodyXLarge),
   ...(p.huge && StyleBodyHuge),
 
-  ...(!p.wrap && p.tiny && { lineHeight: StyleBodyTiny.fontSize }),
-  ...(!p.wrap && p.xsmall && { lineHeight: StyleBodyXsmall.fontSize }),
-  ...(!p.wrap && p.small && { lineHeight: StyleBodySmall.fontSize }),
-  ...(!p.wrap && p.medium && { lineHeight: StyleBodyMedium.fontSize }),
-  ...(!p.wrap && p.large && { lineHeight: StyleBodyLarge.fontSize }),
-  ...(!p.wrap && p.xLarge && { lineHeight: StyleBodyXLarge.fontSize }),
-  ...(!p.wrap && p.huge && { lineHeight: StyleBodyHuge.fontSize }),
+  // TODO: @cllpse: investigate why !important is needed here
+  ...(!p.wrap && p.tiny && { lineHeight: `${StyleBodyTiny.fontSize} !important` }),
+  ...(!p.wrap && p.xsmall && { lineHeight: `${StyleBodyXsmall.fontSize} !important` }),
+  ...(!p.wrap && p.small && { lineHeight: `${StyleBodySmall.fontSize} !important` }),
+  ...(!p.wrap && p.medium && { lineHeight: `${StyleBodyMedium.fontSize} !important` }),
+  ...(!p.wrap && p.large && { lineHeight: `${StyleBodyLarge.fontSize} !important` }),
+  ...(!p.wrap && p.xLarge && { lineHeight: `${StyleBodyXLarge.fontSize} !important` }),
+  ...(!p.wrap && p.huge && { lineHeight: `${StyleBodyHuge.fontSize} !important` }),
 }))
 
 export type TextProps = PlaywrightProps & {
@@ -124,10 +125,9 @@ export type TextProps = PlaywrightProps & {
   wrap?: boolean
 
   /**
-   * Last resort for triggering ellipsis text overflow.
-   * @maxWidth: pixel value
+   * Last resort for triggering text-overflow: ellipsis
    */
-  maxWidth?: string
+  maxWidth?: `${number}${"px"}`
 
   monospace?: boolean
 }
@@ -170,7 +170,7 @@ export const Text = forwardRef<HTMLHeadingElement | HTMLParagraphElement, PropsW
       xxLarge={xxLarge}
       huge={huge}
       _fill={fill}
-      wrap={wrap}
+      wrap={wrap ? true : undefined}
       maxWidth={maxWidth}
       monospace={monospace}
       data-playwright-testid={playwrightTestId}

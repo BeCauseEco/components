@@ -9,6 +9,7 @@ import { PlaywrightProps } from "@new/Playwright"
 const Root = styled(RadixTabs.Root)({
   display: "flex",
   flexDirection: "column",
+  width: "inherit",
   height: "inherit",
 })
 

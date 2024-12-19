@@ -1,27 +1,65 @@
-import React, { ReactElement } from "react"
+import React, { ReactElement, useEffect, useState } from "react"
 import styled from "@emotion/styled"
 import { AlignProps } from "@new/Stack/Align"
-// import { containsIlligalChildren } from "@new/Functions"
 import { computeColor, Color, ColorWithLightness } from "@new/Color"
 import { ComponentBaseProps } from "@new/ComponentBaseProps"
 import { Loader } from "./internal/Loader"
 import { Spinner } from "./internal/Spinner"
 import { GridProps } from "@new/Grid/Grid"
 import { SpacerProps } from "@new/Stack/Spacer"
+import { translateBorderRadius } from "./internal/Functions"
+import { ChildrenValidationResult, validateChildren } from "@new/Functions"
 
-const translateBorderRadius = (cornerRadius: StackProps["cornerRadius"]): string => {
-  switch (cornerRadius) {
+export type StackProps = ComponentBaseProps & {
+  loading?: boolean
+  disabled?: boolean
+
+  /**
+   * Only one of "vertical" or "horizontal" can be true
+   */
+  vertical?: boolean
+  horizontal?: boolean
+
+  fill?: ColorWithLightness
+  fillHover?: ColorWithLightness
+  stroke?: ColorWithLightness
+  strokeHover?: ColorWithLightness
+  fillLoading?: ColorWithLightness
+  dropShadow?: "small" | "medium" | "large"
+
+  cornerRadius?: "small" | "medium" | "large"
+
+  hug?: boolean | "partly"
+
+  /**
+   * WARNING: internal properties - only to be used within /components
+   */
+  explodeHeight?: boolean
+  /**
+   * WARNING: internal property - only to be used within /components
+   */
+  overflowHidden?: boolean
+  /**
+   * WARNING: internal property - only to be used within /components
+   */
+  aspectRatio?: "auto" | "1"
+
+  children:
+    | ReactElement<AlignProps | SpacerProps | null>
+    | ReactElement<AlignProps | SpacerProps | null>[]
+    | ReactElement<GridProps | null>
+}
+
+const computeShadow = (shadow?: StackProps["dropShadow"]): string => {
+  switch (shadow) {
     case "small":
-      return "calc(var(--BU) / 2)"
-
+      return "0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24)"
     case "medium":
-      return "calc(var(--BU) * 1)"
-
+      return "0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23)"
     case "large":
-      return "calc(var(--BU) * 2)"
-
+      return "0 14px 28px rgba(0, 0, 0, 0.25), 0 10px 10px rgba(0, 0, 0, 0.22)"
     default:
-      return "0"
+      return "none"
   }
 }
 
@@ -31,11 +69,13 @@ const Container = styled.div<
     | "explodeHeight"
     | "overflowHidden"
     | "cornerRadius"
-    | "colorBackground"
-    | "colorBackgroundHover"
-    | "colorOutline"
-    | "colorOutlineHover"
+    | "fill"
+    | "fillHover"
+    | "stroke"
+    | "strokeHover"
+    | "dropShadow"
     | "aspectRatio"
+    | "childrenValidationResult"
   >
 >(p => ({
   display: "flex",
@@ -46,25 +86,27 @@ const Container = styled.div<
   cursor: "inherit",
   position: "relative",
   borderRadius: translateBorderRadius(p.cornerRadius),
-  backgroundColor: computeColor(p.colorBackground || [Color.Transparent]),
+  backgroundColor: computeColor(p.fill || [Color.Transparent]),
   transition: "background-color 0.1s ease-in-out",
   willChange: "background-color",
   aspectRatio: p.aspectRatio || "auto",
   content: `'${p.aspectRatio}'`,
-
+  boxShadow: computeShadow(p.dropShadow),
   outlineOffset: -1,
 
-  ...(p.colorOutline && {
-    outline: `solid 1px ${computeColor(p.colorOutline || [Color.Transparent])}`,
+  ...(p.stroke && {
+    outline: `solid 1px ${computeColor(p.stroke || [Color.Transparent])}`,
   }),
 
   "&:hover": {
-    ...(p.colorBackgroundHover && { backgroundColor: computeColor(p.colorBackgroundHover || [Color.Transparent]) }),
+    ...(p.fillHover && { backgroundColor: computeColor(p.fillHover || [Color.Transparent]) }),
 
-    ...(p.colorOutlineHover && {
-      outlineColor: computeColor(p.colorOutlineHover || [Color.Transparent]),
+    ...(p.strokeHover && {
+      outlineColor: computeColor(p.strokeHover || [Color.Transparent]),
     }),
   },
+
+  ...(!p?.childrenValidationResult?.valid && p?.childrenValidationResult?.stylesError),
 }))
 
 const Children = styled.div<Pick<StackProps, "loading" | "disabled" | "hug"> & { flexDirection: "column" | "row" }>(
@@ -79,7 +121,6 @@ const Children = styled.div<Pick<StackProps, "loading" | "disabled" | "hug"> & {
 
     ...(p.loading
       ? {
-          // minHeight: "fit-content", TO-DO: @cllpse: perhaps this will break things like text
           height: "unset",
           maxHeight: "calc(var(--BU) * 40)",
           opacity: 0,
@@ -105,54 +146,41 @@ const Children = styled.div<Pick<StackProps, "loading" | "disabled" | "hug"> & {
   }),
 )
 
-export type StackProps = ComponentBaseProps & {
-  vertical?: boolean
-  horizontal?: boolean
-
-  loading?: boolean
-  disabled?: boolean
-
-  colorBackground?: ColorWithLightness
-  colorBackgroundHover?: ColorWithLightness
-  colorOutline?: ColorWithLightness
-  colorOutlineHover?: ColorWithLightness
-  colorLoading?: ColorWithLightness
-
-  cornerRadius?: "small" | "medium" | "large"
-
-  hug?: boolean | "partly"
-  explodeHeight?: boolean
-  overflowHidden?: boolean
-
-  aspectRatio?: "auto" | "1"
-
-  children:
-    | ReactElement<AlignProps | SpacerProps | null>
-    | ReactElement<AlignProps | SpacerProps | null>[]
-    | ReactElement<GridProps | null>
-}
-
 export const Stack = (p: StackProps) => {
-  // if (containsIlligalChildren(p.children, ["Align"])) {
-  //   return <pre>TStack only accepts children of type: TAlign</pre>
-  // }
+  const [validationResult, setValidationResultvalidationResult] = useState<ChildrenValidationResult | undefined>(
+    undefined,
+  )
+
+  useEffect(() => {
+    setValidationResultvalidationResult(
+      validateChildren("whitelist", ["Align", "Spacer", "Grid", "Divider"], p.children),
+    )
+  }, [p.children])
+
+  // console.log("Stack", validationResult)
 
   return (
     <Container
-      className={p.className || "<Stack /> -"}
+      className={p.className || `${validationResult?.valid ? "" : "<Stack /> *** INVALID CHILDREN ***"} -`}
       data-playwright-testid={p.playwrightTestId}
-      colorBackground={p.colorBackground}
-      colorBackgroundHover={p.colorBackgroundHover}
-      colorOutline={p.colorOutline}
-      colorOutlineHover={p.colorOutlineHover}
+      fill={p.fill}
+      fillHover={p.fillHover}
+      stroke={p.stroke}
+      strokeHover={p.strokeHover}
+      dropShadow={p.dropShadow}
       explodeHeight={p.explodeHeight}
       overflowHidden={p.overflowHidden}
       cornerRadius={p.cornerRadius}
       aspectRatio={p.aspectRatio}
+      childrenValidationResult={validationResult}
     >
-      <Loader className="<Stack: loader />" loading={p.loading}>
-        <Spinner colorLoading={p.colorLoading} loading={p.loading} />
-      </Loader>
+      {p.loading !== undefined ? (
+        <Loader className="<Stack: loader />" loading={p.loading}>
+          <Spinner fillLoading={p.fillLoading} loading={p.loading} />
+        </Loader>
+      ) : (
+        <></>
+      )}
 
       <Children
         className="<Stack: children />"

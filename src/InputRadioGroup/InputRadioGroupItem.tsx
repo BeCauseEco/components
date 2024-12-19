@@ -1,6 +1,6 @@
-import { PlaywrightProps } from "@new/Playwright"
+import { ComponentBaseProps } from "@new/ComponentBaseProps"
 
-export type InputRadioGroupItemProps = PlaywrightProps & {
+export type InputRadioGroupItemProps = ComponentBaseProps & {
   value: string
   label: string
 }
