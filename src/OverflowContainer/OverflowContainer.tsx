@@ -71,20 +71,22 @@ const Container = styled.div<
   overflowX: p.axes === "both" || p.axes === "horizontal" ? "auto" : "hidden",
   overflowY: p.axes === "both" || p.axes === "vertical" ? "auto" : "hidden",
 
+  transition: "border 0.2s ease-in-out",
+
   "&::-webkit-scrollbar-track": {
     backgroundColor: computeColor(p.colorBackground),
   },
 
   "&::-webkit-scrollbar-thumb": {
-    borderRadius: "11px",
-    border: `4px solid ${computeColor(p.colorBackground)}`,
-    backgroundColor: computeColor([p.colorForeground, 600]),
+    borderRadius: "10px",
+    border: `5px solid ${computeColor(p.colorBackground)}`,
+    backgroundColor: computeColor([p.colorForeground, 500]),
   },
 
   "&:hover::-webkit-scrollbar-thumb": {
-    borderRadius: "11.5px",
-    border: `3.5px solid ${computeColor(p.colorBackground)}`,
-    backgroundColor: computeColor([p.colorForeground, 700]),
+    borderRadius: "11px",
+    border: `4px solid ${computeColor(p.colorBackground)}`,
+    backgroundColor: computeColor([p.colorForeground, 600]),
     borderColor: computeColor(p.colorBackground),
   },
 }))
