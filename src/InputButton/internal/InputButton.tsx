@@ -210,8 +210,8 @@ export const InputButton = forwardRef<HTMLButtonElement | HTMLAnchorElement, Inp
 
   const click = href
     ? () => {
-      router.push(href)
-    }
+        router.push(href)
+      }
     : onClick
 
   return (

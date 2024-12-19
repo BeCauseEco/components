@@ -27,21 +27,13 @@ export type SpacerProps = ComponentBaseProps & {
    * WARNING: internal property - only to be used within /components
    */
   aspectRatio?: "auto" | "1"
-  /**
-   * WARNING: internal property - only to be used within /components
-   */
-  overrideWidth?: string
-  /**
-   * WARNING: internal property - only to be used within /components
-   */
-  overrideHeight?: string
 }
 
-const Container = styled.div<{ size: string; overrideWidth?: string; overrideHeight?: string }>(p => ({
+const Container = styled.div<{ size: string }>(p => ({
   display: "flex",
   flexShrink: 0,
-  width: p.overrideWidth || p.size,
-  height: p.overrideHeight || p.size,
+  width: p.size,
+  height: p.size,
 }))
 
 export const Spacer = (p: SpacerProps) => {
@@ -79,7 +71,5 @@ export const Spacer = (p: SpacerProps) => {
     size = Size.Huge
   }
 
-  return (
-    <Container className={`<Spacer />`} size={size} overrideWidth={p.overrideWidth} overrideHeight={p.overrideHeight} />
-  )
+  return <Container className={`<Spacer />`} size={size} />
 }

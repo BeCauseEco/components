@@ -15,6 +15,7 @@ export type InputTextDateProps = Pick<
   | "disabled"
   | "value"
   | "onChange"
+  | "playwrightTestId"
 > & {
   color: Color
 }
@@ -38,6 +39,7 @@ export const InputTextDate = forwardRef<HTMLInputElement, InputTextDateProps>((p
       rows={1}
       disabled={p.disabled ? true : undefined}
       value={p.value}
+      playwrightTestId={p.playwrightTestId}
     />
   )
 })

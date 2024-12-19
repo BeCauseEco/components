@@ -273,7 +273,15 @@ export const InputText = forwardRef<HTMLInputElement | HTMLTextAreaElement, Inpu
   }
 
   return (
-    <StackWidthOverride className={p.className} rows={p.rows} width={p.width} size={p.size} vertical hug>
+    <StackWidthOverride
+      className={p.className}
+      rows={p.rows}
+      width={p.width}
+      size={p.size}
+      vertical
+      hug
+      playwrightTestId={p.playwrightTestId}
+    >
       {labelOutside}
 
       {hintOutside}
@@ -347,11 +355,7 @@ export const InputText = forwardRef<HTMLInputElement | HTMLTextAreaElement, Inpu
           {p.iconNameRight || p.type === "date" ? (
             <>
               <Align vertical center hug="width">
-                <Spacer xsmall overrideWidth="1px" />
-
-                <Divider vertical fill={p.value ? [p.color, 300] : [Color.Transparent]} />
-
-                <Spacer xsmall overrideWidth="1px" />
+                <Divider vertical fill={p.value ? [p.color, 300] : [Color.Transparent]} overrideHeight="50%" />
               </Align>
 
               <Spacer xsmall={p.size === "small"} small={p.size === "large"} />

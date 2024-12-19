@@ -55,7 +55,6 @@ export type InputRadioGroupProps = PlaywrightProps & {
 
 export const InputRadioGroup = (p: InputRadioGroupProps) => {
   const items: ReactElement[] = []
-  let labelOutside: ReactElement<InputRadioGroupProps> = <></>
   const key = useId()
 
   let i = 0
@@ -92,23 +91,28 @@ export const InputRadioGroup = (p: InputRadioGroupProps) => {
     }
   })
 
-  if (p.label) {
-    labelOutside = (
-      <Align vertical left hug="width">
-        <Label htmlFor={key}>
-          <Text xsmall={p.size === "small"} small={p.size !== "small"} fill={[p.color, 700]}>
-            <b>{p.label}</b>
-          </Text>
-        </Label>
-
-        <Spacer xsmall={p.size === "small"} small={p.size === "large"} />
-      </Align>
-    )
-  }
-
   return (
-    <Stack vertical playwrightTestId={p.playwrightTestId} hug className="<InputRadioGroup /> -" disabled={p.disabled ? true : undefined}>
-      {labelOutside}
+    <Stack
+      vertical
+      playwrightTestId={p.playwrightTestId}
+      hug
+      className="<InputRadioGroup /> -"
+      disabled={p.disabled ? true : undefined}
+    >
+      {p.label ? (
+        <Align vertical left hug="width">
+          <Label htmlFor={key}>
+            <Text xsmall={p.size === "small"} small={p.size !== "small"} fill={[p.color, 700]}>
+              <b>{p.label}</b>
+            </Text>
+          </Label>
+
+          <Spacer xsmall={p.size === "small"} small={p.size === "large"} />
+        </Align>
+      ) : (
+        <></>
+      )}
+
       <Align hug left vertical>
         <Root
           defaultValue={p.defaultValue}

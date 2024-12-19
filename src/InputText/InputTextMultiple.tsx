@@ -15,6 +15,7 @@ export type InputTextMultipleProps = Pick<
   | "disabled"
   | "value"
   | "onChange"
+  | "playwrightTestId"
 > & {
   color: Color
 }
@@ -38,6 +39,7 @@ export const InputTextMultiple = forwardRef<HTMLTextAreaElement, InputTextMultip
       rows={3}
       disabled={p.disabled ? true : undefined}
       value={p.value}
+      playwrightTestId={p.playwrightTestId}
     />
   )
 })

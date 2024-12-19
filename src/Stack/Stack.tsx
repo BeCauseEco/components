@@ -63,21 +63,22 @@ const computeShadow = (shadow?: StackProps["dropShadow"]): string => {
   }
 }
 
-const Container = styled.div<
-  Pick<
-    StackProps,
-    | "explodeHeight"
-    | "overflowHidden"
-    | "cornerRadius"
-    | "fill"
-    | "fillHover"
-    | "stroke"
-    | "strokeHover"
-    | "dropShadow"
-    | "aspectRatio"
-    | "validateChildrenErrorStyles"
-  >
->(p => ({
+type ContainerProps = Pick<
+  StackProps,
+  | "explodeHeight"
+  | "overflowHidden"
+  | "cornerRadius"
+  | "fill"
+  | "fillHover"
+  | "stroke"
+  | "strokeHover"
+  | "dropShadow"
+  | "aspectRatio"
+  | "validateChildrenErrorStyles"
+  | "playwrightTestId"
+>
+
+const Container = styled.div<ContainerProps>(p => ({
   display: "flex",
   flexShrink: 1,
   width: "100%",
