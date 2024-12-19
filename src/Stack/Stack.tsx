@@ -1,4 +1,4 @@
-import React, { ReactElement } from "react"
+import React, { ReactElement, useEffect, useState } from "react"
 import styled from "@emotion/styled"
 import { AlignProps } from "@new/Stack/Align"
 import { computeColor, Color, ColorWithLightness } from "@new/Color"
@@ -8,7 +8,7 @@ import { Spinner } from "./internal/Spinner"
 import { GridProps } from "@new/Grid/Grid"
 import { SpacerProps } from "@new/Stack/Spacer"
 import { translateBorderRadius } from "./internal/Functions"
-import { validateChildren } from "@new/Functions"
+import { ChildrenValidationResult, validateChildren } from "@new/Functions"
 
 export type StackProps = ComponentBaseProps & {
   loading?: boolean
@@ -106,7 +106,7 @@ const Container = styled.div<
     }),
   },
 
-  ...p?.childrenValidationResult?.styles,
+  ...(!p?.childrenValidationResult?.valid && p?.childrenValidationResult?.stylesError),
 }))
 
 const Children = styled.div<Pick<StackProps, "loading" | "disabled" | "hug"> & { flexDirection: "column" | "row" }>(
@@ -147,11 +147,21 @@ const Children = styled.div<Pick<StackProps, "loading" | "disabled" | "hug"> & {
 )
 
 export const Stack = (p: StackProps) => {
-  const validationResult = validateChildren("whitelist", ["Align", "Spacer", "Grid", "Divider"], p.children)
+  const [validationResult, setValidationResultvalidationResult] = useState<ChildrenValidationResult | undefined>(
+    undefined,
+  )
+
+  useEffect(() => {
+    setValidationResultvalidationResult(
+      validateChildren("whitelist", ["Align", "Spacer", "Grid", "Divider"], p.children),
+    )
+  }, [p.children])
+
+  // console.log("Stack", validationResult)
 
   return (
     <Container
-      className={p.className || validationResult.valid ? "<Stack /> -" : "*** INVALID CHILDREN *** <Stack /> -"}
+      className={p.className || `${validationResult?.valid ? "" : "<Stack /> *** INVALID CHILDREN ***"} -`}
       data-playwright-testid={p.playwrightTestId}
       fill={p.fill}
       fillHover={p.fillHover}
