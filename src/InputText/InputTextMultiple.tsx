@@ -33,10 +33,10 @@ export const InputTextMultiple = forwardRef<HTMLTextAreaElement, InputTextMultip
       hint={p.hint}
       error={p.error}
       required={p.required}
-      loading={p.loading}
+      loading={p.loading ? true : undefined}
       onChange={p.onChange}
       rows={3}
-      disabled={p.disabled}
+      disabled={p.disabled ? true : undefined}
       value={p.value}
     />
   )

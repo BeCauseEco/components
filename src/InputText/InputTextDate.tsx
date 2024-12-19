@@ -29,14 +29,14 @@ export const InputTextDate = forwardRef<HTMLInputElement, InputTextDateProps>((p
       width={p.width}
       color={p.color}
       label={p.label}
-      loading={p.loading}
+      loading={p.loading ? true : undefined}
       onChange={p.onChange}
       placeholder={p.placeholder}
       hint={p.hint}
       error={p.error}
       required={p.required}
       rows={1}
-      disabled={p.disabled}
+      disabled={p.disabled ? true : undefined}
       value={p.value}
     />
   )

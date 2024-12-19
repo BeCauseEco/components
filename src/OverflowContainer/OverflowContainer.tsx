@@ -57,6 +57,7 @@ const Container = styled.div<
     "axes" | "colorBackground" | "colorForeground" | "minWidth" | "maxWidth" | "minHeight" | "maxHeight" | "hug"
   >
 >(p => ({
+  // position: "relative",
   display: "flex",
   flexDirection: "inherit",
   width: "100%",
@@ -71,7 +72,22 @@ const Container = styled.div<
   overflowX: p.axes === "both" || p.axes === "horizontal" ? "auto" : "hidden",
   overflowY: p.axes === "both" || p.axes === "vertical" ? "auto" : "hidden",
 
-  transition: "border 0.2s ease-in-out",
+  // "&:before, &:after": {
+  //   content: `""`,
+  //   position: "absolute",
+  //   top: 0,
+  //   left: "calc(100% - var(--BU) * 4)",
+  //   height: "100%",
+  //   width: "calc(var(--BU) * 2)",
+  //   zIndex: 1,
+  //   backgroundImage: `linear-gradient(to right, transparent, ${computeColor(p.colorBackground)})`,
+  // },
+
+  // "&:before": {
+  //   right: "auto",
+  //   left: 0,
+  //   backgroundImage: `linear-gradient(to left, transparent, ${computeColor(p.colorBackground)})`,
+  // },
 
   "&::-webkit-scrollbar-track": {
     backgroundColor: computeColor(p.colorBackground),

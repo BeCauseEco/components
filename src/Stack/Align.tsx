@@ -1,8 +1,8 @@
-import { PropsWithChildren, useEffect, useState } from "react"
+import { PropsWithChildren } from "react"
 import styled from "@emotion/styled"
 import { ComponentBaseProps } from "@new/ComponentBaseProps"
 import { computeAlignment, computeWidthHeight } from "./internal/Functions"
-import { ChildrenValidationResult, validateChildren } from "@new/Functions"
+import { generateErrorClassName, generateErrorStyles, useValidateChildren } from "@new/useValidateChildren"
 
 export type AlignProps = ComponentBaseProps & {
   key?: string
@@ -44,25 +44,15 @@ const Container = styled.div<AlignProps>(p => ({
   ...computeWidthHeight(p),
   ...computeAlignment(p),
 
-  ...(!p?.childrenValidationResult?.valid && p?.childrenValidationResult?.stylesError),
+  ...p.validateChildrenErrorStyles,
 }))
 
 export const Align = (p: PropsWithChildren<AlignProps>) => {
-  const [validationResult, setValidationResultvalidationResult] = useState<ChildrenValidationResult | undefined>(
-    undefined,
-  )
-
-  useEffect(() => {
-    setValidationResultvalidationResult(
-      validateChildren("whitelist", ["Align", "Spacer", "Grid", "Divider"], p.children),
-    )
-  }, [p.children])
-
-  // console.log("Stack", validationResult)
+  const [invalidChildren] = useValidateChildren("Align", [], ["Align"], p.children)
 
   return (
     <Container
-      className={`${validationResult?.valid ? "" : "<Align /> *** INVALID CHILDREN ***"} -`}
+      className={`<Align />${generateErrorClassName(invalidChildren)} `}
       vertical={p["vertical"]}
       horizontal={p["horizontal"]}
       wrap={p["wrap"]}
@@ -76,7 +66,7 @@ export const Align = (p: PropsWithChildren<AlignProps>) => {
       bottomCenter={p["bottomCenter"]}
       bottomRight={p["bottomRight"]}
       hug={p.hug}
-      childrenValidationResult={validationResult}
+      validateChildrenErrorStyles={generateErrorStyles(invalidChildren)}
     >
       {p.children}
     </Container>

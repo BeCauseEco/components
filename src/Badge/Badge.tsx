@@ -106,7 +106,7 @@ export const Badge = (p: BadgeProps) => {
   switch (p.variant) {
     case "solid":
       stack = (
-        <Stack horizontal fill={[p.color, 700]} cornerRadius="medium" disabled={p.disabled} hug>
+        <Stack horizontal fill={[p.color, 700]} cornerRadius="medium" disabled={p.disabled ? true : undefined} hug>
           {children}
         </Stack>
       )
@@ -114,7 +114,7 @@ export const Badge = (p: BadgeProps) => {
 
     case "outlined":
       stack = (
-        <Stack horizontal stroke={[p.color, 300]} cornerRadius="medium" disabled={p.disabled} hug>
+        <Stack horizontal stroke={[p.color, 300]} cornerRadius="medium" disabled={p.disabled ? true : undefined} hug>
           {children}
         </Stack>
       )
@@ -122,7 +122,7 @@ export const Badge = (p: BadgeProps) => {
 
     case "opaque":
       stack = (
-        <Stack horizontal fill={[p.color, 100]} cornerRadius="medium" disabled={p.disabled} hug>
+        <Stack horizontal fill={[p.color, 100]} cornerRadius="medium" disabled={p.disabled ? true : undefined} hug>
           {children}
         </Stack>
       )
@@ -130,7 +130,7 @@ export const Badge = (p: BadgeProps) => {
 
     case "transparent":
       stack = (
-        <Stack horizontal cornerRadius="medium" disabled={p.disabled} hug>
+        <Stack horizontal cornerRadius="medium" disabled={p.disabled ? true : undefined} hug>
           {children}
         </Stack>
       )

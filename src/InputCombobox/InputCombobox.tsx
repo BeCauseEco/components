@@ -166,8 +166,8 @@ export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<InputC
                 onClear={
                   p.clearable
                     ? () => {
-                        handleRemoveItem(item)
-                      }
+                      handleRemoveItem(item)
+                    }
                     : undefined
                 }
               />
@@ -215,7 +215,7 @@ export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<InputC
         key={index}
         multiple={p.multiple}
         value={item.label}
-        onSelect={value => (p.multiple ? () => {} : onSelectSingle(value))}
+        onSelect={value => (p.multiple ? () => { } : onSelectSingle(value))}
         selected={p.multiple ? (p.value as string[]).includes(item.value) : p.value === item.value}
         colorSelected={[p.color, 400]}
         colorBackgroundHover={[p.color, 50]}
@@ -315,7 +315,7 @@ export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<InputC
       <Popover
         alignment="start"
         open={p.disabled || p.loading ? false : open}
-        onOpenChange={p.disabled || p.loading ? () => {} : setOpen}
+        onOpenChange={p.disabled || p.loading ? () => { } : setOpen}
         trigger={
           <InputButton
             size={p.size}
@@ -369,7 +369,7 @@ export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<InputC
           <OverflowContainer
             axes="vertical"
             colorBackground={[Color.White]}
-            colorForeground={[Color.Neutral, 600]}
+            colorForeground={Color.Neutral}
             maxHeight="radix-popover-content-available-height-SAFE-AREA-INPUTTEXT"
             hug
           >

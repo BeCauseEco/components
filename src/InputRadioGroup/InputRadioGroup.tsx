@@ -107,7 +107,7 @@ export const InputRadioGroup = (p: InputRadioGroupProps) => {
   }
 
   return (
-    <Stack vertical playwrightTestId={p.playwrightTestId} hug className="<InputRadioGroup /> -" disabled={p.disabled}>
+    <Stack vertical playwrightTestId={p.playwrightTestId} hug className="<InputRadioGroup /> -" disabled={p.disabled ? true : undefined}>
       {labelOutside}
       <Align hug left vertical>
         <Root

@@ -192,8 +192,8 @@ const Children = (p: Omit<InputButtonProps, "width">) => {
         strokeHover={p.colorOutlineHover}
         fillLoading={p.colorLoading}
         cornerRadius="medium"
-        loading={p.loading}
-        disabled={p.disabled}
+        loading={p.loading ? true : undefined}
+        disabled={p.disabled ? true : undefined}
         aspectRatio={p.iconPlacement === "labelNotSpecified" ? "1" : "auto"}
         explodeHeight
         hug
@@ -210,8 +210,8 @@ export const InputButton = forwardRef<HTMLButtonElement | HTMLAnchorElement, Inp
 
   const click = href
     ? () => {
-        router.push(href)
-      }
+      router.push(href)
+    }
     : onClick
 
   return (
@@ -231,7 +231,7 @@ export const InputButton = forwardRef<HTMLButtonElement | HTMLAnchorElement, Inp
         variant={variant}
         size={p.size}
         loading={p.loading}
-        disabled={p.disabled}
+        disabled={p.disabled ? true : undefined}
         label={p.label}
         iconName={p.iconName}
         iconPlacement={p.iconPlacement}
