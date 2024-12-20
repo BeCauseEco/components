@@ -88,7 +88,8 @@ const getComponentTypeNames = (parentTypeName, children: Children): string[] => 
     }
   }
 
-  return r
+  // TODO: @cllpse: not ready for prime time just yet
+  return []
 }
 
 export const useValidateChildren = (
