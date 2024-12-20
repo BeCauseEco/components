@@ -39,6 +39,9 @@ export type InputTextProps = ComponentBaseProps & {
   hug?: boolean
 
   component?: string
+
+  min?: string
+  max?: string
 }
 
 const calculateWidth = (rows: InputTextProps["rows"], width: InputTextProps["width"], size: InputTextProps["size"]) => {
@@ -324,6 +327,8 @@ export const InputText = forwardRef<HTMLInputElement | HTMLTextAreaElement, Inpu
               onFocusCapture={() => setFocusCapture(true)}
               onBlur={() => setFocusCapture(false)}
               width={p.width}
+              min={p.type === "date" ? p.min : undefined}
+              max={p.type === "date" ? p.max : undefined}
               onChange={event => {
                 if (p.onChange) {
                   p.onChange(event?.target?.["value"])
