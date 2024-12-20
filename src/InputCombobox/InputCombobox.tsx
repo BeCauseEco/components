@@ -16,6 +16,7 @@ import { Stack } from "@new/Stack/Stack"
 import { Align } from "@new/Stack/Align"
 import { ComponentBaseProps } from "@new/ComponentBaseProps"
 import { OverflowContainer } from "@new/OverflowContainer/OverflowContainer"
+import { Divider } from "@new/Divider/Divider"
 
 export type InputComboboxProps = ComponentBaseProps & {
   size: "small" | "large"
@@ -25,7 +26,7 @@ export type InputComboboxProps = ComponentBaseProps & {
   /** Enables filtering, if supplied. */
   filterOptions?: { textFilterNoResults: string; textFilterPlaceholder: string }
 
-  label?: string
+  label?: ["outside" | "inside", string]
 
   multiple?: boolean
 
@@ -54,6 +55,7 @@ export type InputComboboxProps = ComponentBaseProps & {
 
 const Container = styled.div({
   display: "flex",
+  flexDirection: "column",
   width: "fit-content",
 })
 
@@ -310,8 +312,31 @@ export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<InputC
 
   const filterWithDebounce = useMemo(() => debounce(filterResults, 300), [filterResults])
 
+  const Label = styled.label({
+    display: "flex",
+    userSelect: "none",
+    cursor: "pointer",
+    alignItems: "center",
+  })
+
   return (
     <Container ref={ref} id={p.id} data-playwright-testid={p.playwrightTestId} className="<InputCombobox /> - ">
+      <Stack vertical hug>
+        {p.label && p.label[0] === "outside" ? (
+          <Align vertical left hug="width">
+            <Label>
+              <Text xsmall={p.size === "small"} small={p.size !== "small"} fill={[p.color, 700]}>
+                <b>{p?.label?.[1]}</b>
+              </Text>
+            </Label>
+
+            <Spacer xsmall={p.size === "small"} small={p.size === "large"} />
+          </Align>
+        ) : (
+          <></>
+        )}
+      </Stack>
+
       <Popover
         alignment="start"
         open={p.disabled || p.loading ? false : open}
@@ -334,16 +359,46 @@ export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<InputC
             content={
               <Stack horizontal hug>
                 <Align horizontal left>
-                  <Text xsmall={p.size === "small"} small={p.size === "large"} fill={[p.color, 500]}>
-                    {p.label}
-                  </Text>
+                  {p.label && p.label[0] === "inside" ? (
+                    <>
+                      <Text xsmall={p.size === "small"} small={p.size === "large"} fill={[p.color, 500]}>
+                        {p.label[1]}
+                      </Text>
 
-                  <Spacer xsmall={p.size === "small"} small={p.size === "large"} />
+                      <Spacer xsmall={p.size === "small"} small={p.size === "large"} />
+                    </>
+                  ) : (
+                    <></>
+                  )}
 
                   <div style={{ display: "flex", width: "100%", flexShrink: 1, flexGrow: 1, overflow: "hidden" }}>
                     {generateCurrentValueLabel(p.multiple)}
                   </div>
                 </Align>
+
+                {(!p.multiple && !p.clearable) || (p.multiple && p.value.length > 1) ? (
+                  <Align horizontal center hug="width">
+                    {!p.multiple ? <Spacer xsmall={p.size === "small"} small={p.size === "large"} /> : <></>}
+
+                    <InputButton
+                      variant="blank"
+                      width="auto"
+                      size={p.size}
+                      colorForeground={p.value ? [p.color, 700] : [Color.Transparent]}
+                      iconName="clear"
+                      iconPlacement="labelNotSpecified"
+                      onClick={() => {
+                        if (p.onChange) {
+                          p.onChange(p.multiple ? [] : "")
+                        }
+                      }}
+                    />
+
+                    <Divider vertical fill={p.value ? [p.color, 300] : [Color.Transparent]} overrideHeight="50%" />
+                  </Align>
+                ) : (
+                  <></>
+                )}
               </Stack>
             }
           />
@@ -369,7 +424,7 @@ export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<InputC
           <OverflowContainer
             axes="vertical"
             colorBackground={[Color.White]}
-            colorForeground={[Color.Neutral, 600]}
+            colorForeground={Color.Neutral}
             maxHeight="radix-popover-content-available-height-SAFE-AREA-INPUTTEXT"
             hug
           >

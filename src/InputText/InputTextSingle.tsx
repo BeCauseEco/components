@@ -17,6 +17,7 @@ export type InputTextSingleProps = Pick<
   | "disabled"
   | "value"
   | "onChange"
+  | "playwrightTestId"
 > & {
   color: Color
 }
@@ -31,7 +32,7 @@ export const InputTextSingle = forwardRef<HTMLInputElement, InputTextSingleProps
       width={p.width}
       color={p.color}
       label={p.label}
-      loading={p.loading}
+      loading={p.loading ? true : undefined}
       onChange={p.onChange}
       placeholder={p.placeholder}
       hint={p.hint}
@@ -40,8 +41,9 @@ export const InputTextSingle = forwardRef<HTMLInputElement, InputTextSingleProps
       iconNameLeft={p.iconNameLeft}
       iconNameRight={p.iconNameRight}
       rows={1}
-      disabled={p.disabled}
+      disabled={p.disabled ? true : undefined}
       value={p.value}
+      playwrightTestId={p.playwrightTestId}
     />
   )
 })

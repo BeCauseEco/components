@@ -1,8 +1,8 @@
 import { PlaywrightProps } from "@new/Playwright"
-import { ChildrenValidationResult } from "./Functions"
+import { ValidateChildrenErrorStyles } from "./useValidateChildren"
 
 export type ComponentBaseProps = PlaywrightProps & {
   id?: string
   className?: string
-  childrenValidationResult?: ChildrenValidationResult
+  validateChildrenErrorStyles?: ValidateChildrenErrorStyles
 }

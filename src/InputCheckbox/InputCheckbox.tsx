@@ -54,8 +54,8 @@ export const InputCheckbox = (p: InputCheckboxProps) => {
   const key = useId()
 
   return (
-    <Container className="<InputCheckbox /> -">
-      <Stack horizontal hug disabled={p.disabled}>
+    <Container className="<InputCheckbox /> -" data-playwright-testid={p.playwrightTestId}>
+      <Stack horizontal hug disabled={p.disabled ? true : undefined}>
         <Align horizontal left hug>
           <Root id={key} checked={p.value} onCheckedChange={checked => p.onChange(checked === true)}>
             {p.value === "indeterminate" && (

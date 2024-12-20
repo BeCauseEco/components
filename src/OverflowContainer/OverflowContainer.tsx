@@ -1,31 +1,37 @@
 import styled from "@emotion/styled"
-import { computeColor } from "@new/Color"
+import { Color, computeColor } from "@new/Color"
 import { ColorWithLightness } from "@new/Color"
 import { ComponentBaseProps } from "@new/ComponentBaseProps"
 import { PropsWithChildren, ReactElement } from "react"
 
+type NumberInPixelsOrPercentage = `${number}${"px" | "%"}`
+
+type NumberInPixelsOrPercentageBaseUnitFactor = `calc(${number}${"px" | "%"} - var(--BU) * ${number})`
+
 export type OverflowContainerProps = ComponentBaseProps & {
   axes: "vertical" | "horizontal" | "both"
   colorBackground: ColorWithLightness
-  colorForeground: ColorWithLightness
+  colorForeground: Color
 
-  minWidth?: `${number}${"px" | "%"}`
-  maxWidth?: `${number}${"px" | "%"}`
-  minHeight?: `${number}${"px" | "%"}`
+  minWidth?: NumberInPixelsOrPercentage
+  minHeight?: NumberInPixelsOrPercentage
 
-  maxHeight:
+  maxWidth?: NumberInPixelsOrPercentage | NumberInPixelsOrPercentageBaseUnitFactor
+
+  maxHeight?:
     | "auto"
     | "radix-accordion-content-height"
     | "radix-popover-content-available-height"
     | "radix-popover-content-available-height-SAFE-AREA-INPUTTEXT"
-    | `${number}${"px" | "%"}`
+    | NumberInPixelsOrPercentage
+    | NumberInPixelsOrPercentageBaseUnitFactor
 
   hug?: boolean | "partly"
   children: ReactElement | ReactElement[]
 }
 
 const computeMaxHeight = (maxHeight: OverflowContainerProps["maxHeight"]): string => {
-  if (maxHeight.endsWith("px")) {
+  if (maxHeight?.endsWith("px")) {
     return maxHeight
   }
 
@@ -51,6 +57,7 @@ const Container = styled.div<
     "axes" | "colorBackground" | "colorForeground" | "minWidth" | "maxWidth" | "minHeight" | "maxHeight" | "hug"
   >
 >(p => ({
+  // position: "relative",
   display: "flex",
   flexDirection: "inherit",
   width: "100%",
@@ -65,12 +72,37 @@ const Container = styled.div<
   overflowX: p.axes === "both" || p.axes === "horizontal" ? "auto" : "hidden",
   overflowY: p.axes === "both" || p.axes === "vertical" ? "auto" : "hidden",
 
-  "::-webkit-scrollbar-track": {
+  // "&:before, &:after": {
+  //   content: `""`,
+  //   position: "absolute",
+  //   top: 0,
+  //   left: "calc(100% - var(--BU) * 4)",
+  //   height: "100%",
+  //   width: "calc(var(--BU) * 2)",
+  //   zIndex: 1,
+  //   backgroundImage: `linear-gradient(to right, transparent, ${computeColor(p.colorBackground)})`,
+  // },
+
+  // "&:before": {
+  //   right: "auto",
+  //   left: 0,
+  //   backgroundImage: `linear-gradient(to left, transparent, ${computeColor(p.colorBackground)})`,
+  // },
+
+  "&::-webkit-scrollbar-track": {
     backgroundColor: computeColor(p.colorBackground),
   },
 
-  "::-webkit-scrollbar-thumb": {
-    backgroundColor: computeColor(p.colorForeground),
+  "&::-webkit-scrollbar-thumb": {
+    borderRadius: "10px",
+    border: `5px solid ${computeColor(p.colorBackground)}`,
+    backgroundColor: computeColor([p.colorForeground, 500]),
+  },
+
+  "&:hover::-webkit-scrollbar-thumb": {
+    borderRadius: "11px",
+    border: `4px solid ${computeColor(p.colorBackground)}`,
+    backgroundColor: computeColor([p.colorForeground, 600]),
     borderColor: computeColor(p.colorBackground),
   },
 }))

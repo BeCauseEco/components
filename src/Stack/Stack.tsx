@@ -8,7 +8,7 @@ import { Spinner } from "./internal/Spinner"
 import { GridProps } from "@new/Grid/Grid"
 import { SpacerProps } from "@new/Stack/Spacer"
 import { translateBorderRadius } from "./internal/Functions"
-import { validateChildren } from "@new/Functions"
+import { generateErrorClassName, generateErrorStyles, useValidateChildren } from "@new/useValidateChildren"
 
 export type StackProps = ComponentBaseProps & {
   loading?: boolean
@@ -63,21 +63,22 @@ const computeShadow = (shadow?: StackProps["dropShadow"]): string => {
   }
 }
 
-const Container = styled.div<
-  Pick<
-    StackProps,
-    | "explodeHeight"
-    | "overflowHidden"
-    | "cornerRadius"
-    | "fill"
-    | "fillHover"
-    | "stroke"
-    | "strokeHover"
-    | "dropShadow"
-    | "aspectRatio"
-    | "childrenValidationResult"
-  >
->(p => ({
+type ContainerProps = Pick<
+  StackProps,
+  | "explodeHeight"
+  | "overflowHidden"
+  | "cornerRadius"
+  | "fill"
+  | "fillHover"
+  | "stroke"
+  | "strokeHover"
+  | "dropShadow"
+  | "aspectRatio"
+  | "validateChildrenErrorStyles"
+  | "playwrightTestId"
+>
+
+const Container = styled.div<ContainerProps>(p => ({
   display: "flex",
   flexShrink: 1,
   width: "100%",
@@ -106,7 +107,7 @@ const Container = styled.div<
     }),
   },
 
-  ...p?.childrenValidationResult?.styles,
+  ...p.validateChildrenErrorStyles,
 }))
 
 const Children = styled.div<Pick<StackProps, "loading" | "disabled" | "hug"> & { flexDirection: "column" | "row" }>(
@@ -147,11 +148,11 @@ const Children = styled.div<Pick<StackProps, "loading" | "disabled" | "hug"> & {
 )
 
 export const Stack = (p: StackProps) => {
-  const validationResult = validateChildren("whitelist", ["Align", "Spacer", "Grid", "Divider"], p.children)
+  const [invalidChildren] = useValidateChildren("Stack", ["Align", "Spacer", "Grid", "Divider"], ["Stack"], p.children)
 
   return (
     <Container
-      className={p.className || validationResult.valid ? "<Stack /> -" : "*** INVALID CHILDREN *** <Stack /> -"}
+      className={p.className || `<Stack />${generateErrorClassName(invalidChildren)} `}
       data-playwright-testid={p.playwrightTestId}
       fill={p.fill}
       fillHover={p.fillHover}
@@ -162,22 +163,22 @@ export const Stack = (p: StackProps) => {
       overflowHidden={p.overflowHidden}
       cornerRadius={p.cornerRadius}
       aspectRatio={p.aspectRatio}
-      childrenValidationResult={validationResult}
+      validateChildrenErrorStyles={generateErrorStyles(invalidChildren)}
     >
       {p.loading !== undefined ? (
-        <Loader className="<Stack: loader />" loading={p.loading}>
-          <Spinner fillLoading={p.fillLoading} loading={p.loading} />
+        <Loader className="<Stack: loader /> " loading={p.loading ? true : undefined}>
+          <Spinner fillLoading={p.fillLoading} loading={p.loading ? true : undefined} />
         </Loader>
       ) : (
         <></>
       )}
 
       <Children
-        className="<Stack: children />"
+        className="<Stack: children /> "
         flexDirection={p["horizontal"] && !p["vertical"] ? "row" : "column"}
         hug={p.hug}
-        disabled={p.disabled}
-        loading={p.loading}
+        disabled={p.disabled ? true : undefined}
+        loading={p.loading ? true : undefined}
       >
         {p.children}
       </Children>
