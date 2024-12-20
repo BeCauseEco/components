@@ -318,8 +318,12 @@ export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<InputC
     alignItems: "center",
   })
 
+  const StackWidthOverride = styled(Stack)({
+    width: "fit-content",
+  })
+
   return (
-    <Stack vertical hug>
+    <StackWidthOverride vertical hug>
       {p.label && p.label[0] === "outside" ? (
         <Align vertical left hug="width">
           <Label>
@@ -443,7 +447,7 @@ export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<InputC
           </Popover>
         </Container>
       </Align>
-    </Stack>
+    </StackWidthOverride>
   )
 })
 
