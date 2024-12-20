@@ -12,21 +12,24 @@ export const generateErrorStyles = (invalidChildren: InvalidChildren): ValidateC
   invalidChildren.length
     ? {
         position: "relative",
-        outline: "solid 2px red",
-        outlineOffset: "-2px",
-        backgroundColor: "rgba(255, 0, 0, 0.2)",
+        background: `repeating-linear-gradient(
+          -45deg,
+          rgba(255, 0, 0, 0.2),
+          rgba(255, 0, 0, 0.2) 3px,
+          rgba(255, 0, 0, 0.1) 3px,
+          rgba(255, 0, 0, 0.1) 6px
+        )`,
 
         "&::before": {
           content: `"INVALID CHILDREN: ${invalidChildren.join(", ")}"`,
           position: "absolute",
-          top: "100%",
-          left: 0,
-          backgroundColor: "red",
-          color: "white",
+          top: "calc(100% - 16px)",
+          right: 0,
+          color: "rgba(255, 255, 255, 1)",
+          backgroundColor: "rgba(255, 0, 0, 1)",
           fontSize: "16px",
           lineHeight: "16px",
           zIndex: 999999999,
-          padding: "2px 4px",
         },
       }
     : {}
@@ -43,27 +46,22 @@ const getComponentName = (parentTypeName: string, child: Children): string | und
   const emotionBase = child?.["type"]?.["__emotion_base"]
   const emotionBaseIsComponent = typeof child?.["type"]?.["__emotion_base"] === "object"
 
-  // console.log("getComponentName")
-
   if (isReactElement) {
-    // console.log(1)
     if (emotionBaseIsComponent) {
       // eslint-disable-next-line no-console
       // console.groupCollapsed(
       //   `⚠️ <${parentTypeName} /> contains a Styled(Component) See https://github.com/BeCauseEco/ui?tab=readme-ov-file#overriding-styles for more information.`,
       // )
+      // // eslint-disable-next-line no-console
       // console.trace()
+      // // eslint-disable-next-line no-console
       // console.groupEnd()
     } else if (!emotionBaseIsComponent && emotionBase !== undefined) {
-      // console.log(2)
       return emotionBase
     } else {
-      // console.log(3)
       if (!typeIsFunction && !typeIsObject) {
-        // console.log(4)
         return type
       } else if (typeName !== undefined) {
-        // console.log(5)
         return typeName
       }
     }
@@ -116,8 +114,11 @@ export const useValidateChildren = (
       }
 
       if (invalidChildren.length > 0) {
+        // eslint-disable-next-line no-console
         console.groupCollapsed(`⚠️ <${parentTypeName} /> contains invalid children: [${invalidChildren.join(", ")}]`)
+        // eslint-disable-next-line no-console
         console.trace()
+        // eslint-disable-next-line no-console
         console.groupEnd()
       }
 
