@@ -55,6 +55,7 @@ export type InputComboboxProps = ComponentBaseProps & {
 
 const Container = styled.div({
   display: "flex",
+  flexDirection: "column",
   width: "fit-content",
 })
 
@@ -318,136 +319,130 @@ export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<InputC
     alignItems: "center",
   })
 
-  const StackWidthOverride = styled(Stack)({
-    width: "fit-content",
-  })
-
   return (
-    <StackWidthOverride vertical hug>
-      {p.label && p.label[0] === "outside" ? (
-        <Align vertical left hug="width">
-          <Label>
-            <Text xsmall={p.size === "small"} small={p.size !== "small"} fill={[p.color, 700]}>
-              <b>{p?.label?.[1]}</b>
-            </Text>
-          </Label>
+    <Container ref={ref} id={p.id} data-playwright-testid={p.playwrightTestId} className="<InputCombobox /> - ">
+      <Stack vertical hug>
+        {p.label && p.label[0] === "outside" ? (
+          <Align vertical left hug="width">
+            <Label>
+              <Text xsmall={p.size === "small"} small={p.size !== "small"} fill={[p.color, 700]}>
+                <b>{p?.label?.[1]}</b>
+              </Text>
+            </Label>
 
-          <Spacer xsmall={p.size === "small"} small={p.size === "large"} />
-        </Align>
-      ) : (
-        <></>
-      )}
+            <Spacer xsmall={p.size === "small"} small={p.size === "large"} />
+          </Align>
+        ) : (
+          <></>
+        )}
+      </Stack>
 
-      <Align vertical left hug="width">
-        <Container ref={ref} id={p.id} data-playwright-testid={p.playwrightTestId} className="<InputCombobox /> - ">
-          <Popover
-            alignment="start"
-            open={p.disabled || p.loading ? false : open}
-            onOpenChange={p.disabled || p.loading ? () => {} : setOpen}
-            trigger={
-              <InputButton
-                size={p.size}
-                width="full"
-                variant="outlined"
-                colorForeground={[p.color, 700]}
-                colorOutline={p.disabled ? [p.color, 100] : [p.color, 300]}
-                colorOutlineHover={p.disabled ? [p.color, 100] : [p.color, 700]}
-                colorBackground={p.disabled ? [p.color, 50] : [Color.White]}
-                colorBackgroundHover={[p.color, 50]}
-                colorLoading={[p.color, 700]}
-                iconName={open ? "keyboard_arrow_up" : "keyboard_arrow_down"}
-                iconPlacement="afterLabel"
-                disabled={p.disabled ? true : undefined}
-                loading={p.loading ? true : undefined}
-                content={
-                  <Stack horizontal hug>
-                    <Align horizontal left>
-                      {p.label && p.label[0] === "inside" ? (
-                        <>
-                          <Text xsmall={p.size === "small"} small={p.size === "large"} fill={[p.color, 500]}>
-                            {p.label[1]}
-                          </Text>
-
-                          <Spacer xsmall={p.size === "small"} small={p.size === "large"} />
-                        </>
-                      ) : (
-                        <></>
-                      )}
-
-                      <div style={{ display: "flex", width: "100%", flexShrink: 1, flexGrow: 1, overflow: "hidden" }}>
-                        {generateCurrentValueLabel(p.multiple)}
-                      </div>
-                    </Align>
-
-                    {(!p.multiple && !p.clearable) || (p.multiple && p.value.length > 1) ? (
-                      <Align horizontal center hug="width">
-                        {!p.multiple ? <Spacer xsmall={p.size === "small"} small={p.size === "large"} /> : <></>}
-
-                        <InputButton
-                          variant="blank"
-                          width="auto"
-                          size={p.size}
-                          colorForeground={p.value ? [p.color, 700] : [Color.Transparent]}
-                          iconName="clear"
-                          iconPlacement="labelNotSpecified"
-                          onClick={() => {
-                            if (p.onChange) {
-                              p.onChange(p.multiple ? [] : "")
-                            }
-                          }}
-                        />
-
-                        <Divider vertical fill={p.value ? [p.color, 300] : [Color.Transparent]} overrideHeight="50%" />
-                      </Align>
-                    ) : (
-                      <></>
-                    )}
-                  </Stack>
-                }
-              />
-            }
-          >
-            <Align vertical topLeft>
-              {p.filterOptions && Object.keys(items).length > 9 && (
-                <InputTextSingle
-                  size="small"
-                  width="auto"
-                  color={p.color}
-                  value={search}
-                  placeholder={p.filterOptions.textFilterPlaceholder}
-                  onChange={value => {
-                    setSearch(value)
-                    filterWithDebounce(value)
-                  }}
-                />
-              )}
-
-              <Spacer tiny={p.size === "small"} xsmall={p.size === "large"} />
-
-              <OverflowContainer
-                axes="vertical"
-                colorBackground={[Color.White]}
-                colorForeground={Color.Neutral}
-                maxHeight="radix-popover-content-available-height-SAFE-AREA-INPUTTEXT"
-                hug
-              >
-                <Command loop>
-                  {p.filterOptions && (
-                    <CommandEmptyStyled>
-                      <Text fill={[p.color, 700]} xsmall={p.size === "small"} small={p.size !== "small"}>
-                        {p.filterOptions.textFilterNoResults}
+      <Popover
+        alignment="start"
+        open={p.disabled || p.loading ? false : open}
+        onOpenChange={p.disabled || p.loading ? () => {} : setOpen}
+        trigger={
+          <InputButton
+            size={p.size}
+            width="full"
+            variant="outlined"
+            colorForeground={[p.color, 700]}
+            colorOutline={p.disabled ? [p.color, 100] : [p.color, 300]}
+            colorOutlineHover={p.disabled ? [p.color, 100] : [p.color, 700]}
+            colorBackground={p.disabled ? [p.color, 50] : [Color.White]}
+            colorBackgroundHover={[p.color, 50]}
+            colorLoading={[p.color, 700]}
+            iconName={open ? "keyboard_arrow_up" : "keyboard_arrow_down"}
+            iconPlacement="afterLabel"
+            disabled={p.disabled ? true : undefined}
+            loading={p.loading ? true : undefined}
+            content={
+              <Stack horizontal hug>
+                <Align horizontal left>
+                  {p.label && p.label[0] === "inside" ? (
+                    <>
+                      <Text xsmall={p.size === "small"} small={p.size === "large"} fill={[p.color, 500]}>
+                        {p.label[1]}
                       </Text>
-                    </CommandEmptyStyled>
+
+                      <Spacer xsmall={p.size === "small"} small={p.size === "large"} />
+                    </>
+                  ) : (
+                    <></>
                   )}
 
-                  <CommandList>{commandListItems}</CommandList>
-                </Command>
-              </OverflowContainer>
-            </Align>
-          </Popover>
-        </Container>
-      </Align>
-    </StackWidthOverride>
+                  <div style={{ display: "flex", width: "100%", flexShrink: 1, flexGrow: 1, overflow: "hidden" }}>
+                    {generateCurrentValueLabel(p.multiple)}
+                  </div>
+                </Align>
+
+                {(!p.multiple && !p.clearable) || (p.multiple && p.value.length > 1) ? (
+                  <Align horizontal center hug="width">
+                    {!p.multiple ? <Spacer xsmall={p.size === "small"} small={p.size === "large"} /> : <></>}
+
+                    <InputButton
+                      variant="blank"
+                      width="auto"
+                      size={p.size}
+                      colorForeground={p.value ? [p.color, 700] : [Color.Transparent]}
+                      iconName="clear"
+                      iconPlacement="labelNotSpecified"
+                      onClick={() => {
+                        if (p.onChange) {
+                          p.onChange(p.multiple ? [] : "")
+                        }
+                      }}
+                    />
+
+                    <Divider vertical fill={p.value ? [p.color, 300] : [Color.Transparent]} overrideHeight="50%" />
+                  </Align>
+                ) : (
+                  <></>
+                )}
+              </Stack>
+            }
+          />
+        }
+      >
+        <Align vertical topLeft>
+          {p.filterOptions && Object.keys(items).length > 9 && (
+            <InputTextSingle
+              size="small"
+              width="auto"
+              color={p.color}
+              value={search}
+              placeholder={p.filterOptions.textFilterPlaceholder}
+              onChange={value => {
+                setSearch(value)
+                filterWithDebounce(value)
+              }}
+            />
+          )}
+
+          <Spacer tiny={p.size === "small"} xsmall={p.size === "large"} />
+
+          <OverflowContainer
+            axes="vertical"
+            colorBackground={[Color.White]}
+            colorForeground={Color.Neutral}
+            maxHeight="radix-popover-content-available-height-SAFE-AREA-INPUTTEXT"
+            hug
+          >
+            <Command loop>
+              {p.filterOptions && (
+                <CommandEmptyStyled>
+                  <Text fill={[p.color, 700]} xsmall={p.size === "small"} small={p.size !== "small"}>
+                    {p.filterOptions.textFilterNoResults}
+                  </Text>
+                </CommandEmptyStyled>
+              )}
+
+              <CommandList>{commandListItems}</CommandList>
+            </Command>
+          </OverflowContainer>
+        </Align>
+      </Popover>
+    </Container>
   )
 })
 
