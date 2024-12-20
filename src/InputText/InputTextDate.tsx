@@ -41,11 +41,9 @@ export const InputTextDate = forwardRef<HTMLInputElement, InputTextDateProps>((p
       rows={1}
       disabled={p.disabled ? true : undefined}
       value={p.value}
-<<<<<<< HEAD
       min={p.min}
       max={p.max}
-=======
->>>>>>> 91b5e034b276b35c43985787c8816e99a9140887
+      playwrightTestId={p.playwrightTestId}
     />
   )
 })
