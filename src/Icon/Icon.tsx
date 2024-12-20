@@ -1,18 +1,9 @@
-import { Size } from "@new/Size"
 import { ColorWithLightness, computeColor } from "@new/Color"
 import styled from "@emotion/styled"
 import { PlaywrightProps } from "@new/Playwright"
 
 const computeSize = (p: IconProps) => {
   let size = "0"
-
-  if (p.tiny) {
-    size = "10px"
-  }
-
-  if (p.xsmall) {
-    size = "12px"
-  }
 
   if (p.small) {
     size = "16px"
@@ -26,16 +17,8 @@ const computeSize = (p: IconProps) => {
     size = "24px"
   }
 
-  if (p.xLarge) {
-    size = Size.XLarge
-  }
-
-  if (p.xxLarge) {
-    size = Size.XXLarge
-  }
-
   if (p.huge) {
-    size = Size.Huge
+    size = "48px"
   }
 
   return size
@@ -43,8 +26,6 @@ const computeSize = (p: IconProps) => {
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const computeStyle = (p: IconProps) => {
-  // console.log("computeStyle", p)
-
   return p.style === "outlined" ? "0" : "1"
 }
 
@@ -77,25 +58,25 @@ const Container = styled.i<{ size: string; fontVariationSettings: string; _fill:
   lineHeight: `${p.size} !important`,
   fontSize: `calc(${p.size} * 0.875) !important`,
   color: computeColor(p._fill),
-  "font-variation-settings": p.fontVariationSettings,
+  fontVariationSettings: p.fontVariationSettings,
   userSelect: "none",
+  cursor: "inherit",
 }))
 
 export type IconProps = PlaywrightProps & {
   name: string | "blank"
   fill: ColorWithLightness
 
-  tiny?: boolean
-  xsmall?: boolean
   small?: boolean
   medium?: boolean
   large?: boolean
-  xLarge?: boolean
-  xxLarge?: boolean
+
   huge?: boolean
 
   style?: "filled" | "outlined" | "rounded" | "twotone" | "sharp"
 
+  // TODO: @cllpse: fix it
+  // eslint-disable-next-line
   onClick?: any
 }
 

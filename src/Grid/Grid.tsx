@@ -2,6 +2,7 @@ import { PropsWithChildren, ReactElement } from "react"
 import styled from "@emotion/styled"
 import { StackProps } from "@new/Stack/Stack"
 import { ComponentBaseProps } from "@new/ComponentBaseProps"
+import { generateErrorClassName, generateErrorStyles, useValidateChildren } from "@new/useValidateChildren"
 
 const computeGridTemplateColumns = (columns: GridProps["columns"]): string => {
   switch (columns) {
@@ -19,12 +20,14 @@ const computeGridTemplateColumns = (columns: GridProps["columns"]): string => {
   }
 }
 
-const Container = styled.div<Pick<GridProps, "columns" | "hug">>(p => ({
+const Container = styled.div<Pick<GridProps, "columns" | "hug" | "validateChildrenErrorStyles">>(p => ({
   display: "grid",
   gap: p.hug ? 0 : "calc(var(--BU) * 4)",
   gridTemplateColumns: computeGridTemplateColumns(p.columns),
   gridTemplateRows: "auto",
   height: "inherit",
+
+  ...p.validateChildrenErrorStyles,
 }))
 
 export type GridProps = ComponentBaseProps & {
@@ -36,12 +39,15 @@ export type GridProps = ComponentBaseProps & {
 }
 
 export const Grid = (p: PropsWithChildren<GridProps>) => {
+  const [invalidChildren] = useValidateChildren("Stack", ["Stack"], ["Grid"], p.children)
+
   return (
     <Container
-      className="<Grid /> - layout-container"
+      className={`<Grid />${generateErrorClassName(invalidChildren)} layout-container`}
       columns={p.columns}
       hug={p.hug}
       data-playwright-testid={p.playwrightTestId}
+      validateChildrenErrorStyles={generateErrorStyles(invalidChildren)}
     >
       {p.children}
     </Container>

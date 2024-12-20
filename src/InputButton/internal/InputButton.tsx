@@ -12,6 +12,39 @@ import { Spacer } from "@new/Stack/Spacer"
 import { useRouter } from "next/router"
 import { ComponentBaseProps } from "@new/ComponentBaseProps"
 
+export type InputButtonProps = ComponentBaseProps &
+  PlaywrightProps & {
+    variant: "link" | "solid" | "outlined" | "transparent" | "blank"
+
+    size: "small" | "large"
+
+    width: "auto" | "half" | "full"
+
+    colorForeground: ColorWithLightness
+    colorBackground?: ColorWithLightness
+    colorBackgroundHover?: ColorWithLightness
+    colorOutline?: ColorWithLightness
+    colorOutlineHover?: ColorWithLightness
+    colorLoading?: ColorWithLightness
+
+    loading?: boolean
+    disabled?: boolean
+
+    label?: string
+
+    iconName?: string
+    iconPlacement?: "beforeLabel" | "afterLabel" | "labelNotSpecified"
+
+    hug?: boolean
+
+    href?: LinkProps["href"]
+    onClick?: () => void
+
+    destructive?: boolean
+
+    content?: ReactElement<StackProps> | null | undefined
+  }
+
 const computeHeight = (p: InputButtonProps): string => {
   if (p.size === "small") {
     return "calc(var(--BU) * 8)"
@@ -128,7 +161,13 @@ const Children = (p: Omit<InputButtonProps, "width">) => {
       {iconBeforeLabel}
       {label}
 
-      {p.content}
+      {p.content ? (
+        <Align horizontal center>
+          {p.content}
+        </Align>
+      ) : (
+        <></>
+      )}
 
       {iconAfterLabel}
       {iconLabelNotSpecified}
@@ -147,14 +186,14 @@ const Children = (p: Omit<InputButtonProps, "width">) => {
     return (
       <Stack
         horizontal
-        colorBackground={p.colorBackground}
-        colorBackgroundHover={p.colorBackgroundHover}
-        colorOutline={p.colorOutline}
-        colorOutlineHover={p.colorOutlineHover}
-        colorLoading={p.colorLoading}
+        fill={p.colorBackground}
+        fillHover={p.colorBackgroundHover}
+        stroke={p.colorOutline}
+        strokeHover={p.colorOutlineHover}
+        fillLoading={p.colorLoading}
         cornerRadius="medium"
-        loading={p.loading}
-        disabled={p.disabled}
+        loading={p.loading ? true : undefined}
+        disabled={p.disabled ? true : undefined}
         aspectRatio={p.iconPlacement === "labelNotSpecified" ? "1" : "auto"}
         explodeHeight
         hug
@@ -164,39 +203,6 @@ const Children = (p: Omit<InputButtonProps, "width">) => {
     )
   }
 }
-
-export type InputButtonProps = ComponentBaseProps &
-  PlaywrightProps & {
-    variant: "link" | "solid" | "outlined" | "transparent" | "blank"
-
-    size: "small" | "large"
-
-    width: "auto" | "half" | "full"
-
-    colorForeground: ColorWithLightness
-    colorBackground?: ColorWithLightness
-    colorBackgroundHover?: ColorWithLightness
-    colorOutline?: ColorWithLightness
-    colorOutlineHover?: ColorWithLightness
-    colorLoading?: ColorWithLightness
-
-    loading?: boolean
-    disabled?: boolean
-
-    label?: string
-
-    iconName?: string
-    iconPlacement?: "beforeLabel" | "afterLabel" | "labelNotSpecified"
-
-    hug?: boolean
-
-    href?: LinkProps["href"]
-    onClick?: () => void
-
-    destructive?: boolean
-
-    content?: ReactElement<StackProps> | null | undefined
-  }
 
 export const InputButton = forwardRef<HTMLButtonElement | HTMLAnchorElement, InputButtonProps>((p, ref) => {
   const { id, variant, onClick, href, playwrightTestId, width, ...pp } = p
@@ -225,7 +231,7 @@ export const InputButton = forwardRef<HTMLButtonElement | HTMLAnchorElement, Inp
         variant={variant}
         size={p.size}
         loading={p.loading}
-        disabled={p.disabled}
+        disabled={p.disabled ? true : undefined}
         label={p.label}
         iconName={p.iconName}
         iconPlacement={p.iconPlacement}

@@ -11,28 +11,55 @@ import { Divider } from "@new/Divider/Divider"
 import { InputButton } from "@new/InputButton/internal/InputButton"
 import { ComponentBaseProps } from "@new/ComponentBaseProps"
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const calculateWidth = (rows: InputTextProps["rows"], width: InputTextProps["width"]) => {
-  return "calc(100% - 1px)"
+export type InputTextProps = ComponentBaseProps & {
+  type: "text" | "date"
 
-  // if (rows !== 1) {
-  //   return "calc(100% - 1px)"
-  // }
+  size: "small" | "large"
+  width: "auto" | "fixed"
 
-  // switch (width) {
-  //   case "quarter":
-  //     return "25%"
-  //   case "half":
-  //     return "50%"
-  //   default:
-  //     return "calc(100% - 1px)"
-  // }
+  rows: 1 | 2 | 3
+
+  color: Color
+
+  value: string
+  onChange: (value: string) => void
+
+  loading?: boolean
+  disabled?: boolean
+
+  placeholder?: string
+  label?: ["outside" | "inside", string]
+  hint?: string
+  error?: string
+  required?: boolean
+
+  iconNameLeft?: string
+  iconNameRight?: string
+
+  hug?: boolean
+
+  component?: string
+
+  dateMin?: string
+  dateMax?: string
 }
 
-const Output = styled.output<Pick<InputTextProps, "color" | "size" | "rows" | "width"> & { focus: boolean }>(p => ({
+const calculateWidth = (rows: InputTextProps["rows"], width: InputTextProps["width"], size: InputTextProps["size"]) => {
+  if (rows !== 1) {
+    return width === "auto"
+      ? "calc(100% - 1px)"
+      : size === "small"
+        ? "calc(var(--BU) * 70 - 1px)"
+        : "calc(var(--BU) * 80 - 1px)"
+  }
+
+  return width === "auto" ? "100%" : size === "small" ? "calc(var(--BU) * 70)" : "calc(var(--BU) * 80)"
+}
+
+const Output = styled.output<Pick<InputTextProps, "color" | "size" | "rows"> & { focus: boolean }>(p => ({
   display: "flex",
-  width: calculateWidth(p.rows, p.width),
-  minWidth: p.size === "small" ? "calc(var(--BU) * 40)" : "calc(var(--BU) * 48)",
+  position: "relative",
+  width: "100%",
   height:
     p.rows === 1
       ? `calc(var(--BU) * ${p.size === "small" ? 8 : 10})`
@@ -46,8 +73,9 @@ const Output = styled.output<Pick<InputTextProps, "color" | "size" | "rows" | "w
 
   padding:
     p.rows === 1
-      ? `0 calc(var(--BU) * ${p.size === "small" ? 2 : 3})`
-      : `calc(var(--BU) * ${p.size === "small" ? 2 : 3})`,
+      ? `0 calc(var(--BU) * ${p.size === "small" ? 2 : 2})`
+      : `calc(var(--BU) * ${p.size === "small" ? 2 : 2})`,
+
   resize: "none",
   color: computeColor([p.color, 700]),
   border: "none",
@@ -79,62 +107,60 @@ const Output = styled.output<Pick<InputTextProps, "color" | "size" | "rows" | "w
   "&::placeholder": {
     color: computeColor([p.color, 300]),
   },
+
+  "&::-webkit-calendar-picker-indicator": {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    width: 0,
+    height: 0,
+    opacity: 0,
+  },
+}))
+
+const StackWidthOverride = styled(Stack)<Pick<InputTextProps, "size" | "rows" | "width">>(p => ({
+  width: calculateWidth(p["rows"], p["width"], p["size"]),
+  minWidth: calculateWidth(p["rows"], p["width"], p["size"]),
+  flexShrink: 0,
 }))
 
 const Label = styled.label({
   display: "flex",
   userSelect: "none",
   cursor: "pointer",
+  alignItems: "center",
 })
-
-export type InputTextProps = ComponentBaseProps & {
-  size: "small" | "large"
-  width: "auto" | "quarter" | "half" | "full"
-
-  rows: 1 | 2 | 3
-
-  color: Color
-
-  value: string
-  onChange: (value: string) => void
-
-  loading?: boolean
-  disabled?: boolean
-
-  placeholder?: string
-  label?: [string, "outside" | "inside"]
-  hint?: string
-  error?: string
-
-  iconNameLeft?: string
-  iconNameRight?: string
-
-  hug?: boolean
-
-  component?: string
-}
 
 export const InputText = forwardRef<HTMLInputElement | HTMLTextAreaElement, InputTextProps>((p, ref) => {
   const key = useId()
 
-  const [focus, setFocus] = useState(false)
+  const [focusCapture, setFocusCapture] = useState(false)
 
   let labelInside: ReactElement<AlignProps> = <></>
   let labelOutside: ReactElement<AlignProps> = <></>
   let hintInside: ReactElement<AlignProps> = <></>
   let hintOutside: ReactElement<AlignProps> = <></>
+  let errorEitherSide: ReactElement<AlignProps> = <></>
   let iconStart: ReactElement<AlignProps> = <></>
   let iconEnd: ReactElement<AlignProps> = <></>
 
-  if (p.label && p.label[1] === "inside") {
+  if (p.label && p.label[0] === "inside") {
     labelInside = (
       <Align horizontal left hug="width">
         <Spacer xsmall={p.size === "small"} small={p.size === "large"} />
 
         <Label htmlFor={key}>
           <Text xsmall={p.size === "small"} small={p.size === "large"} fill={[p.color, 500]}>
-            {p.label[0]}
+            {p.label[1]}
           </Text>
+
+          {p.required && (
+            <>
+              <Spacer tiny={p.size === "small"} xsmall={p.size === "large"} />
+
+              <Icon name="asterisk" small={p.size === "small"} medium={p.size === "large"} fill={[Color.Error, 700]} />
+            </>
+          )}
         </Label>
       </Align>
     )
@@ -142,7 +168,7 @@ export const InputText = forwardRef<HTMLInputElement | HTMLTextAreaElement, Inpu
     if (p.hint) {
       hintInside = (
         <Align vertical left hug>
-          <Spacer tiny={p.size === "small"} xsmall={p.size === "large"} />
+          <Spacer xsmall={p.size === "small"} small={p.size === "large"} />
 
           <Text tiny={p.size === "small"} xsmall={p.size !== "small"} fill={[p.color, 700]}>
             {p.hint}
@@ -152,22 +178,30 @@ export const InputText = forwardRef<HTMLInputElement | HTMLTextAreaElement, Inpu
     }
   }
 
-  if (p.label && p.label[1] === "outside") {
+  if (p.label && p.label[0] === "outside") {
     labelOutside = (
       <Align vertical left hug="width">
         <Label htmlFor={key}>
           <Text xsmall={p.size === "small"} small={p.size !== "small"} fill={[p.color, 700]}>
-            <b>{p.label[0]}</b>
+            <b>{p.label[1]}</b>
           </Text>
+
+          {p.required && (
+            <>
+              <Spacer tiny={p.size === "small"} xsmall={p.size === "large"} />
+
+              <Icon name="asterisk" small={p.size === "small"} medium={p.size === "large"} fill={[Color.Error, 700]} />
+            </>
+          )}
         </Label>
+
+        <Spacer xsmall={p.size === "small"} small={p.size === "large"} />
       </Align>
     )
 
     if (p.hint) {
       hintOutside = (
         <Align vertical left hug>
-          <Spacer tiny={p.size === "small"} xsmall={p.size === "large"} />
-
           <Text tiny={p.size === "small"} xsmall={p.size !== "small"} fill={[p.color, 700]}>
             {p.hint}
           </Text>
@@ -183,7 +217,12 @@ export const InputText = forwardRef<HTMLInputElement | HTMLTextAreaElement, Inpu
       <Align horizontal center hug="width">
         <Spacer xsmall={p.size === "small"} small={p.size === "large"} />
 
-        <Icon name={p.iconNameLeft} medium={p.size === "small"} large={p.size === "large"} fill={[p.color, 700]} />
+        <Icon
+          name={p.iconNameLeft}
+          medium={p.size === "small"}
+          large={p.size === "large"}
+          fill={[p.error ? Color.Error : p.color, 700]}
+        />
       </Align>
     )
   }
@@ -191,15 +230,61 @@ export const InputText = forwardRef<HTMLInputElement | HTMLTextAreaElement, Inpu
   if (p.iconNameRight && p.rows === 1) {
     iconEnd = (
       <Align horizontal center hug="width">
-        <Icon name={p.iconNameRight} medium={p.size === "small"} large={p.size === "large"} fill={[p.color, 700]} />
+        <Icon
+          name={p.iconNameRight}
+          medium={p.size === "small"}
+          large={p.size === "large"}
+          fill={[p.error ? Color.Error : p.color, 700]}
+        />
 
         <Spacer xsmall={p.size === "small"} small={p.size === "large"} />
       </Align>
     )
   }
 
+  if (p.type === "date") {
+    iconEnd = (
+      <Align horizontal center hug="width">
+        {/* TODO: @cllpse: this is a bit of a hack. Will fix at a later point. */}
+        <div style={{ display: "flex", width: "fit-content", height: "fit-content", cursor: "pointer" }}>
+          <Icon
+            name="calendar_month"
+            medium={p.size === "small"}
+            large={p.size === "large"}
+            fill={[p.error ? Color.Error : p.color, 700]}
+            onClick={event => {
+              event?.target?.parentElement?.parentElement?.parentElement?.querySelectorAll("input")?.[0]?.showPicker()
+            }}
+          />
+        </div>
+
+        <Spacer xsmall={p.size === "small"} small={p.size === "large"} />
+      </Align>
+    )
+  }
+
+  if (p.error) {
+    errorEitherSide = (
+      <Align vertical left hug="width">
+        <Spacer xsmall={p.size === "small"} small={p.size === "large"} />
+
+        <Text tiny={p.size === "small"} xsmall={p.size !== "small"} fill={[Color.Error, 700]}>
+          {p.error}
+        </Text>
+      </Align>
+    )
+  }
+
   return (
-    <Stack className={p.className} vertical hug>
+    <StackWidthOverride
+      className={p.className}
+      rows={p.rows}
+      width={p.width}
+      size={p.size}
+      vertical
+      hug
+      playwrightTestId={p.playwrightTestId}
+    >
       {labelOutside}
 
       {hintOutside}
@@ -207,13 +292,19 @@ export const InputText = forwardRef<HTMLInputElement | HTMLTextAreaElement, Inpu
       <Align horizontal left>
         <Stack
           horizontal
-          colorOutline={p.disabled ? [p.color, 100] : [p.color, 300]}
-          colorOutlineHover={p.disabled ? [p.color, 100] : focus ? [p.color, 700] : [p.color, 700]}
-          colorBackground={p.disabled ? [p.color, 50] : [focus ? p.color : Color.White, 50]}
+          stroke={p.disabled ? [p.color, 100] : [p.error ? Color.Error : p.color, 300]}
+          strokeHover={
+            p.disabled
+              ? [p.color, 100]
+              : focusCapture
+                ? [p.error ? Color.Error : p.color, 700]
+                : [p.error ? Color.Error : p.color, 700]
+          }
+          fill={p.disabled ? [p.color, 50] : [focusCapture ? (p.error ? Color.Error : p.color) : Color.White, 50]}
           cornerRadius="medium"
-          disabled={p.disabled}
-          loading={p.loading}
-          colorLoading={[p.color, 700]}
+          disabled={p.disabled ? true : undefined}
+          loading={p.loading ? true : undefined}
+          fillLoading={[p.color, 700]}
           hug
         >
           {labelInside}
@@ -225,16 +316,19 @@ export const InputText = forwardRef<HTMLInputElement | HTMLTextAreaElement, Inpu
               // @ts-expect-error TypeScript can't infer the type of the `ref` prop when using as="...".
               ref={ref}
               as={p.rows === 1 ? "input" : "textarea"}
+              type={p.type}
               id={key}
               value={p.value}
               rows={p.rows || 1}
-              color={p.color}
+              color={p.error ? Color.Error : p.color}
               size={p.size}
-              focus={focus}
+              focus={focusCapture}
               placeholder={p.placeholder}
-              onFocus={() => setFocus(true)}
-              onBlur={() => setFocus(false)}
+              onFocusCapture={() => setFocusCapture(true)}
+              onBlur={() => setFocusCapture(false)}
               width={p.width}
+              min={p.type === "date" ? p.dateMin : undefined}
+              max={p.type === "date" ? p.dateMax : undefined}
               onChange={event => {
                 if (p.onChange) {
                   p.onChange(event?.target?.["value"])
@@ -243,35 +337,33 @@ export const InputText = forwardRef<HTMLInputElement | HTMLTextAreaElement, Inpu
             />
           </Align>
 
-          <Align horizontal center hug="width">
-            <InputButton
-              variant="blank"
-              width="auto"
-              size={p.size}
-              colorForeground={p.value ? [p.color, 700] : [Color.Transparent]}
-              iconName="clear"
-              iconPlacement="labelNotSpecified"
-              onClick={() => {
-                if (p.onChange) {
-                  p.onChange("")
-                }
-              }}
-            />
+          {p.rows === 1 ? (
+            <Align horizontal center hug="width">
+              <InputButton
+                variant="blank"
+                width="auto"
+                size={p.size}
+                colorForeground={p.value ? [p.color, 700] : [Color.Transparent]}
+                iconName="clear"
+                iconPlacement="labelNotSpecified"
+                onClick={() => {
+                  if (p.onChange) {
+                    p.onChange("")
+                  }
+                }}
+              />
+            </Align>
+          ) : (
+            <></>
+          )}
 
-            {/* <Spacer xsmall={p.size === "small"} small={p.size === "large"} /> */}
-          </Align>
-
-          {p.iconNameRight ? (
+          {p.iconNameRight || p.type === "date" ? (
             <>
-              <Align vertical center>
-                <Spacer xsmall overrideWidth="1px" />
-
-                <Divider vertical fill={p.value ? [p.color, 300] : [Color.Transparent]} />
-
-                <Spacer xsmall overrideWidth="1px" />
+              <Align vertical center hug="width">
+                <Divider vertical fill={p.value ? [p.color, 300] : [Color.Transparent]} overrideHeight="50%" />
               </Align>
 
-              <Spacer tiny={p.size === "small"} xsmall={p.size === "large"} />
+              <Spacer xsmall={p.size === "small"} small={p.size === "large"} />
             </>
           ) : (
             <></>
@@ -281,7 +373,9 @@ export const InputText = forwardRef<HTMLInputElement | HTMLTextAreaElement, Inpu
         </Stack>
       </Align>
 
+      {errorEitherSide}
+
       {hintInside}
-    </Stack>
+    </StackWidthOverride>
   )
 })

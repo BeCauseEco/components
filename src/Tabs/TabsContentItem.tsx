@@ -3,11 +3,16 @@ import { PropsWithChildren, ReactElement, RefAttributes, forwardRef } from "reac
 import { TComposition } from "@new/Composition/Composition"
 import { Spacer } from "@new/Stack/Spacer"
 import { PlaywrightProps } from "@new/Playwright"
+import styled from "@emotion/styled"
 
 export type TTabsContentItem = PlaywrightProps & {
   contentTargetId: string
   children: ReactElement<TComposition>
 }
+
+const TabsContent = styled(Tabs.Content)({
+  width: "inherit",
+})
 
 export const TabsContentItem = forwardRef<
   Tabs.TabsContentProps & RefAttributes<HTMLDivElement>,
@@ -16,7 +21,7 @@ export const TabsContentItem = forwardRef<
   const { contentTargetId, children, playwrightTestId } = props
 
   return (
-    <Tabs.Content
+    <TabsContent
       key={`tabscontent${contentTargetId}`}
       ref={ref}
       value={contentTargetId}
@@ -29,6 +34,6 @@ export const TabsContentItem = forwardRef<
 
         {children}
       </>
-    </Tabs.Content>
+    </TabsContent>
   )
 })

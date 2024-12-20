@@ -45,7 +45,7 @@ export const Badge = (p: BadgeProps) => {
   if (p.iconName) {
     icon = (
       <Align horizontal left hug="width">
-        <Spacer xsmall={p.size === "small"} small={p.size === "large"} />
+        {p.variant !== "transparent" ? <Spacer xsmall={p.size === "small"} small={p.size === "large"} /> : <></>}
 
         <Icon
           name={p.iconName}
@@ -90,7 +90,7 @@ export const Badge = (p: BadgeProps) => {
         <Text
           tiny={p.size === "small"}
           xsmall={p.size !== "small"}
-          fill={[p.color, p.variant === "solid" ? 50 : 700]}
+          fill={p.variant === "transparent" ? [Color.Neutral, 700] : [p.color, p.variant === "solid" ? 50 : 700]}
           maxWidth={p.maxWidth}
         >
           {p.label}
@@ -106,7 +106,7 @@ export const Badge = (p: BadgeProps) => {
   switch (p.variant) {
     case "solid":
       stack = (
-        <Stack horizontal colorBackground={[p.color, 700]} cornerRadius="medium" disabled={p.disabled} hug>
+        <Stack horizontal fill={[p.color, 700]} cornerRadius="medium" disabled={p.disabled ? true : undefined} hug>
           {children}
         </Stack>
       )
@@ -114,7 +114,7 @@ export const Badge = (p: BadgeProps) => {
 
     case "outlined":
       stack = (
-        <Stack horizontal colorOutline={[p.color, 300]} cornerRadius="medium" disabled={p.disabled} hug>
+        <Stack horizontal stroke={[p.color, 300]} cornerRadius="medium" disabled={p.disabled ? true : undefined} hug>
           {children}
         </Stack>
       )
@@ -122,7 +122,7 @@ export const Badge = (p: BadgeProps) => {
 
     case "opaque":
       stack = (
-        <Stack horizontal colorBackground={[p.color, 100]} cornerRadius="medium" disabled={p.disabled} hug>
+        <Stack horizontal fill={[p.color, 100]} cornerRadius="medium" disabled={p.disabled ? true : undefined} hug>
           {children}
         </Stack>
       )
@@ -130,7 +130,7 @@ export const Badge = (p: BadgeProps) => {
 
     case "transparent":
       stack = (
-        <Stack horizontal cornerRadius="medium" disabled={p.disabled} hug>
+        <Stack horizontal cornerRadius="medium" disabled={p.disabled ? true : undefined} hug>
           {children}
         </Stack>
       )
@@ -138,7 +138,7 @@ export const Badge = (p: BadgeProps) => {
   }
 
   return (
-    <Container className="<Badge /> -" size={p.size}>
+    <Container className={`<Badge /> - ${p.className}`} size={p.size} data-playwright-testid={p.playwrightTestId}>
       {stack}
     </Container>
   )

@@ -2,13 +2,23 @@ import styled from "@emotion/styled"
 import React, { ReactElement } from "react"
 import * as RadixPopover from "@radix-ui/react-popover"
 import { keyframes } from "@emotion/react"
-// import { Color, computeColor } from "@new/Color"
-// import { Size } from "@new/Size"
-import { EAlignment } from "@new/EAlignment"
-import { TBackgroundCard } from "@new/Composition/BackgroundCard"
-import { TLayoutBase } from "@new/Composition/TLayoutBase"
-import { Composition } from "@new/Composition/Composition"
-import { PlaywrightProps } from "@new/Playwright"
+import { ComponentBaseProps } from "@new/ComponentBaseProps"
+import { AlignProps } from "@new/Stack/Align"
+import { Stack } from "@new/Stack/Stack"
+import { Color } from "@new/Color"
+import { generateErrorStyles, useValidateChildren } from "@new/useValidateChildren"
+
+export type PopoverProps = ComponentBaseProps & {
+  // colorArrow: Color
+
+  trigger: ReactElement
+  alignment: "start" | "middle" | "end"
+
+  open?: boolean
+  onOpenChange?: (value: boolean) => void
+
+  children: ReactElement<AlignProps>
+}
 
 const slideUpAndFade = keyframes({
   from: { opacity: 0, transform: "translateY(2px)" },
@@ -35,7 +45,7 @@ const Root = styled(RadixPopover.Root)({
   flexDirection: "column",
 })
 
-const Content = styled(RadixPopover.Content)({
+const Content = styled(RadixPopover.Content)<Pick<PopoverProps, "validateChildrenErrorStyles">>(p => ({
   animationDuration: "400ms",
   animationTimingFunction: "cubic-bezier(0.16, 1, 0.3, 1)",
   willChange: "transform, opacity",
@@ -60,47 +70,31 @@ const Content = styled(RadixPopover.Content)({
   "&[data-state='open'][data-side='left']": {
     animationName: slideRightAndFade,
   },
-})
+
+  ...p.validateChildrenErrorStyles,
+}))
 
 // const Arrow = styled(RadixPopover.Arrow)<Pick<TPopover, "colorArrow">>(p => ({
 //   fill: computeColor([p.colorArrow, 700]),
 // }))
 
-const alignTranslate = (alignment: EAlignment) => {
-  switch (alignment) {
-    case EAlignment.Start:
-      return "start"
+export const Popover = (p: PopoverProps) => {
+  const [invalidChildren] = useValidateChildren("Popover", ["Align"], ["Popover"], p.children)
 
-    case EAlignment.Middle:
-      return "center"
-
-    case EAlignment.End:
-      return "end"
-  }
-}
-
-export type TPopover = PlaywrightProps & {
-  // colorArrow: Color
-  open?: boolean
-  onOpenChange?: (value: boolean) => void
-  trigger: ReactElement
-  background: ReactElement<TBackgroundCard>
-  layout: ReactElement<TLayoutBase>
-  alignment: EAlignment
-}
-
-export const Popover = ({ open, onOpenChange, trigger, background, layout, alignment, playwrightTestId }: TPopover) => {
   return (
-    <Root open={open} onOpenChange={onOpenChange}>
-      <RadixPopover.Trigger asChild>{trigger}</RadixPopover.Trigger>
+    <Root open={p.open} onOpenChange={p.onOpenChange}>
+      <RadixPopover.Trigger asChild>{p.trigger}</RadixPopover.Trigger>
 
       <RadixPopover.Portal>
-        <Content align={alignTranslate(alignment)} data-playwright-testid={playwrightTestId}>
-          <Composition>
-            {background}
-
-            {layout}
-          </Composition>
+        <Content
+          // @ts-expect-error Radix doesn't expose a type for this
+          align={p.alignment}
+          validateChildrenErrorStyles={generateErrorStyles(invalidChildren)}
+          data-playwright-testid={p.playwrightTestId}
+        >
+          <Stack vertical fill={[Color.White]} hug="partly" dropShadow="medium" cornerRadius="medium">
+            {p.children}
+          </Stack>
 
           {/* <Arrow colorArrow={colorArrow} width={Size.Small} height={Size.Xsmall} /> */}
         </Content>

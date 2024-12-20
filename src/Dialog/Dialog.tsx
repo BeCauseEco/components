@@ -83,7 +83,7 @@ type TDialogContentProperties = Pick<TDialog, "size" | "collapseHeight">
 const Content = styled(RadixDialog.Content)<TDialogContentProperties>(p => ({
   display: "flex",
   position: "fixed",
-  top: p.size === Size.Medium ? "50%" : `calc(50% + ${offsetTop} / 2)`,
+  top: p.size === Size.Medium || p.size === Size.Large ? "50%" : `calc(50% + ${offsetTop} / 2)`,
   left: p.size === Size.Medium ? "calc(50% + calc(var(--BU) * 25))" : "50%",
   transform: "translate(-50%, -50%)",
   minWidth: computeMinSize(p.size).minWidth,
@@ -149,13 +149,15 @@ export const Dialog = ({
               }
               contentMiddle={
                 <>
+                  <Divider fill={[Color.Neutral, 100]} />
+
                   {content}
 
                   {message && message[0] !== "hidden" && (
                     <>
                       <Divider fill={[computeMessageColor(message), 200]} />
 
-                      <Stack horizontal colorBackground={[computeMessageColor(message), 100]}>
+                      <Stack horizontal fill={[computeMessageColor(message), 100]}>
                         <Align horizontal hug="width" left>
                           {message[0] === "notice" && (
                             <Icon large name="info" fill={[computeMessageColor(message), 800]} style="filled" />
