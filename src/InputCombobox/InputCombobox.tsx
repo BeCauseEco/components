@@ -28,6 +28,7 @@ export type InputComboboxProps = ComponentBaseProps & {
   filterOptions?: { textFilterNoResults: string; textFilterPlaceholder: string }
 
   label?: ["outside" | "inside", string]
+  hint?: string
 
   multiple?: boolean
 
@@ -333,15 +334,29 @@ export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<InputC
     >
       <Stack vertical hug>
         {p.label && p.label[0] === "outside" ? (
-          <Align vertical left hug="width">
-            <Label>
-              <Text xsmall={p.size === "small"} small={p.size !== "small"} fill={[p.color, 700]}>
-                <b>{p?.label?.[1]}</b>
-              </Text>
-            </Label>
+          <>
+            <Align vertical left hug="width">
+              <Label>
+                <Text xsmall={p.size === "small"} small={p.size !== "small"} fill={[p.color, 700]}>
+                  <b>{p?.label?.[1]}</b>
+                </Text>
+              </Label>
 
-            <Spacer xsmall={p.size === "small"} small={p.size === "large"} />
-          </Align>
+              <Spacer xsmall={p.size === "small"} small={p.size === "large"} />
+            </Align>
+
+            {p.hint ? (
+              <Align vertical left hug>
+                <Text tiny={p.size === "small"} xsmall={p.size !== "small"} fill={[p.color, 700]}>
+                  {p.hint}
+                </Text>
+
+                <Spacer xsmall={p.size === "small"} small={p.size === "large"} />
+              </Align>
+            ) : (
+              <></>
+            )}
+          </>
         ) : (
           <></>
         )}
