@@ -20,6 +20,7 @@ import { Divider } from "@new/Divider/Divider"
 
 export type InputComboboxProps = ComponentBaseProps & {
   size: "small" | "large"
+  width: "fixed" | "auto"
 
   textNoSelection: string
 
@@ -48,16 +49,18 @@ export type InputComboboxProps = ComponentBaseProps & {
   enableVirtuoso?: boolean
 
   clearable?: boolean
+  resettable?: boolean
 
   disabled?: boolean
   loading?: boolean
 }
 
-const Container = styled.div({
+const Container = styled.div<Pick<InputComboboxProps, "size" | "width">>(p => ({
   display: "flex",
   flexDirection: "column",
   width: "fit-content",
-})
+  minWidth: p.width === "fixed" ? (p.size === "small" ? "calc(var(--BU) * 70)" : "calc(var(--BU) * 80)") : "",
+}))
 
 const CommandItemStyled = styled(CommandItem)<{
   multiple?: boolean
@@ -325,6 +328,8 @@ export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<InputC
       id={p.id}
       data-playwright-testid={p["data-playwright-testid"]}
       className="<InputCombobox /> - "
+      size={p.size}
+      width={p.width}
     >
       <Stack vertical hug>
         {p.label && p.label[0] === "outside" ? (
@@ -381,7 +386,7 @@ export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<InputC
                   </div>
                 </Align>
 
-                {(!p.multiple && !p.clearable) || (p.multiple && p.value.length > 1) ? (
+                {p.resettable && ((!p.multiple && !p.clearable) || (p.multiple && p.value.length > 1)) ? (
                   <Align horizontal center hug="width">
                     {!p.multiple ? <Spacer xsmall={p.size === "small"} small={p.size === "large"} /> : <></>}
 
