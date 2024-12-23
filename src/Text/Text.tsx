@@ -152,8 +152,6 @@ export const Text = forwardRef<HTMLHeadingElement | HTMLParagraphElement, PropsW
 
     children,
 
-    playwrightTestId,
-
     ...rest
   } = p
 
@@ -173,7 +171,7 @@ export const Text = forwardRef<HTMLHeadingElement | HTMLParagraphElement, PropsW
       wrap={wrap ? true : undefined}
       maxWidth={maxWidth}
       monospace={monospace}
-      data-playwright-testid={playwrightTestId}
+      data-playwright-testid={p["data-playwright-testid"]}
       {...rest}
     >
       {children}

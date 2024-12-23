@@ -13,6 +13,6 @@ export type TTableRow = PlaywrightProps & {
   children: ReactElement<TTableCell> | ReactElement<TTableCell>[]
 }
 
-export const TableRow = ({ children, playwrightTestId }: TTableRow) => (
-  <Container data-playwright-testid={playwrightTestId}>{children}</Container>
+export const TableRow = (p: TTableRow) => (
+  <Container data-playwright-testid={p["data-playwright-testid"]}>{p.children}</Container>
 )

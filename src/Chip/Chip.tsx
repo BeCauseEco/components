@@ -35,13 +35,13 @@ export type TChip = PlaywrightProps & {
       ]
 }
 
-export const Chip = ({ colorBackground, colorOutline, children, playwrightTestId }: PropsWithChildren<TChip>) => {
+export const Chip = (p: PropsWithChildren<TChip>) => {
   return (
-    <Container data-playwright-testid={playwrightTestId}>
+    <Container data-playwright-testid={p["data-playwright-testid"]}>
       <Composition>
-        <BackgroundCard colorBackground={colorBackground} colorOutline={colorOutline} borderRadius={Size.Tiny} />
+        <BackgroundCard colorBackground={p.colorBackground} colorOutline={p.colorOutline} borderRadius={Size.Tiny} />
 
-        <LayoutChip content={children} />
+        <LayoutChip content={p.children} />
       </Composition>
     </Container>
   )

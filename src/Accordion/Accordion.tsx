@@ -20,10 +20,10 @@ export type TAccordion = PlaywrightProps & {
   defaultValue: string
 }
 
-export const Accordion = ({ items, defaultValue, playwrightTestId }: TAccordion) => (
-  <Container data-playwright-testid={playwrightTestId}>
-    <Root defaultValue={defaultValue} type="single" collapsible>
-      {items}
+export const Accordion = (p: TAccordion) => (
+  <Container data-playwright-testid={p["data-playwright-testid"]}>
+    <Root defaultValue={p.defaultValue} type="single" collapsible>
+      {p.items}
     </Root>
   </Container>
 )

@@ -90,7 +90,7 @@ export const Popover = (p: PopoverProps) => {
           // @ts-expect-error Radix doesn't expose a type for this
           align={p.alignment}
           validateChildrenErrorStyles={generateErrorStyles(invalidChildren)}
-          data-playwright-testid={p.playwrightTestId}
+          data-playwright-testid={p["data-playwright-testid"]}
         >
           <Stack vertical fill={[Color.White]} hug="partly" dropShadow="medium" cornerRadius="medium">
             {p.children}

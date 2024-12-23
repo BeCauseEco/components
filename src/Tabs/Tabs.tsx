@@ -26,18 +26,16 @@ export type TTabs = PlaywrightProps & {
   contentItems: ReactElement<TTabsContentItem> | ReactElement<TTabsContentItem>[]
 }
 
-export const Tabs = ({
-  contentTargetId,
-  defaultContentTargetId,
-  navigationItems,
-  contentItems,
-  playwrightTestId,
-}: TTabs) => {
+export const Tabs = (p: TTabs) => {
   return (
-    <Root value={contentTargetId} defaultValue={defaultContentTargetId} data-playwright-testid={playwrightTestId}>
-      <List>{navigationItems}</List>
+    <Root
+      value={p.contentTargetId}
+      defaultValue={p.defaultContentTargetId}
+      data-playwright-testid={p["data-playwright-testid"]}
+    >
+      <List>{p.navigationItems}</List>
 
-      {contentItems}
+      {p.contentItems}
     </Root>
   )
 }

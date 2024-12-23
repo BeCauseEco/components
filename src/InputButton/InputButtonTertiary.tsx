@@ -4,7 +4,16 @@ import { Color } from "@new/Color"
 
 export type InputButtonTertiaryProps = Pick<
   InputButtonProps,
-  "id" | "size" | "width" | "hug" | "loading" | "disabled" | "onClick" | "href" | "destructive" | "playwrightTestId"
+  | "id"
+  | "size"
+  | "width"
+  | "hug"
+  | "loading"
+  | "disabled"
+  | "onClick"
+  | "href"
+  | "destructive"
+  | "data-playwright-testid"
 > & {
   label: string
   iconNameLeft?: string
@@ -43,7 +52,7 @@ export const InputButtonTertiary = forwardRef<HTMLButtonElement, InputButtonTert
       iconPlacement={iconPlacement}
       onClick={p.onClick}
       href={p.href}
-      playwrightTestId={p.playwrightTestId}
+      data-playwright-testid={p["data-playwright-testid"]}
     />
   )
 })

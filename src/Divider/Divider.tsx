@@ -31,7 +31,7 @@ const Container = styled.div<
 export const Divider = (p: DividerProps) => (
   <Container
     className="<Divider /> -"
-    data-playwright-testid={p.playwrightTestId}
+    data-playwright-testid={p["data-playwright-testid"]}
     _fill={p.fill}
     vertical={p.vertical}
     horizontal={p.horizontal}

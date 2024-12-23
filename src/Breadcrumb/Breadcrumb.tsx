@@ -14,14 +14,14 @@ export type TBreadcrumb = PlaywrightProps & {
   children: ReactElement<InputButtonLinkProps | TextProps> | ReactElement<InputButtonLinkProps | TextProps>[]
 }
 
-export const Breadcrumb = ({ color, omitPadding, children, playwrightTestId }: PropsWithChildren<TBreadcrumb>) => {
+export const Breadcrumb = (p: PropsWithChildren<TBreadcrumb>) => {
   const items: ReactElement[] = []
 
-  React.Children.forEach(children, (child, index) => {
+  React.Children.forEach(p.children, (child, index) => {
     if (React.isValidElement(child)) {
       items.push(child)
 
-      items.push(<Icon name="chevron_forward" medium fill={[color, 700]} key={index} />)
+      items.push(<Icon name="chevron_forward" medium fill={[p.color, 700]} key={index} />)
     }
   })
 
@@ -31,8 +31,8 @@ export const Breadcrumb = ({ color, omitPadding, children, playwrightTestId }: P
   items.push(<Icon name="chevron_forward" medium fill={[Color.Transparent]} key={items.length} />)
 
   return (
-    <Composition playwrightTestId={playwrightTestId}>
-      <LayoutBreadcrumb omitPadding={omitPadding}>{items}</LayoutBreadcrumb>
+    <Composition data-playwright-testid={p["data-playwright-testid"]}>
+      <LayoutBreadcrumb omitPadding={p.omitPadding}>{items}</LayoutBreadcrumb>
     </Composition>
   )
 }

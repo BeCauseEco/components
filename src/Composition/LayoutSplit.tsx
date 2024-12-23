@@ -56,28 +56,20 @@ export type TLayoutSplit = TLayoutBase & {
   collapse?: ELayoutSplitCollapse
 }
 
-export const LayoutSplit = ({
-  contentStart = null,
-  contentEnd = null,
-  direction,
-  omitPadding = false,
-  spacing,
-  collapse,
-  playwrightTestId,
-}: TLayoutSplit) => {
+export const LayoutSplit = (p: TLayoutSplit) => {
   return (
     <Container
-      omitPadding={omitPadding}
-      direction={direction}
-      spacing={spacing}
-      data-playwright-testid={playwrightTestId}
+      omitPadding={p.omitPadding}
+      direction={p.direction}
+      spacing={p.spacing}
+      data-playwright-testid={p["data-playwright-testid"]}
     >
-      <ContentStart className="layout-container" direction={direction} collapse={collapse}>
-        {contentStart}
+      <ContentStart className="layout-container" direction={p.direction} collapse={p.collapse}>
+        {p.contentStart}
       </ContentStart>
 
-      <ContentEnd className="layout-container" direction={direction} collapse={collapse}>
-        {contentEnd}
+      <ContentEnd className="layout-container" direction={p.direction} collapse={p.collapse}>
+        {p.contentEnd}
       </ContentEnd>
     </Container>
   )

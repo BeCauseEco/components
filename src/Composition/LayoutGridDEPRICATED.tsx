@@ -16,10 +16,15 @@ export type TLayoutGridDEPRICATED = TLayoutBase & {
   rows: "auto"
 }
 
-export const LayoutGridDEPRICATED = ({ columns, rows, content, playwrightTestId }: TLayoutGridDEPRICATED) => {
+export const LayoutGridDEPRICATED = (p: TLayoutGridDEPRICATED) => {
   return (
-    <Container className="layout-container" columns={columns} rows={rows} data-playwright-testid={playwrightTestId}>
-      {content}
+    <Container
+      className="layout-container"
+      columns={p.columns}
+      rows={p.rows}
+      data-playwright-testid={p["data-playwright-testid"]}
+    >
+      {p.content}
     </Container>
   )
 }

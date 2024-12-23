@@ -16,8 +16,11 @@ export type TPageBounds = PlaywrightProps & {
   children: ReactElement<TComposition> | ReactElement<StackProps>
 }
 
-export const PageBounds = ({ children, playwrightTestId }: TPageBounds) => (
-  <Container className="component-page_bounds component-composition-reset" data-playwright-testid={playwrightTestId}>
-    {children}
+export const PageBounds = (p: TPageBounds) => (
+  <Container
+    className="component-page_bounds component-composition-reset"
+    data-playwright-testid={p["data-playwright-testid"]}
+  >
+    {p.children}
   </Container>
 )

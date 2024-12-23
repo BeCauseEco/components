@@ -58,23 +58,9 @@ export type TTakeover = PlaywrightProps & {
   offsetLeftSmallOverride?: string
 }
 
-export const Takeover = ({
-  content,
-  open = false,
-  onOpenChange = () => {},
-  title,
-  status,
-  buttonClose,
-  buttonPrimary,
-  buttonSecondary,
-  buttonTertiary,
-  offsetTopOverride = offsetTop,
-  offsetLeftOverride = offsetLeft,
-  offsetLeftSmallOverride = offsetLeftSmall,
-  playwrightTestId,
-}: TTakeover) => {
+export const Takeover = (p: TTakeover) => {
   useEffect(() => {
-    if (open) {
+    if (p.open) {
       document.querySelectorAll("body")[0].style.overflowY = "hidden"
     } else {
       document.querySelectorAll("body")[0].style.overflowY = "visible"
@@ -83,45 +69,50 @@ export const Takeover = ({
     return () => {
       document.querySelectorAll("body")[0].style.overflowY = "visible"
     }
-  }, [open])
+  }, [p.open])
 
   const contentEnd: ReactElement[] = []
 
-  if (status) {
-    contentEnd.push(status)
+  if (p.status) {
+    contentEnd.push(p.status)
     contentEnd.push(<Spacer large />)
   }
 
-  if (buttonTertiary) {
-    contentEnd.push(buttonTertiary)
+  if (p.buttonTertiary) {
+    contentEnd.push(p.buttonTertiary)
   }
 
-  if (buttonSecondary) {
+  if (p.buttonSecondary) {
     contentEnd.push(<Spacer small />)
-    contentEnd.push(buttonSecondary)
+    contentEnd.push(p.buttonSecondary)
   }
 
-  if (buttonPrimary) {
+  if (p.buttonPrimary) {
     contentEnd.push(<Spacer small />)
-    contentEnd.push(buttonPrimary)
+    contentEnd.push(p.buttonPrimary)
   }
 
   return (
-    <RadixDialog.Root open={open} onOpenChange={onOpenChange} modal={false} data-playwright-testid={playwrightTestId}>
+    <RadixDialog.Root
+      open={p.open}
+      onOpenChange={p.onOpenChange}
+      modal={false}
+      data-playwright-testid={p["data-playwright-testid"]}
+    >
       <RadixDialog.Portal>
         <RadixDialogContent
-          offsetTopOverride={offsetTopOverride}
-          offsetLeftOverride={offsetLeftOverride}
-          offsetLeftSmallOverride={offsetLeftSmallOverride}
+          offsetTopOverride={p.offsetTopOverride || offsetTop}
+          offsetLeftOverride={p.offsetLeftOverride || offsetLeft}
+          offsetLeftSmallOverride={p.offsetLeftSmallOverride || offsetLeftSmall}
         >
           <Composition explodeHeight>
             <BackgroundCard colorBackground={[Color.White]} />
 
             <LayoutTakeover
-              contentStart={title}
-              contentMiddle={content}
+              contentStart={p.title}
+              contentMiddle={p.content}
               contentEnd={contentEnd.length > 0 ? contentEnd : undefined}
-              buttonClose={<RadixDialogClose asChild>{buttonClose}</RadixDialogClose>}
+              buttonClose={<RadixDialogClose asChild>{p.buttonClose}</RadixDialogClose>}
             />
           </Composition>
         </RadixDialogContent>

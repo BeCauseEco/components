@@ -114,91 +114,80 @@ export type TDialog = PlaywrightProps & {
   buttonTertiary?: ReactElement<InputButtonTertiaryProps>
 }
 
-export const Dialog = ({
-  size,
-  content,
-  open = false,
-  onOpenChange = () => {},
-  title,
-  collapseHeight,
-  description,
-  message,
-  buttonPrimary,
-  buttonSecondary,
-  buttonTertiary,
-  playwrightTestId,
-}: TDialog) => {
+export const Dialog = (p: TDialog) => {
   return (
-    <RadixDialog.Root open={open} onOpenChange={onOpenChange}>
+    <RadixDialog.Root open={p.open} onOpenChange={p.onOpenChange}>
       <RadixDialog.Portal>
         <Overlay />
 
-        <Content size={size} collapseHeight={collapseHeight} data-playwright-testid={playwrightTestId}>
+        <Content size={p.size} collapseHeight={p.collapseHeight} data-playwright-testid={p["data-playwright-testid"]}>
           <Composition>
             <BackgroundCard colorBackground={[Color.White]} borderRadius={Size.Tiny} shadow={EShadow.Large} />
 
             <LayoutDialog
               contentStart={
                 <TitleAndDescription>
-                  {title}
+                  {p.title}
 
-                  {description && <Spacer xsmall />}
+                  {p.description && <Spacer xsmall />}
 
-                  {description}
+                  {p.description}
                 </TitleAndDescription>
               }
               contentMiddle={
                 <>
                   <Divider fill={[Color.Neutral, 100]} />
 
-                  {content}
+                  {p.content}
 
-                  {message && message[0] !== "hidden" && (
+                  {p.message && p.message[0] !== "hidden" && (
                     <>
-                      <Divider fill={[computeMessageColor(message), 200]} />
+                      <Divider fill={[computeMessageColor(p.message), 200]} />
 
-                      <Stack horizontal fill={[computeMessageColor(message), 100]}>
+                      <Stack horizontal fill={[computeMessageColor(p.message), 100]}>
                         <Align horizontal hug="width" left>
-                          {message[0] === "notice" && (
-                            <Icon large name="info" fill={[computeMessageColor(message), 800]} style="filled" />
+                          {p.message[0] === "notice" && (
+                            <Icon large name="info" fill={[computeMessageColor(p.message), 800]} style="filled" />
                           )}
 
-                          {(message[0] === "warning" || message[0] === "error") && (
-                            <Icon large name="warning" fill={[computeMessageColor(message), 800]} style="filled" />
+                          {(p.message[0] === "warning" || p.message[0] === "error") && (
+                            <Icon large name="warning" fill={[computeMessageColor(p.message), 800]} style="filled" />
                           )}
                         </Align>
 
                         <Spacer xsmall />
 
                         <Align horizontal left>
-                          <Text xsmall fill={[computeMessageColor(message), 800]}>
-                            {message[1]}
+                          <Text xsmall fill={[computeMessageColor(p.message), 800]}>
+                            {p.message[1]}
                           </Text>
                         </Align>
                       </Stack>
                     </>
                   )}
 
-                  <Divider fill={[computeMessageColor(message), message && message[0] !== "hidden" ? 200 : 100]} />
+                  <Divider
+                    fill={[computeMessageColor(p.message), p.message && p.message[0] !== "hidden" ? 200 : 100]}
+                  />
                 </>
               }
               contentEnd={
                 <>
-                  {buttonTertiary && buttonTertiary}
+                  {p.buttonTertiary && p.buttonTertiary}
 
-                  {buttonSecondary && (
+                  {p.buttonSecondary && (
                     <>
                       <Spacer small />
 
-                      {buttonSecondary}
+                      {p.buttonSecondary}
                     </>
                   )}
 
-                  {buttonPrimary && (
+                  {p.buttonPrimary && (
                     <>
                       <Spacer small />
 
-                      {buttonPrimary}
+                      {p.buttonPrimary}
                     </>
                   )}
                 </>

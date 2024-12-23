@@ -17,16 +17,16 @@ const TabsContent = styled(Tabs.Content)({
 export const TabsContentItem = forwardRef<
   Tabs.TabsContentProps & RefAttributes<HTMLDivElement>,
   PropsWithChildren<TTabsContentItem>
->((props, ref) => {
-  const { contentTargetId, children, playwrightTestId } = props
+>((p, ref) => {
+  const { contentTargetId, children } = p
 
   return (
     <TabsContent
       key={`tabscontent${contentTargetId}`}
       ref={ref}
       value={contentTargetId}
-      data-playwright-testid={playwrightTestId}
-      {...(props as any)}
+      data-playwright-testid={p["data-playwright-testid"]}
+      {...(p as any)}
       asChild
     >
       <>

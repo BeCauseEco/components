@@ -283,7 +283,7 @@ export const InputText = forwardRef<HTMLInputElement | HTMLTextAreaElement, Inpu
       size={p.size}
       vertical
       hug
-      playwrightTestId={p.playwrightTestId}
+      data-playwright-testid={p["data-playwright-testid"]}
     >
       {labelOutside}
 

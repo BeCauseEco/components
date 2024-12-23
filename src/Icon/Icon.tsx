@@ -87,7 +87,7 @@ export const Icon = (p: IconProps) => (
     fontVariationSettings={computeFontVariantSettings(p)}
     _fill={p.fill}
     onClick={p.onClick}
-    data-playwright-testid={p.playwrightTestId}
+    data-playwright-testid={p["data-playwright-testid"]}
   >
     {p.name === "blank" ? null : p.name}
   </Container>

@@ -15,7 +15,7 @@ export type InputTextDateProps = Pick<
   | "disabled"
   | "value"
   | "onChange"
-  | "playwrightTestId"
+  | "data-playwright-testid"
 > & {
   color: Color
   min?: string
@@ -43,7 +43,7 @@ export const InputTextDate = forwardRef<HTMLInputElement, InputTextDateProps>((p
       value={p.value}
       dateMin={p.min}
       dateMax={p.max}
-      playwrightTestId={p.playwrightTestId}
+      data-playwright-testid={p["data-playwright-testid"]}
     />
   )
 })

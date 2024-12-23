@@ -94,7 +94,7 @@ export const InputRadioGroup = (p: InputRadioGroupProps) => {
   return (
     <Stack
       vertical
-      playwrightTestId={p.playwrightTestId}
+      data-playwright-testid={p["data-playwright-testid"]}
       hug
       className="<InputRadioGroup /> -"
       disabled={p.disabled ? true : undefined}
@@ -118,7 +118,7 @@ export const InputRadioGroup = (p: InputRadioGroupProps) => {
           defaultValue={p.defaultValue}
           value={p.value}
           onValueChange={p.onChange}
-          data-playwright-test-id={p.playwrightTestId}
+          data-playwright-test-id={p["data-playwright-testid"]}
         >
           <Stack vertical hug>
             <Align vertical left hug>

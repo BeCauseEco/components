@@ -50,15 +50,15 @@ export type TTable = PlaywrightProps & {
   colorRowHover: ColorWithLightness
 }
 
-export const Table = ({ head, body, colorBorder, colorCellSeparator, colorRowHover, playwrightTestId }: TTable) => (
+export const Table = (p: TTable) => (
   <Container
-    colorBorder={colorBorder}
-    colorCellSeparator={colorCellSeparator}
-    colorRowHover={colorRowHover}
-    data-playwright-testid={playwrightTestId}
+    colorBorder={p.colorBorder}
+    colorCellSeparator={p.colorCellSeparator}
+    colorRowHover={p.colorRowHover}
+    data-playwright-testid={p["data-playwright-testid"]}
   >
-    <Head>{head}</Head>
+    <Head>{p.head}</Head>
 
-    <Body>{body}</Body>
+    <Body>{p.body}</Body>
   </Container>
 )

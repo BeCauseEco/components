@@ -17,10 +17,15 @@ export type TLayoutGrid = TLayoutBase & {
   children: ReactElement<AlignProps>[]
 }
 
-export const LayoutGrid = ({ columns, rows, children, playwrightTestId }: PropsWithChildren<TLayoutGrid>) => {
+export const LayoutGrid = (p: PropsWithChildren<TLayoutGrid>) => {
   return (
-    <Container className="layout-container" columns={columns} rows={rows} data-playwright-testid={playwrightTestId}>
-      {children}
+    <Container
+      className="layout-container"
+      columns={p.columns}
+      rows={p.rows}
+      data-playwright-testid={p["data-playwright-testid"]}
+    >
+      {p.children}
     </Container>
   )
 }

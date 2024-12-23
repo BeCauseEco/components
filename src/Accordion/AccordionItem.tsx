@@ -67,23 +67,26 @@ export type TAccordionItem = PlaywrightProps & {
   colorContent: ColorWithLightness
 }
 
-export const AccordionItem = ({ label, value, content, colorHead, colorContent, playwrightTestId }: TAccordionItem) => (
-  <Item value={value} data-playwright-testid={playwrightTestId}>
+export const AccordionItem = (p: TAccordionItem) => (
+  <Item value={p.value} data-playwright-testid={p["data-playwright-testid"]}>
     <Header>
       <Trigger>
         <Composition>
-          <BackgroundCard colorBackground={colorHead} />
+          <BackgroundCard colorBackground={p.colorHead} />
 
-          <LayoutSingle direction={EDirection.Vertical} content={[<Label key="accordion-item-label">{label}</Label>]} />
+          <LayoutSingle
+            direction={EDirection.Vertical}
+            content={[<Label key="accordion-item-label">{p.label}</Label>]}
+          />
         </Composition>
       </Trigger>
     </Header>
 
     <Content>
       <Composition>
-        <BackgroundCard colorBackground={colorContent} />
+        <BackgroundCard colorBackground={p.colorContent} />
 
-        <LayoutSingle direction={EDirection.Vertical} content={content} />
+        <LayoutSingle direction={EDirection.Vertical} content={p.content} />
       </Composition>
     </Content>
   </Item>
