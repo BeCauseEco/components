@@ -337,7 +337,7 @@ export const InputText = forwardRef<HTMLInputElement | HTMLTextAreaElement, Inpu
             />
           </Align>
 
-          {p.rows === 1 ? (
+          {p.rows === 1 && p.type !== "date" ? (
             <Align horizontal center hug="width">
               <InputButton
                 variant="blank"
@@ -357,7 +357,7 @@ export const InputText = forwardRef<HTMLInputElement | HTMLTextAreaElement, Inpu
             <></>
           )}
 
-          {p.iconNameRight || p.type === "date" ? (
+          {p.iconNameRight ? (
             <>
               <Align vertical center hug="width">
                 <Divider vertical fill={p.value ? [p.color, 300] : [Color.Transparent]} overrideHeight="50%" />
