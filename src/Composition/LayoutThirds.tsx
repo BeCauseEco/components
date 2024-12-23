@@ -27,32 +27,24 @@ export type TLayoutThirds = TLayoutBase & {
   spacing?: Size
 }
 
-export const LayoutThirds = ({
-  contentStart,
-  contentMiddle,
-  contentEnd,
-  direction = EDirection.Vertical,
-  omitPadding = false,
-  spacing,
-  playwrightTestId,
-}: TLayoutThirds) => {
+export const LayoutThirds = (p: TLayoutThirds) => {
   return (
     <Container
-      omitPadding={omitPadding}
-      spacing={spacing}
-      direction={direction}
-      data-playwright-testid={playwrightTestId}
+      omitPadding={p.omitPadding}
+      spacing={p.spacing}
+      direction={p.direction}
+      data-playwright-testid={p["data-playwright-testid"]}
     >
-      <Content direction={direction} className="layout-container">
-        {contentStart}
+      <Content direction={p.direction} className="layout-container">
+        {p.contentStart}
       </Content>
 
-      <Content direction={direction} className="layout-container">
-        {contentMiddle}
+      <Content direction={p.direction} className="layout-container">
+        {p.contentMiddle}
       </Content>
 
-      <Content direction={direction} className="layout-container">
-        {contentEnd}
+      <Content direction={p.direction} className="layout-container">
+        {p.contentEnd}
       </Content>
     </Container>
   )

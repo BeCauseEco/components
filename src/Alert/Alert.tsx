@@ -40,25 +40,25 @@ export type TAlertDialog = PlaywrightProps & {
   buttonSecondary: ReactElement<InputButtonPrimaryProps>
 }
 
-export const Alert = ({ open, title, description, buttonPrimary, buttonSecondary, playwrightTestId }: TAlertDialog) => (
-  <RadixAlertDialog.Root open={open}>
+export const Alert = (p: TAlertDialog) => (
+  <RadixAlertDialog.Root open={p.open}>
     <RadixAlertDialog.Portal>
       <Overlay />
 
-      <Content data-playwright-testid={playwrightTestId}>
+      <Content data-playwright-testid={p["data-playwright-testid"]}>
         <Composition>
           <BackgroundCard colorBackground={[Color.White]} borderRadius={Size.Tiny} shadow={EShadow.Large} />
 
           <LayoutAlert
-            contentTop={title}
-            contentMiddle={description}
+            contentTop={p.title}
+            contentMiddle={p.description}
             contentEnd={
               <>
-                <RadixAlertDialog.Cancel asChild>{buttonSecondary}</RadixAlertDialog.Cancel>
+                <RadixAlertDialog.Cancel asChild>{p.buttonSecondary}</RadixAlertDialog.Cancel>
 
                 <Spacer small />
 
-                <RadixAlertDialog.Action asChild>{buttonPrimary}</RadixAlertDialog.Action>
+                <RadixAlertDialog.Action asChild>{p.buttonPrimary}</RadixAlertDialog.Action>
               </>
             }
           />

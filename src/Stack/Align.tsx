@@ -67,7 +67,7 @@ export const Align = (p: PropsWithChildren<AlignProps>) => {
       bottomRight={p["bottomRight"]}
       hug={p.hug}
       validateChildrenErrorStyles={generateErrorStyles(invalidChildren)}
-      data-playwright-testid={p.playwrightTestId}
+      data-playwright-testid={p["data-playwright-testid"]}
     >
       {p.children}
     </Container>

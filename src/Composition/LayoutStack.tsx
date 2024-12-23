@@ -37,7 +37,7 @@ export const LayoutStack = (p: TLayoutStack) => {
       className="layout-container layout-single"
       omitPadding={p.omitPadding}
       direction={direction}
-      data-playwright-testid={p.playwrightTestId}
+      data-playwright-testid={p["data-playwright-testid"]}
     >
       {p.children}
     </Container>

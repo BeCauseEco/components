@@ -222,7 +222,7 @@ export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<InputC
         colorSelected={[p.color, 400]}
         colorBackgroundHover={[p.color, 50]}
         colorForeground={[p.color, 700]}
-        data-playwright-testid={item.playwrightTestId}
+        data-playwright-testid={item["data-playwright-testid"]}
       >
         {p.multiple ? (
           <Stack horizontal hug>
@@ -320,7 +320,12 @@ export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<InputC
   })
 
   return (
-    <Container ref={ref} id={p.id} data-playwright-testid={p.playwrightTestId} className="<InputCombobox /> - ">
+    <Container
+      ref={ref}
+      id={p.id}
+      data-playwright-testid={p["data-playwright-testid"]}
+      className="<InputCombobox /> - "
+    >
       <Stack vertical hug>
         {p.label && p.label[0] === "outside" ? (
           <Align vertical left hug="width">

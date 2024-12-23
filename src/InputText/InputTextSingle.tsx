@@ -17,7 +17,7 @@ export type InputTextSingleProps = Pick<
   | "disabled"
   | "value"
   | "onChange"
-  | "playwrightTestId"
+  | "data-playwright-testid"
 > & {
   color: Color
 }
@@ -43,7 +43,7 @@ export const InputTextSingle = forwardRef<HTMLInputElement, InputTextSingleProps
       rows={1}
       disabled={p.disabled ? true : undefined}
       value={p.value}
-      playwrightTestId={p.playwrightTestId}
+      data-playwright-testid={p["data-playwright-testid"]}
     />
   )
 })

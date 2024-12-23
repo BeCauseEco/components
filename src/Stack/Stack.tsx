@@ -75,7 +75,7 @@ type ContainerProps = Pick<
   | "dropShadow"
   | "aspectRatio"
   | "validateChildrenErrorStyles"
-  | "playwrightTestId"
+  | "data-playwright-testid"
 >
 
 const Container = styled.div<ContainerProps>(p => ({
@@ -153,7 +153,7 @@ export const Stack = (p: StackProps) => {
   return (
     <Container
       className={p.className || `<Stack />${generateErrorClassName(invalidChildren)} `}
-      data-playwright-testid={p.playwrightTestId}
+      data-playwright-testid={p["data-playwright-testid"]}
       fill={p.fill}
       fillHover={p.fillHover}
       stroke={p.stroke}

@@ -107,31 +107,19 @@ const Container = styled.div<
   },
 }))
 
-export const OverflowContainer = ({
-  axes,
-  colorBackground,
-  colorForeground,
-  minWidth,
-  maxWidth,
-  minHeight,
-  maxHeight,
-  hug,
-  children,
-  playwrightTestId,
-  className,
-}: PropsWithChildren<OverflowContainerProps>) => (
+export const OverflowContainer = (p: PropsWithChildren<OverflowContainerProps>) => (
   <Container
-    className={`<OverflowContainer /> -${className || ""}`}
-    axes={axes}
-    colorBackground={colorBackground}
-    colorForeground={colorForeground}
-    minWidth={minWidth}
-    maxWidth={maxWidth}
-    minHeight={minHeight}
-    maxHeight={maxHeight}
-    hug={hug}
-    data-playwright-testid={playwrightTestId}
+    className={`<OverflowContainer /> -${p.className || ""}`}
+    axes={p.axes}
+    colorBackground={p.colorBackground}
+    colorForeground={p.colorForeground}
+    minWidth={p.minWidth}
+    maxWidth={p.maxWidth}
+    minHeight={p.minHeight}
+    maxHeight={p.maxHeight}
+    hug={p.hug}
+    data-playwright-testid={p["data-playwright-testid"]}
   >
-    {children}
+    {p.children}
   </Container>
 )

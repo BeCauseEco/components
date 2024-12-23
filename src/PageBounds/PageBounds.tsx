@@ -33,7 +33,7 @@ export const PageBounds = (p: PageBoundsProps) => {
   return (
     <Outer
       className={`<PageBounds />${generateErrorClassName(invalidChildren)} component-page_bounds component-composition-reset`}
-      data-playwright-testid={p.playwrightTestId}
+      data-playwright-testid={p["data-playwright-testid"]}
       validateChildrenErrorStyles={generateErrorStyles(invalidChildren)}
     >
       <Inner className="<PageBounds: children /> - ">{p.children}</Inner>

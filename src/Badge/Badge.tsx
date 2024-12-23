@@ -138,7 +138,11 @@ export const Badge = (p: BadgeProps) => {
   }
 
   return (
-    <Container className={`<Badge /> - ${p.className}`} size={p.size} data-playwright-testid={p.playwrightTestId}>
+    <Container
+      className={`<Badge /> - ${p.className}`}
+      size={p.size}
+      data-playwright-testid={p["data-playwright-testid"]}
+    >
       {stack}
     </Container>
   )

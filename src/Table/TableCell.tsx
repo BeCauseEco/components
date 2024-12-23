@@ -18,8 +18,13 @@ export type TTableCell = PlaywrightProps & {
   columnSpan?: number
 }
 
-export const TableCell = ({ children, width, omitPadding, columnSpan = 1, playwrightTestId }: TTableCell) => (
-  <Container width={width} colSpan={columnSpan} omitPadding={omitPadding} data-playwright-testid={playwrightTestId}>
-    {children}
+export const TableCell = (p: TTableCell) => (
+  <Container
+    width={p.width || "auto"}
+    colSpan={p.columnSpan || 1}
+    omitPadding={p.omitPadding}
+    data-playwright-testid={p["data-playwright-testid"]}
+  >
+    {p.children}
   </Container>
 )

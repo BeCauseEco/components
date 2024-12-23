@@ -33,17 +33,17 @@ export type TTabsNavigationItem = PlaywrightProps & {
 export const TabsNavigationItem = forwardRef<
   Tabs.TabsTriggerProps & RefAttributes<HTMLButtonElement>,
   PropsWithChildren<TTabsNavigationItem>
->((props, ref) => {
-  const { contentTargetId, children, onClick, playwrightTestId } = props
+>((p, ref) => {
+  const { contentTargetId, children, onClick } = p
 
   return (
     <Trigger
       key={`tabstrigger${contentTargetId}`}
       ref={ref}
       value={contentTargetId}
-      data-playwright-testid={playwrightTestId}
+      data-playwright-testid={p["data-playwright-testid"]}
       onClick={onClick}
-      {...(props as any)}
+      {...(p as any)}
       asChild
     >
       {children}

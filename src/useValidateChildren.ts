@@ -1,5 +1,5 @@
 import { CSSObject } from "@emotion/react"
-import React, { ReactNode, useEffect, useState } from "react"
+import React, { Children, ReactNode, useEffect, useState } from "react"
 import { ReactElement } from "react"
 
 type Children = ReactNode | ReactElement | ReactNode[] | ReactElement[]
@@ -78,7 +78,7 @@ const getComponentTypeNames = (parentTypeName, children: Children): string[] => 
     const isReactFragment = child?.["type"]?.toString() === "Symbol(react.fragment)"
 
     if (isReactFragment) {
-      r.push(...getComponentTypeNames(parentTypeName, React.Children.toArray(child?.["props"]?.["children"])))
+      r.push(...getComponentTypeNames(parentTypeName, Children.toArray(child?.["props"]?.["children"])))
     } else {
       const n = getComponentName(parentTypeName, child)
 
@@ -90,6 +90,7 @@ const getComponentTypeNames = (parentTypeName, children: Children): string[] => 
 
   // TODO: @cllpse: not ready for prime time just yet
   return []
+  // return r
 }
 
 export const useValidateChildren = (

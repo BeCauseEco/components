@@ -148,15 +148,7 @@ export type TComposition = PlaywrightProps & {
 }
 
 export const Composition = forwardRef<HTMLDivElement, PropsWithChildren<TComposition>>((props, ref) => {
-  const {
-    children,
-    loading = false,
-    disabled = false,
-    explodeHeight = false,
-    overflowHidden = false,
-    onClick,
-    playwrightTestId,
-  } = props
+  const { children, loading = false, disabled = false, explodeHeight = false, overflowHidden = false, onClick } = props
 
   const c = React.Children.toArray(children)
 
@@ -179,7 +171,7 @@ export const Composition = forwardRef<HTMLDivElement, PropsWithChildren<TComposi
       overflowHidden={overflowHidden}
       className="component-composition component-composition-reset"
       onClick={onClick}
-      data-playwright-testid={playwrightTestId}
+      data-playwright-testid={props["data-playwright-testid"]}
     >
       {c.length === 1 ? (
         <>

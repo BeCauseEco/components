@@ -65,31 +65,23 @@ export type TSwitch = PlaywrightProps & {
   label?: ReactElement<TextProps>
 }
 
-export const Switch = ({
-  value,
-  onChange,
-  colorBackground,
-  colorForeground,
-  colorValueTrue,
-  label,
-  playwrightTestId,
-}: TSwitch) => {
+export const Switch = (p: TSwitch) => {
   const key = useId()
 
   return (
-    <Container data-playwright-testid={playwrightTestId}>
+    <Container data-playwright-testid={p["data-playwright-testid"]}>
       <KeyValuePair direction={EDirection.Horizontal} spacing={Size.Xsmall}>
         <SwitchRoot
           id={key}
-          checked={value}
-          onCheckedChange={value => onChange(value)}
-          colorBackground={colorBackground}
-          colorValueTrue={colorValueTrue}
+          checked={p.value}
+          onCheckedChange={value => p.onChange(value)}
+          colorBackground={p.colorBackground}
+          colorValueTrue={p.colorValueTrue}
         >
-          <SwitchThumb colorForeground={colorForeground} />
+          <SwitchThumb colorForeground={p.colorForeground} />
         </SwitchRoot>
 
-        <Label htmlFor={key}>{label}</Label>
+        <Label htmlFor={key}>{p.label}</Label>
       </KeyValuePair>
     </Container>
   )

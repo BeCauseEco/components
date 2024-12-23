@@ -34,11 +34,11 @@ export type TKeyValuePair = PlaywrightProps & {
   itemDistribution?: EDistribution
 }
 
-export const KeyValuePair = forwardRef<HTMLDivElement, PropsWithChildren<TKeyValuePair>>((props, ref) => {
-  const { spacing, children, playwrightTestId } = props
+export const KeyValuePair = forwardRef<HTMLDivElement, PropsWithChildren<TKeyValuePair>>((p, ref) => {
+  const { spacing, children } = p
 
   return (
-    <Container ref={ref} data-playwright-testid={playwrightTestId} {...props}>
+    <Container ref={ref} data-playwright-testid={p["data-playwright-testid"]} {...p}>
       <Content>{children[0]}</Content>
 
       {/* TO-DO: @cllpse fix Spacer */}

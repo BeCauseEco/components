@@ -66,28 +66,19 @@ export type TBackground = PlaywrightProps & {
   stacked?: boolean
 }
 
-export const Background = ({
-  colorBackground,
-  colorBackgroundHover,
-  colorOutline,
-  colorOutlineHover,
-  borderRadius,
-  shadow,
-  stacked,
-  playwrightTestId,
-}: TBackground) => {
+export const Background = (p: TBackground) => {
   // TO-DO: @cllpse: clean up at a later date
   const id = Math.random().toString().replace(".", "")
 
   const c = css`
     .component-composition > .component-composition-background > .component-backgroundcard-${id} {
-      background-color: ${computeColor(colorBackground || [Color.Transparent])};
-      outline: solid 1px ${computeColor(colorOutline || [Color.Transparent])};
+      background-color: ${computeColor(p.colorBackground || [Color.Transparent])};
+      outline: solid 1px ${computeColor(p.colorOutline || [Color.Transparent])};
     }
 
     .component-composition:hover > .component-composition-background > .component-backgroundcard-${id} {
-      background-color: ${computeColor(colorBackgroundHover || colorBackground || [Color.Transparent])} !important;
-      outlinecolor: ${computeColor(colorOutlineHover || colorOutline || [Color.Transparent])} !important;
+      background-color: ${computeColor(p.colorBackgroundHover || p.colorBackground || [Color.Transparent])} !important;
+      outlinecolor: ${computeColor(p.colorOutlineHover || p.colorOutline || [Color.Transparent])} !important;
     }
   `
 
@@ -97,14 +88,14 @@ export const Background = ({
 
       <Container
         className={`component-backgroundcard-${id}`}
-        colorBackground={colorBackground}
-        colorBackgroundHover={colorBackgroundHover}
-        colorOutline={colorOutline}
-        colorOutlineHover={colorOutlineHover}
-        borderRadius={borderRadius}
-        shadow={shadow}
-        stacked={stacked}
-        data-playwright-testid={playwrightTestId}
+        colorBackground={p.colorBackground}
+        colorBackgroundHover={p.colorBackgroundHover}
+        colorOutline={p.colorOutline}
+        colorOutlineHover={p.colorOutlineHover}
+        borderRadius={p.borderRadius}
+        shadow={p.shadow}
+        stacked={p.stacked}
+        data-playwright-testid={p["data-playwright-testid"]}
       />
     </>
   )

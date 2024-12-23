@@ -22,14 +22,12 @@ export type AutocompleteProps = PlaywrightProps & {
   colorBackground: Color
 }
 
-export const Autocomplete = forwardRef<HTMLDivElement, PropsWithChildren<AutocompleteProps>>((props, ref) => {
-  const { playwrightTestId, input, results, open, onOpenChange } = props
-
+export const Autocomplete = forwardRef<HTMLDivElement, PropsWithChildren<AutocompleteProps>>((p, ref) => {
   return (
-    <Container ref={ref} data-playwright-testid={playwrightTestId}>
-      <Popover open={open} onOpenChange={onOpenChange} alignment="start" trigger={input}>
+    <Container ref={ref} data-playwright-testid={p["data-playwright-testid"]}>
+      <Popover open={p.open} onOpenChange={p.onOpenChange} alignment="start" trigger={p.input}>
         <Align vertical topLeft>
-          {results}
+          {p.results}
         </Align>
       </Popover>
     </Container>
