@@ -46,7 +46,7 @@ export const Grid = (p: PropsWithChildren<GridProps>) => {
       className={`<Grid />${generateErrorClassName(invalidChildren)} layout-container`}
       columns={p.columns}
       hug={p.hug}
-      data-playwright-testid={p.playwrightTestId}
+      data-playwright-testid={p["data-playwright-testid"]}
       validateChildrenErrorStyles={generateErrorStyles(invalidChildren)}
     >
       {p.children}
