@@ -17,6 +17,7 @@ import { Align } from "@new/Stack/Align"
 import { ComponentBaseProps } from "@new/ComponentBaseProps"
 import { OverflowContainer } from "@new/OverflowContainer/OverflowContainer"
 import { Divider } from "@new/Divider/Divider"
+import { Icon } from "@new/Icon/Icon"
 
 export type InputComboboxProps = ComponentBaseProps & {
   size: "small" | "large"
@@ -54,6 +55,8 @@ export type InputComboboxProps = ComponentBaseProps & {
 
   disabled?: boolean
   loading?: boolean
+
+  required?: boolean
 }
 
 const Container = styled.div<Pick<InputComboboxProps, "size" | "width">>(p => ({
@@ -340,6 +343,18 @@ export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<InputC
                 <Text xsmall={p.size === "small"} small={p.size !== "small"} fill={[p.color, 700]}>
                   <b>{p?.label?.[1]}</b>
                 </Text>
+                {p.required && (
+                  <>
+                    <Spacer tiny={p.size === "small"} xsmall={p.size === "large"} />
+
+                    <Icon
+                      name="asterisk"
+                      small={p.size === "small"}
+                      medium={p.size === "large"}
+                      fill={[Color.Error, 700]}
+                    />
+                  </>
+                )}
               </Label>
 
               <Spacer xsmall={p.size === "small"} small={p.size === "large"} />

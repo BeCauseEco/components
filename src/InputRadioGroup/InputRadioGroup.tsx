@@ -51,6 +51,8 @@ export type InputRadioGroupProps = PlaywrightProps & {
   children: ReactElement<InputRadioGroupItemProps> | ReactElement<InputRadioGroupItemProps>[]
 
   disabled?: boolean
+
+  required?: boolean
 }
 
 export const InputRadioGroup = (p: InputRadioGroupProps) => {
@@ -105,6 +107,17 @@ export const InputRadioGroup = (p: InputRadioGroupProps) => {
             <Text xsmall={p.size === "small"} small={p.size !== "small"} fill={[p.color, 700]}>
               <b>{p.label}</b>
             </Text>
+            {p.required && (
+              <>
+                <Spacer tiny={p.size === "small"} xsmall={p.size === "large"} />
+                <Icon
+                  name="asterisk"
+                  small={p.size === "small"}
+                  medium={p.size === "large"}
+                  fill={[Color.Error, 700]}
+                />
+              </>
+            )}
           </Label>
 
           <Spacer xsmall={p.size === "small"} small={p.size === "large"} />
