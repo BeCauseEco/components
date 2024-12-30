@@ -138,7 +138,7 @@ export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<InputC
       }
 
       return (
-        <Text fill={[p.color, 700]} xsmall={p.size === "small"} small={p.size === "large"} maxWidth="160px">
+        <Text fill={[p.color, 700]} xsmall={p.size === "small"} small={p.size === "large"} maxWidth="165px">
           {selectedItem?.label || p.textNoSelection}
         </Text>
       )
@@ -171,7 +171,7 @@ export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<InputC
                 size={p.size}
                 variant={p.disabled ? "opaque" : "solid"}
                 color={p.disabled ? p.color : Color.Primary}
-                maxWidth="160px"
+                maxWidth="165px"
                 onClear={
                   p.clearable
                     ? () => {
