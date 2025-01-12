@@ -61,6 +61,7 @@ const Container = styled.p<Omit<TextProps, "fill"> & { _fill: TextProps["fill"] 
   textDecoration: "inherit",
   textTransform: "inherit",
   textWrap: !p.maxWidth && p.wrap ? "pretty" : "nowrap",
+  wordBreak: !p.maxWidth && p.wrap ? "break-all" : "normal",
   textAlign: "left",
   alignItems: "inherit",
   margin: 0,

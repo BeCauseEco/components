@@ -108,14 +108,19 @@ const Output = styled.output<Pick<InputTextProps, "color" | "size" | "rows"> & {
     color: computeColor([p.color, 300]),
   },
 
-  "&::-webkit-calendar-picker-indicator": {
-    position: "absolute",
-    top: 0,
-    left: 0,
-    width: 0,
-    height: 0,
-    opacity: 0,
-  },
+  // "::-webkit-calendar-picker-indicator": {
+  //   position: "absolute",
+  //   opacity: 0,
+  //   top: 0,
+  //   left: 0,
+  //   right: 0,
+  //   bottom: 0,
+  //   width: "100%",
+  //   height: "100%",
+  //   margin: 0,
+  //   padding: 0,
+  //   cursor: "pointer",
+  // },
 }))
 
 const StackWidthOverride = styled(Stack)<Pick<InputTextProps, "size" | "rows" | "width">>(p => ({
@@ -242,27 +247,6 @@ export const InputText = forwardRef<HTMLInputElement | HTMLTextAreaElement, Inpu
     )
   }
 
-  if (p.type === "date") {
-    iconEnd = (
-      <Align horizontal center hug="width">
-        {/* TODO: @cllpse: this is a bit of a hack. Will fix at a later point. */}
-        <div style={{ display: "flex", width: "fit-content", height: "fit-content", cursor: "pointer" }}>
-          <Icon
-            name="calendar_month"
-            medium={p.size === "small"}
-            large={p.size === "large"}
-            fill={[p.error ? Color.Error : p.color, 700]}
-            onClick={event => {
-              event?.target?.parentElement?.parentElement?.parentElement?.querySelectorAll("input")?.[0]?.showPicker()
-            }}
-          />
-        </div>
-
-        <Spacer xsmall={p.size === "small"} small={p.size === "large"} />
-      </Align>
-    )
-  }
-
   if (p.error) {
     errorEitherSide = (
       <Align vertical left hug="width">
@@ -357,10 +341,35 @@ export const InputText = forwardRef<HTMLInputElement | HTMLTextAreaElement, Inpu
             <></>
           )}
 
+          {/* {p.rows === 1 && p.type === "date" ? (
+            <Align horizontal center hug="width">
+              <div style={{ all: "inherit", cursor: "pointer !important" }}>
+                <Icon
+                  name="calendar_month"
+                  medium={p.size === "small"}
+                  large={p.size === "large"}
+                  fill={[p.error ? Color.Error : p.color, 700]}
+                  onClick={event => {
+                    event?.target?.parentElement?.parentElement?.parentElement
+                      ?.querySelectorAll("input")?.[0]
+                      ?.showPicker()
+                  }}
+                />
+              </div>
+            </Align>
+          ) : (
+            <></>
+          )} */}
+
           {p.iconNameRight ? (
             <>
               <Align vertical center hug="width">
-                <Divider vertical fill={p.value ? [p.color, 300] : [Color.Transparent]} overrideHeight="50%" />
+                <Divider
+                  vertical
+                  fill={p.value ? [p.color, 300] : [Color.Transparent]}
+                  overrideHeight="50%"
+                  style="solid"
+                />
               </Align>
 
               <Spacer xsmall={p.size === "small"} small={p.size === "large"} />

@@ -93,7 +93,6 @@ const Container = styled.div<ContainerProps>(p => ({
   aspectRatio: p.aspectRatio || "auto",
   content: `'${p.aspectRatio}'`,
   boxShadow: computeShadow(p.dropShadow),
-  outlineOffset: -1,
 
   ...(p.stroke && {
     outline: `solid 1px ${computeColor(p.stroke || [Color.Transparent])}`,
