@@ -313,6 +313,7 @@ export const InputText = forwardRef<HTMLInputElement | HTMLTextAreaElement, Inpu
               width={p.width}
               min={p.type === "date" ? p.dateMin : undefined}
               max={p.type === "date" ? p.dateMax : undefined}
+              autoComplete="one-time-code"
               onChange={event => {
                 if (p.onChange) {
                   p.onChange(event?.target?.["value"])
