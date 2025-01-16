@@ -365,12 +365,7 @@ export const InputText = forwardRef<HTMLInputElement | HTMLTextAreaElement, Inpu
           {p.iconNameRight ? (
             <>
               <Align vertical center hug="width">
-                <Divider
-                  vertical
-                  fill={p.value ? [p.color, 300] : [Color.Transparent]}
-                  overrideHeight="50%"
-                  style="solid"
-                />
+                <Divider vertical fill={p.value ? [p.color, 300] : [Color.Transparent]} overrideHeight="50%" />
               </Align>
 
               <Spacer xsmall={p.size === "small"} small={p.size === "large"} />

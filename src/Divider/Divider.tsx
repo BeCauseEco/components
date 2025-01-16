@@ -7,7 +7,6 @@ export type DividerProps = ComponentBaseProps & {
   horizontal?: boolean
 
   fill: ColorWithLightness
-  style: "solid" | "dotted"
 
   /**
    * WARNING: internal property - only to be used within /components
@@ -20,17 +19,13 @@ export type DividerProps = ComponentBaseProps & {
 }
 
 const Container = styled.div<
-  Pick<DividerProps, "vertical" | "horizontal" | "overrideWidth" | "overrideHeight"> & {
-    _fill: ColorWithLightness
-    _style: string
-  }
+  Pick<DividerProps, "vertical" | "horizontal" | "overrideWidth" | "overrideHeight"> & { _fill: ColorWithLightness }
 >(p => ({
   display: "flex",
   flexShrink: 0,
-  width: p.vertical ? "0px" : p.overrideWidth ? p.overrideWidth : "100%",
-  height: !p.vertical ? "0px" : p.overrideHeight ? p.overrideHeight : "100%",
-  ...(p.vertical && { borderRight: `${p._style} 1px ${computeColor(p._fill)}` }),
-  ...(!p.vertical && { borderTop: `${p._style} 1px ${computeColor(p._fill)}` }),
+  width: p.vertical ? "1px" : p.overrideWidth ? p.overrideWidth : "100%",
+  height: !p.vertical ? "1px" : p.overrideHeight ? p.overrideHeight : "100%",
+  backgroundColor: computeColor(p._fill),
 }))
 
 export const Divider = (p: DividerProps) => (
@@ -38,7 +33,6 @@ export const Divider = (p: DividerProps) => (
     className="<Divider /> -"
     data-playwright-testid={p["data-playwright-testid"]}
     _fill={p.fill}
-    _style={p.style === "dotted" ? "dotted" : "solid"}
     vertical={p.vertical}
     horizontal={p.horizontal}
     overrideWidth={p.overrideWidth}

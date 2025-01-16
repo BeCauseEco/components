@@ -136,13 +136,13 @@ export const Dialog = (p: TDialog) => {
               }
               contentMiddle={
                 <>
-                  <Divider fill={[Color.Neutral, 100]} style="solid" />
+                  <Divider fill={[Color.Neutral, 100]} />
 
                   {p.content}
 
                   {p.message && p.message[0] !== "hidden" && (
                     <>
-                      <Divider fill={[computeMessageColor(p.message), 200]} style="solid" />
+                      <Divider fill={[computeMessageColor(p.message), 200]} />
 
                       <Stack horizontal fill={[computeMessageColor(p.message), 100]}>
                         <Align horizontal hug="width" left>
@@ -168,7 +168,6 @@ export const Dialog = (p: TDialog) => {
 
                   <Divider
                     fill={[computeMessageColor(p.message), p.message && p.message[0] !== "hidden" ? 200 : 100]}
-                    style="solid"
                   />
                 </>
               }
