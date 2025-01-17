@@ -118,6 +118,7 @@ const Children = styled.div<Pick<StackProps, "loading" | "disabled" | "hug"> & {
     padding: p.hug ? (p.hug === "partly" ? "calc(var(--BU) * 2)" : 0) : "calc(var(--BU) * 4)",
     transition: "opacity 0.2s ease-in-out",
     willChange: "opacity",
+    overflow: "inherit",
 
     ...(p.loading
       ? {

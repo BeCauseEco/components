@@ -1,6 +1,15 @@
 import { Stack } from "@new/Stack/Stack"
 import { Align } from "@new/Stack/Align"
-import { DataType, InsertRowPosition, SortDirection, SortingMode, Table, useTable, useTableInstance } from "ka-table"
+import {
+  DataType,
+  InsertRowPosition,
+  ITableInstance,
+  SortDirection,
+  SortingMode,
+  Table,
+  useTable,
+  useTableInstance,
+} from "ka-table"
 import { ICellEditorProps, ICellTextProps } from "ka-table/props"
 import { closeRowEditors, deleteRow, openRowEditors, saveRowEditors } from "ka-table/actionCreators"
 import { InputButtonPrimary } from "@new/InputButton/InputButtonPrimary"
@@ -15,7 +24,6 @@ import { StyleBodySmall, StyleFontFamily, Text } from "@new/Text/Text"
 import { Icon } from "@new/Icon/Icon"
 import styled from "@emotion/styled"
 import { useRef, useState } from "react"
-import { CSVLink } from "react-csv"
 import "jspdf-autotable"
 import jsPDF from "jspdf"
 import { useReactToPrint } from "react-to-print"
@@ -57,6 +65,45 @@ const formatValue = (value: string, dataType: DataType): string => {
     default:
       return "–"
   }
+}
+
+const csv = (data: DataTableProps["data"], columns: ColumnProps[]) => {
+  const dataSanitized: DataTableProps["data"] = []
+
+  data.forEach(row => {
+    const rowSanitized: string[] = []
+
+    columns.forEach(column => {
+      const value = (row[column.key] || "").toString()
+
+      if (column.dataType === DataType.Boolean) {
+        rowSanitized.push(value !== undefined ? (value ? "Yes" : "No") : "")
+      } else if (column.dataType === DataType.String) {
+        rowSanitized.push(value.lastIndexOf(";") !== -1 ? `"${value}"` : value)
+      } else {
+        rowSanitized.push(value)
+      }
+    })
+
+    dataSanitized.push(rowSanitized)
+  })
+
+  if (window) {
+    window.open("data:text/csv;charset=utf-8," + dataSanitized.map(ds => ds.join(";")).join("\n"))
+  }
+}
+
+const pdf = (table: ITableInstance, exportName: string) => {
+  const document: any = new jsPDF("landscape")
+
+  document.autoTable({
+    headStyles: { fillColor: "white", textColor: "black" },
+    alternateRowStyles: { fillColor: "white" },
+    head: [table.props.columns.map(c => c.title)],
+    body: table.props.data!.map(d => table.props.columns.map(c => getValueByColumn(d, c))),
+  })
+
+  document.save(`${exportName}.pdf`)
 }
 
 const ActionEdit = ({ dispatch, rowKeyValue, disabled }: ICellTextProps & { disabled: boolean }) => {
@@ -139,7 +186,7 @@ const CellInputCheckbox = ({ column, rowKeyValue, value }: ICellEditorProps) => 
 
   return (
     <InputCheckbox
-      value={value}
+      value={value || false}
       size="small"
       onChange={v => {
         table.updateCellValue(rowKeyValue, column.key, v)
@@ -188,19 +235,21 @@ export type ColumnProps = ColumnPropsInternal & {
 }
 
 export type DataTableProps = {
-  data: any[]
-  defaultSortColumn: string
-  columns: Array<ColumnProps | ColumnPropsInternal>
-  rowKeyField: string
   mode: "simple" | "filter" | "edit"
+  data: any[]
+  columns: Array<ColumnProps | ColumnPropsInternal>
+  defaultSortColumn: string
+  rowKeyField: string
+  exportName: string
   fixedKeyField?: string
   selectKeyField?: string
   virtualScrolling?: boolean
+  loading?: boolean
   onChange?: (value: DataTableProps["data"]) => void
   onChangeRow?: (value: object) => void
 }
 
-export const LayoutDialog = (p: DataTableProps) => {
+export const DataTable = (p: DataTableProps) => {
   const [filter, setFilter] = useState("")
   const [editId, setEditId] = useState<number | null>(null)
   const [deleteId, setDeleteId] = useState<number | null>(null)
@@ -312,25 +361,38 @@ export const LayoutDialog = (p: DataTableProps) => {
   })
 
   const printReference = useRef<HTMLDivElement>(null)
-  const print = useReactToPrint({ contentRef: printReference })
-
-  const pdf = () => {
-    const document: any = new jsPDF("landscape")
-
-    document.autoTable({
-      headStyles: { fillColor: "white", textColor: "black" },
-      alternateRowStyles: { fillColor: "white" },
-      head: [table.props.columns.map(c => c.title)],
-      body: table.props.data!.map(d => table.props.columns.map(c => getValueByColumn(d, c))),
-    })
-
-    document.save("download.pdf")
-  }
+  const print = useReactToPrint({ contentRef: printReference, documentTitle: p.exportName })
 
   return (
     <>
       <Global
         styles={css`
+          @media print {
+            .ka {
+              zoom: 0.5 !important;
+            }
+
+            .ka * {
+              overflow: visible !important;
+              position: static !important;
+            }
+
+            .ka p {
+              white-space: normal !important;
+            }
+
+            .ka td,
+            .ka th {
+              width: auto !important;
+              min-width: auto !important;
+            }
+
+            .ka .override-ka-fixed-right {
+              display: none !important;
+              visibility: hidden !important;
+            }
+          }
+
           .ka {
             background-color: white;
             font-size: unset;
@@ -435,6 +497,33 @@ export const LayoutDialog = (p: DataTableProps) => {
             width: 8px;
           }
 
+          .override-ka-virtual .ka-thead-row {
+            border-bottom: solid 1px white;
+          }
+
+          .override-ka-virtual .ka-thead-row .ka-thead-cell:before {
+            content: "";
+            position: absolute;
+            bottom: -8px;
+            left: 0;
+            right: 0;
+            height: 8px;
+            width: 100%;
+            border-top: solid 1px ${computeColor([Color.Neutral, 100])};
+            background: linear-gradient(to bottom, ${computeColor([Color.Neutral, 50])}, transparent);
+          }
+
+          .override-ka-virtual .ka-thead-row:after {
+            content: "";
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 8px;
+            width: 100%;
+            background: linear-gradient(to top, ${computeColor([Color.Neutral, 50])}, transparent);
+          }
+
           .ka-thead-row .override-ka-fixed-left:after {
             width: 20px;
             right: -20px;
@@ -506,7 +595,7 @@ export const LayoutDialog = (p: DataTableProps) => {
         `}
       />
 
-      <Stack vertical hug stroke={[Color.Neutral, 100]} cornerRadius="medium">
+      <Stack vertical hug stroke={[Color.Neutral, 100]} cornerRadius="medium" loading={p.loading} overflowHidden>
         <Align left horizontal>
           <Stack hug="partly" horizontal>
             <Align left horizontal>
@@ -528,36 +617,15 @@ export const LayoutDialog = (p: DataTableProps) => {
 
               <Align right horizontal>
                 <Export>
-                  <CSVLink
-                    data={p.data}
-                    headers={nativeColumns.map(c => ({ label: c.key, key: c.key }))}
-                    filename="download.csv"
-                    enclosingCharacter=""
-                    separator=";"
-                    title="Export to CSV"
-                  >
-                    <Stack hug="partly" vertical fillHover={[Color.Primary, 100]} cornerRadius="medium" aspectRatio="1">
-                      <Align center>
-                        <Icon name="csv" medium fill={[Color.Primary, 700]} />
-                      </Align>
-                    </Stack>
-                  </CSVLink>
+                  <InputButtonIconTertiary
+                    size="large"
+                    iconName="csv"
+                    onClick={() => csv(p.data, p.columns as ColumnProps[])}
+                  />
 
-                  <a href="#" onClick={() => pdf()} title="Export to PDF">
-                    <Stack hug="partly" vertical fillHover={[Color.Primary, 100]} cornerRadius="medium" aspectRatio="1">
-                      <Align center>
-                        <Icon name="docs" medium fill={[Color.Primary, 700]} />
-                      </Align>
-                    </Stack>
-                  </a>
+                  <InputButtonIconTertiary size="large" iconName="docs" onClick={() => pdf(table, p.exportName)} />
 
-                  <a href="#" onClick={() => print()} title="Print table">
-                    <Stack hug="partly" vertical fillHover={[Color.Primary, 100]} cornerRadius="medium" aspectRatio="1">
-                      <Align center>
-                        <Icon name="print" medium fill={[Color.Primary, 700]} />
-                      </Align>
-                    </Stack>
-                  </a>
+                  <InputButtonIconTertiary size="large" iconName="print" onClick={() => print()} />
                 </Export>
               </Align>
             </Align>
@@ -565,7 +633,10 @@ export const LayoutDialog = (p: DataTableProps) => {
         </Align>
 
         <Align left vertical>
-          <div style={{ all: "inherit" }} ref={printReference}>
+          <div
+            style={{ display: "flex", flexDirection: "column", width: "inherit", height: "inherit" }}
+            ref={printReference}
+          >
             <Table
               table={table}
               columns={nativeColumns}
@@ -575,9 +646,7 @@ export const LayoutDialog = (p: DataTableProps) => {
               rowReordering={p.mode === "edit"}
               noData={{ text: "Nothing found" }}
               searchText={filter}
-              virtualScrolling={{
-                enabled: p.mode !== "edit" ? false : p.virtualScrolling,
-              }}
+              virtualScrolling={p.mode !== "edit" && p.virtualScrolling ? { enabled: true } : { enabled: false }}
               search={({ searchText: searchTextValue, rowData, column }) => {
                 if (column.dataType === DataType.Boolean) {
                   const b = rowData[column.key]
@@ -587,9 +656,13 @@ export const LayoutDialog = (p: DataTableProps) => {
                 }
               }}
               childComponents={{
-                // tableWrapper: {
-                //   elementAttributes: () => ({ style: { height: 200 } }),
-                // },
+                tableWrapper: {
+                  elementAttributes: () => {
+                    if (p.mode !== "edit" && p.virtualScrolling) {
+                      return { className: "override-ka-virtual", style: { height: "calc(100% - var(--BU) * 14)" } }
+                    }
+                  },
+                },
 
                 dataRow: {
                   elementAttributes: dataRowElementAttributes => {
