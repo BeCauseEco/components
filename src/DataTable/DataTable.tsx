@@ -325,7 +325,9 @@ export const DataTable = (p: DataTableProps) => {
       if (d.type === "SaveRowEditors" || d.type === "ReorderRows" || d.type === "InsertRow" || d.type === "DeleteRow") {
         const data = kaPropsUtils.getData(table.props)
 
-        setEditId(null)
+        if (d.type !== "ReorderRows") {
+          setEditId(null)
+        }
 
         if (p.onChange) {
           p.onChange(data)
@@ -546,9 +548,9 @@ export const DataTable = (p: DataTableProps) => {
             background: linear-gradient(to left, ${computeColor([Color.Quarternary, 50])}, transparent);
           }
 
-          .override-ka-editing-row,
-          .override-ka-editing-row ~ .override-ka-editing-row {
+          .override-ka-editing-row {
             outline: solid 1px ${computeColor([Color.Quarternary, 100])};
+            outline-offset: -1px;
           }
 
           .ka-no-data-row {
@@ -566,12 +568,14 @@ export const DataTable = (p: DataTableProps) => {
             left: unset;
           }
 
-          .ka-drag-over-row {
-            box-shadow: inset 0 4px 0px -2px ${computeColor([Color.Quarternary, 400])};
+          .ka-drag-over-row,
+          .ka-drag-over-row th,
+          .ka-drag-over-row td {
+            box-shadow: inset 0 1px 0 0 ${computeColor([Color.Quarternary, 700])};
           }
 
           .ka-dragged-row ~ .ka-drag-over-row {
-            box-shadow: inset 0 -4px 0px -2px ${computeColor([Color.Quarternary, 400])};
+            box-shadow: unset;
           }
         `}
       />
@@ -646,7 +650,12 @@ export const DataTable = (p: DataTableProps) => {
                 tableWrapper: {
                   elementAttributes: () => {
                     if (p.mode !== "edit" && p.virtualScrolling) {
-                      return { className: "override-ka-virtual", style: { height: "calc(100% - var(--BU) * 14)" } }
+                      return {
+                        className: "override-ka-virtual",
+                        style: {
+                          height: "calc(100% - var(--BU) * 14)",
+                        },
+                      }
                     }
                   },
                 },
@@ -811,20 +820,56 @@ export const DataTable = (p: DataTableProps) => {
 
                 cellEditor: {
                   content: cellEditorContent => {
-                    switch (cellEditorContent.column.dataType) {
-                      case DataType.Boolean:
-                        return <CellInputCheckbox {...cellEditorContent} />
-                      case DataType.Date:
-                        return <CellInputTextDate {...cellEditorContent} />
-                      case DataType.Number:
-                        return <CellInputTextSingle {...cellEditorContent} />
-                      case DataType.String:
-                        return <CellInputTextSingle {...cellEditorContent} />
-                    }
+                    const firstColumn = cellEditorContent.column.key === nativeColumns[0].key
 
-                    if (cellEditorContent.column.key === KEY_ACTIONS) {
-                      return <ActionSaveCancel {...cellEditorContent} />
-                    }
+                    return (
+                      <Stack hug horizontal>
+                        {p.mode === "edit" && firstColumn ? (
+                          <Align left horizontal hug>
+                            <div style={{ all: "inherit", cursor: "move" }}>
+                              <Icon name="drag_indicator" medium fill={[Color.Neutral, 700]} />
+
+                              <Spacer xsmall />
+                            </div>
+                          </Align>
+                        ) : (
+                          <></>
+                        )}
+
+                        {cellEditorContent.column.dataType === DataType.Boolean ? (
+                          <Align left horizontal>
+                            <CellInputCheckbox {...cellEditorContent} />
+                          </Align>
+                        ) : (
+                          <></>
+                        )}
+
+                        {cellEditorContent.column.dataType === DataType.Date ? (
+                          <Align left horizontal>
+                            <CellInputTextDate {...cellEditorContent} />
+                          </Align>
+                        ) : (
+                          <></>
+                        )}
+
+                        {cellEditorContent.column.dataType === DataType.Number ||
+                        cellEditorContent.column.dataType === DataType.String ? (
+                          <Align left horizontal>
+                            <CellInputTextSingle {...cellEditorContent} />
+                          </Align>
+                        ) : (
+                          <></>
+                        )}
+
+                        {cellEditorContent.column.key === KEY_ACTIONS ? (
+                          <Align left horizontal>
+                            <ActionSaveCancel {...cellEditorContent} />
+                          </Align>
+                        ) : (
+                          <></>
+                        )}
+                      </Stack>
+                    )
                   },
                 },
 
