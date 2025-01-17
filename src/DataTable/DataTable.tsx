@@ -267,7 +267,7 @@ export const DataTable = (p: DataTableProps) => {
       key: columnProps.key,
       title: columnProps.title,
       dataType: columnProps.dataType,
-      sortDirection: p.mode === "edit" ? "" : columnProps.sortDirection,
+      sortDirection: p.mode !== "edit" && columnProps.key === p.defaultSortColumn ? SortDirection.Ascend : undefined,
       style: {
         width: columnProps.width || "auto",
         "min-width": columnProps.minWidth || "0px",
