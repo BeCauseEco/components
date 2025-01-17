@@ -1,37 +1,27 @@
 import { Stack } from "@new/Stack/Stack"
 import { Align } from "@new/Stack/Align"
-import {
-  DataType,
-  InsertRowPosition,
-  ITableInstance,
-  SortDirection,
-  SortingMode,
-  Table,
-  useTable,
-  useTableInstance,
-} from "ka-table"
+import { DataType, InsertRowPosition, SortDirection, SortingMode, Table, useTable, useTableInstance } from "ka-table"
 import { ICellEditorProps, ICellTextProps } from "ka-table/props"
 import { closeRowEditors, deleteRow, openRowEditors, saveRowEditors } from "ka-table/actionCreators"
 import { InputButtonPrimary } from "@new/InputButton/InputButtonPrimary"
 import { Spacer } from "@new/Stack/Spacer"
 import { InputButtonTertiary } from "@new/InputButton/InputButtonTertiary"
 import { css, Global } from "@emotion/react"
-import { InputTextSingle } from "@new/InputText/InputTextSingle"
+import { InputTextSingle, InputTextSingleProps } from "@new/InputText/InputTextSingle"
 import { Color, computeColor } from "@new/Color"
-import { InputTextDate } from "@new/InputText/InputTextDate"
-import { InputCheckbox } from "@new/InputCheckbox/InputCheckbox"
+import { InputTextDate, InputTextDateProps } from "@new/InputText/InputTextDate"
+import { InputCheckbox, InputCheckboxProps } from "@new/InputCheckbox/InputCheckbox"
 import { StyleBodySmall, StyleFontFamily, Text } from "@new/Text/Text"
 import { Icon } from "@new/Icon/Icon"
 import styled from "@emotion/styled"
-import { useRef, useState } from "react"
-import "jspdf-autotable"
-import jsPDF from "jspdf"
+import { Children, ReactElement, useRef, useState } from "react"
 import { useReactToPrint } from "react-to-print"
-import { getValueByColumn } from "ka-table/Utils/DataUtils"
+
 import { InputButtonIconTertiary } from "@new/InputButton/InputButtonIconTertiary"
 import { Divider } from "@new/Divider/Divider"
 import { kaPropsUtils } from "ka-table/utils"
 import { Alert } from "@new/Alert/Alert"
+import { InputComboboxProps } from "@new/InputCombobox/InputCombobox"
 
 export { DataType, SortDirection } from "ka-table"
 
@@ -67,8 +57,8 @@ const formatValue = (value: string, dataType: DataType): string => {
   }
 }
 
-const csv = (data: DataTableProps["data"], columns: ColumnProps[]) => {
-  const dataSanitized: DataTableProps["data"] = []
+const csv = (data: DataTableProps["data"], columns: Columns[]) => {
+  const dataSanitized: DataTableProps["data"] = [columns.map(c => c.title)]
 
   data.forEach(row => {
     const rowSanitized: string[] = []
@@ -91,19 +81,6 @@ const csv = (data: DataTableProps["data"], columns: ColumnProps[]) => {
   if (window) {
     window.open("data:text/csv;charset=utf-8," + dataSanitized.map(ds => ds.join(";")).join("\n"))
   }
-}
-
-const pdf = (table: ITableInstance, exportName: string) => {
-  const document: any = new jsPDF("landscape")
-
-  document.autoTable({
-    headStyles: { fillColor: "white", textColor: "black" },
-    alternateRowStyles: { fillColor: "white" },
-    head: [table.props.columns.map(c => c.title)],
-    body: table.props.data!.map(d => table.props.columns.map(c => getValueByColumn(d, c))),
-  })
-
-  document.save(`${exportName}.pdf`)
 }
 
 const ActionEdit = ({ dispatch, rowKeyValue, disabled }: ICellTextProps & { disabled: boolean }) => {
@@ -212,7 +189,7 @@ const Export = styled.div({
   },
 })
 
-type NativeColumnProps = {
+type NativeColumns = {
   key: string
   title?: string
   dataType?: DataType
@@ -222,11 +199,11 @@ type NativeColumnProps = {
   }
 }
 
-type ColumnPropsInternal = {
+type ColumnsInternal = {
   key: string
 }
 
-export type ColumnProps = ColumnPropsInternal & {
+export type Columns = ColumnsInternal & {
   title: string
   dataType: DataType
   width?: `${number}${"px" | "%"}`
@@ -234,10 +211,16 @@ export type ColumnProps = ColumnPropsInternal & {
   sortDirection?: SortDirection
 }
 
+type Children =
+  | ReactElement<InputCheckboxProps>
+  | ReactElement<InputComboboxProps>
+  | ReactElement<InputTextSingleProps>
+  | ReactElement<InputTextDateProps>
+
 export type DataTableProps = {
   mode: "simple" | "filter" | "edit"
   data: any[]
-  columns: Array<ColumnProps | ColumnPropsInternal>
+  columns: Array<Columns | ColumnsInternal>
   defaultSortColumn: string
   rowKeyField: string
   exportName: string
@@ -247,6 +230,7 @@ export type DataTableProps = {
   loading?: boolean
   onChange?: (value: DataTableProps["data"]) => void
   onChangeRow?: (value: object) => void
+  children?: Children | Children[]
 }
 
 export const DataTable = (p: DataTableProps) => {
@@ -258,10 +242,10 @@ export const DataTable = (p: DataTableProps) => {
   )
   const [dataTemp, setDataTemp] = useState<DataTableProps["data"]>([])
 
-  let nativeColumns: NativeColumnProps[] = []
+  let nativeColumns: NativeColumns[] = []
 
   nativeColumns = p.columns.map(c => {
-    const columnProps = c as ColumnProps
+    const columnProps = c as Columns
 
     return {
       key: columnProps.key,
@@ -370,6 +354,8 @@ export const DataTable = (p: DataTableProps) => {
           @media print {
             .ka {
               zoom: 0.5 !important;
+              width: calc(100% - 8em) !important;
+              margin: 4em !important;
             }
 
             .ka * {
@@ -385,11 +371,6 @@ export const DataTable = (p: DataTableProps) => {
             .ka th {
               width: auto !important;
               min-width: auto !important;
-            }
-
-            .ka .override-ka-fixed-right {
-              display: none !important;
-              visibility: hidden !important;
             }
           }
 
@@ -513,16 +494,16 @@ export const DataTable = (p: DataTableProps) => {
             background: linear-gradient(to bottom, ${computeColor([Color.Neutral, 50])}, transparent);
           }
 
-          .override-ka-virtual .ka-thead-row:after {
-            content: "";
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            height: 8px;
-            width: 100%;
-            background: linear-gradient(to top, ${computeColor([Color.Neutral, 50])}, transparent);
-          }
+          // .override-ka-virtual .ka-thead-row:after {
+          //   content: "";
+          //   position: absolute;
+          //   bottom: 0;
+          //   left: 0;
+          //   right: 0;
+          //   height: 8px;
+          //   width: 100%;
+          //   background: linear-gradient(to top, ${computeColor([Color.Neutral, 50])}, transparent);
+          // }
 
           .ka-thead-row .override-ka-fixed-left:after {
             width: 20px;
@@ -613,17 +594,23 @@ export const DataTable = (p: DataTableProps) => {
                 <></>
               )}
 
-              <Spacer small />
+              {Children.toArray(p.children).map(child => (
+                <>
+                  <Spacer large />
+
+                  {child}
+                </>
+              ))}
+
+              <Spacer large />
 
               <Align right horizontal>
                 <Export>
                   <InputButtonIconTertiary
                     size="large"
                     iconName="csv"
-                    onClick={() => csv(p.data, p.columns as ColumnProps[])}
+                    onClick={() => csv(p.data, p.columns as Columns[])}
                   />
-
-                  <InputButtonIconTertiary size="large" iconName="docs" onClick={() => pdf(table, p.exportName)} />
 
                   <InputButtonIconTertiary size="large" iconName="print" onClick={() => print()} />
                 </Export>
@@ -876,7 +863,7 @@ export const DataTable = (p: DataTableProps) => {
                     disabled={editId !== null}
                     onClick={() => {
                       table.insertRow(createNewRow(p.data), {
-                        rowKeyValue: p.data[p.data.length - 1].key,
+                        rowKeyValue: p.data[p.data.length - 1]?.key || 0,
                         insertRowPosition: InsertRowPosition.after,
                       })
                     }}
