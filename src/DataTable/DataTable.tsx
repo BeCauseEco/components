@@ -1,6 +1,6 @@
 import { Stack } from "@new/Stack/Stack"
 import { Align } from "@new/Stack/Align"
-import { DataType, InsertRowPosition, SortDirection, SortingMode, Table, useTable, useTableInstance } from "ka-table"
+import { InsertRowPosition, SortDirection, SortingMode, Table, useTable, useTableInstance } from "ka-table"
 import { ICellEditorProps, ICellTextProps } from "ka-table/props"
 import { closeRowEditors, deleteRow, openRowEditors, saveRowEditors } from "ka-table/actionCreators"
 import { InputButtonPrimary } from "@new/InputButton/InputButtonPrimary"
@@ -22,8 +22,11 @@ import { Divider } from "@new/Divider/Divider"
 import { kaPropsUtils } from "ka-table/utils"
 import { Alert } from "@new/Alert/Alert"
 import { InputComboboxProps } from "@new/InputCombobox/InputCombobox"
+import { IntRange } from "type-fest"
+import { ProgressIndicator } from "@new/ProgressIndicator/ProgressIndicator"
+import { ProgressIndicatorItem } from "@new/ProgressIndicator/ProgressIndicatorItem"
 
-export { DataType, SortDirection } from "ka-table"
+export { SortDirection } from "ka-table"
 
 const KEY_DRAG = "DRAG"
 const KEY_ACTIONS = "ACTIONS"
@@ -57,19 +60,22 @@ const formatValue = (value: string, dataType: DataType): string => {
   }
 }
 
-const csv = (data: DataTableProps["data"], columns: Columns[]) => {
+const csv = (data: DataTableProps["data"], columns: Column[]) => {
   const dataSanitized: DataTableProps["data"] = [columns.map(c => c.title)]
 
   data.forEach(row => {
     const rowSanitized: string[] = []
 
-    columns.forEach(column => {
+    columns.forEach(c => {
+      const column = c as Column
       const value = (row[column.key] || "").toString()
 
       if (column.dataType === DataType.Boolean) {
         rowSanitized.push(value !== undefined ? (value ? "Yes" : "No") : "")
       } else if (column.dataType === DataType.String) {
         rowSanitized.push(value.lastIndexOf(";") !== -1 ? `"${value}"` : value)
+      } else if (column.dataType === DataType.ProgressIndicator) {
+        rowSanitized.push(row[column.key]?.["value"] || "")
       } else {
         rowSanitized.push(value)
       }
@@ -173,6 +179,22 @@ const CellInputCheckbox = ({ column, rowKeyValue, value }: ICellEditorProps) => 
   )
 }
 
+const CellProgressIndicator = ({ column, value }: ICellTextProps | ICellEditorProps) => {
+  const _value = value?.["value"] || 0
+  const _color = value?.["color"] || Color.Neutral
+  const _type = column["progressIndicator"]?.["type"] || "bar"
+
+  return (
+    <Stack hug horizontal>
+      <Align horizontal left={_type === "bar"} center={_type === "circle"}>
+        <ProgressIndicator type={_type} size={_type === "bar" ? "small" : "large"} color={Color.Neutral}>
+          <ProgressIndicatorItem width={`${_value}%`} color={_color} />
+        </ProgressIndicator>
+      </Align>
+    </Stack>
+  )
+}
+
 const CellHeadLink = styled.a({
   display: "flex",
   alignItems: "center",
@@ -189,26 +211,28 @@ const Export = styled.div({
   },
 })
 
-type NativeColumns = {
-  key: string
-  title?: string
-  dataType?: DataType
-  style?: {
-    width?: string
-    "min-width"?: string
-  }
+export enum DataType {
+  Internal = "internal",
+  Boolean = "boolean",
+  Date = "date",
+  Number = "number",
+  Object = "object",
+  String = "string",
+  ProgressIndicator = "progressindicator",
 }
 
-type ColumnsInternal = {
+export type Column = {
   key: string
-}
-
-export type Columns = ColumnsInternal & {
   title: string
   dataType: DataType
   width?: `${number}${"px" | "%"}`
   minWidth?: `calc(var(--BU) * ${number})`
   sortDirection?: SortDirection
+
+  progressIndicator?: {
+    value: IntRange<0, 100>
+    type: "bar" | "circle"
+  }
 }
 
 type Children =
@@ -220,7 +244,7 @@ type Children =
 export type DataTableProps = {
   mode: "simple" | "filter" | "edit"
   data: any[]
-  columns: Array<Columns | ColumnsInternal>
+  columns: Column[]
   defaultSortColumn: string
   rowKeyField: string
   exportName: string
@@ -242,15 +266,16 @@ export const DataTable = (p: DataTableProps) => {
   )
   const [dataTemp, setDataTemp] = useState<DataTableProps["data"]>([])
 
-  let nativeColumns: NativeColumns[] = []
+  let nativeColumns: Column[] = []
 
   nativeColumns = p.columns.map(c => {
-    const columnProps = c as Columns
+    const columnProps = c as Column
 
     return {
       key: columnProps.key,
       title: columnProps.title,
       dataType: columnProps.dataType,
+      progressIndicator: columnProps.progressIndicator,
       sortDirection: p.mode !== "edit" && columnProps.key === p.defaultSortColumn ? SortDirection.Ascend : undefined,
       style: {
         width: columnProps.width || "auto",
@@ -260,7 +285,14 @@ export const DataTable = (p: DataTableProps) => {
   })
 
   if (p.mode === "edit") {
-    nativeColumns = [...nativeColumns, { key: KEY_ACTIONS }]
+    nativeColumns = [
+      ...nativeColumns,
+      {
+        key: KEY_ACTIONS,
+        title: "",
+        dataType: DataType.Internal,
+      },
+    ]
   }
 
   const updateSelectField = (index: number, value: boolean) => {
@@ -310,6 +342,10 @@ export const DataTable = (p: DataTableProps) => {
       if (d.type === "OpenRowEditors") {
         setEditId(d.rowKeyValue)
         setDataTemp(p.data)
+      }
+
+      if (d.type === "ReorderRows") {
+        setDataTemp(kaPropsUtils.getData(table.props))
       }
 
       if (d.type === "CloseRowEditors") {
@@ -507,6 +543,10 @@ export const DataTable = (p: DataTableProps) => {
           //   background: linear-gradient(to top, ${computeColor([Color.Neutral, 50])}, transparent);
           // }
 
+          .override-ka-reorder .ka-row {
+            cursor: move;
+          }
+
           .ka-thead-row .override-ka-fixed-left:after {
             width: 20px;
             right: -20px;
@@ -613,7 +653,7 @@ export const DataTable = (p: DataTableProps) => {
                   <InputButtonIconTertiary
                     size="large"
                     iconName="csv"
-                    onClick={() => csv(p.data, p.columns as Columns[])}
+                    onClick={() => csv(p.data, p.columns as Column[])}
                   />
 
                   <InputButtonIconTertiary size="large" iconName="print" onClick={() => print()} />
@@ -630,7 +670,7 @@ export const DataTable = (p: DataTableProps) => {
           >
             <Table
               table={table}
-              columns={nativeColumns}
+              columns={nativeColumns as any}
               data={p.data}
               rowKeyField={p.rowKeyField}
               sortingMode={SortingMode.Single}
@@ -655,6 +695,12 @@ export const DataTable = (p: DataTableProps) => {
                         style: {
                           height: "calc(100% - var(--BU) * 14)",
                         },
+                      }
+                    }
+
+                    if (p.mode === "edit") {
+                      return {
+                        className: "override-ka-reorder",
                       }
                     }
                   },
@@ -689,6 +735,8 @@ export const DataTable = (p: DataTableProps) => {
                     const alignmentRight = headCellContent.column.dataType === DataType.Number
                     const firstColumn = headCellContent.column.key === nativeColumns[0].key
 
+                    const headCellContentAsColumn = headCellContent.column as Column
+
                     return (
                       <Stack hug horizontal>
                         {(p.mode === "simple" || p.mode === "filter") && p.selectKeyField && firstColumn ? (
@@ -715,7 +763,7 @@ export const DataTable = (p: DataTableProps) => {
                         )}
 
                         <Align horizontal left={!alignmentRight} right={alignmentRight}>
-                          {p.mode === "edit" ? (
+                          {p.mode === "edit" || headCellContentAsColumn.dataType === DataType.ProgressIndicator ? (
                             <Text fill={[Color.Neutral, 700]} xsmall>
                               <b>{headCellContent.column.title}</b>
                             </Text>
@@ -771,15 +819,28 @@ export const DataTable = (p: DataTableProps) => {
                       const alignmentRight = cellTextContent.column.dataType === DataType.Number
                       const firstColumn = cellTextContent.column.key === nativeColumns[0].key
 
+                      let output = <></>
+
+                      if ((cellTextContent.column as Column).dataType === DataType.ProgressIndicator) {
+                        output = <CellProgressIndicator {...cellTextContent} />
+                      } else {
+                        output = (
+                          <Text fill={[Color.Neutral, 700]} small monospace={monospace}>
+                            {formatValue(
+                              cellTextContent.value?.toString(),
+                              cellTextContent.column.dataType || DataType.String,
+                            )}
+                          </Text>
+                        )
+                      }
+
                       return (
                         <Stack hug horizontal>
                           {p.mode === "edit" && firstColumn ? (
                             <Align left horizontal hug>
-                              <div style={{ all: "inherit", cursor: "move" }}>
-                                <Icon name="drag_indicator" medium fill={[Color.Neutral, 700]} />
+                              <Icon name="drag_indicator" medium fill={[Color.Neutral, 700]} />
 
-                                <Spacer xsmall />
-                              </div>
+                              <Spacer xsmall />
                             </Align>
                           ) : (
                             <></>
@@ -805,12 +866,7 @@ export const DataTable = (p: DataTableProps) => {
                           )}
 
                           <Align left={!alignmentRight} right={alignmentRight} horizontal>
-                            <Text fill={[Color.Neutral, 700]} small monospace={monospace}>
-                              {formatValue(
-                                cellTextContent.value?.toString(),
-                                cellTextContent.column.dataType || DataType.String,
-                              )}
-                            </Text>
+                            {output}
                           </Align>
                         </Stack>
                       )
@@ -826,11 +882,17 @@ export const DataTable = (p: DataTableProps) => {
                       <Stack hug horizontal>
                         {p.mode === "edit" && firstColumn ? (
                           <Align left horizontal hug>
-                            <div style={{ all: "inherit", cursor: "move" }}>
-                              <Icon name="drag_indicator" medium fill={[Color.Neutral, 700]} />
+                            <Icon name="drag_indicator" medium fill={[Color.Neutral, 700]} />
 
-                              <Spacer xsmall />
-                            </div>
+                            <Spacer xsmall />
+                          </Align>
+                        ) : (
+                          <></>
+                        )}
+
+                        {(cellEditorContent.column as Column).dataType === DataType.ProgressIndicator ? (
+                          <Align left horizontal>
+                            <CellProgressIndicator {...cellEditorContent} />
                           </Align>
                         ) : (
                           <></>
