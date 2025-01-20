@@ -22,7 +22,6 @@ import { Divider } from "@new/Divider/Divider"
 import { kaPropsUtils } from "ka-table/utils"
 import { Alert } from "@new/Alert/Alert"
 import { InputComboboxProps } from "@new/InputCombobox/InputCombobox"
-import { IntRange } from "type-fest"
 import { ProgressIndicator } from "@new/ProgressIndicator/ProgressIndicator"
 import { ProgressIndicatorItem } from "@new/ProgressIndicator/ProgressIndicatorItem"
 
@@ -179,17 +178,25 @@ const CellInputCheckbox = ({ column, rowKeyValue, value }: ICellEditorProps) => 
   )
 }
 
-const CellProgressIndicator = ({ column, value }: ICellTextProps | ICellEditorProps) => {
-  const _value = value?.["value"] || 0
-  const _color = value?.["color"] || Color.Neutral
-  const _type = column["progressIndicator"]?.["type"] || "bar"
+const CellProgressIndicator = (cellTextProps: ICellTextProps | ICellEditorProps) => {
+  const progressIndicator = cellTextProps.column["progressIndicator"] as Column["progressIndicator"]
+  const type = progressIndicator?.type || "bar"
+  const { value, color } = progressIndicator?.calculate(cellTextProps.rowData) || { value: 0, color: Color.Neutral }
 
   return (
     <Stack hug horizontal>
-      <Align horizontal left={_type === "bar"} center={_type === "circle"}>
-        <ProgressIndicator type={_type} size={_type === "bar" ? "small" : "large"} color={Color.Neutral}>
-          <ProgressIndicatorItem width={`${_value}%`} color={_color} />
+      <Align horizontal left={type === "bar"} center={type === "circle"}>
+        <ProgressIndicator type={type} size="large" color={Color.Neutral}>
+          <ProgressIndicatorItem width={`${value}%`} color={color} />
         </ProgressIndicator>
+
+        {/* <Spacer xsmall />
+
+        <div style={{ all: "inherit", width: "calc(var(--BU) * 8)", justifyContent: "flex-end" }}>
+          <Text fill={[Color.Neutral, 700]} tiny monospace>
+            {value}%
+          </Text>
+        </div> */}
       </Align>
     </Stack>
   )
@@ -227,11 +234,14 @@ export type Column = {
   dataType: DataType
   width?: `${number}${"px" | "%"}`
   minWidth?: `calc(var(--BU) * ${number})`
-  sortDirection?: SortDirection
 
   progressIndicator?: {
-    value: IntRange<0, 100>
     type: "bar" | "circle"
+
+    calculate: (rowData: ICellTextProps["rowData"]) => {
+      value: number
+      color: Color
+    }
   }
 }
 
@@ -269,17 +279,17 @@ export const DataTable = (p: DataTableProps) => {
   let nativeColumns: Column[] = []
 
   nativeColumns = p.columns.map(c => {
-    const columnProps = c as Column
+    const column = c as Column
 
     return {
-      key: columnProps.key,
-      title: columnProps.title,
-      dataType: columnProps.dataType,
-      progressIndicator: columnProps.progressIndicator,
-      sortDirection: p.mode !== "edit" && columnProps.key === p.defaultSortColumn ? SortDirection.Ascend : undefined,
+      key: column.key,
+      title: column.title,
+      dataType: column.dataType,
+      progressIndicator: column.progressIndicator,
+      sortDirection: p.mode !== "edit" && column.key === p.defaultSortColumn ? SortDirection.Ascend : undefined,
       style: {
-        width: columnProps.width || "auto",
-        "min-width": columnProps.minWidth || "0px",
+        width: column.width || "auto",
+        "min-width": column.minWidth || "0px",
       },
     }
   })
@@ -389,29 +399,6 @@ export const DataTable = (p: DataTableProps) => {
     <>
       <Global
         styles={css`
-          @media print {
-            .ka {
-              zoom: 0.5 !important;
-              width: calc(100% - 8em) !important;
-              margin: 4em !important;
-            }
-
-            .ka * {
-              overflow: visible !important;
-              position: static !important;
-            }
-
-            .ka p {
-              white-space: normal !important;
-            }
-
-            .ka td,
-            .ka th {
-              width: auto !important;
-              min-width: auto !important;
-            }
-          }
-
           .ka {
             background-color: white;
             font-size: unset;
@@ -532,17 +519,6 @@ export const DataTable = (p: DataTableProps) => {
             background: linear-gradient(to bottom, ${computeColor([Color.Neutral, 50])}, transparent);
           }
 
-          // .override-ka-virtual .ka-thead-row:after {
-          //   content: "";
-          //   position: absolute;
-          //   bottom: 0;
-          //   left: 0;
-          //   right: 0;
-          //   height: 8px;
-          //   width: 100%;
-          //   background: linear-gradient(to top, ${computeColor([Color.Neutral, 50])}, transparent);
-          // }
-
           .override-ka-reorder .ka-row {
             cursor: move;
           }
@@ -617,10 +593,33 @@ export const DataTable = (p: DataTableProps) => {
           .ka-dragged-row ~ .ka-drag-over-row {
             box-shadow: unset;
           }
+
+          @media print {
+            .ka {
+              zoom: 0.5 !important;
+              width: calc(100% - 8em) !important;
+              margin: 4em !important;
+            }
+
+            .ka * {
+              overflow: visible !important;
+              position: static !important;
+            }
+
+            .ka p {
+              white-space: normal !important;
+            }
+
+            .ka td,
+            .ka th {
+              width: auto !important;
+              min-width: auto !important;
+            }
+          }
         `}
       />
 
-      <Stack vertical hug stroke={[Color.Neutral, 100]} cornerRadius="medium" loading={p.loading} overflowHidden>
+      <Stack vertical hug stroke={[Color.Neutral, 100]} cornerRadius="large" loading={p.loading} overflowHidden>
         <Align left horizontal>
           <Stack hug="partly" horizontal>
             <Align left horizontal>
@@ -640,7 +639,7 @@ export const DataTable = (p: DataTableProps) => {
 
               {Children.toArray(p.children).map(child => (
                 <>
-                  <Spacer large />
+                  <Spacer medium />
 
                   {child}
                 </>
@@ -651,17 +650,19 @@ export const DataTable = (p: DataTableProps) => {
               <Align right horizontal>
                 <Export>
                   <InputButtonIconTertiary
-                    size="large"
+                    size="small"
                     iconName="csv"
                     onClick={() => csv(p.data, p.columns as Column[])}
                   />
 
-                  <InputButtonIconTertiary size="large" iconName="print" onClick={() => print()} />
+                  <InputButtonIconTertiary size="small" iconName="print" onClick={() => print()} />
                 </Export>
               </Align>
             </Align>
           </Stack>
         </Align>
+
+        {p.mode === "filter" ? <Spacer small /> : <></>}
 
         <Align left vertical>
           <div
