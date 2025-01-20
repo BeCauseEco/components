@@ -205,7 +205,7 @@ const Children = (p: Omit<InputButtonProps, "width">) => {
 }
 
 export const InputButton = forwardRef<HTMLButtonElement | HTMLAnchorElement, InputButtonProps>((p, ref) => {
-  const { id, variant, onClick, href, width, ...pp } = p
+  const { id, variant, onClick, href, width, disabled, ...pp } = p
   const router = useRouter()
 
   const click = href
@@ -221,7 +221,7 @@ export const InputButton = forwardRef<HTMLButtonElement | HTMLAnchorElement, Inp
       id={id}
       as={variant === "link" ? "span" : "div"} // TO-DO: @cllpse: should render a button, but React is retarded
       variant={variant}
-      onClick={click}
+      onClick={disabled ? () => {} : click}
       _width={width}
       _height={computeHeight(p)}
       data-playwright-testid={p["data-playwright-testid"]}

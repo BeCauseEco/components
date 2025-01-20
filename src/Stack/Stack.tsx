@@ -93,7 +93,6 @@ const Container = styled.div<ContainerProps>(p => ({
   aspectRatio: p.aspectRatio || "auto",
   content: `'${p.aspectRatio}'`,
   boxShadow: computeShadow(p.dropShadow),
-  outlineOffset: -1,
 
   ...(p.stroke && {
     outline: `solid 1px ${computeColor(p.stroke || [Color.Transparent])}`,
@@ -119,6 +118,7 @@ const Children = styled.div<Pick<StackProps, "loading" | "disabled" | "hug"> & {
     padding: p.hug ? (p.hug === "partly" ? "calc(var(--BU) * 2)" : 0) : "calc(var(--BU) * 4)",
     transition: "opacity 0.2s ease-in-out",
     willChange: "opacity",
+    overflow: "inherit",
 
     ...(p.loading
       ? {

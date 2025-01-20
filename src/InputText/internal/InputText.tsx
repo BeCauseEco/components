@@ -108,13 +108,18 @@ const Output = styled.output<Pick<InputTextProps, "color" | "size" | "rows"> & {
     color: computeColor([p.color, 300]),
   },
 
-  "&::-webkit-calendar-picker-indicator": {
+  "::-webkit-calendar-picker-indicator": {
     position: "absolute",
+    opacity: 0,
     top: 0,
     left: 0,
-    width: 0,
-    height: 0,
-    opacity: 0,
+    right: 0,
+    bottom: 0,
+    width: "100%",
+    height: "100%",
+    margin: 0,
+    padding: 0,
+    cursor: "pointer",
   },
 }))
 
@@ -242,27 +247,6 @@ export const InputText = forwardRef<HTMLInputElement | HTMLTextAreaElement, Inpu
     )
   }
 
-  if (p.type === "date") {
-    iconEnd = (
-      <Align horizontal center hug="width">
-        {/* TODO: @cllpse: this is a bit of a hack. Will fix at a later point. */}
-        <div style={{ display: "flex", width: "fit-content", height: "fit-content", cursor: "pointer" }}>
-          <Icon
-            name="calendar_month"
-            medium={p.size === "small"}
-            large={p.size === "large"}
-            fill={[p.error ? Color.Error : p.color, 700]}
-            onClick={event => {
-              event?.target?.parentElement?.parentElement?.parentElement?.querySelectorAll("input")?.[0]?.showPicker()
-            }}
-          />
-        </div>
-
-        <Spacer xsmall={p.size === "small"} small={p.size === "large"} />
-      </Align>
-    )
-  }
-
   if (p.error) {
     errorEitherSide = (
       <Align vertical left hug="width">
@@ -329,6 +313,7 @@ export const InputText = forwardRef<HTMLInputElement | HTMLTextAreaElement, Inpu
               width={p.width}
               min={p.type === "date" ? p.dateMin : undefined}
               max={p.type === "date" ? p.dateMax : undefined}
+              autoComplete="one-time-code"
               onChange={event => {
                 if (p.onChange) {
                   p.onChange(event?.target?.["value"])
