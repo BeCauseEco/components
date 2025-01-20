@@ -189,14 +189,6 @@ const CellProgressIndicator = (cellTextProps: ICellTextProps | ICellEditorProps)
         <ProgressIndicator type={type} size="large" color={Color.Neutral}>
           <ProgressIndicatorItem width={`${value}%`} color={color} />
         </ProgressIndicator>
-
-        {/* <Spacer xsmall />
-
-        <div style={{ all: "inherit", width: "calc(var(--BU) * 8)", justifyContent: "flex-end" }}>
-          <Text fill={[Color.Neutral, 700]} tiny monospace>
-            {value}%
-          </Text>
-        </div> */}
       </Align>
     </Stack>
   )

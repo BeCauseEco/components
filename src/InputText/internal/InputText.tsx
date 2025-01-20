@@ -342,26 +342,6 @@ export const InputText = forwardRef<HTMLInputElement | HTMLTextAreaElement, Inpu
             <></>
           )}
 
-          {/* {p.rows === 1 && p.type === "date" ? (
-            <Align horizontal center hug="width">
-              <div style={{ all: "inherit", cursor: "pointer !important" }}>
-                <Icon
-                  name="calendar_month"
-                  medium={p.size === "small"}
-                  large={p.size === "large"}
-                  fill={[p.error ? Color.Error : p.color, 700]}
-                  onClick={event => {
-                    event?.target?.parentElement?.parentElement?.parentElement
-                      ?.querySelectorAll("input")?.[0]
-                      ?.showPicker()
-                  }}
-                />
-              </div>
-            </Align>
-          ) : (
-            <></>
-          )} */}
-
           {p.iconNameRight ? (
             <>
               <Align vertical center hug="width">
