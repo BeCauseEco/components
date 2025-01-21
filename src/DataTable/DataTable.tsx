@@ -62,7 +62,6 @@ const formatValue = (value: string, dataType: DataType): string => {
 }
 
 const csv = <T extends DataModel>(data: T[], columns: Column<T>[]) => {
-  // const dataSanitized: T[] = [columns.map(c => c.title)] // what?
   const dataSanitized: string[][] = [columns.map(c => c.title)] // like this?
 
   data.forEach(row => {
@@ -184,9 +183,12 @@ const CellInputCheckbox = ({ column, rowKeyValue, value }: ICellEditorProps) => 
 }
 
 const CellProgressIndicator = (cellTextProps: ICellTextProps | ICellEditorProps) => {
-  const progressIndicator = cellTextProps.column["progressIndicator"] as Column<unknown>["progressIndicator"]
-  const type = progressIndicator?.type || "bar"
-  const { value, color } = progressIndicator?.calculate(cellTextProps.rowData) || { value: 0, color: Color.Neutral }
+  const columnProgressIndicator = cellTextProps.column["progressIndicator"] as ColumnProgressIndicator<DataModel>
+  const type = columnProgressIndicator.progressIndicator?.type || "bar"
+  const { value, color } = columnProgressIndicator.progressIndicator?.calculate(cellTextProps.rowData) || {
+    value: 0,
+    color: Color.Neutral,
+  }
 
   return (
     <Stack hug horizontal>
@@ -222,25 +224,35 @@ export enum DataType {
   Number = "number",
   Object = "object",
   String = "string",
-  ProgressIndicator = "progressindicator",
 }
 
-export type Column<T> = {
+type ColumnBasic<T> = {
   key: Extract<keyof T, string>
   title: string
   dataType: DataType
+  width?: `${number}${"px" | "%"}`
+  minWidth?: `calc(var(--BU) * ${number})`
+}
+
+type ColumnProgressIndicator<T> = {
+  key: null
+  title: string
   width?: `${number}${"px" | "%"}`
   minWidth?: `calc(var(--BU) * ${number})`
 
   progressIndicator?: {
     type: "bar" | "circle"
 
-    calculate: (rowData: ICellTextProps["rowData"]) => {
+    calculate: <B extends T>(
+      rowData: B,
+    ) => {
       value: number
       color: Color
     }
   }
 }
+
+export type Column<T> = ColumnBasic<T> | ColumnProgressIndicator<T>
 
 type Children =
   | ReactElement<InputCheckboxProps>
@@ -286,7 +298,7 @@ export const DataTable = <T extends DataModel>(p: DataTableProps<T>) => {
     return {
       key: column.key,
       title: column.title,
-      dataType: column.dataType as any,
+      dataType: column.dataType && (column.dataType as any),
       progressIndicator: column.progressIndicator,
       sortDirection: p.mode !== "edit" && column.key === p.defaultSortColumn ? SortDirection.Ascend : undefined,
       style: {
