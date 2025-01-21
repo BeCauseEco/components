@@ -806,8 +806,7 @@ export const DataTable = (p: DataTableProps) => {
                     } else {
                       const monospace =
                         cellTextContent.column.dataType === DataType.Date ||
-                        cellTextContent.column.dataType === DataType.Number ||
-                        cellTextContent.column.dataType === DataType.Boolean
+                        cellTextContent.column.dataType === DataType.Number
 
                       const alignmentRight = cellTextContent.column.dataType === DataType.Number
                       const firstColumn = cellTextContent.column.key === nativeColumns[0].key

@@ -74,6 +74,7 @@ const Container = styled.div<Pick<ProgressIndicatorProps, "type" | "size" | "col
           top: "calc(var(--BU) * 2)",
           clipPath: "inset(0 0 0 0 round var(--BU))",
           opacity: 0.05,
+
           background: `repeating-linear-gradient(
             -45deg,
             transparent,
