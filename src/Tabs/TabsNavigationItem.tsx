@@ -22,12 +22,18 @@ const Trigger = styled(Tabs.Trigger)({
   "&[data-state='active']": {
     boxShadow: "inset 0 -1px 0 0 currentColor, 0 1px 0 0 currentColor",
   },
+
+  "&[disabled]": {
+    cursor: "not-allowed",
+    color: "gray",
+  },
 })
 
 export type TTabsNavigationItem = PlaywrightProps & {
   contentTargetId: string
   children: ReactElement<IconProps | TextProps | SpacerProps> | ReactElement<IconProps | TextProps | SpacerProps>[]
   onClick?: () => void
+  disabled?: boolean
 }
 
 export const TabsNavigationItem = forwardRef<
