@@ -110,7 +110,7 @@ export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<InputC
 
     return output
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [React.Children.count(p.children)])
+  }, [p.children])
 
   useEffect(() => {
     const newItems = Object.values(items).map(item => item.value)
