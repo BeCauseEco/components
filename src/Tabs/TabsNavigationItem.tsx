@@ -5,6 +5,7 @@ import styled from "@emotion/styled"
 import * as Tabs from "@radix-ui/react-tabs"
 import { PropsWithChildren, ReactElement, RefAttributes, forwardRef } from "react"
 import { PlaywrightProps } from "@new/Playwright"
+import { Color, computeColor } from "@new/Color"
 
 const Trigger = styled(Tabs.Trigger)({
   display: "flex",
@@ -25,7 +26,7 @@ const Trigger = styled(Tabs.Trigger)({
 
   "&[disabled]": {
     cursor: "not-allowed",
-    color: "gray",
+    color: computeColor([Color.Neutral, 200]),
   },
 })
 
