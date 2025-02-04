@@ -13,6 +13,8 @@ export const StyleMonospace = {
 
 export const StyleFontFamily = {
   fontFamily: `"Inter", sans-serif`,
+  fontStyle: "normal",
+  fontWeight: 400,
 }
 
 export const StyleBodyTiny = {
@@ -56,8 +58,6 @@ const Container = styled.p<Omit<TextProps, "fill"> & { _fill: TextProps["fill"] 
   ...(p.monospace ? StyleMonospace : StyleFontFamily),
 
   color: computeColor(p._fill),
-  fontStyle: "normal",
-  fontWeight: 400,
   textDecoration: "inherit",
   textTransform: "inherit",
   textWrap: !p.maxWidth && p.wrap ? "pretty" : "nowrap",
