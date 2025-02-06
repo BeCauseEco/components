@@ -39,6 +39,7 @@ export type InputButtonProps = ComponentBaseProps &
 
     href?: LinkProps["href"]
     onClick?: () => void
+    preventDefault?: boolean
 
     destructive?: boolean
 
@@ -180,7 +181,18 @@ const Children = (p: Omit<InputButtonProps, "width">) => {
     if (p.href) {
       return <NextLink href={p.href}>{label}</NextLink>
     } else {
-      return <a onClick={p.onClick}>{label}</a>
+      return (
+        <a
+          onMouseDown={event => {
+            if (p.preventDefault) {
+              event.preventDefault()
+            }
+          }}
+          onClick={p.onClick}
+        >
+          {label}
+        </a>
+      )
     }
   } else {
     return (
@@ -221,6 +233,15 @@ export const InputButton = forwardRef<HTMLButtonElement | HTMLAnchorElement, Inp
       id={id}
       as={variant === "link" ? "span" : "div"} // TO-DO: @cllpse: should render a button, but React is retarded
       variant={variant}
+      onMouseDown={event => {
+        if (p.preventDefault && !disabled) {
+          event.preventDefault()
+
+          if (click) {
+            click()
+          }
+        }
+      }}
       onClick={disabled ? () => {} : click}
       _width={width}
       _height={computeHeight(p)}
