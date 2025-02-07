@@ -4,7 +4,7 @@ import { Color } from "@new/Color"
 
 export type InputButtonLinkProps = Pick<
   InputButtonProps,
-  "id" | "size" | "hug" | "loading" | "disabled" | "onClick" | "href" | "data-playwright-testid"
+  "id" | "size" | "hug" | "loading" | "disabled" | "onClick" | "preventDefault" | "href" | "data-playwright-testid"
 > & {
   label: string
   iconNameLeft?: string
@@ -39,6 +39,7 @@ export const InputButtonLink = forwardRef<HTMLAnchorElement, InputButtonLinkProp
       iconName={iconName}
       iconPlacement={iconPlacement}
       onClick={p.onClick}
+      preventDefault={p.preventDefault}
       href={p.href}
       data-playwright-testid={p["data-playwright-testid"]}
     />

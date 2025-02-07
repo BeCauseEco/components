@@ -11,6 +11,7 @@ export type InputButtonPrimaryProps = Pick<
   | "loading"
   | "disabled"
   | "onClick"
+  | "preventDefault"
   | "href"
   | "destructive"
   | "data-playwright-testid"
@@ -52,6 +53,7 @@ export const InputButtonPrimary = forwardRef<HTMLButtonElement, InputButtonPrima
       iconName={iconName}
       iconPlacement={iconPlacement}
       onClick={p.onClick}
+      preventDefault={p.preventDefault}
       href={p.href}
       data-playwright-testid={p["data-playwright-testid"]}
     />
