@@ -5,6 +5,7 @@ import styled from "@emotion/styled"
 import * as Tabs from "@radix-ui/react-tabs"
 import { PropsWithChildren, ReactElement, RefAttributes, forwardRef } from "react"
 import { PlaywrightProps } from "@new/Playwright"
+import { Color, computeColor } from "@new/Color"
 
 const Trigger = styled(Tabs.Trigger)({
   display: "flex",
@@ -22,12 +23,18 @@ const Trigger = styled(Tabs.Trigger)({
   "&[data-state='active']": {
     boxShadow: "inset 0 -1px 0 0 currentColor, 0 1px 0 0 currentColor",
   },
+
+  "&[disabled]": {
+    cursor: "not-allowed",
+    color: computeColor([Color.Neutral, 200]),
+  },
 })
 
 export type TTabsNavigationItem = PlaywrightProps & {
   contentTargetId: string
   children: ReactElement<IconProps | TextProps | SpacerProps> | ReactElement<IconProps | TextProps | SpacerProps>[]
   onClick?: () => void
+  disabled?: boolean
 }
 
 export const TabsNavigationItem = forwardRef<

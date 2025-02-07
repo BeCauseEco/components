@@ -1,6 +1,6 @@
 import { Stack } from "@new/Stack/Stack"
 import { Align } from "@new/Stack/Align"
-import { InsertRowPosition, SortDirection, ITableProps, SortingMode, Table, useTable, useTableInstance } from "ka-table"
+import { InsertRowPosition, SortDirection, SortingMode, Table, useTable, useTableInstance } from "ka-table"
 import { ICellEditorProps, ICellTextProps } from "ka-table/props"
 import { closeRowEditors, deleteRow, openRowEditors, saveRowEditors } from "ka-table/actionCreators"
 import { InputButtonPrimary } from "@new/InputButton/InputButtonPrimary"
@@ -8,7 +8,7 @@ import { Spacer } from "@new/Stack/Spacer"
 import { InputButtonTertiary } from "@new/InputButton/InputButtonTertiary"
 import { css, Global } from "@emotion/react"
 import { InputTextSingle, InputTextSingleProps } from "@new/InputText/InputTextSingle"
-import { Color, computeColor } from "@new/Color"
+import { Color, ColorWithLightness, computeColor, Lightness } from "@new/Color"
 import { InputTextDate, InputTextDateProps } from "@new/InputText/InputTextDate"
 import { InputCheckbox, InputCheckboxProps } from "@new/InputCheckbox/InputCheckbox"
 import { StyleBodySmall, StyleFontFamily, Text } from "@new/Text/Text"
@@ -16,7 +16,6 @@ import { Icon } from "@new/Icon/Icon"
 import styled from "@emotion/styled"
 import { Children, ReactElement, useRef, useState } from "react"
 import { useReactToPrint } from "react-to-print"
-
 import { InputButtonIconTertiary } from "@new/InputButton/InputButtonIconTertiary"
 import { Divider } from "@new/Divider/Divider"
 import { kaPropsUtils } from "ka-table/utils"
@@ -27,13 +26,11 @@ import { ProgressIndicatorItem } from "@new/ProgressIndicator/ProgressIndicatorI
 
 export { SortDirection } from "ka-table"
 
-type ColumnInternal<T> = ITableProps<T>["columns"][number]
-
 const KEY_DRAG = "DRAG"
 const KEY_ACTIONS = "ACTIONS"
 
-const createNewRow = <T extends DataModel>(data: T[]): object => {
-  return { id: Math.max(...data.map(d => d.id)) + 1 } // should T have an id: number property?
+const createNewRow = (data: DataTableProps["data"]): object => {
+  return { id: Math.max(...data.map(d => d.id)) + 1 }
 }
 
 const formatValue = (value: string, dataType: DataType): string => {
@@ -61,29 +58,27 @@ const formatValue = (value: string, dataType: DataType): string => {
   }
 }
 
-const csv = <T extends DataModel>(data: T[], columns: Column<T>[]) => {
-  const dataSanitized: string[][] = [columns.map(c => c.title)] // like this?
+const csv = (data: DataTableProps["data"], columns: Column[]) => {
+  const dataSanitized: DataTableProps["data"] = [columns.map(c => c.title)]
 
   data.forEach(row => {
     const rowSanitized: string[] = []
 
-    columns.forEach(column => {
-      // const value = (row[column.key] || "").toString() // column.key can be "DRAG" or "ACTIONS" which are invalid here
-      const value = (row[column.key as keyof T] || "").toString() // not correct, should be narrowed instead probably...
+    columns.forEach(c => {
+      const column = c as Column
+      const value = (row[column.key] || "").toString()
 
       if (column.dataType === DataType.Boolean) {
         rowSanitized.push(value !== undefined ? (value ? "Yes" : "No") : "")
       } else if (column.dataType === DataType.String) {
         rowSanitized.push(value.lastIndexOf(";") !== -1 ? `"${value}"` : value)
       } else if (column.dataType === DataType.ProgressIndicator) {
-        // rowSanitized.push(row[column.key]?.["value"] || "")
-        rowSanitized.push(row[column.key as keyof T]?.["value"] || "") // not correct, should be narrowed instead probably...
+        rowSanitized.push(row[column.key]?.["value"] || "")
       } else {
         rowSanitized.push(value)
       }
     })
 
-    // dataSanitized.push(rowSanitized)
     dataSanitized.push(rowSanitized)
   })
 
@@ -183,12 +178,9 @@ const CellInputCheckbox = ({ column, rowKeyValue, value }: ICellEditorProps) => 
 }
 
 const CellProgressIndicator = (cellTextProps: ICellTextProps | ICellEditorProps) => {
-  const columnProgressIndicator = cellTextProps.column["progressIndicator"] as ColumnProgressIndicator<DataModel>
-  const type = columnProgressIndicator.progressIndicator?.type || "bar"
-  const { value, color } = columnProgressIndicator.progressIndicator?.calculate(cellTextProps.rowData) || {
-    value: 0,
-    color: Color.Neutral,
-  }
+  const progressIndicator = cellTextProps.column["progressIndicator"] as Column["progressIndicator"]
+  const type = progressIndicator?.type || "bar"
+  const { value, color } = progressIndicator?.calculate(cellTextProps.rowData) || { value: 0, color: Color.Neutral }
 
   return (
     <Stack hug horizontal>
@@ -224,35 +216,25 @@ export enum DataType {
   Number = "number",
   Object = "object",
   String = "string",
+  ProgressIndicator = "progressindicator",
 }
 
-type ColumnBasic<T> = {
-  key: Extract<keyof T, string>
+export type Column = {
+  key: string
   title: string
   dataType: DataType
-  width?: `${number}${"px" | "%"}`
-  minWidth?: `calc(var(--BU) * ${number})`
-}
-
-type ColumnProgressIndicator<T> = {
-  key: null
-  title: string
   width?: `${number}${"px" | "%"}`
   minWidth?: `calc(var(--BU) * ${number})`
 
   progressIndicator?: {
     type: "bar" | "circle"
 
-    calculate: <B extends T>(
-      rowData: B,
-    ) => {
+    calculate: (rowData: ICellTextProps["rowData"]) => {
       value: number
       color: Color
     }
   }
 }
-
-export type Column<T> = ColumnBasic<T> | ColumnProgressIndicator<T>
 
 type Children =
   | ReactElement<InputCheckboxProps>
@@ -260,45 +242,43 @@ type Children =
   | ReactElement<InputTextSingleProps>
   | ReactElement<InputTextDateProps>
 
-type DataModel = {
-  id: number
-  key: string
-}
-
-type PropertyKeysOfType<T, P> = { [K in keyof T]: T[K] extends P ? K : never }[keyof T]
-
-export type DataTableProps<T extends DataModel> = {
+export type DataTableProps = {
   mode: "simple" | "filter" | "edit"
-  data: T[]
-  columns: Column<T>[]
-  defaultSortColumn: Extract<keyof T, string>
-  rowKeyField: Extract<keyof T, string>
+  data: any[]
+  columns: Column[]
+  defaultSortColumn: string
+  rowKeyField: string
   exportName: string
-  fixedKeyField?: Extract<keyof T, string>
-  selectKeyField?: PropertyKeysOfType<T, boolean>
+  fixedKeyField?: string
+  selectKeyField?: string
   virtualScrolling?: boolean
   loading?: boolean
-  onChange?: (value: T[]) => void
-  onChangeRow?: (value: T) => void
+  exportDisable?: boolean
+  onChange?: (value: DataTableProps["data"]) => void
+  onChangeRow?: (value: object) => void
+  fill?: ColorWithLightness
+  stroke?: ColorWithLightness
   children?: Children | Children[]
 }
 
-export const DataTable = <T extends DataModel>(p: DataTableProps<T>) => {
+export const DataTable = (p: DataTableProps) => {
   const [filter, setFilter] = useState("")
   const [editId, setEditId] = useState<number | null>(null)
   const [deleteId, setDeleteId] = useState<number | null>(null)
   const [selectedFields, setSelectedFields] = useState<number>(
     p.data.filter(d => p.selectKeyField && d[p.selectKeyField]).length,
   )
-  const [dataTemp, setDataTemp] = useState<T[]>([])
+  const [dataTemp, setDataTemp] = useState<DataTableProps["data"]>([])
 
-  let nativeColumns: ColumnInternal<T>[] = []
+  let nativeColumns: Column[] = []
 
-  nativeColumns = p.columns.map(column => {
+  nativeColumns = p.columns.map(c => {
+    const column = c as Column
+
     return {
       key: column.key,
       title: column.title,
-      dataType: column.dataType && (column.dataType as any),
+      dataType: column.dataType,
       progressIndicator: column.progressIndicator,
       sortDirection: p.mode !== "edit" && column.key === p.defaultSortColumn ? SortDirection.Ascend : undefined,
       style: {
@@ -314,7 +294,7 @@ export const DataTable = <T extends DataModel>(p: DataTableProps<T>) => {
       {
         key: KEY_ACTIONS,
         title: "",
-        dataType: DataType.Internal as any,
+        dataType: DataType.Internal,
       },
     ]
   }
@@ -326,8 +306,7 @@ export const DataTable = <T extends DataModel>(p: DataTableProps<T>) => {
 
     const d = [...p.data]
 
-    // @ts-expect-error: This is ensured to be a boolean property due to typing
-    d[index][p.selectKeyField] = value // can selectKeyField only point to boolean properties?
+    d[index][p.selectKeyField] = value
 
     if (p.onChange) {
       p.onChange(d)
@@ -349,7 +328,6 @@ export const DataTable = <T extends DataModel>(p: DataTableProps<T>) => {
 
     d.forEach(row => {
       if (p.selectKeyField) {
-        // @ts-expect-error: This is ensured to be a boolean property due to typing
         row[p.selectKeyField] = value
       }
     })
@@ -411,18 +389,47 @@ export const DataTable = <T extends DataModel>(p: DataTableProps<T>) => {
   const printReference = useRef<HTMLDivElement>(null)
   const print = useReactToPrint({ contentRef: printReference, documentTitle: p.exportName })
 
+  let colorRowHover: ColorWithLightness = [Color.Neutral, 50]
+
+  if (p.fill) {
+    const c = p.fill[0] as Color
+    let l = p.fill[1] as Lightness
+
+    if (l == 50) {
+      l = 100
+    } else {
+      l + 100
+    }
+
+    colorRowHover = [c, l]
+  }
+
   return (
     <>
       <Global
         styles={css`
           .ka {
-            background-color: white;
+            background-color: unset;
             font-size: unset;
             width: 100%;
           }
 
+          .ka .ka-table-wrapper::-webkit-scrollbar-thumb {
+            border: 5px solid ${computeColor(p.fill || [Color.White])} !important;
+          }
+
+          .ka .ka-table-wrapper:hover::-webkit-scrollbar-thumb {
+            border: 4px solid ${computeColor(p.fill || [Color.White])} !important;
+          }
+
           .ka-table {
             table-layout: unset;
+          }
+
+          .ka .ka-table-wrapper {
+            background-color: unset;
+            width: calc(100% - 2px);
+            margin-left: 1px;
           }
 
           .ka colgroup {
@@ -431,7 +438,7 @@ export const DataTable = <T extends DataModel>(p: DataTableProps<T>) => {
           }
 
           .ka-thead-background {
-            background-color: ${computeColor([Color.White])};
+            background-color: ${computeColor(p.fill || [Color.White])};
           }
 
           .ka-thead-cell-height {
@@ -467,7 +474,7 @@ export const DataTable = <T extends DataModel>(p: DataTableProps<T>) => {
           }
 
           .ka-cell:not(:last-child) {
-            border-right: dotted 1px ${computeColor([Color.Neutral, 100])};
+            border-right: dotted 1px ${computeColor(p.stroke || [Color.Neutral, 100])};
           }
 
           .ka-cell:hover {
@@ -475,8 +482,8 @@ export const DataTable = <T extends DataModel>(p: DataTableProps<T>) => {
           }
 
           .ka-row {
-            border-bottom: solid 1px ${computeColor([Color.Neutral, 100])};
-            border-top: solid 1px ${computeColor([Color.Neutral, 100])};
+            border-bottom: solid 1px ${computeColor(p.stroke || [Color.Neutral, 100])};
+            border-top: solid 1px ${computeColor(p.stroke || [Color.Neutral, 100])};
           }
 
           .ka-row:last-child {
@@ -488,7 +495,7 @@ export const DataTable = <T extends DataModel>(p: DataTableProps<T>) => {
           }
 
           .ka-row:hover {
-            background-color: ${computeColor([Color.Neutral, 50])};
+            background-color: ${computeColor(colorRowHover)};
           }
 
           .ka-row-selected {
@@ -498,7 +505,7 @@ export const DataTable = <T extends DataModel>(p: DataTableProps<T>) => {
           .override-ka-fixed-left,
           .override-ka-fixed-right {
             position: sticky;
-            background-color: ${computeColor([Color.White])};
+            background-color: ${computeColor(p.fill || [Color.White])};
             z-index: 999999999;
           }
 
@@ -531,8 +538,8 @@ export const DataTable = <T extends DataModel>(p: DataTableProps<T>) => {
             right: 0;
             height: 8px;
             width: 100%;
-            border-top: solid 1px ${computeColor([Color.Neutral, 100])};
-            background: linear-gradient(to bottom, ${computeColor([Color.Neutral, 50])}, transparent);
+            border-top: solid 1px ${computeColor(p.stroke || [Color.Neutral, 100])};
+            background: linear-gradient(to bottom, ${computeColor(p.fill || [Color.Neutral, 50])}, transparent);
           }
 
           .override-ka-reorder .ka-row {
@@ -543,24 +550,24 @@ export const DataTable = <T extends DataModel>(p: DataTableProps<T>) => {
             width: 20px;
             right: -20px;
             border: none;
-            background: linear-gradient(to right, ${computeColor([Color.White])}, transparent);
+            background: linear-gradient(to right, ${computeColor(p.fill || [Color.White])}, transparent);
           }
 
           .override-ka-fixed-left:after {
             right: -8px;
-            border-left: solid 1px ${computeColor([Color.Neutral, 100])};
-            background: linear-gradient(to right, ${computeColor([Color.Neutral, 50])}, transparent);
+            border-left: solid 1px ${computeColor(p.stroke || [Color.Neutral, 100])};
+            background: linear-gradient(to right, ${computeColor(p.fill || [Color.Neutral, 50])}, transparent);
           }
 
           .override-ka-fixed-right:after {
             left: -8px;
-            border-right: solid 1px ${computeColor([Color.Neutral, 100])};
-            background: linear-gradient(to left, ${computeColor([Color.Neutral, 50])}, transparent);
+            border-right: solid 1px ${computeColor(p.stroke || [Color.Neutral, 100])};
+            background: linear-gradient(to left, ${computeColor(p.fill || [Color.Neutral, 50])}, transparent);
           }
 
           .ka-row:hover .override-ka-fixed-left,
           .ka-row:hover .override-ka-fixed-right {
-            background-color: ${computeColor([Color.Neutral, 50])};
+            background-color: ${computeColor(colorRowHover)};
           }
 
           .override-ka-editing-row,
@@ -635,7 +642,15 @@ export const DataTable = <T extends DataModel>(p: DataTableProps<T>) => {
         `}
       />
 
-      <Stack vertical hug stroke={[Color.Neutral, 100]} cornerRadius="large" loading={p.loading} overflowHidden>
+      <Stack
+        vertical
+        hug
+        stroke={p.stroke || [Color.Neutral, 100]}
+        fill={p.fill || [Color.Transparent]}
+        cornerRadius="large"
+        loading={p.loading}
+        overflowHidden
+      >
         <Align left horizontal>
           <Stack hug="partly" horizontal>
             <Align left horizontal>
@@ -665,7 +680,12 @@ export const DataTable = <T extends DataModel>(p: DataTableProps<T>) => {
 
               <Align right horizontal>
                 <Export>
-                  <InputButtonIconTertiary size="small" iconName="csv" onClick={() => csv(p.data, p.columns)} />
+                  <InputButtonIconTertiary
+                    size="small"
+                    iconName="csv"
+                    onClick={() => csv(p.data, p.columns as Column[])}
+                  />
+
                   <InputButtonIconTertiary size="small" iconName="print" onClick={() => print()} />
                 </Export>
               </Align>
@@ -684,7 +704,7 @@ export const DataTable = <T extends DataModel>(p: DataTableProps<T>) => {
               table={table}
               columns={nativeColumns as any}
               data={p.data}
-              rowKeyField={p.rowKeyField} // Table.rowKeyField doesn't support number | symbol which is a bit weird.. but okay.. we can restrict the properties to only allow string names
+              rowKeyField={p.rowKeyField}
               sortingMode={SortingMode.Single}
               rowReordering={p.mode === "edit"}
               noData={{ text: "Nothing found" }}
@@ -747,7 +767,7 @@ export const DataTable = <T extends DataModel>(p: DataTableProps<T>) => {
                     const alignmentRight = headCellContent.column.dataType === DataType.Number
                     const firstColumn = headCellContent.column.key === nativeColumns[0].key
 
-                    const headCellContentAsColumn = headCellContent.column as Column<unknown>
+                    const headCellContentAsColumn = headCellContent.column as Column
 
                     return (
                       <Stack hug horizontal>
@@ -833,7 +853,7 @@ export const DataTable = <T extends DataModel>(p: DataTableProps<T>) => {
 
                       let output = <></>
 
-                      if ((cellTextContent.column as Column<unknown>).dataType === DataType.ProgressIndicator) {
+                      if ((cellTextContent.column as Column).dataType === DataType.ProgressIndicator) {
                         output = <CellProgressIndicator {...cellTextContent} />
                       } else {
                         output = (
@@ -864,7 +884,7 @@ export const DataTable = <T extends DataModel>(p: DataTableProps<T>) => {
                                 <InputCheckbox
                                   size="small"
                                   color={Color.Neutral}
-                                  value={!!p.data[cellTextContent.rowKeyValue]?.[p.selectKeyField]}
+                                  value={p.data[cellTextContent.rowKeyValue]?.[p.selectKeyField] ?? false}
                                   onChange={value => {
                                     updateSelectField(cellTextContent.rowKeyValue, value)
                                   }}
@@ -902,7 +922,7 @@ export const DataTable = <T extends DataModel>(p: DataTableProps<T>) => {
                           <></>
                         )}
 
-                        {(cellEditorContent.column as Column<unknown>).dataType === DataType.ProgressIndicator ? (
+                        {(cellEditorContent.column as Column).dataType === DataType.ProgressIndicator ? (
                           <Align left horizontal>
                             <CellProgressIndicator {...cellEditorContent} />
                           </Align>
@@ -982,7 +1002,7 @@ export const DataTable = <T extends DataModel>(p: DataTableProps<T>) => {
                     disabled={editId !== null}
                     onClick={() => {
                       table.insertRow(createNewRow(p.data), {
-                        rowKeyValue: p.data[p.data.length - 1]?.key || 0, // key? who says that's a thing?
+                        rowKeyValue: p.data[p.data.length - 1]?.key || 0,
                         insertRowPosition: InsertRowPosition.after,
                       })
                     }}

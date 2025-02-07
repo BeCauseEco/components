@@ -96,6 +96,7 @@ const Container = styled.div<ContainerProps>(p => ({
 
   ...(p.stroke && {
     outline: `solid 1px ${computeColor(p.stroke || [Color.Transparent])}`,
+    outlineOffset: "-1px",
   }),
 
   "&:hover": {
