@@ -392,13 +392,19 @@ export const DataTable = (p: DataTableProps) => {
       <Global
         styles={css`
           .ka {
-            background-color: white;
+            background-color: unset;
             font-size: unset;
             width: 100%;
           }
 
           .ka-table {
             table-layout: unset;
+          }
+
+          .ka .ka-table-wrapper {
+            background-color: unset;
+            width: calc(100% - 2px);
+            margin-left: 1px;
           }
 
           .ka colgroup {
