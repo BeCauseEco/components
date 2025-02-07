@@ -4,7 +4,15 @@ import { Color } from "@new/Color"
 
 export type InputButtonIconTertiaryProps = Pick<
   InputButtonProps,
-  "id" | "size" | "hug" | "loading" | "disabled" | "onClick" | "destructive" | "data-playwright-testid"
+  | "id"
+  | "size"
+  | "hug"
+  | "loading"
+  | "disabled"
+  | "onClick"
+  | "preventDefault"
+  | "destructive"
+  | "data-playwright-testid"
 > & {
   iconName: string
 }
@@ -28,6 +36,7 @@ export const InputButtonIconTertiary = forwardRef<HTMLButtonElement, InputButton
       iconName={p.iconName}
       iconPlacement="labelNotSpecified"
       onClick={p.onClick}
+      preventDefault={p.preventDefault}
       data-playwright-testid={p["data-playwright-testid"]}
     />
   )
