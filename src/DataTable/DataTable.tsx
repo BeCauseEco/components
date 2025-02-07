@@ -8,7 +8,7 @@ import { Spacer } from "@new/Stack/Spacer"
 import { InputButtonTertiary } from "@new/InputButton/InputButtonTertiary"
 import { css, Global } from "@emotion/react"
 import { InputTextSingle, InputTextSingleProps } from "@new/InputText/InputTextSingle"
-import { Color, computeColor } from "@new/Color"
+import { Color, ColorWithLightness, computeColor, Lightness } from "@new/Color"
 import { InputTextDate, InputTextDateProps } from "@new/InputText/InputTextDate"
 import { InputCheckbox, InputCheckboxProps } from "@new/InputCheckbox/InputCheckbox"
 import { StyleBodySmall, StyleFontFamily, Text } from "@new/Text/Text"
@@ -16,7 +16,6 @@ import { Icon } from "@new/Icon/Icon"
 import styled from "@emotion/styled"
 import { Children, ReactElement, useRef, useState } from "react"
 import { useReactToPrint } from "react-to-print"
-
 import { InputButtonIconTertiary } from "@new/InputButton/InputButtonIconTertiary"
 import { Divider } from "@new/Divider/Divider"
 import { kaPropsUtils } from "ka-table/utils"
@@ -254,8 +253,11 @@ export type DataTableProps = {
   selectKeyField?: string
   virtualScrolling?: boolean
   loading?: boolean
+  exportDisable?: boolean
   onChange?: (value: DataTableProps["data"]) => void
   onChangeRow?: (value: object) => void
+  fill?: ColorWithLightness
+  stroke?: ColorWithLightness
   children?: Children | Children[]
 }
 
@@ -387,6 +389,21 @@ export const DataTable = (p: DataTableProps) => {
   const printReference = useRef<HTMLDivElement>(null)
   const print = useReactToPrint({ contentRef: printReference, documentTitle: p.exportName })
 
+  let colorRowHover: ColorWithLightness = [Color.Neutral, 50]
+
+  if (p.fill) {
+    const c = p.fill[0] as Color
+    let l = p.fill[1] as Lightness
+
+    if (l == 50) {
+      l = 100
+    } else {
+      l + 100
+    }
+
+    colorRowHover = [c, l]
+  }
+
   return (
     <>
       <Global
@@ -395,6 +412,14 @@ export const DataTable = (p: DataTableProps) => {
             background-color: unset;
             font-size: unset;
             width: 100%;
+          }
+
+          .ka .ka-table-wrapper::-webkit-scrollbar-thumb {
+            border: 5px solid ${computeColor(p.fill || [Color.White])} !important;
+          }
+
+          .ka .ka-table-wrapper:hover::-webkit-scrollbar-thumb {
+            border: 4px solid ${computeColor(p.fill || [Color.White])} !important;
           }
 
           .ka-table {
@@ -413,7 +438,7 @@ export const DataTable = (p: DataTableProps) => {
           }
 
           .ka-thead-background {
-            background-color: ${computeColor([Color.White])};
+            background-color: ${computeColor(p.fill || [Color.White])};
           }
 
           .ka-thead-cell-height {
@@ -449,7 +474,7 @@ export const DataTable = (p: DataTableProps) => {
           }
 
           .ka-cell:not(:last-child) {
-            border-right: dotted 1px ${computeColor([Color.Neutral, 100])};
+            border-right: dotted 1px ${computeColor(p.stroke || [Color.Neutral, 100])};
           }
 
           .ka-cell:hover {
@@ -457,8 +482,8 @@ export const DataTable = (p: DataTableProps) => {
           }
 
           .ka-row {
-            border-bottom: solid 1px ${computeColor([Color.Neutral, 100])};
-            border-top: solid 1px ${computeColor([Color.Neutral, 100])};
+            border-bottom: solid 1px ${computeColor(p.stroke || [Color.Neutral, 100])};
+            border-top: solid 1px ${computeColor(p.stroke || [Color.Neutral, 100])};
           }
 
           .ka-row:last-child {
@@ -470,7 +495,7 @@ export const DataTable = (p: DataTableProps) => {
           }
 
           .ka-row:hover {
-            background-color: ${computeColor([Color.Neutral, 50])};
+            background-color: ${computeColor(colorRowHover)};
           }
 
           .ka-row-selected {
@@ -480,7 +505,7 @@ export const DataTable = (p: DataTableProps) => {
           .override-ka-fixed-left,
           .override-ka-fixed-right {
             position: sticky;
-            background-color: ${computeColor([Color.White])};
+            background-color: ${computeColor(p.fill || [Color.White])};
             z-index: 999999999;
           }
 
@@ -513,8 +538,8 @@ export const DataTable = (p: DataTableProps) => {
             right: 0;
             height: 8px;
             width: 100%;
-            border-top: solid 1px ${computeColor([Color.Neutral, 100])};
-            background: linear-gradient(to bottom, ${computeColor([Color.Neutral, 50])}, transparent);
+            border-top: solid 1px ${computeColor(p.stroke || [Color.Neutral, 100])};
+            background: linear-gradient(to bottom, ${computeColor(p.fill || [Color.Neutral, 50])}, transparent);
           }
 
           .override-ka-reorder .ka-row {
@@ -525,24 +550,24 @@ export const DataTable = (p: DataTableProps) => {
             width: 20px;
             right: -20px;
             border: none;
-            background: linear-gradient(to right, ${computeColor([Color.White])}, transparent);
+            background: linear-gradient(to right, ${computeColor(p.fill || [Color.White])}, transparent);
           }
 
           .override-ka-fixed-left:after {
             right: -8px;
-            border-left: solid 1px ${computeColor([Color.Neutral, 100])};
-            background: linear-gradient(to right, ${computeColor([Color.Neutral, 50])}, transparent);
+            border-left: solid 1px ${computeColor(p.stroke || [Color.Neutral, 100])};
+            background: linear-gradient(to right, ${computeColor(p.fill || [Color.Neutral, 50])}, transparent);
           }
 
           .override-ka-fixed-right:after {
             left: -8px;
-            border-right: solid 1px ${computeColor([Color.Neutral, 100])};
-            background: linear-gradient(to left, ${computeColor([Color.Neutral, 50])}, transparent);
+            border-right: solid 1px ${computeColor(p.stroke || [Color.Neutral, 100])};
+            background: linear-gradient(to left, ${computeColor(p.fill || [Color.Neutral, 50])}, transparent);
           }
 
           .ka-row:hover .override-ka-fixed-left,
           .ka-row:hover .override-ka-fixed-right {
-            background-color: ${computeColor([Color.Neutral, 50])};
+            background-color: ${computeColor(colorRowHover)};
           }
 
           .override-ka-editing-row,
@@ -617,7 +642,15 @@ export const DataTable = (p: DataTableProps) => {
         `}
       />
 
-      <Stack vertical hug stroke={[Color.Neutral, 100]} cornerRadius="large" loading={p.loading} overflowHidden>
+      <Stack
+        vertical
+        hug
+        stroke={p.stroke || [Color.Neutral, 100]}
+        fill={p.fill || [Color.Transparent]}
+        cornerRadius="large"
+        loading={p.loading}
+        overflowHidden
+      >
         <Align left horizontal>
           <Stack hug="partly" horizontal>
             <Align left horizontal>
