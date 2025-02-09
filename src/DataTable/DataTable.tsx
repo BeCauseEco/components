@@ -651,47 +651,51 @@ export const DataTable = (p: DataTableProps) => {
         loading={p.loading}
         overflowHidden
       >
-        <Align left horizontal>
-          <Stack hug="partly" horizontal>
-            <Align left horizontal>
-              {p.mode === "filter" ? (
-                <InputTextSingle
-                  iconNameLeft="search"
-                  value={filter}
-                  width="fixed"
-                  size="small"
-                  placeholder="Search"
-                  onChange={v => setFilter(v)}
-                  color={Color.Neutral}
-                />
-              ) : (
-                <></>
-              )}
-
-              {Children.toArray(p.children).map(child => (
-                <>
-                  <Spacer medium />
-
-                  {child}
-                </>
-              ))}
-
-              <Spacer large />
-
-              <Align right horizontal>
-                <Export>
-                  <InputButtonIconTertiary
+        {!p.exportDisable && !p.children && p.mode !== "simple" ? (
+          <Align left horizontal>
+            <Stack hug="partly" horizontal>
+              <Align left horizontal>
+                {p.mode === "filter" ? (
+                  <InputTextSingle
+                    iconNameLeft="search"
+                    value={filter}
+                    width="fixed"
                     size="small"
-                    iconName="csv"
-                    onClick={() => csv(p.data, p.columns as Column[])}
+                    placeholder="Search"
+                    onChange={v => setFilter(v)}
+                    color={Color.Neutral}
                   />
+                ) : (
+                  <></>
+                )}
 
-                  <InputButtonIconTertiary size="small" iconName="print" onClick={() => print()} />
-                </Export>
+                {Children.toArray(p.children).map(child => (
+                  <>
+                    <Spacer medium />
+
+                    {child}
+                  </>
+                ))}
+
+                <Spacer large />
+
+                <Align right horizontal>
+                  <Export>
+                    <InputButtonIconTertiary
+                      size="small"
+                      iconName="csv"
+                      onClick={() => csv(p.data, p.columns as Column[])}
+                    />
+
+                    <InputButtonIconTertiary size="small" iconName="print" onClick={() => print()} />
+                  </Export>
+                </Align>
               </Align>
-            </Align>
-          </Stack>
-        </Align>
+            </Stack>
+          </Align>
+        ) : (
+          <></>
+        )}
 
         {p.mode === "filter" ? <Spacer small /> : <></>}
 
