@@ -414,6 +414,10 @@ export const DataTable = (p: DataTableProps) => {
             width: 100%;
           }
 
+          .ka .ka-table-wrapper::-webkit-scrollbar-track {
+            ${computeColor(p.fill || [Color.White])} !important;
+          }
+
           .ka .ka-table-wrapper::-webkit-scrollbar-thumb {
             border: 5px solid ${computeColor(p.fill || [Color.White])} !important;
           }
@@ -430,6 +434,7 @@ export const DataTable = (p: DataTableProps) => {
             background-color: unset;
             width: calc(100% - 2px);
             margin-left: 1px;
+            margin-top: 1px;
           }
 
           .ka colgroup {
@@ -651,7 +656,7 @@ export const DataTable = (p: DataTableProps) => {
         loading={p.loading}
         overflowHidden
       >
-        {!p.exportDisable && !p.children && p.mode !== "simple" ? (
+        {!p.exportDisable && p.children !== null && p.mode !== "simple" ? (
           <Align left horizontal>
             <Stack hug="partly" horizontal>
               <Align left horizontal>
