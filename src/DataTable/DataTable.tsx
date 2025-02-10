@@ -408,6 +408,8 @@ export const DataTable = (p: DataTableProps) => {
     <>
       <Global
         styles={css`
+          @layer reset;
+
           .ka {
             background-color: unset;
             font-size: unset;
