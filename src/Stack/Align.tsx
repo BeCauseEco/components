@@ -52,6 +52,7 @@ export const Align = (p: PropsWithChildren<AlignProps>) => {
 
   return (
     <Container
+      id={p.id}
       className={`<Align />${generateErrorClassName(invalidChildren)} `}
       vertical={p["vertical"]}
       horizontal={p["horizontal"]}

@@ -71,5 +71,5 @@ export const Spacer = (p: SpacerProps) => {
     size = Size.Huge
   }
 
-  return <Container className={`<Spacer />`} size={size} />
+  return <Container id={p.id} className={`<Spacer />`} size={size} />
 }

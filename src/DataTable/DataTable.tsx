@@ -1,3 +1,5 @@
+"use client"
+
 import { Stack } from "@new/Stack/Stack"
 import { Align } from "@new/Stack/Align"
 import { InsertRowPosition, SortDirection, SortingMode, Table, useTable, useTableInstance } from "ka-table"
@@ -6,7 +8,6 @@ import { closeRowEditors, deleteRow, openRowEditors, saveRowEditors } from "ka-t
 import { InputButtonPrimary } from "@new/InputButton/InputButtonPrimary"
 import { Spacer } from "@new/Stack/Spacer"
 import { InputButtonTertiary } from "@new/InputButton/InputButtonTertiary"
-import { css, Global } from "@emotion/react"
 import { InputTextSingle, InputTextSingleProps } from "@new/InputText/InputTextSingle"
 import { Color, ColorWithLightness, computeColor, Lightness } from "@new/Color"
 import { InputTextDate, InputTextDateProps } from "@new/InputText/InputTextDate"
@@ -14,7 +15,7 @@ import { InputCheckbox, InputCheckboxProps } from "@new/InputCheckbox/InputCheck
 import { StyleBodySmall, StyleFontFamily, Text } from "@new/Text/Text"
 import { Icon } from "@new/Icon/Icon"
 import styled from "@emotion/styled"
-import { Children, ReactElement, useRef, useState } from "react"
+import { Children, ReactElement, useId, useRef, useState } from "react"
 import { useReactToPrint } from "react-to-print"
 import { InputButtonIconTertiary } from "@new/InputButton/InputButtonIconTertiary"
 import { Divider } from "@new/Divider/Divider"
@@ -23,6 +24,7 @@ import { Alert } from "@new/Alert/Alert"
 import { InputComboboxProps } from "@new/InputCombobox/InputCombobox"
 import { ProgressIndicator } from "@new/ProgressIndicator/ProgressIndicator"
 import { ProgressIndicatorItem } from "@new/ProgressIndicator/ProgressIndicatorItem"
+import { useResizeObserver } from "usehooks-ts"
 
 export { SortDirection } from "ka-table"
 
@@ -262,6 +264,43 @@ export type DataTableProps = {
 }
 
 export const DataTable = (p: DataTableProps) => {
+  const cssScope = useId().replace(/:/g, "datatable")
+  const referenceContainer = useRef<HTMLDivElement>(null)
+
+  // TODO @cllpse: this is super hacky
+  useResizeObserver({
+    ref: referenceContainer,
+    box: "border-box",
+    onResize: size => {
+      // const containerHeight = Math.floor(size.height || 0)
+
+      // if (referenceContainer.current && containerHeight > 0) {
+      //   const filtersHeight = Math.floor(
+      //     referenceContainer.current.querySelector(`#reference-filters`)?.clientHeight || 0,
+      //   )
+      //   const spacerHeight = Math.floor(
+      //     referenceContainer.current.querySelector(`#reference-spacer`)?.clientHeight || 0,
+      //   )
+
+      //   referenceContainer.current.querySelectorAll(`#reference-target`).forEach(target => {
+      //     const t = target as HTMLElement | undefined
+
+      //     if (t) {
+      //       t.style.height = `${containerHeight - filtersHeight - spacerHeight}px`
+      //     }
+      //   })
+
+      //   console.log(
+      //     "doing it",
+      //     containerHeight,
+      //     filtersHeight,
+      //     spacerHeight,
+      //     `${containerHeight - filtersHeight - spacerHeight}px`,
+      //   )
+      // }
+    },
+  })
+
   const [filter, setFilter] = useState("")
   const [editId, setEditId] = useState<number | null>(null)
   const [deleteId, setDeleteId] = useState<number | null>(null)
@@ -386,8 +425,8 @@ export const DataTable = (p: DataTableProps) => {
     },
   })
 
-  const printReference = useRef<HTMLDivElement>(null)
-  const print = useReactToPrint({ contentRef: printReference, documentTitle: p.exportName })
+  const referencePrint = useRef<HTMLDivElement>(null)
+  const print = useReactToPrint({ contentRef: referencePrint, documentTitle: p.exportName })
 
   let colorRowHover: ColorWithLightness = [Color.Neutral, 50]
 
@@ -404,262 +443,262 @@ export const DataTable = (p: DataTableProps) => {
     colorRowHover = [c, l]
   }
 
+  const ffs = `
+    .${cssScope} .ka {
+      background-color: unset;
+      font-size: unset;
+      width: 100%;
+    }
+
+    .${cssScope} .ka .ka-table-wrapper::-webkit-scrollbar-track {
+      ${computeColor(p.fill || [Color.White])} !important;
+    }
+
+    .${cssScope} .ka .ka-table-wrapper::-webkit-scrollbar-thumb {
+      border: 5px solid ${computeColor(p.fill || [Color.White])} !important;
+    }
+
+    .${cssScope} .ka .ka-table-wrapper:hover::-webkit-scrollbar-thumb {
+      border: 4px solid ${computeColor(p.fill || [Color.White])} !important;
+    }
+
+    .${cssScope} .ka-table {
+      table-layout: unset;
+    }
+
+    .${cssScope} .ka .ka-table-wrapper {
+      background-color: unset;
+      width: calc(100% - 2px);
+      margin-left: 1px;
+      margin-top: 1px;
+    }
+
+    .${cssScope} .ka colgroup {
+      display: none;
+      visibility: hidden;
+    }
+
+    .${cssScope} .ka-thead-background {
+      background-color: ${computeColor(p.fill || [Color.White])};
+    }
+
+    .${cssScope} .ka-thead-cell-height {
+      height: calc(var(--BU) * 10);
+    }
+
+    .${cssScope} .ka-thead-cell {
+      padding: 0 calc(var(--BU) * 4);
+      color: unset;
+    }
+
+    .${cssScope} .ka-thead-row .ka-thead-cell:first-child {
+      padding-left: calc(var(--BU) * 2);
+    }
+
+    .${cssScope} .ka-thead-row .ka-thead-cell:last-child {
+      padding-left: calc(var(--BU) * 2);
+    }
+
+    .${cssScope} .ka-cell {
+      padding: var(--BU) calc(var(--BU) * 4);
+      height: calc(var(--BU) * 10);
+      line-height: unset;
+      color: unset;
+    }
+
+    .${cssScope} .ka-cell:first-child {
+      padding-left: calc(var(--BU) * 2);
+    }
+
+    .${cssScope} .ka-cell:last-child {
+      padding-right: calc(var(--BU) * 2);
+    }
+
+    .${cssScope} .ka-cell:not(:last-child) {
+      border-right: dotted 1px ${computeColor(p.stroke || [Color.Neutral, 100])};
+    }
+
+    .${cssScope} .ka-cell:hover {
+      background-color: unset;
+    }
+
+    .${cssScope} .ka-row {
+      border-bottom: solid 1px ${computeColor(p.stroke || [Color.Neutral, 100])};
+      border-top: solid 1px ${computeColor(p.stroke || [Color.Neutral, 100])};
+    }
+
+    .${cssScope} .ka-row:last-child {
+      border-bottom: none;
+    }
+
+    .${cssScope} .ka-even {
+      background-color: unset;
+    }
+
+    .${cssScope} .ka-row:hover {
+      background-color: ${computeColor(colorRowHover)};
+    }
+
+    .${cssScope} .ka-row-selected {
+      background-color: unset;
+    }
+
+    .${cssScope} .override-ka-fixed-left,
+    .${cssScope} .override-ka-fixed-right {
+      position: sticky;
+      background-color: ${computeColor(p.fill || [Color.White])};
+      z-index: 999999999;
+    }
+
+    .${cssScope} .override-ka-fixed-left {
+      left: 0;
+    }
+
+    .${cssScope} .override-ka-fixed-right {
+      right: 0;
+    }
+
+    .${cssScope} .override-ka-fixed-left:after,
+    .${cssScope} .override-ka-fixed-right:after {
+      content: "";
+      position: absolute;
+      top: 0;
+      height: 100%;
+      width: 8px;
+    }
+
+    .${cssScope} .override-ka-virtual .ka-thead-row {
+      border-bottom: solid 1px ${computeColor(p.fill || [Color.White])};
+    }
+
+    .${cssScope} .override-ka-virtual .ka-thead-row .ka-thead-cell:before {
+      content: "";
+      position: absolute;
+      bottom: -8px;
+      left: 0;
+      right: 0;
+      height: 8px;
+      width: 100%;
+      border-top: solid 1px ${computeColor(p.stroke || [Color.Neutral, 100])};
+      background: linear-gradient(to bottom, ${computeColor(p.fill || [Color.Neutral, 50])}, transparent);
+    }
+
+    .${cssScope} .override-ka-reorder .ka-row {
+      cursor: move;
+    }
+
+    .${cssScope} .ka-thead-row .override-ka-fixed-left:after {
+      width: 20px;
+      right: -20px;
+      border: none;
+      background: linear-gradient(to right, ${computeColor(p.fill || [Color.White])}, transparent);
+    }
+
+    .${cssScope} .override-ka-fixed-left:after {
+      right: -8px;
+      border-left: solid 1px ${computeColor(p.stroke || [Color.Neutral, 100])};
+      background: linear-gradient(to right, ${computeColor(p.fill || [Color.Neutral, 50])}, transparent);
+    }
+
+    .${cssScope} .override-ka-fixed-right:after {
+      left: -8px;
+      border-right: solid 1px ${computeColor(p.stroke || [Color.Neutral, 100])};
+      background: linear-gradient(to left, ${computeColor(p.fill || [Color.Neutral, 50])}, transparent);
+    }
+
+    .${cssScope} .ka-row:hover .override-ka-fixed-left,
+    .${cssScope} .ka-row:hover .override-ka-fixed-right {
+      background-color: ${computeColor(colorRowHover)};
+    }
+
+    .${cssScope} .override-ka-editing-row,
+    .${cssScope} .override-ka-editing-row:hover,
+    .${cssScope} .override-ka-editing-row .override-ka-fixed-left,
+    .${cssScope} .override-ka-editing-row:hover .override-ka-fixed-left,
+    .${cssScope} .override-ka-editing-row .override-ka-fixed-right,
+    .${cssScope} .override-ka-editing-row:hover .override-ka-fixed-right {
+      background-color: ${computeColor([Color.Quarternary, 50])};
+    }
+
+    .${cssScope} .override-ka-editing-row .override-ka-fixed-left:after {
+      background: linear-gradient(to right, ${computeColor([Color.Quarternary, 50])}, transparent);
+    }
+
+    .${cssScope} .override-ka-editing-row .override-ka-fixed-right:after {
+      background: linear-gradient(to left, ${computeColor([Color.Quarternary, 50])}, transparent);
+    }
+
+    .${cssScope} .override-ka-editing-row {
+      outline: solid 1px ${computeColor([Color.Quarternary, 100])};
+      outline-offset: -1px;
+    }
+
+    .${cssScope} .ka-no-data-row {
+      height: unset;
+    }
+
+    .${cssScope} .ka-no-data-cell {
+      ${StyleFontFamily}
+      ${StyleBodySmall}
+      padding: var(--BU) calc(var(--BU) * 2);
+      height: calc(var(--BU) * 10);
+    }
+
+    .${cssScope} .ka-thead-cell-resize {
+      left: unset;
+    }
+
+    .${cssScope} .ka-drag-over-row,
+    .${cssScope} .ka-drag-over-row th,
+    .${cssScope} .ka-drag-over-row td {
+      box-shadow: inset 0 1px 0 0 ${computeColor([Color.Quarternary, 700])};
+    }
+
+    .${cssScope} .ka-dragged-row ~ .ka-drag-over-row {
+      box-shadow: unset;
+    }
+
+    @media print {
+      .ka {
+        zoom: 0.5 !important;
+        width: calc(100% - 8em) !important;
+        margin: 4em !important;
+      }
+
+      .ka * {
+        overflow: visible !important;
+        position: static !important;
+      }
+
+      .ka p {
+        white-space: normal !important;
+      }
+
+      .ka td,
+      .ka th {
+        width: auto !important;
+        min-width: auto !important;
+        background-color: unset !important;
+      }
+    }
+  `
+
   return (
     <>
-      <Global
-        styles={css`
-          @layer reset;
+      <style>{ffs}</style>
 
-          .ka {
-            background-color: unset;
-            font-size: unset;
-            width: 100%;
-          }
-
-          .ka .ka-table-wrapper::-webkit-scrollbar-track {
-            ${computeColor(p.fill || [Color.White])} !important;
-          }
-
-          .ka .ka-table-wrapper::-webkit-scrollbar-thumb {
-            border: 5px solid ${computeColor(p.fill || [Color.White])} !important;
-          }
-
-          .ka .ka-table-wrapper:hover::-webkit-scrollbar-thumb {
-            border: 4px solid ${computeColor(p.fill || [Color.White])} !important;
-          }
-
-          .ka-table {
-            table-layout: unset;
-          }
-
-          .ka .ka-table-wrapper {
-            background-color: unset;
-            width: calc(100% - 2px);
-            margin-left: 1px;
-            margin-top: 1px;
-          }
-
-          .ka colgroup {
-            display: none;
-            visibility: hidden;
-          }
-
-          .ka-thead-background {
-            background-color: ${computeColor(p.fill || [Color.White])};
-          }
-
-          .ka-thead-cell-height {
-            height: calc(var(--BU) * 10);
-          }
-
-          .ka-thead-cell {
-            padding: 0 calc(var(--BU) * 4);
-            color: unset;
-          }
-
-          .ka-thead-row .ka-thead-cell:first-child {
-            padding-left: calc(var(--BU) * 2);
-          }
-
-          .ka-thead-row .ka-thead-cell:last-child {
-            padding-left: calc(var(--BU) * 2);
-          }
-
-          .ka-cell {
-            padding: var(--BU) calc(var(--BU) * 4);
-            height: calc(var(--BU) * 10);
-            line-height: unset;
-            color: unset;
-          }
-
-          .ka-cell:first-child {
-            padding-left: calc(var(--BU) * 2);
-          }
-
-          .ka-cell:last-child {
-            padding-right: calc(var(--BU) * 2);
-          }
-
-          .ka-cell:not(:last-child) {
-            border-right: dotted 1px ${computeColor(p.stroke || [Color.Neutral, 100])};
-          }
-
-          .ka-cell:hover {
-            background-color: unset;
-          }
-
-          .ka-row {
-            border-bottom: solid 1px ${computeColor(p.stroke || [Color.Neutral, 100])};
-            border-top: solid 1px ${computeColor(p.stroke || [Color.Neutral, 100])};
-          }
-
-          .ka-row:last-child {
-            border-bottom: none;
-          }
-
-          .ka-even {
-            background-color: unset;
-          }
-
-          .ka-row:hover {
-            background-color: ${computeColor(colorRowHover)};
-          }
-
-          .ka-row-selected {
-            background-color: unset;
-          }
-
-          .override-ka-fixed-left,
-          .override-ka-fixed-right {
-            position: sticky;
-            background-color: ${computeColor(p.fill || [Color.White])};
-            z-index: 999999999;
-          }
-
-          .override-ka-fixed-left {
-            left: 0;
-          }
-
-          .override-ka-fixed-right {
-            right: 0;
-          }
-
-          .override-ka-fixed-left:after,
-          .override-ka-fixed-right:after {
-            content: "";
-            position: absolute;
-            top: 0;
-            height: 100%;
-            width: 8px;
-          }
-
-          .override-ka-virtual .ka-thead-row {
-            border-bottom: solid 1px white;
-          }
-
-          .override-ka-virtual .ka-thead-row .ka-thead-cell:before {
-            content: "";
-            position: absolute;
-            bottom: -8px;
-            left: 0;
-            right: 0;
-            height: 8px;
-            width: 100%;
-            border-top: solid 1px ${computeColor(p.stroke || [Color.Neutral, 100])};
-            background: linear-gradient(to bottom, ${computeColor(p.fill || [Color.Neutral, 50])}, transparent);
-          }
-
-          .override-ka-reorder .ka-row {
-            cursor: move;
-          }
-
-          .ka-thead-row .override-ka-fixed-left:after {
-            width: 20px;
-            right: -20px;
-            border: none;
-            background: linear-gradient(to right, ${computeColor(p.fill || [Color.White])}, transparent);
-          }
-
-          .override-ka-fixed-left:after {
-            right: -8px;
-            border-left: solid 1px ${computeColor(p.stroke || [Color.Neutral, 100])};
-            background: linear-gradient(to right, ${computeColor(p.fill || [Color.Neutral, 50])}, transparent);
-          }
-
-          .override-ka-fixed-right:after {
-            left: -8px;
-            border-right: solid 1px ${computeColor(p.stroke || [Color.Neutral, 100])};
-            background: linear-gradient(to left, ${computeColor(p.fill || [Color.Neutral, 50])}, transparent);
-          }
-
-          .ka-row:hover .override-ka-fixed-left,
-          .ka-row:hover .override-ka-fixed-right {
-            background-color: ${computeColor(colorRowHover)};
-          }
-
-          .override-ka-editing-row,
-          .override-ka-editing-row:hover,
-          .override-ka-editing-row .override-ka-fixed-left,
-          .override-ka-editing-row:hover .override-ka-fixed-left,
-          .override-ka-editing-row .override-ka-fixed-right,
-          .override-ka-editing-row:hover .override-ka-fixed-right {
-            background-color: ${computeColor([Color.Quarternary, 50])};
-          }
-
-          .override-ka-editing-row .override-ka-fixed-left:after {
-            background: linear-gradient(to right, ${computeColor([Color.Quarternary, 50])}, transparent);
-          }
-
-          .override-ka-editing-row .override-ka-fixed-right:after {
-            background: linear-gradient(to left, ${computeColor([Color.Quarternary, 50])}, transparent);
-          }
-
-          .override-ka-editing-row {
-            outline: solid 1px ${computeColor([Color.Quarternary, 100])};
-            outline-offset: -1px;
-          }
-
-          .ka-no-data-row {
-            height: unset;
-          }
-
-          .ka-no-data-cell {
-            ${StyleFontFamily}
-            ${StyleBodySmall}
-            padding: var(--BU) calc(var(--BU) * 2);
-            height: calc(var(--BU) * 10);
-          }
-
-          .ka-thead-cell-resize {
-            left: unset;
-          }
-
-          .ka-drag-over-row,
-          .ka-drag-over-row th,
-          .ka-drag-over-row td {
-            box-shadow: inset 0 1px 0 0 ${computeColor([Color.Quarternary, 700])};
-          }
-
-          .ka-dragged-row ~ .ka-drag-over-row {
-            box-shadow: unset;
-          }
-
-          @media print {
-            .ka {
-              zoom: 0.5 !important;
-              width: calc(100% - 8em) !important;
-              margin: 4em !important;
-            }
-
-            .ka * {
-              overflow: visible !important;
-              position: static !important;
-            }
-
-            .ka p {
-              white-space: normal !important;
-            }
-
-            .ka td,
-            .ka th {
-              width: auto !important;
-              min-width: auto !important;
-            }
-          }
-        `}
-      />
-
-      <Stack
-        vertical
-        hug
-        stroke={p.stroke || [Color.Neutral, 100]}
-        fill={p.fill || [Color.Transparent]}
-        cornerRadius="large"
-        loading={p.loading}
-        overflowHidden
-      >
-        {!p.exportDisable && p.children !== null && p.mode !== "simple" ? (
-          <Align left horizontal>
+      <div className={cssScope} style={{ display: "flex", width: "100%", height: "100%" }} ref={referenceContainer}>
+        <Stack
+          vertical
+          hug
+          stroke={p.stroke || [Color.Neutral, 100]}
+          fill={p.fill || [Color.Transparent]}
+          cornerRadius="large"
+          loading={p.loading}
+          overflowHidden
+          explodeHeight
+        >
+          <Align left hug="height" horizontal id="reference-filters">
             <Stack hug="partly" horizontal>
               <Align left horizontal>
                 {p.mode === "filter" ? (
@@ -700,182 +739,221 @@ export const DataTable = (p: DataTableProps) => {
               </Align>
             </Stack>
           </Align>
-        ) : (
-          <></>
-        )}
 
-        {p.mode === "filter" ? <Spacer small /> : <></>}
+          {p.mode === "filter" ? <Spacer small id="reference-spacer" /> : <></>}
 
-        <Align left vertical>
-          <div
-            style={{ display: "flex", flexDirection: "column", width: "inherit", height: "inherit" }}
-            ref={printReference}
-          >
-            <Table
-              table={table}
-              columns={nativeColumns as any}
-              data={p.data}
-              rowKeyField={p.rowKeyField}
-              sortingMode={SortingMode.Single}
-              rowReordering={p.mode === "edit"}
-              noData={{ text: "Nothing found" }}
-              searchText={filter}
-              virtualScrolling={p.mode !== "edit" && p.virtualScrolling ? { enabled: true } : { enabled: false }}
-              search={({ searchText: searchTextValue, rowData, column }) => {
-                if (column.dataType === DataType.Boolean) {
-                  const b = rowData[column.key]
-                  const s = searchTextValue.toLowerCase()
+          <Align left vertical>
+            <div
+              id="reference-table"
+              style={{ display: "flex", flexDirection: "column", width: "inherit", height: "inherit" }}
+              ref={referencePrint}
+            >
+              <Table
+                table={table}
+                columns={nativeColumns as any}
+                data={p.data}
+                rowKeyField={p.rowKeyField}
+                sortingMode={SortingMode.Single}
+                rowReordering={p.mode === "edit"}
+                noData={{ text: "Nothing found" }}
+                searchText={filter}
+                virtualScrolling={p.mode !== "edit" && p.virtualScrolling ? { enabled: true } : { enabled: false }}
+                search={({ searchText: searchTextValue, rowData, column }) => {
+                  if (column.dataType === DataType.Boolean) {
+                    const b = rowData[column.key]
+                    const s = searchTextValue.toLowerCase()
 
-                  return (s === "yes" && b === true) || (s === "no" && b === false)
-                }
-              }}
-              childComponents={{
-                tableWrapper: {
-                  elementAttributes: () => {
-                    if (p.mode !== "edit" && p.virtualScrolling) {
-                      return {
-                        className: "override-ka-virtual",
-                        style: {
-                          height: "calc(100% - var(--BU) * 14)",
-                        },
+                    return (s === "yes" && b === true) || (s === "no" && b === false)
+                  }
+                }}
+                childComponents={{
+                  tableWrapper: {
+                    elementAttributes: () => {
+                      if (p.mode !== "edit" && p.virtualScrolling) {
+                        return {
+                          className: "override-ka-virtual",
+                        }
                       }
-                    }
 
-                    if (p.mode === "edit") {
-                      return {
-                        className: "override-ka-reorder",
+                      if (p.mode === "edit") {
+                        return {
+                          className: "override-ka-reorder",
+                        }
                       }
-                    }
+                    },
                   },
-                },
 
-                dataRow: {
-                  elementAttributes: dataRowElementAttributes => {
-                    if (dataRowElementAttributes.rowKeyValue === editId) {
-                      return {
-                        className: "override-ka-editing-row",
+                  dataRow: {
+                    elementAttributes: dataRowElementAttributes => {
+                      if (dataRowElementAttributes.rowKeyValue === editId) {
+                        return {
+                          className: "override-ka-editing-row",
+                        }
                       }
-                    }
+                    },
                   },
-                },
 
-                headCell: {
-                  content: headCellContent => {
-                    if (headCellContent.column.key === KEY_DRAG || headCellContent.column.key === KEY_ACTIONS) {
-                      return <></>
-                    }
+                  headCell: {
+                    content: headCellContent => {
+                      if (headCellContent.column.key === KEY_DRAG || headCellContent.column.key === KEY_ACTIONS) {
+                        return <></>
+                      }
 
-                    let iconName = ""
+                      let iconName = ""
 
-                    if (headCellContent.column.sortDirection === SortDirection.Ascend) {
-                      iconName = "keyboard_arrow_up"
-                    } else if (headCellContent.column.sortDirection === SortDirection.Descend) {
-                      iconName = "keyboard_arrow_down"
-                    } else {
-                      iconName = "unfold_more"
-                    }
+                      if (headCellContent.column.sortDirection === SortDirection.Ascend) {
+                        iconName = "keyboard_arrow_up"
+                      } else if (headCellContent.column.sortDirection === SortDirection.Descend) {
+                        iconName = "keyboard_arrow_down"
+                      } else {
+                        iconName = "unfold_more"
+                      }
 
-                    const alignmentRight = headCellContent.column.dataType === DataType.Number
-                    const firstColumn = headCellContent.column.key === nativeColumns[0].key
+                      const alignmentRight = headCellContent.column.dataType === DataType.Number
+                      const firstColumn = headCellContent.column.key === nativeColumns[0].key
 
-                    const headCellContentAsColumn = headCellContent.column as Column
+                      const headCellContentAsColumn = headCellContent.column as Column
 
-                    return (
-                      <Stack hug horizontal>
-                        {(p.mode === "simple" || p.mode === "filter") && p.selectKeyField && firstColumn ? (
-                          <>
-                            <Align left horizontal hug>
-                              <InputCheckbox
-                                size="small"
-                                color={Color.Neutral}
-                                value={
-                                  selectedFields === p.data.length
-                                    ? true
-                                    : selectedFields === 0
-                                      ? false
-                                      : "indeterminate"
-                                }
-                                onChange={value => updateSelectFieldAll(value)}
-                              />
-                            </Align>
+                      return (
+                        <Stack hug horizontal>
+                          {(p.mode === "simple" || p.mode === "filter") && p.selectKeyField && firstColumn ? (
+                            <>
+                              <Align left horizontal hug>
+                                <InputCheckbox
+                                  size="small"
+                                  color={Color.Neutral}
+                                  value={
+                                    selectedFields === p.data.length
+                                      ? true
+                                      : selectedFields === 0
+                                        ? false
+                                        : "indeterminate"
+                                  }
+                                  onChange={value => updateSelectFieldAll(value)}
+                                />
+                              </Align>
 
-                            <Spacer xsmall />
-                          </>
-                        ) : (
-                          <></>
-                        )}
-
-                        <Align horizontal left={!alignmentRight} right={alignmentRight}>
-                          {p.mode === "edit" || headCellContentAsColumn.dataType === DataType.ProgressIndicator ? (
-                            <Text fill={[Color.Neutral, 700]} xsmall>
-                              <b>{headCellContent.column.title}</b>
-                            </Text>
+                              <Spacer xsmall />
+                            </>
                           ) : (
-                            <CellHeadLink onClick={() => table.updateSortDirection(headCellContent.column.key)}>
+                            <></>
+                          )}
+
+                          <Align horizontal left={!alignmentRight} right={alignmentRight}>
+                            {p.mode === "edit" || headCellContentAsColumn.dataType === DataType.ProgressIndicator ? (
                               <Text fill={[Color.Neutral, 700]} xsmall>
                                 <b>{headCellContent.column.title}</b>
                               </Text>
+                            ) : (
+                              <CellHeadLink onClick={() => table.updateSortDirection(headCellContent.column.key)}>
+                                <Text fill={[Color.Neutral, 700]} xsmall>
+                                  <b>{headCellContent.column.title}</b>
+                                </Text>
 
-                              <Spacer tiny />
+                                <Spacer tiny />
 
-                              <Icon medium name={iconName} fill={[Color.Neutral, 700]} />
-                            </CellHeadLink>
-                          )}
-                        </Align>
-                      </Stack>
-                    )
-                  },
-
-                  elementAttributes: headCellElementAttributes => {
-                    if (p.fixedKeyField === headCellElementAttributes.column.key) {
-                      return {
-                        className: "override-ka-fixed-left",
-                      }
-                    }
-                  },
-                },
-
-                cellText: {
-                  content: cellTextContent => {
-                    if (cellTextContent.column.key === KEY_ACTIONS) {
-                      return (
-                        <Stack horizontal hug>
-                          <Align horizontal right>
-                            <InputButtonIconTertiary
-                              size="small"
-                              iconName="delete"
-                              onClick={() => setDeleteId(cellTextContent.rowKeyValue)}
-                              disabled={editId !== null}
-                              destructive
-                            />
-
-                            <ActionEdit {...cellTextContent} disabled={editId !== null} />
+                                <Icon medium name={iconName} fill={[Color.Neutral, 700]} />
+                              </CellHeadLink>
+                            )}
                           </Align>
                         </Stack>
                       )
-                    } else {
-                      const monospace =
-                        cellTextContent.column.dataType === DataType.Date ||
-                        cellTextContent.column.dataType === DataType.Number ||
-                        cellTextContent.column.dataType === DataType.Boolean
+                    },
 
-                      const alignmentRight = cellTextContent.column.dataType === DataType.Number
-                      const firstColumn = cellTextContent.column.key === nativeColumns[0].key
+                    elementAttributes: headCellElementAttributes => {
+                      if (p.fixedKeyField === headCellElementAttributes.column.key) {
+                        return {
+                          className: "override-ka-fixed-left",
+                        }
+                      }
+                    },
+                  },
 
-                      let output = <></>
+                  cellText: {
+                    content: cellTextContent => {
+                      if (cellTextContent.column.key === KEY_ACTIONS) {
+                        return (
+                          <Stack horizontal hug>
+                            <Align horizontal right>
+                              <InputButtonIconTertiary
+                                size="small"
+                                iconName="delete"
+                                onClick={() => setDeleteId(cellTextContent.rowKeyValue)}
+                                disabled={editId !== null}
+                                destructive
+                              />
 
-                      if ((cellTextContent.column as Column).dataType === DataType.ProgressIndicator) {
-                        output = <CellProgressIndicator {...cellTextContent} />
+                              <ActionEdit {...cellTextContent} disabled={editId !== null} />
+                            </Align>
+                          </Stack>
+                        )
                       } else {
-                        output = (
-                          <Text fill={[Color.Neutral, 700]} small monospace={monospace}>
-                            {formatValue(
-                              cellTextContent.value?.toString(),
-                              cellTextContent.column.dataType || DataType.String,
+                        const monospace =
+                          cellTextContent.column.dataType === DataType.Date ||
+                          cellTextContent.column.dataType === DataType.Number ||
+                          cellTextContent.column.dataType === DataType.Boolean
+
+                        const alignmentRight = cellTextContent.column.dataType === DataType.Number
+                        const firstColumn = cellTextContent.column.key === nativeColumns[0].key
+
+                        let output = <></>
+
+                        if ((cellTextContent.column as Column).dataType === DataType.ProgressIndicator) {
+                          output = <CellProgressIndicator {...cellTextContent} />
+                        } else {
+                          output = (
+                            <Text fill={[Color.Neutral, 700]} small monospace={monospace}>
+                              {formatValue(
+                                cellTextContent.value?.toString(),
+                                cellTextContent.column.dataType || DataType.String,
+                              )}
+                            </Text>
+                          )
+                        }
+
+                        return (
+                          <Stack hug horizontal>
+                            {p.mode === "edit" && firstColumn ? (
+                              <Align left horizontal hug>
+                                <Icon name="drag_indicator" medium fill={[Color.Neutral, 700]} />
+
+                                <Spacer xsmall />
+                              </Align>
+                            ) : (
+                              <></>
                             )}
-                          </Text>
+
+                            {(p.mode === "simple" || p.mode === "filter") && p.selectKeyField && firstColumn ? (
+                              <>
+                                <Align left horizontal hug>
+                                  <InputCheckbox
+                                    size="small"
+                                    color={Color.Neutral}
+                                    value={p.data[cellTextContent.rowKeyValue]?.[p.selectKeyField] ?? false}
+                                    onChange={value => {
+                                      updateSelectField(cellTextContent.rowKeyValue, value)
+                                    }}
+                                  />
+                                </Align>
+
+                                <Spacer xsmall />
+                              </>
+                            ) : (
+                              <></>
+                            )}
+
+                            <Align left={!alignmentRight} right={alignmentRight} horizontal>
+                              {output}
+                            </Align>
+                          </Stack>
                         )
                       }
+                    },
+                  },
+
+                  cellEditor: {
+                    content: cellEditorContent => {
+                      const firstColumn = cellEditorContent.column.key === nativeColumns[0].key
 
                       return (
                         <Stack hug horizontal>
@@ -889,143 +967,100 @@ export const DataTable = (p: DataTableProps) => {
                             <></>
                           )}
 
-                          {(p.mode === "simple" || p.mode === "filter") && p.selectKeyField && firstColumn ? (
-                            <>
-                              <Align left horizontal hug>
-                                <InputCheckbox
-                                  size="small"
-                                  color={Color.Neutral}
-                                  value={p.data[cellTextContent.rowKeyValue]?.[p.selectKeyField] ?? false}
-                                  onChange={value => {
-                                    updateSelectField(cellTextContent.rowKeyValue, value)
-                                  }}
-                                />
-                              </Align>
-
-                              <Spacer xsmall />
-                            </>
+                          {(cellEditorContent.column as Column).dataType === DataType.ProgressIndicator ? (
+                            <Align left horizontal>
+                              <CellProgressIndicator {...cellEditorContent} />
+                            </Align>
                           ) : (
                             <></>
                           )}
 
-                          <Align left={!alignmentRight} right={alignmentRight} horizontal>
-                            {output}
-                          </Align>
+                          {cellEditorContent.column.dataType === DataType.Boolean ? (
+                            <Align left horizontal>
+                              <CellInputCheckbox {...cellEditorContent} />
+                            </Align>
+                          ) : (
+                            <></>
+                          )}
+
+                          {cellEditorContent.column.dataType === DataType.Date ? (
+                            <Align left horizontal>
+                              <CellInputTextDate {...cellEditorContent} />
+                            </Align>
+                          ) : (
+                            <></>
+                          )}
+
+                          {cellEditorContent.column.dataType === DataType.Number ||
+                          cellEditorContent.column.dataType === DataType.String ? (
+                            <Align left horizontal>
+                              <CellInputTextSingle {...cellEditorContent} />
+                            </Align>
+                          ) : (
+                            <></>
+                          )}
+
+                          {cellEditorContent.column.key === KEY_ACTIONS ? (
+                            <Align left horizontal>
+                              <ActionSaveCancel {...cellEditorContent} />
+                            </Align>
+                          ) : (
+                            <></>
+                          )}
                         </Stack>
                       )
-                    }
+                    },
                   },
-                },
 
-                cellEditor: {
-                  content: cellEditorContent => {
-                    const firstColumn = cellEditorContent.column.key === nativeColumns[0].key
-
-                    return (
-                      <Stack hug horizontal>
-                        {p.mode === "edit" && firstColumn ? (
-                          <Align left horizontal hug>
-                            <Icon name="drag_indicator" medium fill={[Color.Neutral, 700]} />
-
-                            <Spacer xsmall />
-                          </Align>
-                        ) : (
-                          <></>
-                        )}
-
-                        {(cellEditorContent.column as Column).dataType === DataType.ProgressIndicator ? (
-                          <Align left horizontal>
-                            <CellProgressIndicator {...cellEditorContent} />
-                          </Align>
-                        ) : (
-                          <></>
-                        )}
-
-                        {cellEditorContent.column.dataType === DataType.Boolean ? (
-                          <Align left horizontal>
-                            <CellInputCheckbox {...cellEditorContent} />
-                          </Align>
-                        ) : (
-                          <></>
-                        )}
-
-                        {cellEditorContent.column.dataType === DataType.Date ? (
-                          <Align left horizontal>
-                            <CellInputTextDate {...cellEditorContent} />
-                          </Align>
-                        ) : (
-                          <></>
-                        )}
-
-                        {cellEditorContent.column.dataType === DataType.Number ||
-                        cellEditorContent.column.dataType === DataType.String ? (
-                          <Align left horizontal>
-                            <CellInputTextSingle {...cellEditorContent} />
-                          </Align>
-                        ) : (
-                          <></>
-                        )}
-
-                        {cellEditorContent.column.key === KEY_ACTIONS ? (
-                          <Align left horizontal>
-                            <ActionSaveCancel {...cellEditorContent} />
-                          </Align>
-                        ) : (
-                          <></>
-                        )}
-                      </Stack>
-                    )
-                  },
-                },
-
-                cell: {
-                  elementAttributes: cellElementAttributes => {
-                    if (p.fixedKeyField === cellElementAttributes.column.key) {
-                      return {
-                        className: "override-ka-fixed-left",
+                  cell: {
+                    elementAttributes: cellElementAttributes => {
+                      if (p.fixedKeyField === cellElementAttributes.column.key) {
+                        return {
+                          className: "override-ka-fixed-left",
+                        }
                       }
-                    }
 
-                    if (p.fixedKeyField && cellElementAttributes.column.key === KEY_ACTIONS) {
-                      return {
-                        className: "override-ka-fixed-right",
+                      if (p.fixedKeyField && cellElementAttributes.column.key === KEY_ACTIONS) {
+                        return {
+                          className: "override-ka-fixed-right",
+                        }
                       }
-                    }
+                    },
                   },
-                },
-              }}
-            />
-          </div>
-        </Align>
+                }}
+              />
+            </div>
+          </Align>
 
-        {p.mode === "edit" ? (
-          <>
-            <Divider horizontal fill={[Color.Neutral, 100]} />
+          {p.mode === "edit" ? (
+            <>
+              <Divider horizontal fill={[Color.Neutral, 100]} />
 
-            <Align left horizontal>
-              <Stack hug="partly" horizontal fill={[Color.White]} cornerRadius="medium">
-                <Align center horizontal>
-                  <InputButtonTertiary
-                    width="auto"
-                    size="small"
-                    iconNameLeft="add"
-                    label="Add row"
-                    disabled={editId !== null}
-                    onClick={() => {
-                      table.insertRow(createNewRow(p.data), {
-                        rowKeyValue: p.data[p.data.length - 1]?.key || 0,
-                        insertRowPosition: InsertRowPosition.after,
-                      })
-                    }}
-                  />
-                </Align>
-              </Stack>
-            </Align>
-          </>
-        ) : (
-          <></>
-        )}
-      </Stack>
+              <Align left horizontal>
+                <Stack hug="partly" horizontal fill={[Color.White]} cornerRadius="medium">
+                  <Align center horizontal>
+                    <InputButtonTertiary
+                      width="auto"
+                      size="small"
+                      iconNameLeft="add"
+                      label="Add row"
+                      disabled={editId !== null}
+                      onClick={() => {
+                        table.insertRow(createNewRow(p.data), {
+                          rowKeyValue: p.data[p.data.length - 1]?.key || 0,
+                          insertRowPosition: InsertRowPosition.after,
+                        })
+                      }}
+                    />
+                  </Align>
+                </Stack>
+              </Align>
+            </>
+          ) : (
+            <></>
+          )}
+        </Stack>
+      </div>
 
       <Alert
         open={deleteId !== null}
