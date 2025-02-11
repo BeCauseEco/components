@@ -268,38 +268,34 @@ export const DataTable = (p: DataTableProps) => {
   const referenceContainer = useRef<HTMLDivElement>(null)
 
   // TODO @cllpse: this is super hacky
-  useResizeObserver({
-    ref: referenceContainer,
-    box: "border-box",
-    onResize: size => {
-      // const containerHeight = Math.floor(size.height || 0)
-
-      // if (referenceContainer.current && containerHeight > 0) {
-      //   const filtersHeight = Math.floor(
-      //     referenceContainer.current.querySelector(`#reference-filters`)?.clientHeight || 0,
-      //   )
-      //   const spacerHeight = Math.floor(
-      //     referenceContainer.current.querySelector(`#reference-spacer`)?.clientHeight || 0,
-      //   )
-
-      //   referenceContainer.current.querySelectorAll(`#reference-target`).forEach(target => {
-      //     const t = target as HTMLElement | undefined
-
-      //     if (t) {
-      //       t.style.height = `${containerHeight - filtersHeight - spacerHeight}px`
-      //     }
-      //   })
-
-      //   console.log(
-      //     "doing it",
-      //     containerHeight,
-      //     filtersHeight,
-      //     spacerHeight,
-      //     `${containerHeight - filtersHeight - spacerHeight}px`,
-      //   )
-      // }
-    },
-  })
+  // useResizeObserver({
+  //   ref: referenceContainer,
+  //   box: "border-box",
+  //   onResize: size => {
+  //     const containerHeight = Math.floor(size.height || 0)
+  //     if (referenceContainer.current && containerHeight > 0) {
+  //       const filtersHeight = Math.floor(
+  //         referenceContainer.current.querySelector(`#reference-filters`)?.clientHeight || 0,
+  //       )
+  //       const spacerHeight = Math.floor(
+  //         referenceContainer.current.querySelector(`#reference-spacer`)?.clientHeight || 0,
+  //       )
+  //       referenceContainer.current.querySelectorAll(`#reference-target`).forEach(target => {
+  //         const t = target as HTMLElement | undefined
+  //         if (t) {
+  //           t.style.height = `${containerHeight - filtersHeight - spacerHeight}px`
+  //         }
+  //       })
+  //       console.log(
+  //         "doing it",
+  //         containerHeight,
+  //         filtersHeight,
+  //         spacerHeight,
+  //         `${containerHeight - filtersHeight - spacerHeight}px`,
+  //       )
+  //     }
+  //   },
+  // })
 
   const [filter, setFilter] = useState("")
   const [editId, setEditId] = useState<number | null>(null)
