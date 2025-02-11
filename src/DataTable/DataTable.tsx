@@ -24,7 +24,7 @@ import { Alert } from "@new/Alert/Alert"
 import { InputComboboxProps } from "@new/InputCombobox/InputCombobox"
 import { ProgressIndicator } from "@new/ProgressIndicator/ProgressIndicator"
 import { ProgressIndicatorItem } from "@new/ProgressIndicator/ProgressIndicatorItem"
-// import { useResizeObserver } from "usehooks-ts"
+import { useResizeObserver } from "usehooks-ts"
 
 export { SortDirection } from "ka-table"
 
@@ -171,6 +171,7 @@ const CellInputCheckbox = ({ column, rowKeyValue, value }: ICellEditorProps) => 
     <InputCheckbox
       value={value || false}
       size="small"
+      disabled
       onChange={v => {
         table.updateCellValue(rowKeyValue, column.key, v)
       }}
@@ -253,6 +254,7 @@ export type DataTableProps = {
   exportName: string
   fixedKeyField?: string
   selectKeyField?: string
+  selectDisabledField?: string
   virtualScrolling?: boolean
   loading?: boolean
   exportDisable?: boolean
@@ -267,35 +269,29 @@ export const DataTable = (p: DataTableProps) => {
   const cssScope = useId().replace(/:/g, "datatable")
   const referenceContainer = useRef<HTMLDivElement>(null)
 
-  // TODO @cllpse: this is super hacky
-  // useResizeObserver({
-  //   ref: referenceContainer,
-  //   box: "border-box",
-  //   onResize: size => {
-  //     const containerHeight = Math.floor(size.height || 0)
-  //     if (referenceContainer.current && containerHeight > 0) {
-  //       const filtersHeight = Math.floor(
-  //         referenceContainer.current.querySelector(`#reference-filters`)?.clientHeight || 0,
-  //       )
-  //       const spacerHeight = Math.floor(
-  //         referenceContainer.current.querySelector(`#reference-spacer`)?.clientHeight || 0,
-  //       )
-  //       referenceContainer.current.querySelectorAll(`#reference-target`).forEach(target => {
-  //         const t = target as HTMLElement | undefined
-  //         if (t) {
-  //           t.style.height = `${containerHeight - filtersHeight - spacerHeight}px`
-  //         }
-  //       })
-  //       console.log(
-  //         "doing it",
-  //         containerHeight,
-  //         filtersHeight,
-  //         spacerHeight,
-  //         `${containerHeight - filtersHeight - spacerHeight}px`,
-  //       )
-  //     }
-  //   },
-  // })
+  // TODO @cllpse: this seems super hacky, but this is to auto-adjust the height of the table to simplify use
+  useResizeObserver({
+    ref: referenceContainer,
+    box: "border-box",
+    onResize: size => {
+      if (p.mode === "edit") {
+        return
+      }
+
+      const containerHeight = size.height || 0
+      if (referenceContainer.current && containerHeight > 0) {
+        const filtersHeight = referenceContainer.current.querySelector(`#reference-filters`)?.clientHeight || 0
+        const spacerHeight = referenceContainer.current.querySelector(`#reference-spacer`)?.clientHeight || 0
+
+        referenceContainer.current.querySelectorAll(`#reference-target`).forEach(target => {
+          const t = target as HTMLElement | undefined
+          if (t) {
+            t.style.height = `${containerHeight - filtersHeight - spacerHeight}px`
+          }
+        })
+      }
+    },
+  })
 
   const [filter, setFilter] = useState("")
   const [editId, setEditId] = useState<number | null>(null)
@@ -439,7 +435,7 @@ export const DataTable = (p: DataTableProps) => {
     colorRowHover = [c, l]
   }
 
-  const ffs = `
+  const css = `
     .${cssScope} .ka {
       background-color: unset;
       font-size: unset;
@@ -466,7 +462,6 @@ export const DataTable = (p: DataTableProps) => {
       background-color: unset;
       width: calc(100% - 2px);
       margin-left: 1px;
-      margin-top: 1px;
     }
 
     .${cssScope} .ka colgroup {
@@ -681,7 +676,7 @@ export const DataTable = (p: DataTableProps) => {
 
   return (
     <>
-      <style>{ffs}</style>
+      <style suppressHydrationWarning>{css}</style>
 
       <div className={cssScope} style={{ display: "flex", width: "100%", height: "100%" }} ref={referenceContainer}>
         <Stack
@@ -740,7 +735,7 @@ export const DataTable = (p: DataTableProps) => {
 
           <Align left vertical>
             <div
-              id="reference-table"
+              id="reference-target"
               style={{ display: "flex", flexDirection: "column", width: "inherit", height: "inherit" }}
               ref={referencePrint}
             >
@@ -925,6 +920,11 @@ export const DataTable = (p: DataTableProps) => {
                                   <InputCheckbox
                                     size="small"
                                     color={Color.Neutral}
+                                    disabled={
+                                      p.selectDisabledField
+                                        ? p.data[cellTextContent.rowKeyValue]?.[p.selectDisabledField]
+                                        : false
+                                    }
                                     value={p.data[cellTextContent.rowKeyValue]?.[p.selectKeyField] ?? false}
                                     onChange={value => {
                                       updateSelectField(cellTextContent.rowKeyValue, value)
