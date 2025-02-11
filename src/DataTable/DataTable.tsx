@@ -24,7 +24,7 @@ import { Alert } from "@new/Alert/Alert"
 import { InputComboboxProps } from "@new/InputCombobox/InputCombobox"
 import { ProgressIndicator } from "@new/ProgressIndicator/ProgressIndicator"
 import { ProgressIndicatorItem } from "@new/ProgressIndicator/ProgressIndicatorItem"
-import { useResizeObserver } from "usehooks-ts"
+// import { useResizeObserver } from "usehooks-ts"
 
 export { SortDirection } from "ka-table"
 
