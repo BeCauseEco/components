@@ -443,7 +443,7 @@ export const DataTable = (p: DataTableProps) => {
     }
 
     .${cssScope} .ka .ka-table-wrapper::-webkit-scrollbar-track {
-      ${computeColor(p.fill || [Color.White])} !important;
+      background: ${computeColor(p.fill || [Color.White])} !important;
     }
 
     .${cssScope} .ka .ka-table-wrapper::-webkit-scrollbar-thumb {
@@ -453,6 +453,12 @@ export const DataTable = (p: DataTableProps) => {
     .${cssScope} .ka .ka-table-wrapper:hover::-webkit-scrollbar-thumb {
       border: 4px solid ${computeColor(p.fill || [Color.White])} !important;
     }
+
+    .${cssScope} .ka .ka-table-wrapper::-webkit-scrollbar-corner {
+      background: ${computeColor(p.fill || [Color.White])} !important;
+    }
+
+
 
     .${cssScope} .ka-table {
       table-layout: unset;
