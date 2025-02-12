@@ -178,6 +178,7 @@ const ChartTooltipContent = React.forwardRef<
     React.ComponentProps<"div"> & {
       hideLabel?: boolean
       hideIndicator?: boolean
+      hideValue?: boolean
       indicator?: "line" | "dot" | "dashed"
       nameKey?: string
       labelKey?: string
@@ -194,6 +195,7 @@ const ChartTooltipContent = React.forwardRef<
       indicator = "dot",
       hideLabel = false,
       hideIndicator = false,
+      hideValue = false,
       // eslint-disable-next-line
       label,
       // eslint-disable-next-line
@@ -256,7 +258,7 @@ const ChartTooltipContent = React.forwardRef<
         <div className="grid gap-1.5">
           {
             // eslint-disable-next-line
-          payload.map((item, index) => {
+            payload.map((item, index) => {
               const key = `${nameKey || item.name || item.dataKey || "value"}`
               const itemConfig = getPayloadConfigFromPayload(config, item, key)
               const indicatorColor = color || item.payload.fill || item.color
@@ -303,7 +305,7 @@ const ChartTooltipContent = React.forwardRef<
                           {nestLabel ? tooltipLabel : null}
                           <span className="text-muted-foreground">{itemConfig?.label || item.name}</span>
                         </div>
-                        {item.value && (
+                        {!hideValue && item.value && (
                           <span className="font-mono font-medium tabular-nums text-foreground">
                             {item.value.toLocaleString()}
                           </span>
