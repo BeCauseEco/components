@@ -138,9 +138,21 @@ export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<InputC
       }
 
       return (
-        <Text fill={[p.color, 700]} xsmall={p.size === "small"} small={p.size === "large"} maxWidth="165px">
-          {selectedItem?.label || p.textNoSelection}
-        </Text>
+        <Stack horizontal hug>
+          <Align horizontal left hug>
+            {selectedItem?.icon ? (
+              <>
+                {selectedItem.icon}
+
+                <Spacer xsmall />
+              </>
+            ) : null}
+
+            <Text fill={[p.color, 700]} xsmall={p.size === "small"} small={p.size === "large"} maxWidth="165px">
+              {selectedItem?.label || p.textNoSelection}
+            </Text>
+          </Align>
+        </Stack>
       )
     }
 
@@ -253,9 +265,21 @@ export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<InputC
             </Align>
           </Stack>
         ) : (
-          <Text xsmall={p.size === "small"} small={p.size === "large"} fill={[p.color, 700]} maxWidth="320px">
-            {item.label}
-          </Text>
+          <Stack horizontal hug>
+            <Align horizontal left hug>
+              {item.icon ? (
+                <>
+                  {item.icon}
+
+                  <Spacer xsmall />
+                </>
+              ) : null}
+
+              <Text xsmall={p.size === "small"} small={p.size === "large"} fill={[p.color, 700]} maxWidth="320px">
+                {item.label}
+              </Text>
+            </Align>
+          </Stack>
         )}
       </CommandItemStyled>
     )
