@@ -223,7 +223,7 @@ const Children = (p: Omit<InputButtonProps, "width">) => {
 }
 
 export const InputButton = forwardRef<HTMLButtonElement | HTMLAnchorElement, InputButtonProps>((p, ref) => {
-  const { id, variant, onClick, href, width, disabled, ...pp } = p
+  const { id, variant, onClick, width, disabled, ...pp } = p
 
   return (
     <Output
