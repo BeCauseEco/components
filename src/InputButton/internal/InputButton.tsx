@@ -10,6 +10,7 @@ import { Align, AlignProps } from "@new/Stack/Align"
 import { Icon } from "@new/Icon/Icon"
 import { Spacer } from "@new/Stack/Spacer"
 import { ComponentBaseProps } from "@new/ComponentBaseProps"
+import { useRouter } from "next/router"
 
 export type InputButtonProps = ComponentBaseProps &
   PlaywrightProps & {
@@ -223,7 +224,15 @@ const Children = (p: Omit<InputButtonProps, "width">) => {
 }
 
 export const InputButton = forwardRef<HTMLButtonElement | HTMLAnchorElement, InputButtonProps>((p, ref) => {
-  const { id, variant, onClick, width, disabled, ...pp } = p
+  const { id, variant, onClick, href, width, disabled, ...pp } = p
+  const router = useRouter()
+
+  const click =
+    href && variant !== "link"
+      ? () => {
+          router.push(href)
+        }
+      : onClick
 
   return (
     <Output
@@ -236,12 +245,12 @@ export const InputButton = forwardRef<HTMLButtonElement | HTMLAnchorElement, Inp
         if (p.preventDefault && !disabled) {
           event.preventDefault()
 
-          if (onClick) {
-            onClick()
+          if (click) {
+            click()
           }
         }
       }}
-      onClick={disabled ? () => {} : onClick}
+      onClick={disabled ? () => {} : click}
       _width={width}
       _height={computeHeight(p)}
       data-playwright-testid={p["data-playwright-testid"]}
