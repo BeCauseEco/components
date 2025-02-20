@@ -1,5 +1,5 @@
 import styled from "@emotion/styled"
-import { forwardRef, ReactElement } from "react"
+import { forwardRef, HTMLAttributeAnchorTarget, ReactElement } from "react"
 import { Color, ColorWithLightness, replaceColorComponent } from "@new/Color"
 import { Stack, StackProps } from "@new/Stack/Stack"
 import Link, { LinkProps } from "next/link"
@@ -9,8 +9,8 @@ import { Text, TextProps } from "@new/Text/Text"
 import { Align, AlignProps } from "@new/Stack/Align"
 import { Icon } from "@new/Icon/Icon"
 import { Spacer } from "@new/Stack/Spacer"
-import { useRouter } from "next/router"
 import { ComponentBaseProps } from "@new/ComponentBaseProps"
+import { useRouter } from "next/router"
 
 export type InputButtonProps = ComponentBaseProps &
   PlaywrightProps & {
@@ -38,6 +38,7 @@ export type InputButtonProps = ComponentBaseProps &
     hug?: boolean
 
     href?: LinkProps["href"]
+    target?: HTMLAttributeAnchorTarget
     onClick?: () => void
     preventDefault?: boolean
 
@@ -156,30 +157,53 @@ const Children = (p: Omit<InputButtonProps, "width">) => {
   }
 
   const children = (
-    <>
-      {!iconLabelNotSpecified && <Spacer xsmall={p.size === "small"} small={p.size === "large"} />}
+    <Stack
+      horizontal
+      fill={p.colorBackground}
+      fillHover={p.colorBackgroundHover}
+      stroke={p.colorOutline}
+      strokeHover={p.colorOutlineHover}
+      fillLoading={p.colorLoading}
+      cornerRadius="medium"
+      loading={p.loading ? true : undefined}
+      disabled={p.disabled ? true : undefined}
+      aspectRatio={p.iconPlacement === "labelNotSpecified" ? "1" : "auto"}
+      explodeHeight
+      hug
+    >
+      <>
+        {!iconLabelNotSpecified && p.variant !== "link" && (
+          <Spacer xsmall={p.size === "small"} small={p.size === "large"} />
+        )}
 
-      {iconBeforeLabel}
-      {label}
+        {iconBeforeLabel}
+        {label}
 
-      {p.content ? (
-        <Align horizontal center>
-          {p.content}
-        </Align>
-      ) : (
-        <></>
-      )}
+        {p.content ? (
+          <Align horizontal center>
+            {p.content}
+          </Align>
+        ) : (
+          <></>
+        )}
 
-      {iconAfterLabel}
-      {iconLabelNotSpecified}
+        {iconAfterLabel}
+        {iconLabelNotSpecified}
 
-      {!iconLabelNotSpecified && <Spacer xsmall={p.size === "small"} small={p.size === "large"} />}
-    </>
+        {!iconLabelNotSpecified && p.variant !== "link" && (
+          <Spacer xsmall={p.size === "small"} small={p.size === "large"} />
+        )}
+      </>
+    </Stack>
   )
 
   if (p.variant === "link") {
     if (p.href) {
-      return <NextLink href={p.href}>{label}</NextLink>
+      return (
+        <NextLink href={p.href} target={p.target} passHref>
+          {children}
+        </NextLink>
+      )
     } else {
       return (
         <a
@@ -190,29 +214,12 @@ const Children = (p: Omit<InputButtonProps, "width">) => {
           }}
           onClick={p.onClick}
         >
-          {label}
+          {children}
         </a>
       )
     }
   } else {
-    return (
-      <Stack
-        horizontal
-        fill={p.colorBackground}
-        fillHover={p.colorBackgroundHover}
-        stroke={p.colorOutline}
-        strokeHover={p.colorOutlineHover}
-        fillLoading={p.colorLoading}
-        cornerRadius="medium"
-        loading={p.loading ? true : undefined}
-        disabled={p.disabled ? true : undefined}
-        aspectRatio={p.iconPlacement === "labelNotSpecified" ? "1" : "auto"}
-        explodeHeight
-        hug
-      >
-        {children}
-      </Stack>
-    )
+    return children
   }
 }
 
@@ -220,11 +227,12 @@ export const InputButton = forwardRef<HTMLButtonElement | HTMLAnchorElement, Inp
   const { id, variant, onClick, href, width, disabled, ...pp } = p
   const router = useRouter()
 
-  const click = href
-    ? () => {
-        router.push(href)
-      }
-    : onClick
+  const click =
+    href && variant !== "link"
+      ? () => {
+          router.push(href)
+        }
+      : onClick
 
   return (
     <Output
@@ -264,6 +272,8 @@ export const InputButton = forwardRef<HTMLButtonElement | HTMLAnchorElement, Inp
         colorLoading={p.colorLoading}
         content={p.content}
         hug={p.hug}
+        href={p.href}
+        target={p.target}
       />
     </Output>
   )
