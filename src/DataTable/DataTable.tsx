@@ -15,7 +15,7 @@ import { InputCheckbox, InputCheckboxProps } from "@new/InputCheckbox/InputCheck
 import { StyleBodySmall, StyleFontFamily, Text } from "@new/Text/Text"
 import { Icon } from "@new/Icon/Icon"
 import styled from "@emotion/styled"
-import { Children, ReactElement, useId, useRef, useState } from "react"
+import { Children, PropsWithChildren, ReactElement, useId, useRef, useState } from "react"
 import { useReactToPrint } from "react-to-print"
 import { InputButtonIconTertiary } from "@new/InputButton/InputButtonIconTertiary"
 import { Divider } from "@new/Divider/Divider"
@@ -263,6 +263,7 @@ export type DataTableProps = {
   fill?: ColorWithLightness
   stroke?: ColorWithLightness
   children?: Children | Children[]
+  customCellRenderer?: (cellProps: PropsWithChildren<ICellTextProps>) => ReactElement | null
 }
 
 export const DataTable = (p: DataTableProps) => {
@@ -868,6 +869,15 @@ export const DataTable = (p: DataTableProps) => {
 
                   cellText: {
                     content: cellTextContent => {
+                      //If we have received a function that may custom render a cell,
+                      //we always check first whether the given cell should be rendered by the custom renderer
+                      if (p.customCellRenderer) {
+                        const customCell = p.customCellRenderer(cellTextContent)
+                        if (customCell !== null) {
+                          return customCell
+                        }
+                      }
+
                       if (cellTextContent.column.key === KEY_ACTIONS) {
                         return (
                           <Stack horizontal hug>
