@@ -724,15 +724,19 @@ export const DataTable = (p: DataTableProps) => {
                 <Spacer large />
 
                 <Align right horizontal>
-                  <Export>
-                    <InputButtonIconTertiary
-                      size="small"
-                      iconName="csv"
-                      onClick={() => csv(p.data, p.columns as Column[])}
-                    />
+                  {!p.exportDisable ? (
+                    <Export>
+                      <InputButtonIconTertiary
+                        size="small"
+                        iconName="csv"
+                        onClick={() => csv(p.data, p.columns as Column[])}
+                      />
 
-                    <InputButtonIconTertiary size="small" iconName="print" onClick={() => print()} />
-                  </Export>
+                      <InputButtonIconTertiary size="small" iconName="print" onClick={() => print()} />
+                    </Export>
+                  ) : (
+                    <></>
+                  )}
                 </Align>
               </Align>
             </Stack>
