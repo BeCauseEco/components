@@ -258,6 +258,7 @@ export type DataTableProps = {
   virtualScrolling?: boolean
   loading?: boolean
   exportDisable?: boolean
+  noDataText?: string
   onChange?: (value: DataTableProps["data"]) => void
   onChangeRow?: (value: object) => void
   fill?: ColorWithLightness
@@ -757,7 +758,7 @@ export const DataTable = (p: DataTableProps) => {
                 rowKeyField={p.rowKeyField}
                 sortingMode={SortingMode.Single}
                 rowReordering={p.mode === "edit"}
-                noData={{ text: "Nothing found" }}
+                noData={{ text: p.noDataText ?? "Nothing found" }}
                 searchText={filter}
                 virtualScrolling={p.mode !== "edit" && p.virtualScrolling ? { enabled: true } : { enabled: false }}
                 search={({ searchText: searchTextValue, rowData, column }) => {
