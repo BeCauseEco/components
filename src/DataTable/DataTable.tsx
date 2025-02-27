@@ -250,6 +250,7 @@ export type DataTableProps = {
   data: any[]
   columns: Column[]
   defaultSortColumn: string
+  defaultSortDirection?: SortDirection
   rowKeyField: string
   exportName: string
   fixedKeyField?: string
@@ -308,12 +309,16 @@ export const DataTable = (p: DataTableProps) => {
   nativeColumns = p.columns.map(c => {
     const column = c as Column
 
+    let sortDirection = p.mode !== "edit" && column.key === p.defaultSortColumn ? p.defaultSortDirection : undefined
+    if (p.defaultSortDirection) {
+      sortDirection = p.defaultSortDirection
+    }
     return {
       key: column.key,
       title: column.title,
       dataType: column.dataType,
       progressIndicator: column.progressIndicator,
-      sortDirection: p.mode !== "edit" && column.key === p.defaultSortColumn ? SortDirection.Ascend : undefined,
+      sortDirection: sortDirection,
       style: {
         width: column.width || "auto",
         "min-width": column.minWidth || "0px",
