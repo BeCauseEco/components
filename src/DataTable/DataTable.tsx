@@ -249,11 +249,12 @@ export type DataTableProps = {
   mode: "simple" | "filter" | "edit"
   data: any[]
   columns: Column[]
-  defaultSortColumn: string
+  defaultSortColumn?: string
   defaultSortDirection?: SortDirection
   rowKeyField: string
   exportName: string
   fixedKeyField?: string
+  fixedKeyFieldPosition?: "left" | "right"
   selectKeyField?: string
   selectDisabledField?: string
   virtualScrolling?: boolean
@@ -876,7 +877,8 @@ export const DataTable = (p: DataTableProps) => {
                     elementAttributes: headCellElementAttributes => {
                       if (p.fixedKeyField === headCellElementAttributes.column.key) {
                         return {
-                          className: "override-ka-fixed-left",
+                          className:
+                            p.fixedKeyFieldPosition === "right" ? "override-ka-fixed-right" : "override-ka-fixed-left",
                         }
                       }
                     },
@@ -1043,13 +1045,15 @@ export const DataTable = (p: DataTableProps) => {
                     elementAttributes: cellElementAttributes => {
                       if (p.fixedKeyField === cellElementAttributes.column.key) {
                         return {
-                          className: "override-ka-fixed-left",
+                          className:
+                            p.fixedKeyFieldPosition === "right" ? "override-ka-fixed-right" : "override-ka-fixed-left",
                         }
                       }
 
                       if (p.fixedKeyField && cellElementAttributes.column.key === KEY_ACTIONS) {
                         return {
-                          className: "override-ka-fixed-right",
+                          className:
+                            p.fixedKeyFieldPosition === "right" ? "override-ka-fixed-right" : "override-ka-fixed-left",
                         }
                       }
                     },
