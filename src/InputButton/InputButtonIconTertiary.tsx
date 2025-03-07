@@ -1,6 +1,6 @@
 import { forwardRef } from "react"
 import { InputButtonProps, InputButton } from "@new/InputButton/internal/InputButton"
-import { Color, ColorWithLightness } from "@new/Color"
+import { Color } from "@new/Color"
 
 export type InputButtonIconTertiaryProps = Pick<
   InputButtonProps,
@@ -15,8 +15,6 @@ export type InputButtonIconTertiaryProps = Pick<
   | "data-playwright-testid"
 > & {
   iconName: string
-  colorForeground?: ColorWithLightness
-  colorBackgroundHover?: ColorWithLightness
 }
 
 export const InputButtonIconTertiary = forwardRef<HTMLButtonElement, InputButtonIconTertiaryProps>((p, ref) => {
@@ -28,8 +26,8 @@ export const InputButtonIconTertiary = forwardRef<HTMLButtonElement, InputButton
       variant="transparent"
       size={p.size}
       width="auto"
-      colorForeground={p.colorForeground || [Color.Primary, 700]}
-      colorBackgroundHover={p.colorBackgroundHover || [Color.Primary, 100]}
+      colorForeground={[Color.Primary, 700]}
+      colorBackgroundHover={[Color.Primary, 100]}
       colorLoading={[Color.Primary, 700]}
       hug={p.hug}
       loading={p.loading ? true : undefined}
