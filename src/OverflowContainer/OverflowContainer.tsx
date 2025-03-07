@@ -5,6 +5,7 @@ import { ComponentBaseProps } from "@new/ComponentBaseProps"
 import { PropsWithChildren, ReactElement } from "react"
 
 type NumberInPixelsOrPercentage = `${number}${"px" | "%"}`
+type NumberInVh = `${number}${"vh"}`
 
 type NumberInPixelsOrPercentageBaseUnitFactor = `calc(${number}${"px" | "%"} - var(--BU) * ${number})`
 
@@ -23,6 +24,7 @@ export type OverflowContainerProps = ComponentBaseProps & {
     | "radix-accordion-content-height"
     | "radix-popover-content-available-height"
     | "radix-popover-content-available-height-SAFE-AREA-INPUTTEXT"
+    | NumberInVh
     | NumberInPixelsOrPercentage
     | NumberInPixelsOrPercentageBaseUnitFactor
 
@@ -32,6 +34,10 @@ export type OverflowContainerProps = ComponentBaseProps & {
 
 const computeMaxHeight = (maxHeight: OverflowContainerProps["maxHeight"]): string => {
   if (maxHeight?.endsWith("px")) {
+    return maxHeight
+  }
+
+  if (maxHeight?.endsWith("vh")) {
     return maxHeight
   }
 

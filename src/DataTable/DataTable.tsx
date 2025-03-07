@@ -260,6 +260,7 @@ export type DataTableProps = {
   loading?: boolean
   exportDisable?: boolean
   noDataText?: string
+  hideHeader?: boolean
   onChange?: (value: DataTableProps["data"]) => void
   onChangeRow?: (value: object) => void
   fill?: ColorWithLightness
@@ -482,6 +483,10 @@ export const DataTable = (p: DataTableProps) => {
       visibility: hidden;
     }
 
+    .${cssScope} .ka-thead {
+      display: ${p.hideHeader ? "none" : "table-header-group"};
+    }
+    
     .${cssScope} .ka-thead-background {
       background-color: ${computeColor(p.fill || [Color.White])};
     }
