@@ -312,6 +312,7 @@ export const DataTable = (p: DataTableProps) => {
     const column = c as Column
 
     let sortDirection = p.mode !== "edit" && column.key === p.defaultSortColumn ? p.defaultSortDirection : undefined
+
     if (p.defaultSortDirection) {
       sortDirection = p.defaultSortDirection
     }
@@ -451,23 +452,21 @@ export const DataTable = (p: DataTableProps) => {
       width: 100%;
     }
 
-    .${cssScope} .ka .ka-table-wrapper::-webkit-scrollbar-track {
-      background: ${computeColor(p.fill || [Color.White])} !important;
-    }
+    // .${cssScope} .ka .ka-table-wrapper::-webkit-scrollbar-track {
+    //   background: ${computeColor(p.fill || [Color.White])} !important;
+    // }
 
-    .${cssScope} .ka .ka-table-wrapper::-webkit-scrollbar-thumb {
-      border: 5px solid ${computeColor(p.fill || [Color.White])} !important;
-    }
+    // .${cssScope} .ka .ka-table-wrapper::-webkit-scrollbar-thumb {
+    //   border: 5px solid ${computeColor(p.fill || [Color.White])} !important;
+    // }
 
-    .${cssScope} .ka .ka-table-wrapper:hover::-webkit-scrollbar-thumb {
-      border: 4px solid ${computeColor(p.fill || [Color.White])} !important;
-    }
+    // .${cssScope} .ka .ka-table-wrapper:hover::-webkit-scrollbar-thumb {
+    //   border: 4px solid ${computeColor(p.fill || [Color.White])} !important;
+    // }
 
-    .${cssScope} .ka .ka-table-wrapper::-webkit-scrollbar-corner {
-      background: ${computeColor(p.fill || [Color.White])} !important;
-    }
-
-
+    // .${cssScope} .ka .ka-table-wrapper::-webkit-scrollbar-corner {
+    //   background: ${computeColor(p.fill || [Color.White])} !important;
+    // }
 
     .${cssScope} .ka-table {
       table-layout: unset;
@@ -477,6 +476,7 @@ export const DataTable = (p: DataTableProps) => {
       background-color: unset;
       width: calc(100% - 2px);
       margin-left: 1px;
+      margin-bottom: 1px;
     }
 
     .${cssScope} .ka colgroup {
@@ -486,8 +486,9 @@ export const DataTable = (p: DataTableProps) => {
 
     .${cssScope} .ka-thead {
       display: ${p.hideHeader ? "none" : "table-header-group"};
+      position: relative;
     }
-    
+
     .${cssScope} .ka-thead-background {
       background-color: ${computeColor(p.fill || [Color.White])};
     }
@@ -499,6 +500,7 @@ export const DataTable = (p: DataTableProps) => {
     .${cssScope} .ka-thead-cell {
       padding: 0 calc(var(--BU) * 4);
       color: unset;
+      z-index: 3;
     }
 
     .${cssScope} .ka-thead-row .ka-thead-cell:first-child {
@@ -518,6 +520,7 @@ export const DataTable = (p: DataTableProps) => {
 
     .${cssScope} .ka-cell:first-child {
       padding-left: calc(var(--BU) * 2);
+      z-index: 3;
     }
 
     .${cssScope} .ka-cell:last-child {
@@ -557,7 +560,7 @@ export const DataTable = (p: DataTableProps) => {
     .${cssScope} .override-ka-fixed-right {
       position: sticky;
       background-color: ${computeColor(p.fill || [Color.White])};
-      z-index: 999999999;
+      z-index: 4;
     }
 
     .${cssScope} .override-ka-fixed-left {
@@ -577,8 +580,15 @@ export const DataTable = (p: DataTableProps) => {
       width: 8px;
     }
 
-    .${cssScope} .override-ka-virtual .ka-thead-row {
-      border-bottom: solid 1px ${computeColor(p.fill || [Color.White])};
+    .${cssScope} .ka-thead-row .ka-thead-cell:before {
+      content: "";
+      display: block;
+      position: absolute;
+      left: 0;
+      bottom: -1px;
+      width: 100%;
+      height: 1px;
+      background-color: ${computeColor(p.stroke || [Color.Neutral, 100])};
     }
 
     .${cssScope} .override-ka-virtual .ka-thead-row .ka-thead-cell:before {
@@ -1053,7 +1063,7 @@ export const DataTable = (p: DataTableProps) => {
                       if (p.fixedKeyField && cellElementAttributes.column.key === KEY_ACTIONS) {
                         return {
                           className:
-                            p.fixedKeyFieldPosition === "right" ? "override-ka-fixed-right" : "override-ka-fixed-left",
+                            p.fixedKeyFieldPosition === "right" ? "override-ka-fixed-right" : "override-ka-fixed-right",
                         }
                       }
                     },

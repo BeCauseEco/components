@@ -39,17 +39,19 @@ const computeMessageColor = (message?: TDialog["message"]) => {
   }
 }
 
-const computeMinSize = (size: TDialog["size"]) => {
+const computeMinSize = (size: TDialog["size"], fixedWidth: TDialog["fixedWidth"]) => {
   switch (size) {
     case Size.Medium:
       return {
         minWidth: "calc(var(--BU) * 160)",
+        ...(fixedWidth ? { maxWidth: "calc(var(--BU) * 160)" } : {}),
         minHeight: "auto",
       }
 
     case Size.Large:
       return {
         minWidth: "calc(var(--BU) * 320)",
+        ...(fixedWidth ? { maxWidth: "calc(var(--BU) * 320)" } : {}),
         minHeight: "auto",
       }
 
@@ -78,7 +80,7 @@ const RadixDialogClose = styled(RadixDialog.Close)({
   height: "fit-content",
 })
 
-type TDialogContentProperties = Pick<TDialog, "size" | "collapseHeight">
+type TDialogContentProperties = Pick<TDialog, "size" | "collapseHeight" | "fixedWidth">
 
 const Content = styled(RadixDialog.Content)<TDialogContentProperties>(p => ({
   display: "flex",
@@ -86,8 +88,9 @@ const Content = styled(RadixDialog.Content)<TDialogContentProperties>(p => ({
   top: p.size === Size.Medium || p.size === Size.Large ? "50%" : `calc(50% + ${offsetTop} / 2)`,
   left: p.size === Size.Medium ? "calc(50% + calc(var(--BU) * 25))" : "50%",
   transform: "translate(-50%, -50%)",
-  minWidth: computeMinSize(p.size).minWidth,
-  minHeight: computeMinSize(p.size).minHeight,
+  minWidth: computeMinSize(p.size, p.fixedWidth).minWidth,
+  maxWidth: computeMinSize(p.size, p.fixedWidth).minWidth,
+  minHeight: computeMinSize(p.size, p.fixedWidth).minHeight,
   zIndex: 99999,
   // TO-DO: @cllpe
   // maxHeight: `calc(100vh - ${offsetTop} - calc(var(--BU) * 10))`,
@@ -106,6 +109,7 @@ export type TDialog = PlaywrightProps & {
   open: boolean
   onOpenChange: (open: boolean) => void
   collapseHeight?: boolean
+  fixedWidth?: boolean
   title?: ReactElement<TextProps>
   description?: ReactElement<TextProps> | ReactElement<TextProps | SpacerProps>[]
   message?: ["notice" | "warning" | "error" | "hidden", string]
@@ -120,7 +124,12 @@ export const Dialog = (p: TDialog) => {
       <RadixDialog.Portal>
         <Overlay />
 
-        <Content size={p.size} collapseHeight={p.collapseHeight} data-playwright-testid={p["data-playwright-testid"]}>
+        <Content
+          size={p.size}
+          collapseHeight={p.collapseHeight}
+          fixedWidth={p.fixedWidth}
+          data-playwright-testid={p["data-playwright-testid"]}
+        >
           <Composition>
             <BackgroundCard colorBackground={[Color.White]} borderRadius={Size.Tiny} shadow={EShadow.Large} />
 
