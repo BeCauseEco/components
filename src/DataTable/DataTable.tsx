@@ -1052,8 +1052,7 @@ export const DataTable = (p: DataTableProps) => {
 
                       if (p.fixedKeyField && cellElementAttributes.column.key === KEY_ACTIONS) {
                         return {
-                          className:
-                            p.fixedKeyFieldPosition === "right" ? "override-ka-fixed-right" : "override-ka-fixed-left",
+                          className: "override-ka-fixed-right",
                         }
                       }
                     },
