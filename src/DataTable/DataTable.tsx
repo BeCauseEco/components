@@ -30,6 +30,7 @@ import { InputButtonSecondaryProps } from "@new/InputButton/InputButtonSecondary
 import { InputButtonIconSecondaryProps } from "@new/InputButton/InputButtonIconSecondary"
 import { PopoverProps } from "@new/Popover/Popover"
 import { Badge } from "@new/Badge/Badge"
+import { InputButtonLink } from "@new/InputButton/InputButtonLink"
 
 export { SortDirection } from "ka-table"
 
@@ -225,6 +226,29 @@ const CellStatus = (cellTextProps: ICellTextProps | ICellEditorProps) => {
   )
 }
 
+const CellLink = (cellTextProps: ICellTextProps | ICellEditorProps) => {
+  const link = cellTextProps.column["link"] as Column["link"]
+
+  const { label, href } = link?.configure(cellTextProps.rowData) || {
+    label: undefined,
+    href: undefined,
+  }
+
+  return (
+    <Stack hug horizontal>
+      <Align horizontal left>
+        {label && href ? (
+          <InputButtonLink size="large" label={label} href={href} />
+        ) : (
+          <Text fill={[Color.Neutral, 700]} small monospace>
+            –
+          </Text>
+        )}
+      </Align>
+    </Stack>
+  )
+}
+
 const CellHeadLink = styled.a({
   display: "flex",
   alignItems: "center",
@@ -279,6 +303,13 @@ export type Column = {
           label: string
         }
       | undefined
+  }
+
+  link?: {
+    configure: (rowData: ICellTextProps["rowData"]) => {
+      label: string
+      href: string
+    }
   }
 }
 
@@ -373,6 +404,7 @@ export const DataTable = (p: DataTableProps) => {
       dataType: column.dataType,
       progressIndicator: column.progressIndicator,
       status: column.status,
+      link: column.link,
       sortDirection: sortDirection,
       style: {
         width: column.width || "auto",
@@ -853,7 +885,7 @@ export const DataTable = (p: DataTableProps) => {
                 rowReordering={p.mode === "edit"}
                 noData={{ text: "Nothing found" }}
                 searchText={filter}
-                virtualScrolling={p.mode !== "edit" && p.virtualScrolling ? { enabled: true } : { enabled: false }}
+                virtualScrolling={p.mode !== "edit" && p.virtualScrolling ? { enabled: true } : undefined}
                 search={({ searchText: searchTextValue, rowData, column }) => {
                   if (column.dataType === DataType.Boolean) {
                     const b = rowData[column.key]
@@ -1031,6 +1063,8 @@ export const DataTable = (p: DataTableProps) => {
                           output = <CellProgressIndicator {...cellTextContent} />
                         } else if ((cellTextContent.column as Column).dataType === DataType.Status) {
                           output = <CellStatus {...cellTextContent} />
+                        } else if ((cellTextContent.column as Column).dataType === DataType.Link) {
+                          output = <CellLink {...cellTextContent} />
                         } else {
                           output = (
                             <Text fill={[Color.Neutral, 700]} small monospace={monospace}>
@@ -1114,6 +1148,14 @@ export const DataTable = (p: DataTableProps) => {
                           {(cellEditorContent.column as Column).dataType === DataType.Status ? (
                             <Align left horizontal>
                               <CellStatus {...cellEditorContent} />
+                            </Align>
+                          ) : (
+                            <></>
+                          )}
+
+                          {(cellEditorContent.column as Column).dataType === DataType.Link ? (
+                            <Align left horizontal>
+                              <CellLink {...cellEditorContent} />
                             </Align>
                           ) : (
                             <></>
