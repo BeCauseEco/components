@@ -253,6 +253,7 @@ type Children =
 type RowAction = {
   label?: string
   iconName?: string
+  destructive?: boolean
   onClick: (rowData: ICellTextProps["rowData"]) => void
 }
 
@@ -521,6 +522,15 @@ export const DataTable = (p: DataTableProps) => {
       padding: 0 calc(var(--BU) * 4);
       color: unset;
       z-index: 3;
+    }
+
+    .${cssScope} .ka-cell {
+      overflow: hidden;
+    }
+
+    .${cssScope} .ka-cell .ka-cell-text {
+      width: inherit;
+      overflow: inherit;
     }
 
     .${cssScope} .ka-thead-row .ka-thead-cell:first-child {
@@ -968,6 +978,7 @@ export const DataTable = (p: DataTableProps) => {
                                 // @ts-expect-error
                                 p.rowActionPrimary.onClick(cellTextContent.rowData)
                               }}
+                              destructive={p.rowActionPrimary.destructive}
                             />,
                           )
 
@@ -982,6 +993,7 @@ export const DataTable = (p: DataTableProps) => {
                                 // @ts-expect-error
                                 p.rowActionPrimary.onClick(cellTextContent.rowData)
                               }}
+                              destructive={p.rowActionPrimary.destructive}
                             />,
                           )
 
@@ -997,6 +1009,7 @@ export const DataTable = (p: DataTableProps) => {
                                 // @ts-expect-error
                                 p.rowActionSecondary.onClick(cellTextContent.rowData)
                               }}
+                              destructive={p.rowActionSecondary.destructive}
                             />,
                           )
 
@@ -1011,6 +1024,7 @@ export const DataTable = (p: DataTableProps) => {
                                 // @ts-expect-error
                                 p.rowActionSecondary.onClick(cellTextContent.rowData)
                               }}
+                              destructive={p.rowActionSecondary.destructive}
                             />,
                           )
 
@@ -1026,6 +1040,7 @@ export const DataTable = (p: DataTableProps) => {
                                 // @ts-expect-error
                                 p.rowActionTertiary.onClick(cellTextContent.rowData)
                               }}
+                              destructive={p.rowActionTertiary.destructive}
                             />,
                           )
                         } else if (p.rowActionTertiary?.label) {
@@ -1038,6 +1053,7 @@ export const DataTable = (p: DataTableProps) => {
                                 // @ts-expect-error
                                 p.rowActionTertiary.onClick(cellTextContent.rowData)
                               }}
+                              destructive={p.rowActionTertiary.destructive}
                             />,
                           )
                         }
@@ -1064,7 +1080,7 @@ export const DataTable = (p: DataTableProps) => {
                           output = <CellProgressIndicator {...cellTextContent} />
                         } else {
                           output = (
-                            <Text fill={[Color.Neutral, 700]} small monospace={monospace}>
+                            <Text fill={[Color.Neutral, 700]} small monospace={monospace} wrap>
                               {formatValue(
                                 cellTextContent.value?.toString(),
                                 cellTextContent.column.dataType || DataType.String,
