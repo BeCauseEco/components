@@ -239,6 +239,10 @@ const CellLink = (cellTextProps: ICellTextProps | ICellEditorProps) => {
       <Align horizontal left>
         {label && href ? (
           <InputButtonLink size="large" label={label} href={href} />
+        ) : label ? (
+          <Text fill={[Color.Neutral, 700]} small>
+            {label}
+          </Text>
         ) : (
           <Text fill={[Color.Neutral, 700]} small monospace>
             –
@@ -308,7 +312,7 @@ export type Column = {
   link?: {
     configure: (rowData: ICellTextProps["rowData"]) => {
       label: string
-      href: string
+      href: string | undefined
     }
   }
 }
