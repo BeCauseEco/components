@@ -15,7 +15,7 @@ import { InputCheckbox, InputCheckboxProps } from "@new/InputCheckbox/InputCheck
 import { StyleBodySmall, StyleFontFamily, Text } from "@new/Text/Text"
 import { Icon } from "@new/Icon/Icon"
 import styled from "@emotion/styled"
-import { Children, PropsWithChildren, ReactElement, useId, useRef, useState } from "react"
+import { Children, ReactElement, useId, useRef, useState } from "react"
 import { useReactToPrint } from "react-to-print"
 import { InputButtonIconTertiary } from "@new/InputButton/InputButtonIconTertiary"
 import { Divider } from "@new/Divider/Divider"
@@ -25,11 +25,15 @@ import { InputComboboxProps } from "@new/InputCombobox/InputCombobox"
 import { ProgressIndicator } from "@new/ProgressIndicator/ProgressIndicator"
 import { ProgressIndicatorItem } from "@new/ProgressIndicator/ProgressIndicatorItem"
 import { useResizeObserver } from "usehooks-ts"
+import { InputButtonSecondary } from "@new/InputButton/InputButtonSecondary"
+import { InputButtonIconPrimary } from "@new/InputButton/InputButtonIconPrimary"
+import { InputButtonIconSecondary } from "@new/InputButton/InputButtonIconSecondary"
 
 export { SortDirection } from "ka-table"
 
 const KEY_DRAG = "DRAG"
-const KEY_ACTIONS = "ACTIONS"
+const KEY_ACTIONS_EDIT = "ACTIONS"
+const KEY_ACTIONS = "ACTIONS2"
 
 const createNewRow = (data: DataTableProps["data"]): object => {
   return { id: Math.max(...data.map(d => d.id)) + 1 }
@@ -220,6 +224,7 @@ export enum DataType {
   Object = "object",
   String = "string",
   ProgressIndicator = "progressindicator",
+  Image = "image",
 }
 
 export type Column = {
@@ -245,6 +250,12 @@ type Children =
   | ReactElement<InputTextSingleProps>
   | ReactElement<InputTextDateProps>
 
+type RowAction = {
+  label?: string
+  iconName?: string
+  onClick: (rowData: ICellTextProps["rowData"]) => void
+}
+
 export type DataTableProps = {
   mode: "simple" | "filter" | "edit"
   data: any[]
@@ -254,20 +265,19 @@ export type DataTableProps = {
   rowKeyField: string
   exportName: string
   fixedKeyField?: string
-  fixedKeyFieldPosition?: "left" | "right"
   selectKeyField?: string
   selectDisabledField?: string
   virtualScrolling?: boolean
   loading?: boolean
   exportDisable?: boolean
-  noDataText?: string
-  hideHeader?: boolean
+  rowActionPrimary?: RowAction
+  rowActionSecondary?: RowAction
+  rowActionTertiary?: RowAction
   onChange?: (value: DataTableProps["data"]) => void
   onChangeRow?: (value: object) => void
   fill?: ColorWithLightness
   stroke?: ColorWithLightness
   children?: Children | Children[]
-  customCellRenderer?: (cellProps: PropsWithChildren<ICellTextProps>) => ReactElement | null
 }
 
 export const DataTable = (p: DataTableProps) => {
@@ -316,6 +326,7 @@ export const DataTable = (p: DataTableProps) => {
     if (p.defaultSortDirection) {
       sortDirection = p.defaultSortDirection
     }
+
     return {
       key: column.key,
       title: column.title,
@@ -330,6 +341,15 @@ export const DataTable = (p: DataTableProps) => {
   })
 
   if (p.mode === "edit") {
+    nativeColumns = [
+      ...nativeColumns,
+      {
+        key: KEY_ACTIONS_EDIT,
+        title: "",
+        dataType: DataType.Internal,
+      },
+    ]
+  } else if (p.rowActionPrimary || p.rowActionSecondary || p.rowActionTertiary) {
     nativeColumns = [
       ...nativeColumns,
       {
@@ -452,21 +472,21 @@ export const DataTable = (p: DataTableProps) => {
       width: 100%;
     }
 
-    // .${cssScope} .ka .ka-table-wrapper::-webkit-scrollbar-track {
-    //   background: ${computeColor(p.fill || [Color.White])} !important;
-    // }
+    .${cssScope} .ka .ka-table-wrapper::-webkit-scrollbar-track {
+      background: ${computeColor(p.fill || [Color.White])} !important;
+    }
 
-    // .${cssScope} .ka .ka-table-wrapper::-webkit-scrollbar-thumb {
-    //   border: 5px solid ${computeColor(p.fill || [Color.White])} !important;
-    // }
+    .${cssScope} .ka .ka-table-wrapper::-webkit-scrollbar-thumb {
+      border: 5px solid ${computeColor(p.fill || [Color.White])} !important;
+    }
 
-    // .${cssScope} .ka .ka-table-wrapper:hover::-webkit-scrollbar-thumb {
-    //   border: 4px solid ${computeColor(p.fill || [Color.White])} !important;
-    // }
+    .${cssScope} .ka .ka-table-wrapper:hover::-webkit-scrollbar-thumb {
+      border: 4px solid ${computeColor(p.fill || [Color.White])} !important;
+    }
 
-    // .${cssScope} .ka .ka-table-wrapper::-webkit-scrollbar-corner {
-    //   background: ${computeColor(p.fill || [Color.White])} !important;
-    // }
+    .${cssScope} .ka .ka-table-wrapper::-webkit-scrollbar-corner {
+      background: ${computeColor(p.fill || [Color.White])} !important;
+    }
 
     .${cssScope} .ka-table {
       table-layout: unset;
@@ -485,7 +505,7 @@ export const DataTable = (p: DataTableProps) => {
     }
 
     .${cssScope} .ka-thead {
-      display: ${p.hideHeader ? "none" : "table-header-group"};
+      display: "table-header-group";
       position: relative;
     }
 
@@ -516,6 +536,10 @@ export const DataTable = (p: DataTableProps) => {
       height: calc(var(--BU) * 10);
       line-height: unset;
       color: unset;
+    }
+
+    .${cssScope} .ka-cell.override-ka-fixed-right {
+      padding-left: calc(var(--BU) * 2);
     }
 
     .${cssScope} .ka-cell:first-child {
@@ -612,6 +636,13 @@ export const DataTable = (p: DataTableProps) => {
       right: -20px;
       border: none;
       background: linear-gradient(to right, ${computeColor(p.fill || [Color.White])}, transparent);
+    }
+
+    .${cssScope} .ka-thead-row .override-ka-fixed-right:after {
+      width: 20px;
+      left: -20px;
+      border: none;
+      background: linear-gradient(to left, ${computeColor(p.fill || [Color.White])}, transparent);
     }
 
     .${cssScope} .override-ka-fixed-left:after {
@@ -779,7 +810,7 @@ export const DataTable = (p: DataTableProps) => {
                 rowKeyField={p.rowKeyField}
                 sortingMode={SortingMode.Single}
                 rowReordering={p.mode === "edit"}
-                noData={{ text: p.noDataText ?? "Nothing found" }}
+                noData={{ text: "Nothing found" }}
                 searchText={filter}
                 virtualScrolling={p.mode !== "edit" && p.virtualScrolling ? { enabled: true } : { enabled: false }}
                 search={({ searchText: searchTextValue, rowData, column }) => {
@@ -819,7 +850,11 @@ export const DataTable = (p: DataTableProps) => {
 
                   headCell: {
                     content: headCellContent => {
-                      if (headCellContent.column.key === KEY_DRAG || headCellContent.column.key === KEY_ACTIONS) {
+                      if (
+                        headCellContent.column.key === KEY_DRAG ||
+                        headCellContent.column.key === KEY_ACTIONS_EDIT ||
+                        headCellContent.column.key === KEY_ACTIONS
+                      ) {
                         return <></>
                       }
 
@@ -887,8 +922,17 @@ export const DataTable = (p: DataTableProps) => {
                     elementAttributes: headCellElementAttributes => {
                       if (p.fixedKeyField === headCellElementAttributes.column.key) {
                         return {
-                          className:
-                            p.fixedKeyFieldPosition === "right" ? "override-ka-fixed-right" : "override-ka-fixed-left",
+                          className: "override-ka-fixed-left",
+                        }
+                      }
+
+                      if (
+                        headCellElementAttributes.column.key === KEY_DRAG ||
+                        headCellElementAttributes.column.key === KEY_ACTIONS_EDIT ||
+                        headCellElementAttributes.column.key === KEY_ACTIONS
+                      ) {
+                        return {
+                          className: "override-ka-fixed-right",
                         }
                       }
                     },
@@ -896,16 +940,7 @@ export const DataTable = (p: DataTableProps) => {
 
                   cellText: {
                     content: cellTextContent => {
-                      //If we have received a function that may custom render a cell,
-                      //we always check first whether the given cell should be rendered by the custom renderer
-                      if (p.customCellRenderer) {
-                        const customCell = p.customCellRenderer(cellTextContent)
-                        if (customCell !== null) {
-                          return customCell
-                        }
-                      }
-
-                      if (cellTextContent.column.key === KEY_ACTIONS) {
+                      if (cellTextContent.column.key === KEY_ACTIONS_EDIT) {
                         return (
                           <Stack horizontal hug>
                             <Align horizontal right>
@@ -918,6 +953,99 @@ export const DataTable = (p: DataTableProps) => {
                               />
 
                               <ActionEdit {...cellTextContent} disabled={editId !== null} />
+                            </Align>
+                          </Stack>
+                        )
+                      } else if (cellTextContent.column.key === KEY_ACTIONS) {
+                        const actions: ReactElement[] = []
+
+                        if (p.rowActionPrimary?.iconName) {
+                          actions.push(
+                            <InputButtonIconPrimary
+                              size="small"
+                              iconName={p.rowActionPrimary.iconName}
+                              onClick={() => {
+                                // @ts-expect-error
+                                p.rowActionPrimary.onClick(cellTextContent.rowData)
+                              }}
+                            />,
+                          )
+
+                          actions.push(<Spacer xsmall />)
+                        } else if (p.rowActionPrimary?.label) {
+                          actions.push(
+                            <InputButtonPrimary
+                              size="small"
+                              width="auto"
+                              label={p.rowActionPrimary.label}
+                              onClick={() => {
+                                // @ts-expect-error
+                                p.rowActionPrimary.onClick(cellTextContent.rowData)
+                              }}
+                            />,
+                          )
+
+                          actions.push(<Spacer xsmall />)
+                        }
+
+                        if (p.rowActionSecondary?.iconName) {
+                          actions.push(
+                            <InputButtonIconSecondary
+                              size="small"
+                              iconName={p.rowActionSecondary.iconName}
+                              onClick={() => {
+                                // @ts-expect-error
+                                p.rowActionSecondary.onClick(cellTextContent.rowData)
+                              }}
+                            />,
+                          )
+
+                          actions.push(<Spacer xsmall />)
+                        } else if (p.rowActionSecondary?.label) {
+                          actions.push(
+                            <InputButtonSecondary
+                              size="small"
+                              width="auto"
+                              label={p.rowActionSecondary.label}
+                              onClick={() => {
+                                // @ts-expect-error
+                                p.rowActionSecondary.onClick(cellTextContent.rowData)
+                              }}
+                            />,
+                          )
+
+                          actions.push(<Spacer xsmall />)
+                        }
+
+                        if (p.rowActionTertiary?.iconName) {
+                          actions.push(
+                            <InputButtonIconTertiary
+                              size="small"
+                              iconName={p.rowActionTertiary.iconName}
+                              onClick={() => {
+                                // @ts-expect-error
+                                p.rowActionTertiary.onClick(cellTextContent.rowData)
+                              }}
+                            />,
+                          )
+                        } else if (p.rowActionTertiary?.label) {
+                          actions.push(
+                            <InputButtonTertiary
+                              size="small"
+                              width="auto"
+                              label={p.rowActionTertiary.label}
+                              onClick={() => {
+                                // @ts-expect-error
+                                p.rowActionTertiary.onClick(cellTextContent.rowData)
+                              }}
+                            />,
+                          )
+                        }
+
+                        return (
+                          <Stack horizontal hug>
+                            <Align horizontal right>
+                              {actions}
                             </Align>
                           </Stack>
                         )
@@ -1039,7 +1167,7 @@ export const DataTable = (p: DataTableProps) => {
                             <></>
                           )}
 
-                          {cellEditorContent.column.key === KEY_ACTIONS ? (
+                          {cellEditorContent.column.key === KEY_ACTIONS_EDIT ? (
                             <Align left horizontal>
                               <ActionSaveCancel {...cellEditorContent} />
                             </Align>
@@ -1055,15 +1183,16 @@ export const DataTable = (p: DataTableProps) => {
                     elementAttributes: cellElementAttributes => {
                       if (p.fixedKeyField === cellElementAttributes.column.key) {
                         return {
-                          className:
-                            p.fixedKeyFieldPosition === "right" ? "override-ka-fixed-right" : "override-ka-fixed-left",
+                          className: "override-ka-fixed-left",
                         }
                       }
 
-                      if (p.fixedKeyField && cellElementAttributes.column.key === KEY_ACTIONS) {
+                      if (
+                        cellElementAttributes.column.key === KEY_ACTIONS_EDIT ||
+                        cellElementAttributes.column.key === KEY_ACTIONS
+                      ) {
                         return {
-                          className:
-                            p.fixedKeyFieldPosition === "right" ? "override-ka-fixed-right" : "override-ka-fixed-right",
+                          className: "override-ka-fixed-right",
                         }
                       }
                     },
