@@ -88,8 +88,8 @@ export const Badge = (p: BadgeProps) => {
         {p.iconName ? null : <Spacer xsmall={p.size === "small"} small={p.size === "large"} />}
 
         <Text
-          tiny={p.size === "small"}
-          xsmall={p.size !== "small"}
+          xsmall={p.size === "small"}
+          small={p.size !== "small"}
           fill={p.variant === "transparent" ? [Color.Neutral, 700] : [p.color, p.variant === "solid" ? 50 : 700]}
           maxWidth={p.maxWidth}
         >

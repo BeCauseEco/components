@@ -5,9 +5,9 @@ import { Align } from "@new/Stack/Align"
 import { InsertRowPosition, SortDirection, SortingMode, Table, useTable, useTableInstance } from "ka-table"
 import { ICellEditorProps, ICellTextProps } from "ka-table/props"
 import { closeRowEditors, deleteRow, openRowEditors, saveRowEditors } from "ka-table/actionCreators"
-import { InputButtonPrimary } from "@new/InputButton/InputButtonPrimary"
+import { InputButtonPrimary, InputButtonPrimaryProps } from "@new/InputButton/InputButtonPrimary"
 import { Spacer } from "@new/Stack/Spacer"
-import { InputButtonTertiary } from "@new/InputButton/InputButtonTertiary"
+import { InputButtonTertiary, InputButtonTertiaryProps } from "@new/InputButton/InputButtonTertiary"
 import { InputTextSingle, InputTextSingleProps } from "@new/InputText/InputTextSingle"
 import { Color, ColorWithLightness, computeColor, Lightness } from "@new/Color"
 import { InputTextDate, InputTextDateProps } from "@new/InputText/InputTextDate"
@@ -15,7 +15,7 @@ import { InputCheckbox, InputCheckboxProps } from "@new/InputCheckbox/InputCheck
 import { StyleBodySmall, StyleFontFamily, Text } from "@new/Text/Text"
 import { Icon } from "@new/Icon/Icon"
 import styled from "@emotion/styled"
-import { Children, ReactElement, useId, useRef, useState } from "react"
+import { Children, ReactElement, ReactNode, useId, useRef, useState } from "react"
 import { useReactToPrint } from "react-to-print"
 import { InputButtonIconTertiary } from "@new/InputButton/InputButtonIconTertiary"
 import { Divider } from "@new/Divider/Divider"
@@ -25,9 +25,11 @@ import { InputComboboxProps } from "@new/InputCombobox/InputCombobox"
 import { ProgressIndicator } from "@new/ProgressIndicator/ProgressIndicator"
 import { ProgressIndicatorItem } from "@new/ProgressIndicator/ProgressIndicatorItem"
 import { useResizeObserver } from "usehooks-ts"
-import { InputButtonSecondary } from "@new/InputButton/InputButtonSecondary"
-import { InputButtonIconPrimary } from "@new/InputButton/InputButtonIconPrimary"
-import { InputButtonIconSecondary } from "@new/InputButton/InputButtonIconSecondary"
+import { InputButtonIconPrimaryProps } from "@new/InputButton/InputButtonIconPrimary"
+import { InputButtonSecondaryProps } from "@new/InputButton/InputButtonSecondary"
+import { InputButtonIconSecondaryProps } from "@new/InputButton/InputButtonIconSecondary"
+import { PopoverProps } from "@new/Popover/Popover"
+import { Badge } from "@new/Badge/Badge"
 
 export { SortDirection } from "ka-table"
 
@@ -187,7 +189,7 @@ const CellInputCheckbox = ({ column, rowKeyValue, value }: ICellEditorProps) => 
 const CellProgressIndicator = (cellTextProps: ICellTextProps | ICellEditorProps) => {
   const progressIndicator = cellTextProps.column["progressIndicator"] as Column["progressIndicator"]
   const type = progressIndicator?.type || "bar"
-  const { value, color } = progressIndicator?.calculate(cellTextProps.rowData) || { value: 0, color: Color.Neutral }
+  const { value, color } = progressIndicator?.configure(cellTextProps.rowData) || { value: 0, color: Color.Neutral }
 
   return (
     <Stack hug horizontal>
@@ -195,6 +197,29 @@ const CellProgressIndicator = (cellTextProps: ICellTextProps | ICellEditorProps)
         <ProgressIndicator type={type} size="large" color={Color.Neutral}>
           <ProgressIndicatorItem width={`${value}%`} color={color} />
         </ProgressIndicator>
+      </Align>
+    </Stack>
+  )
+}
+
+const CellStatus = (cellTextProps: ICellTextProps | ICellEditorProps) => {
+  const status = cellTextProps.column["status"] as Column["status"]
+
+  const { color, label } = status?.configure(cellTextProps.rowData) || {
+    color: undefined,
+    label: undefined,
+  }
+
+  return (
+    <Stack hug horizontal>
+      <Align horizontal left>
+        {color && label ? (
+          <Badge size="large" variant="transparent" color={color} iconName="circle" label={label} />
+        ) : (
+          <Text fill={[Color.Neutral, 700]} small monospace>
+            –
+          </Text>
+        )}
       </Align>
     </Stack>
   )
@@ -223,8 +248,10 @@ export enum DataType {
   Number = "number",
   Object = "object",
   String = "string",
+  Link = "link",
   ProgressIndicator = "progressindicator",
   Image = "image",
+  Status = "status",
 }
 
 export type Column = {
@@ -237,10 +264,21 @@ export type Column = {
   progressIndicator?: {
     type: "bar" | "circle"
 
-    calculate: (rowData: ICellTextProps["rowData"]) => {
-      value: number
-      color: Color
-    }
+    configure: (rowData: ICellTextProps["rowData"]) =>
+      | {
+          value: number
+          color: Color
+        }
+      | undefined
+  }
+
+  status?: {
+    configure: (rowData: ICellTextProps["rowData"]) =>
+      | {
+          color: Color
+          label: string
+        }
+      | undefined
   }
 }
 
@@ -250,12 +288,15 @@ type Children =
   | ReactElement<InputTextSingleProps>
   | ReactElement<InputTextDateProps>
 
-type RowAction = {
-  label?: string
-  iconName?: string
-  destructive?: boolean
-  onClick: (rowData: ICellTextProps["rowData"]) => void
-}
+type RowActionsElement =
+  | ReactElement<InputButtonPrimaryProps>
+  | ReactElement<InputButtonIconPrimaryProps>
+  | ReactElement<InputButtonSecondaryProps>
+  | ReactElement<InputButtonIconSecondaryProps>
+  | ReactElement<InputButtonTertiaryProps>
+  | ReactElement<InputButtonIconPrimaryProps>
+  | ReactElement<InputButtonIconPrimaryProps>
+  | ReactElement<PopoverProps>
 
 export type DataTableProps = {
   mode: "simple" | "filter" | "edit"
@@ -271,9 +312,7 @@ export type DataTableProps = {
   virtualScrolling?: boolean
   loading?: boolean
   exportDisable?: boolean
-  rowActionPrimary?: RowAction
-  rowActionSecondary?: RowAction
-  rowActionTertiary?: RowAction
+  rowActions?: (rowData: ICellTextProps["rowData"]) => RowActionsElement[]
   onChange?: (value: DataTableProps["data"]) => void
   onChangeRow?: (value: object) => void
   fill?: ColorWithLightness
@@ -333,6 +372,7 @@ export const DataTable = (p: DataTableProps) => {
       title: column.title,
       dataType: column.dataType,
       progressIndicator: column.progressIndicator,
+      status: column.status,
       sortDirection: sortDirection,
       style: {
         width: column.width || "auto",
@@ -350,7 +390,7 @@ export const DataTable = (p: DataTableProps) => {
         dataType: DataType.Internal,
       },
     ]
-  } else if (p.rowActionPrimary || p.rowActionSecondary || p.rowActionTertiary) {
+  } else if (p.rowActions) {
     nativeColumns = [
       ...nativeColumns,
       {
@@ -522,15 +562,6 @@ export const DataTable = (p: DataTableProps) => {
       padding: 0 calc(var(--BU) * 4);
       color: unset;
       z-index: 3;
-    }
-
-    .${cssScope} .ka-cell {
-      overflow: hidden;
-    }
-
-    .${cssScope} .ka-cell .ka-cell-text {
-      width: inherit;
-      overflow: inherit;
     }
 
     .${cssScope} .ka-thead-row .ka-thead-cell:first-child {
@@ -909,7 +940,9 @@ export const DataTable = (p: DataTableProps) => {
                           )}
 
                           <Align horizontal left={!alignmentRight} right={alignmentRight}>
-                            {p.mode === "edit" || headCellContentAsColumn.dataType === DataType.ProgressIndicator ? (
+                            {p.mode === "edit" ||
+                            headCellContentAsColumn.dataType === DataType.ProgressIndicator ||
+                            headCellContentAsColumn.dataType === DataType.Status ? (
                               <Text fill={[Color.Neutral, 700]} xsmall>
                                 <b>{headCellContent.column.title}</b>
                               </Text>
@@ -966,102 +999,20 @@ export const DataTable = (p: DataTableProps) => {
                             </Align>
                           </Stack>
                         )
-                      } else if (cellTextContent.column.key === KEY_ACTIONS) {
-                        const actions: ReactElement[] = []
+                      } else if (cellTextContent.column.key === KEY_ACTIONS && p.rowActions) {
+                        const ra: ReactNode[] = []
 
-                        if (p.rowActionPrimary?.iconName) {
-                          actions.push(
-                            <InputButtonIconPrimary
-                              size="small"
-                              iconName={p.rowActionPrimary.iconName}
-                              onClick={() => {
-                                // @ts-expect-error
-                                p.rowActionPrimary.onClick(cellTextContent.rowData)
-                              }}
-                              destructive={p.rowActionPrimary.destructive}
-                            />,
-                          )
+                        Children.toArray(p.rowActions(cellTextContent.rowData)).forEach(r => {
+                          ra.push(r)
+                          ra.push(<Spacer xsmall />)
+                        })
 
-                          actions.push(<Spacer xsmall />)
-                        } else if (p.rowActionPrimary?.label) {
-                          actions.push(
-                            <InputButtonPrimary
-                              size="small"
-                              width="auto"
-                              label={p.rowActionPrimary.label}
-                              onClick={() => {
-                                // @ts-expect-error
-                                p.rowActionPrimary.onClick(cellTextContent.rowData)
-                              }}
-                              destructive={p.rowActionPrimary.destructive}
-                            />,
-                          )
-
-                          actions.push(<Spacer xsmall />)
-                        }
-
-                        if (p.rowActionSecondary?.iconName) {
-                          actions.push(
-                            <InputButtonIconSecondary
-                              size="small"
-                              iconName={p.rowActionSecondary.iconName}
-                              onClick={() => {
-                                // @ts-expect-error
-                                p.rowActionSecondary.onClick(cellTextContent.rowData)
-                              }}
-                              destructive={p.rowActionSecondary.destructive}
-                            />,
-                          )
-
-                          actions.push(<Spacer xsmall />)
-                        } else if (p.rowActionSecondary?.label) {
-                          actions.push(
-                            <InputButtonSecondary
-                              size="small"
-                              width="auto"
-                              label={p.rowActionSecondary.label}
-                              onClick={() => {
-                                // @ts-expect-error
-                                p.rowActionSecondary.onClick(cellTextContent.rowData)
-                              }}
-                              destructive={p.rowActionSecondary.destructive}
-                            />,
-                          )
-
-                          actions.push(<Spacer xsmall />)
-                        }
-
-                        if (p.rowActionTertiary?.iconName) {
-                          actions.push(
-                            <InputButtonIconTertiary
-                              size="small"
-                              iconName={p.rowActionTertiary.iconName}
-                              onClick={() => {
-                                // @ts-expect-error
-                                p.rowActionTertiary.onClick(cellTextContent.rowData)
-                              }}
-                              destructive={p.rowActionTertiary.destructive}
-                            />,
-                          )
-                        } else if (p.rowActionTertiary?.label) {
-                          actions.push(
-                            <InputButtonTertiary
-                              size="small"
-                              width="auto"
-                              label={p.rowActionTertiary.label}
-                              onClick={() => {
-                                // @ts-expect-error
-                                p.rowActionTertiary.onClick(cellTextContent.rowData)
-                              }}
-                              destructive={p.rowActionTertiary.destructive}
-                            />,
-                          )
-                        }
+                        ra.pop()
 
                         return (
                           <Stack horizontal hug>
-                            <Align horizontal right>
-                              {actions}
+                            <Align horizontal left>
+                              {ra}
                             </Align>
                           </Stack>
                         )
@@ -1078,9 +1029,11 @@ export const DataTable = (p: DataTableProps) => {
 
                         if ((cellTextContent.column as Column).dataType === DataType.ProgressIndicator) {
                           output = <CellProgressIndicator {...cellTextContent} />
+                        } else if ((cellTextContent.column as Column).dataType === DataType.Status) {
+                          output = <CellStatus {...cellTextContent} />
                         } else {
                           output = (
-                            <Text fill={[Color.Neutral, 700]} small monospace={monospace} wrap>
+                            <Text fill={[Color.Neutral, 700]} small monospace={monospace}>
                               {formatValue(
                                 cellTextContent.value?.toString(),
                                 cellTextContent.column.dataType || DataType.String,
@@ -1153,6 +1106,14 @@ export const DataTable = (p: DataTableProps) => {
                           {(cellEditorContent.column as Column).dataType === DataType.ProgressIndicator ? (
                             <Align left horizontal>
                               <CellProgressIndicator {...cellEditorContent} />
+                            </Align>
+                          ) : (
+                            <></>
+                          )}
+
+                          {(cellEditorContent.column as Column).dataType === DataType.Status ? (
+                            <Align left horizontal>
+                              <CellStatus {...cellEditorContent} />
                             </Align>
                           ) : (
                             <></>
