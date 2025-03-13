@@ -1011,7 +1011,7 @@ export const DataTable = (p: DataTableProps) => {
 
                         return (
                           <Stack horizontal hug>
-                            <Align horizontal left>
+                            <Align horizontal right>
                               {ra}
                             </Align>
                           </Stack>
