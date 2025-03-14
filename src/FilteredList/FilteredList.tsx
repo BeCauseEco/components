@@ -95,7 +95,7 @@ export const FilteredList = forwardRef<HTMLDivElement, PropsWithChildren<Filtere
           >
             <Stack horizontal hug>
               <Align horizontal left hug>
-                <Avatar src={avatarSrc} title={avatarTitle} />
+                <Avatar size="large" src={avatarSrc} title={avatarTitle} />
               </Align>
 
               <Spacer xsmall />

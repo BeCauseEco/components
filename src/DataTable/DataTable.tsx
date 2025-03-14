@@ -30,7 +30,8 @@ import { InputButtonSecondaryProps } from "@new/InputButton/InputButtonSecondary
 import { InputButtonIconSecondaryProps } from "@new/InputButton/InputButtonIconSecondary"
 import { PopoverProps } from "@new/Popover/Popover"
 import { Badge } from "@new/Badge/Badge"
-import { InputButtonLink } from "@new/InputButton/InputButtonLink"
+import { Avatar } from "@new/Avatar/Avatar"
+import Link from "next/link"
 
 export { SortDirection } from "ka-table"
 
@@ -226,33 +227,6 @@ const CellStatus = (cellTextProps: ICellTextProps | ICellEditorProps) => {
   )
 }
 
-const CellLink = (cellTextProps: ICellTextProps | ICellEditorProps) => {
-  const link = cellTextProps.column["link"] as Column["link"]
-
-  const { label, href } = link?.configure(cellTextProps.rowData) || {
-    label: undefined,
-    href: undefined,
-  }
-
-  return (
-    <Stack hug horizontal>
-      <Align horizontal left>
-        {label && href ? (
-          <InputButtonLink size="large" label={label} href={href} />
-        ) : label ? (
-          <Text fill={[Color.Neutral, 700]} small>
-            {label}
-          </Text>
-        ) : (
-          <Text fill={[Color.Neutral, 700]} small monospace>
-            –
-          </Text>
-        )}
-      </Align>
-    </Stack>
-  )
-}
-
 const CellHeadLink = styled.a({
   display: "flex",
   alignItems: "center",
@@ -278,7 +252,6 @@ export enum DataType {
   String = "string",
   Link = "link",
   ProgressIndicator = "progressindicator",
-  Image = "image",
   Status = "status",
 }
 
@@ -288,6 +261,10 @@ export type Column = {
   dataType: DataType
   width?: `${number}${"px" | "%"}`
   minWidth?: `calc(var(--BU) * ${number})`
+
+  avatar?: (rowData: ICellTextProps["rowData"]) => string | undefined
+
+  link?: (rowData: ICellTextProps["rowData"]) => string | undefined
 
   progressIndicator?: {
     type: "bar" | "circle"
@@ -307,13 +284,6 @@ export type Column = {
           label: string
         }
       | undefined
-  }
-
-  link?: {
-    configure: (rowData: ICellTextProps["rowData"]) => {
-      label: string
-      href: string | undefined
-    }
   }
 }
 
@@ -408,6 +378,7 @@ export const DataTable = (p: DataTableProps) => {
       dataType: column.dataType,
       progressIndicator: column.progressIndicator,
       status: column.status,
+      avatar: column.avatar,
       link: column.link,
       sortDirection: sortDirection,
       style: {
@@ -1062,23 +1033,58 @@ export const DataTable = (p: DataTableProps) => {
                         const alignmentRight = cellTextContent.column.dataType === DataType.Number
                         const firstColumn = cellTextContent.column.key === nativeColumns[0].key
 
+                        const avatar = cellTextContent.column["avatar"] as Column["avatar"]
+                        const link = cellTextContent.column["link"] as Column["link"]
+
+                        let avatarSrc
+                        let linkHref
+
+                        if (typeof avatar === "function") {
+                          avatarSrc = avatar(cellTextContent.rowData)
+                        }
+
+                        if (typeof link === "function") {
+                          linkHref = link(cellTextContent.rowData)
+                        }
+
                         let output = <></>
 
                         if ((cellTextContent.column as Column).dataType === DataType.ProgressIndicator) {
                           output = <CellProgressIndicator {...cellTextContent} />
                         } else if ((cellTextContent.column as Column).dataType === DataType.Status) {
                           output = <CellStatus {...cellTextContent} />
-                        } else if ((cellTextContent.column as Column).dataType === DataType.Link) {
-                          output = <CellLink {...cellTextContent} />
                         } else {
-                          output = (
-                            <Text fill={[Color.Neutral, 700]} small monospace={monospace}>
-                              {formatValue(
-                                cellTextContent.value?.toString(),
-                                cellTextContent.column.dataType || DataType.String,
-                              )}
-                            </Text>
+                          const text = formatValue(
+                            cellTextContent.value?.toString(),
+                            cellTextContent.column.dataType || DataType.String,
                           )
+
+                          const avatar = avatarSrc ? (
+                            <>
+                              <Avatar size="small" src={avatarSrc} title={text} />
+
+                              <Spacer xsmall />
+                            </>
+                          ) : (
+                            <></>
+                          )
+
+                          output =
+                            linkHref && text !== "–" ? (
+                              <>
+                                {avatar}
+                                <Text fill={[Color.Neutral, 700]} small monospace={monospace}>
+                                  <Link href={linkHref}>{text}</Link>
+                                </Text>
+                              </>
+                            ) : (
+                              <>
+                                {avatar}
+                                <Text fill={[Color.Neutral, 700]} small monospace={monospace}>
+                                  {text}
+                                </Text>
+                              </>
+                            )
                         }
 
                         return (
@@ -1153,14 +1159,6 @@ export const DataTable = (p: DataTableProps) => {
                           {(cellEditorContent.column as Column).dataType === DataType.Status ? (
                             <Align left horizontal>
                               <CellStatus {...cellEditorContent} />
-                            </Align>
-                          ) : (
-                            <></>
-                          )}
-
-                          {(cellEditorContent.column as Column).dataType === DataType.Link ? (
-                            <Align left horizontal>
-                              <CellLink {...cellEditorContent} />
                             </Align>
                           ) : (
                             <></>
