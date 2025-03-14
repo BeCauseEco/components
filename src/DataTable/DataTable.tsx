@@ -28,7 +28,7 @@ import { useResizeObserver } from "usehooks-ts"
 import { InputButtonIconPrimaryProps } from "@new/InputButton/InputButtonIconPrimary"
 import { InputButtonSecondaryProps } from "@new/InputButton/InputButtonSecondary"
 import { InputButtonIconSecondaryProps } from "@new/InputButton/InputButtonIconSecondary"
-import { PopoverProps } from "@new/Popover/Popover"
+import { Popover, PopoverProps } from "@new/Popover/Popover"
 import { Badge } from "@new/Badge/Badge"
 import { Avatar } from "@new/Avatar/Avatar"
 import Link from "next/link"
@@ -263,8 +263,10 @@ export type Column = {
   minWidth?: `calc(var(--BU) * ${number})`
 
   avatar?: (rowData: ICellTextProps["rowData"]) => string | undefined
-
   link?: (rowData: ICellTextProps["rowData"]) => string | undefined
+
+  // TO-DO: @cllpse: not yet implemented. But the signature of this is correct - so use it, and on Monday a tooltip will appear without any further changes needed.
+  tooltip?: (rowData: ICellTextProps["rowData"]) => string | undefined
 
   progressIndicator?: {
     type: "bar" | "circle"
@@ -380,6 +382,7 @@ export const DataTable = (p: DataTableProps) => {
       status: column.status,
       avatar: column.avatar,
       link: column.link,
+      tooltip: column.tooltip,
       sortDirection: sortDirection,
       style: {
         width: column.width || "auto",
@@ -1035,9 +1038,11 @@ export const DataTable = (p: DataTableProps) => {
 
                         const avatar = cellTextContent.column["avatar"] as Column["avatar"]
                         const link = cellTextContent.column["link"] as Column["link"]
+                        const tooltip = cellTextContent.column["tooltip"] as Column["tooltip"]
 
                         let avatarSrc
                         let linkHref
+                        let tooltipText
 
                         if (typeof avatar === "function") {
                           avatarSrc = avatar(cellTextContent.rowData)
@@ -1045,6 +1050,10 @@ export const DataTable = (p: DataTableProps) => {
 
                         if (typeof link === "function") {
                           linkHref = link(cellTextContent.rowData)
+                        }
+
+                        if (typeof tooltip === "function") {
+                          tooltipText = tooltip(cellTextContent.rowData)
                         }
 
                         let output = <></>
@@ -1124,7 +1133,7 @@ export const DataTable = (p: DataTableProps) => {
                             )}
 
                             <Align left={!alignmentRight} right={alignmentRight} horizontal>
-                              {output}
+                              {tooltipText ? output : output}
                             </Align>
                           </Stack>
                         )
