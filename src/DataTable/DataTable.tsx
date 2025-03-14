@@ -626,6 +626,7 @@ export const DataTable = (p: DataTableProps) => {
 
     .${cssScope} .ka-cell:last-child {
       padding-right: calc(var(--BU) * 2);
+      z-index: 3;
     }
 
     .${cssScope} .ka-cell:not(:last-child) {
