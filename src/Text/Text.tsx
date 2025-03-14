@@ -71,7 +71,7 @@ const Container = styled.p<Omit<TextProps, "fill"> & { _fill: TextProps["fill"] 
   },
 
   "& a": {
-    color: computeColor([Color.Quarternary, p._fill?.[1] || 700]),
+    color: computeColor([Color.Quarternary, 700]),
   },
 
   "& abbr": {
