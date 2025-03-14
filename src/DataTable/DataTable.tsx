@@ -337,7 +337,7 @@ export type DataTableProps = {
   mode: "simple" | "filter" | "edit"
   data: any[]
   columns: Column[]
-  defaultSortColumn?: string
+  defaultSortColumn: string
   defaultSortDirection?: SortDirection
   rowKeyField: string
   exportName: string

@@ -1,6 +1,6 @@
 import { PropsWithChildren, forwardRef } from "react"
 import styled from "@emotion/styled"
-import { ColorWithLightness, computeColor } from "@new/Color"
+import { Color, ColorWithLightness, computeColor } from "@new/Color"
 import { PlaywrightProps } from "@new/Playwright"
 
 export const StyleMonospace = {
@@ -71,7 +71,7 @@ const Container = styled.p<Omit<TextProps, "fill"> & { _fill: TextProps["fill"] 
   },
 
   "& a": {
-    color: "inherit",
+    color: computeColor([Color.Quarternary, 700]),
   },
 
   "& abbr": {
