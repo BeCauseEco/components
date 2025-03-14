@@ -2,7 +2,7 @@ import styled from "@emotion/styled"
 import { PlaywrightProps } from "@new/Playwright"
 
 export type AvatarProps = PlaywrightProps & {
-  size: "small" | "medium" | "large"
+  size: "small" | "large"
   title: string
   src: string
 }
