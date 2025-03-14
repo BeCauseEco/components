@@ -6,6 +6,7 @@ const Container = styled.div({
   display: "flex",
   flexDirection: "column",
   height: "100%",
+  maxHeight: "inherit",
 })
 
 const ContentStart = styled.div({

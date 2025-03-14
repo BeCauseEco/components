@@ -5,9 +5,9 @@ import { Align } from "@new/Stack/Align"
 import { InsertRowPosition, SortDirection, SortingMode, Table, useTable, useTableInstance } from "ka-table"
 import { ICellEditorProps, ICellTextProps } from "ka-table/props"
 import { closeRowEditors, deleteRow, openRowEditors, saveRowEditors } from "ka-table/actionCreators"
-import { InputButtonPrimary } from "@new/InputButton/InputButtonPrimary"
+import { InputButtonPrimary, InputButtonPrimaryProps } from "@new/InputButton/InputButtonPrimary"
 import { Spacer } from "@new/Stack/Spacer"
-import { InputButtonTertiary } from "@new/InputButton/InputButtonTertiary"
+import { InputButtonTertiary, InputButtonTertiaryProps } from "@new/InputButton/InputButtonTertiary"
 import { InputTextSingle, InputTextSingleProps } from "@new/InputText/InputTextSingle"
 import { Color, ColorWithLightness, computeColor, Lightness } from "@new/Color"
 import { InputTextDate, InputTextDateProps } from "@new/InputText/InputTextDate"
@@ -15,7 +15,7 @@ import { InputCheckbox, InputCheckboxProps } from "@new/InputCheckbox/InputCheck
 import { StyleBodySmall, StyleFontFamily, Text } from "@new/Text/Text"
 import { Icon } from "@new/Icon/Icon"
 import styled from "@emotion/styled"
-import { Children, PropsWithChildren, ReactElement, useId, useRef, useState } from "react"
+import { Children, ReactElement, ReactNode, useId, useRef, useState } from "react"
 import { useReactToPrint } from "react-to-print"
 import { InputButtonIconTertiary } from "@new/InputButton/InputButtonIconTertiary"
 import { Divider } from "@new/Divider/Divider"
@@ -25,11 +25,18 @@ import { InputComboboxProps } from "@new/InputCombobox/InputCombobox"
 import { ProgressIndicator } from "@new/ProgressIndicator/ProgressIndicator"
 import { ProgressIndicatorItem } from "@new/ProgressIndicator/ProgressIndicatorItem"
 import { useResizeObserver } from "usehooks-ts"
+import { InputButtonIconPrimaryProps } from "@new/InputButton/InputButtonIconPrimary"
+import { InputButtonSecondaryProps } from "@new/InputButton/InputButtonSecondary"
+import { InputButtonIconSecondaryProps } from "@new/InputButton/InputButtonIconSecondary"
+import { PopoverProps } from "@new/Popover/Popover"
+import { Badge } from "@new/Badge/Badge"
+import { InputButtonLink } from "@new/InputButton/InputButtonLink"
 
 export { SortDirection } from "ka-table"
 
 const KEY_DRAG = "DRAG"
-const KEY_ACTIONS = "ACTIONS"
+const KEY_ACTIONS_EDIT = "ACTIONS"
+const KEY_ACTIONS = "ACTIONS2"
 
 const createNewRow = (data: DataTableProps["data"]): object => {
   return { id: Math.max(...data.map(d => d.id)) + 1 }
@@ -183,7 +190,7 @@ const CellInputCheckbox = ({ column, rowKeyValue, value }: ICellEditorProps) => 
 const CellProgressIndicator = (cellTextProps: ICellTextProps | ICellEditorProps) => {
   const progressIndicator = cellTextProps.column["progressIndicator"] as Column["progressIndicator"]
   const type = progressIndicator?.type || "bar"
-  const { value, color } = progressIndicator?.calculate(cellTextProps.rowData) || { value: 0, color: Color.Neutral }
+  const { value, color } = progressIndicator?.configure(cellTextProps.rowData) || { value: 0, color: Color.Neutral }
 
   return (
     <Stack hug horizontal>
@@ -191,6 +198,56 @@ const CellProgressIndicator = (cellTextProps: ICellTextProps | ICellEditorProps)
         <ProgressIndicator type={type} size="large" color={Color.Neutral}>
           <ProgressIndicatorItem width={`${value}%`} color={color} />
         </ProgressIndicator>
+      </Align>
+    </Stack>
+  )
+}
+
+const CellStatus = (cellTextProps: ICellTextProps | ICellEditorProps) => {
+  const status = cellTextProps.column["status"] as Column["status"]
+
+  const { color, label } = status?.configure(cellTextProps.rowData) || {
+    color: undefined,
+    label: undefined,
+  }
+
+  return (
+    <Stack hug horizontal>
+      <Align horizontal left>
+        {color && label ? (
+          <Badge size="large" variant="transparent" color={color} iconName="circle" label={label} />
+        ) : (
+          <Text fill={[Color.Neutral, 700]} small monospace>
+            –
+          </Text>
+        )}
+      </Align>
+    </Stack>
+  )
+}
+
+const CellLink = (cellTextProps: ICellTextProps | ICellEditorProps) => {
+  const link = cellTextProps.column["link"] as Column["link"]
+
+  const { label, href } = link?.configure(cellTextProps.rowData) || {
+    label: undefined,
+    href: undefined,
+  }
+
+  return (
+    <Stack hug horizontal>
+      <Align horizontal left>
+        {label && href ? (
+          <InputButtonLink size="large" label={label} href={href} />
+        ) : label ? (
+          <Text fill={[Color.Neutral, 700]} small>
+            {label}
+          </Text>
+        ) : (
+          <Text fill={[Color.Neutral, 700]} small monospace>
+            –
+          </Text>
+        )}
       </Align>
     </Stack>
   )
@@ -219,7 +276,10 @@ export enum DataType {
   Number = "number",
   Object = "object",
   String = "string",
+  Link = "link",
   ProgressIndicator = "progressindicator",
+  Image = "image",
+  Status = "status",
 }
 
 export type Column = {
@@ -232,9 +292,27 @@ export type Column = {
   progressIndicator?: {
     type: "bar" | "circle"
 
-    calculate: (rowData: ICellTextProps["rowData"]) => {
-      value: number
-      color: Color
+    configure: (rowData: ICellTextProps["rowData"]) =>
+      | {
+          value: number
+          color: Color
+        }
+      | undefined
+  }
+
+  status?: {
+    configure: (rowData: ICellTextProps["rowData"]) =>
+      | {
+          color: Color
+          label: string
+        }
+      | undefined
+  }
+
+  link?: {
+    configure: (rowData: ICellTextProps["rowData"]) => {
+      label: string
+      href: string | undefined
     }
   }
 }
@@ -245,6 +323,16 @@ type Children =
   | ReactElement<InputTextSingleProps>
   | ReactElement<InputTextDateProps>
 
+type RowActionsElement =
+  | ReactElement<InputButtonPrimaryProps>
+  | ReactElement<InputButtonIconPrimaryProps>
+  | ReactElement<InputButtonSecondaryProps>
+  | ReactElement<InputButtonIconSecondaryProps>
+  | ReactElement<InputButtonTertiaryProps>
+  | ReactElement<InputButtonIconPrimaryProps>
+  | ReactElement<InputButtonIconPrimaryProps>
+  | ReactElement<PopoverProps>
+
 export type DataTableProps = {
   mode: "simple" | "filter" | "edit"
   data: any[]
@@ -254,20 +342,17 @@ export type DataTableProps = {
   rowKeyField: string
   exportName: string
   fixedKeyField?: string
-  fixedKeyFieldPosition?: "left" | "right"
   selectKeyField?: string
   selectDisabledField?: string
   virtualScrolling?: boolean
   loading?: boolean
   exportDisable?: boolean
-  noDataText?: string
-  hideHeader?: boolean
+  rowActions?: (rowData: ICellTextProps["rowData"]) => RowActionsElement[]
   onChange?: (value: DataTableProps["data"]) => void
   onChangeRow?: (value: object) => void
   fill?: ColorWithLightness
   stroke?: ColorWithLightness
   children?: Children | Children[]
-  customCellRenderer?: (cellProps: PropsWithChildren<ICellTextProps>) => ReactElement | null
 }
 
 export const DataTable = (p: DataTableProps) => {
@@ -312,14 +397,18 @@ export const DataTable = (p: DataTableProps) => {
     const column = c as Column
 
     let sortDirection = p.mode !== "edit" && column.key === p.defaultSortColumn ? p.defaultSortDirection : undefined
+
     if (p.defaultSortDirection) {
       sortDirection = p.defaultSortDirection
     }
+
     return {
       key: column.key,
       title: column.title,
       dataType: column.dataType,
       progressIndicator: column.progressIndicator,
+      status: column.status,
+      link: column.link,
       sortDirection: sortDirection,
       style: {
         width: column.width || "auto",
@@ -329,6 +418,15 @@ export const DataTable = (p: DataTableProps) => {
   })
 
   if (p.mode === "edit") {
+    nativeColumns = [
+      ...nativeColumns,
+      {
+        key: KEY_ACTIONS_EDIT,
+        title: "",
+        dataType: DataType.Internal,
+      },
+    ]
+  } else if (p.rowActions) {
     nativeColumns = [
       ...nativeColumns,
       {
@@ -467,8 +565,6 @@ export const DataTable = (p: DataTableProps) => {
       background: ${computeColor(p.fill || [Color.White])} !important;
     }
 
-
-
     .${cssScope} .ka-table {
       table-layout: unset;
     }
@@ -477,6 +573,7 @@ export const DataTable = (p: DataTableProps) => {
       background-color: unset;
       width: calc(100% - 2px);
       margin-left: 1px;
+      margin-bottom: 1px;
     }
 
     .${cssScope} .ka colgroup {
@@ -485,9 +582,10 @@ export const DataTable = (p: DataTableProps) => {
     }
 
     .${cssScope} .ka-thead {
-      display: ${p.hideHeader ? "none" : "table-header-group"};
+      display: "table-header-group";
+      position: relative;
     }
-    
+
     .${cssScope} .ka-thead-background {
       background-color: ${computeColor(p.fill || [Color.White])};
     }
@@ -499,6 +597,7 @@ export const DataTable = (p: DataTableProps) => {
     .${cssScope} .ka-thead-cell {
       padding: 0 calc(var(--BU) * 4);
       color: unset;
+      z-index: 3;
     }
 
     .${cssScope} .ka-thead-row .ka-thead-cell:first-child {
@@ -516,12 +615,18 @@ export const DataTable = (p: DataTableProps) => {
       color: unset;
     }
 
+    .${cssScope} .ka-cell.override-ka-fixed-right {
+      padding-left: calc(var(--BU) * 2);
+    }
+
     .${cssScope} .ka-cell:first-child {
       padding-left: calc(var(--BU) * 2);
+      z-index: 3;
     }
 
     .${cssScope} .ka-cell:last-child {
       padding-right: calc(var(--BU) * 2);
+      z-index: 3;
     }
 
     .${cssScope} .ka-cell:not(:last-child) {
@@ -557,7 +662,7 @@ export const DataTable = (p: DataTableProps) => {
     .${cssScope} .override-ka-fixed-right {
       position: sticky;
       background-color: ${computeColor(p.fill || [Color.White])};
-      z-index: 999999999;
+      z-index: 4;
     }
 
     .${cssScope} .override-ka-fixed-left {
@@ -577,8 +682,15 @@ export const DataTable = (p: DataTableProps) => {
       width: 8px;
     }
 
-    .${cssScope} .override-ka-virtual .ka-thead-row {
-      border-bottom: solid 1px ${computeColor(p.fill || [Color.White])};
+    .${cssScope} .ka-thead-row .ka-thead-cell:before {
+      content: "";
+      display: block;
+      position: absolute;
+      left: 0;
+      bottom: -1px;
+      width: 100%;
+      height: 1px;
+      background-color: ${computeColor(p.stroke || [Color.Neutral, 100])};
     }
 
     .${cssScope} .override-ka-virtual .ka-thead-row .ka-thead-cell:before {
@@ -602,6 +714,13 @@ export const DataTable = (p: DataTableProps) => {
       right: -20px;
       border: none;
       background: linear-gradient(to right, ${computeColor(p.fill || [Color.White])}, transparent);
+    }
+
+    .${cssScope} .ka-thead-row .override-ka-fixed-right:after {
+      width: 20px;
+      left: -20px;
+      border: none;
+      background: linear-gradient(to left, ${computeColor(p.fill || [Color.White])}, transparent);
     }
 
     .${cssScope} .override-ka-fixed-left:after {
@@ -769,9 +888,9 @@ export const DataTable = (p: DataTableProps) => {
                 rowKeyField={p.rowKeyField}
                 sortingMode={SortingMode.Single}
                 rowReordering={p.mode === "edit"}
-                noData={{ text: p.noDataText ?? "Nothing found" }}
+                noData={{ text: "Nothing found" }}
                 searchText={filter}
-                virtualScrolling={p.mode !== "edit" && p.virtualScrolling ? { enabled: true } : { enabled: false }}
+                virtualScrolling={p.mode !== "edit" && p.virtualScrolling ? { enabled: true } : undefined}
                 search={({ searchText: searchTextValue, rowData, column }) => {
                   if (column.dataType === DataType.Boolean) {
                     const b = rowData[column.key]
@@ -809,7 +928,11 @@ export const DataTable = (p: DataTableProps) => {
 
                   headCell: {
                     content: headCellContent => {
-                      if (headCellContent.column.key === KEY_DRAG || headCellContent.column.key === KEY_ACTIONS) {
+                      if (
+                        headCellContent.column.key === KEY_DRAG ||
+                        headCellContent.column.key === KEY_ACTIONS_EDIT ||
+                        headCellContent.column.key === KEY_ACTIONS
+                      ) {
                         return <></>
                       }
 
@@ -854,7 +977,9 @@ export const DataTable = (p: DataTableProps) => {
                           )}
 
                           <Align horizontal left={!alignmentRight} right={alignmentRight}>
-                            {p.mode === "edit" || headCellContentAsColumn.dataType === DataType.ProgressIndicator ? (
+                            {p.mode === "edit" ||
+                            headCellContentAsColumn.dataType === DataType.ProgressIndicator ||
+                            headCellContentAsColumn.dataType === DataType.Status ? (
                               <Text fill={[Color.Neutral, 700]} xsmall>
                                 <b>{headCellContent.column.title}</b>
                               </Text>
@@ -877,8 +1002,17 @@ export const DataTable = (p: DataTableProps) => {
                     elementAttributes: headCellElementAttributes => {
                       if (p.fixedKeyField === headCellElementAttributes.column.key) {
                         return {
-                          className:
-                            p.fixedKeyFieldPosition === "right" ? "override-ka-fixed-right" : "override-ka-fixed-left",
+                          className: "override-ka-fixed-left",
+                        }
+                      }
+
+                      if (
+                        headCellElementAttributes.column.key === KEY_DRAG ||
+                        headCellElementAttributes.column.key === KEY_ACTIONS_EDIT ||
+                        headCellElementAttributes.column.key === KEY_ACTIONS
+                      ) {
+                        return {
+                          className: "override-ka-fixed-right",
                         }
                       }
                     },
@@ -886,16 +1020,7 @@ export const DataTable = (p: DataTableProps) => {
 
                   cellText: {
                     content: cellTextContent => {
-                      //If we have received a function that may custom render a cell,
-                      //we always check first whether the given cell should be rendered by the custom renderer
-                      if (p.customCellRenderer) {
-                        const customCell = p.customCellRenderer(cellTextContent)
-                        if (customCell !== null) {
-                          return customCell
-                        }
-                      }
-
-                      if (cellTextContent.column.key === KEY_ACTIONS) {
+                      if (cellTextContent.column.key === KEY_ACTIONS_EDIT) {
                         return (
                           <Stack horizontal hug>
                             <Align horizontal right>
@@ -908,6 +1033,23 @@ export const DataTable = (p: DataTableProps) => {
                               />
 
                               <ActionEdit {...cellTextContent} disabled={editId !== null} />
+                            </Align>
+                          </Stack>
+                        )
+                      } else if (cellTextContent.column.key === KEY_ACTIONS && p.rowActions) {
+                        const ra: ReactNode[] = []
+
+                        Children.toArray(p.rowActions(cellTextContent.rowData)).forEach(r => {
+                          ra.push(r)
+                          ra.push(<Spacer xsmall />)
+                        })
+
+                        ra.pop()
+
+                        return (
+                          <Stack horizontal hug>
+                            <Align horizontal right>
+                              {ra}
                             </Align>
                           </Stack>
                         )
@@ -924,6 +1066,10 @@ export const DataTable = (p: DataTableProps) => {
 
                         if ((cellTextContent.column as Column).dataType === DataType.ProgressIndicator) {
                           output = <CellProgressIndicator {...cellTextContent} />
+                        } else if ((cellTextContent.column as Column).dataType === DataType.Status) {
+                          output = <CellStatus {...cellTextContent} />
+                        } else if ((cellTextContent.column as Column).dataType === DataType.Link) {
+                          output = <CellLink {...cellTextContent} />
                         } else {
                           output = (
                             <Text fill={[Color.Neutral, 700]} small monospace={monospace}>
@@ -1004,6 +1150,22 @@ export const DataTable = (p: DataTableProps) => {
                             <></>
                           )}
 
+                          {(cellEditorContent.column as Column).dataType === DataType.Status ? (
+                            <Align left horizontal>
+                              <CellStatus {...cellEditorContent} />
+                            </Align>
+                          ) : (
+                            <></>
+                          )}
+
+                          {(cellEditorContent.column as Column).dataType === DataType.Link ? (
+                            <Align left horizontal>
+                              <CellLink {...cellEditorContent} />
+                            </Align>
+                          ) : (
+                            <></>
+                          )}
+
                           {cellEditorContent.column.dataType === DataType.Boolean ? (
                             <Align left horizontal>
                               <CellInputCheckbox {...cellEditorContent} />
@@ -1029,7 +1191,7 @@ export const DataTable = (p: DataTableProps) => {
                             <></>
                           )}
 
-                          {cellEditorContent.column.key === KEY_ACTIONS ? (
+                          {cellEditorContent.column.key === KEY_ACTIONS_EDIT ? (
                             <Align left horizontal>
                               <ActionSaveCancel {...cellEditorContent} />
                             </Align>
@@ -1045,12 +1207,14 @@ export const DataTable = (p: DataTableProps) => {
                     elementAttributes: cellElementAttributes => {
                       if (p.fixedKeyField === cellElementAttributes.column.key) {
                         return {
-                          className:
-                            p.fixedKeyFieldPosition === "right" ? "override-ka-fixed-right" : "override-ka-fixed-left",
+                          className: "override-ka-fixed-left",
                         }
                       }
 
-                      if (p.fixedKeyField && cellElementAttributes.column.key === KEY_ACTIONS) {
+                      if (
+                        cellElementAttributes.column.key === KEY_ACTIONS_EDIT ||
+                        cellElementAttributes.column.key === KEY_ACTIONS
+                      ) {
                         return {
                           className: "override-ka-fixed-right",
                         }
