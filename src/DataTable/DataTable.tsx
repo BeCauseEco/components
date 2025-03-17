@@ -28,10 +28,11 @@ import { useResizeObserver } from "usehooks-ts"
 import { InputButtonIconPrimaryProps } from "@new/InputButton/InputButtonIconPrimary"
 import { InputButtonSecondaryProps } from "@new/InputButton/InputButtonSecondary"
 import { InputButtonIconSecondaryProps } from "@new/InputButton/InputButtonIconSecondary"
-import { Popover, PopoverProps } from "@new/Popover/Popover"
+import { PopoverProps } from "@new/Popover/Popover"
 import { Badge } from "@new/Badge/Badge"
 import { Avatar } from "@new/Avatar/Avatar"
 import Link from "next/link"
+import { InputButtonLink } from "@new/InputButton/InputButtonLink"
 
 export { SortDirection } from "ka-table"
 
@@ -263,7 +264,7 @@ export type Column = {
   minWidth?: `calc(var(--BU) * ${number})`
 
   avatar?: (rowData: ICellTextProps["rowData"]) => string | undefined
-  link?: (rowData: ICellTextProps["rowData"]) => string | undefined
+  link?: (rowData: ICellTextProps["rowData"]) => string | (() => void) | undefined
 
   // TO-DO: @cllpse: not yet implemented. But the signature of this is correct - so use it, and on Monday a tooltip will appear without any further changes needed.
   tooltip?: (rowData: ICellTextProps["rowData"]) => string | undefined
@@ -1041,7 +1042,7 @@ export const DataTable = (p: DataTableProps) => {
                         const tooltip = cellTextContent.column["tooltip"] as Column["tooltip"]
 
                         let avatarSrc
-                        let linkHref
+                        let linkEffect
                         let tooltipText
 
                         if (typeof avatar === "function") {
@@ -1049,7 +1050,7 @@ export const DataTable = (p: DataTableProps) => {
                         }
 
                         if (typeof link === "function") {
-                          linkHref = link(cellTextContent.rowData)
+                          linkEffect = link(cellTextContent.rowData)
                         }
 
                         if (typeof tooltip === "function") {
@@ -1079,11 +1080,15 @@ export const DataTable = (p: DataTableProps) => {
                           )
 
                           output =
-                            linkHref && text !== "–" ? (
+                            linkEffect && text !== "–" ? (
                               <>
                                 {avatar}
                                 <Text fill={[Color.Neutral, 700]} small monospace={monospace}>
-                                  <Link href={linkHref}>{text}</Link>
+                                  {typeof linkEffect === "string" ? (
+                                    <Link href={linkEffect}>{text}</Link>
+                                  ) : (
+                                    <InputButtonLink size="large" label={text} onClick={linkEffect} />
+                                  )}
                                 </Text>
                               </>
                             ) : (
