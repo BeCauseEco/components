@@ -1,7 +1,7 @@
 "use client"
 
 import { Stack } from "@new/Stack/Stack"
-import { Align } from "@new/Stack/Align"
+import { Align, AlignProps } from "@new/Stack/Align"
 import { InsertRowPosition, SortDirection, SortingMode, Table, useTable, useTableInstance } from "ka-table"
 import { ICellEditorProps, ICellTextProps } from "ka-table/props"
 import { closeRowEditors, deleteRow, openRowEditors, saveRowEditors } from "ka-table/actionCreators"
@@ -33,6 +33,7 @@ import { Badge } from "@new/Badge/Badge"
 import { Avatar } from "@new/Avatar/Avatar"
 import Link from "next/link"
 import { InputButtonLink } from "@new/InputButton/InputButtonLink"
+import { Tooltip } from "@new/Tooltip/Tooltip"
 
 export { SortDirection } from "ka-table"
 
@@ -251,7 +252,6 @@ export enum DataType {
   Number = "number",
   Object = "object",
   String = "string",
-  Link = "link",
   ProgressIndicator = "progressindicator",
   Status = "status",
 }
@@ -265,9 +265,7 @@ export type Column = {
 
   avatar?: (rowData: ICellTextProps["rowData"]) => string | undefined
   link?: (rowData: ICellTextProps["rowData"]) => string | (() => void) | undefined
-
-  // TO-DO: @cllpse: not yet implemented. But the signature of this is correct - so use it, and on Monday a tooltip will appear without any further changes needed.
-  tooltip?: (rowData: ICellTextProps["rowData"]) => string | undefined
+  tooltip?: (rowData: ICellTextProps["rowData"]) => ReactElement<AlignProps> | undefined
 
   progressIndicator?: {
     type: "bar" | "circle"
@@ -1043,7 +1041,7 @@ export const DataTable = (p: DataTableProps) => {
 
                         let avatarSrc
                         let linkEffect
-                        let tooltipText
+                        let tooltipElement
 
                         if (typeof avatar === "function") {
                           avatarSrc = avatar(cellTextContent.rowData)
@@ -1054,7 +1052,7 @@ export const DataTable = (p: DataTableProps) => {
                         }
 
                         if (typeof tooltip === "function") {
-                          tooltipText = tooltip(cellTextContent.rowData)
+                          tooltipElement = tooltip(cellTextContent.rowData)
                         }
 
                         let output = <></>
@@ -1083,6 +1081,7 @@ export const DataTable = (p: DataTableProps) => {
                             linkEffect && text !== "–" ? (
                               <>
                                 {avatar}
+
                                 <Text fill={[Color.Neutral, 700]} small monospace={monospace}>
                                   {typeof linkEffect === "string" ? (
                                     <Link href={linkEffect}>{text}</Link>
@@ -1094,11 +1093,16 @@ export const DataTable = (p: DataTableProps) => {
                             ) : (
                               <>
                                 {avatar}
+
                                 <Text fill={[Color.Neutral, 700]} small monospace={monospace}>
                                   {text}
                                 </Text>
                               </>
                             )
+
+                          if (tooltipElement) {
+                            output = <Tooltip trigger={output}>{tooltipElement}</Tooltip>
+                          }
                         }
 
                         return (
@@ -1138,7 +1142,7 @@ export const DataTable = (p: DataTableProps) => {
                             )}
 
                             <Align left={!alignmentRight} right={alignmentRight} horizontal>
-                              {tooltipText ? output : output}
+                              {tooltipElement ? output : output}
                             </Align>
                           </Stack>
                         )
