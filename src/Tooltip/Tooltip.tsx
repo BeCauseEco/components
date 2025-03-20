@@ -45,7 +45,6 @@ const Content = styled(RadixTooltip.Content)({
   animationTimingFunction: "cubic-bezier(0.16, 1, 0.3, 1)",
   willChange: "transform, opacity",
   zIndex: 999999,
-  userSelect: "none",
 
   ":focus": {
     outline: "none",

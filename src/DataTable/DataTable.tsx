@@ -195,6 +195,9 @@ const CellProgressIndicator = (cellTextProps: ICellTextProps | ICellEditorProps)
   const type = progressIndicator?.type || "bar"
   const { value, color } = progressIndicator?.configure(cellTextProps.rowData) || { value: 0, color: Color.Neutral }
 
+  // const tooltip = cellTextProps.column["tooltip"] as Column["tooltip"]
+  // const tooltipElement = tooltip?.(cellTextProps.rowData)
+
   return (
     <Stack hug horizontal>
       <Align horizontal left={type === "bar"} center={type === "circle"}>
@@ -346,8 +349,9 @@ export const DataTable = (p: DataTableProps) => {
 
         referenceContainer.current.querySelectorAll(`#reference-target`).forEach(target => {
           const t = target as HTMLElement | undefined
+
           if (t) {
-            t.style.height = `${containerHeight - filtersHeight - spacerHeight}px`
+            t.style.height = `${Math.ceil(containerHeight - filtersHeight - spacerHeight)}px`
           }
         })
       }
@@ -740,10 +744,12 @@ export const DataTable = (p: DataTableProps) => {
     }
 
     .${cssScope} .ka-no-data-cell {
-      ${StyleFontFamily}
-      ${StyleBodySmall}
-      padding: var(--BU) calc(var(--BU) * 2);
-      height: calc(var(--BU) * 10);
+      font-family: ${StyleFontFamily.fontFamily};
+      font-style: ${StyleFontFamily.fontStyle};
+      font-weight: ${StyleFontFamily.fontWeight};
+      font-size: ${StyleBodySmall.fontSize};
+      line-height: ${StyleBodySmall.lineHeight};
+      height: calc(var(--BU) * 16);
     }
 
     .${cssScope} .ka-thead-cell-resize {
@@ -758,6 +764,25 @@ export const DataTable = (p: DataTableProps) => {
 
     .${cssScope} .ka-dragged-row ~ .ka-drag-over-row {
       box-shadow: unset;
+    }
+
+    .${cssScope} #reference-target {
+      display: flex;
+      flexDirection: column;
+      position: relative;
+      width: inherit;
+      height: inherit;
+    }
+
+    .${cssScope} #reference-target:after {
+      content: "";
+      position: absolute;
+      left: 1px;
+      top: -2px;
+      width: calc(100% - 2px);
+      height: 4px;
+      background-color: white;
+      z-index: 99999;
     }
 
     @media print {
@@ -831,12 +856,12 @@ export const DataTable = (p: DataTableProps) => {
                   {!p.exportDisable ? (
                     <Export>
                       <InputButtonIconTertiary
-                        size="small"
+                        size="large"
                         iconName="csv"
                         onClick={() => csv(p.data, p.columns as Column[])}
                       />
 
-                      <InputButtonIconTertiary size="small" iconName="print" onClick={() => print()} />
+                      <InputButtonIconTertiary size="large" iconName="print" onClick={() => print()} />
                     </Export>
                   ) : (
                     <></>
@@ -849,11 +874,7 @@ export const DataTable = (p: DataTableProps) => {
           {p.mode === "filter" ? <Spacer small id="reference-spacer" /> : <></>}
 
           <Align left vertical>
-            <div
-              id="reference-target"
-              style={{ display: "flex", flexDirection: "column", width: "inherit", height: "inherit" }}
-              ref={referencePrint}
-            >
+            <div id="reference-target" ref={referencePrint}>
               <Table
                 table={table}
                 columns={nativeColumns as any}
@@ -1142,7 +1163,7 @@ export const DataTable = (p: DataTableProps) => {
                             )}
 
                             <Align left={!alignmentRight} right={alignmentRight} horizontal>
-                              {tooltipElement ? output : output}
+                              {output}
                             </Align>
                           </Stack>
                         )
