@@ -850,7 +850,7 @@ export const DataTable = (p: DataTableProps) => {
             </Stack>
           </Align>
 
-          <Spacer small id="reference-spacer" />
+          <Spacer medium id="reference-spacer" />
 
           <Align left vertical>
             <div id="reference-target" ref={referencePrint}>
