@@ -72,6 +72,11 @@ const Container = styled.p<Omit<TextProps, "fill"> & { _fill: TextProps["fill"] 
 
   "& a": {
     color: computeColor([Color.Quarternary, 700]),
+    textDecoration: "none",
+  },
+
+  "& a:hover": {
+    textDecoration: "underline",
   },
 
   "& abbr": {

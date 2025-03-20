@@ -195,6 +195,9 @@ const CellProgressIndicator = (cellTextProps: ICellTextProps | ICellEditorProps)
   const type = progressIndicator?.type || "bar"
   const { value, color } = progressIndicator?.configure(cellTextProps.rowData) || { value: 0, color: Color.Neutral }
 
+  // const tooltip = cellTextProps.column["tooltip"] as Column["tooltip"]
+  // const tooltipElement = tooltip?.(cellTextProps.rowData)
+
   return (
     <Stack hug horizontal>
       <Align horizontal left={type === "bar"} center={type === "circle"}>
@@ -346,8 +349,9 @@ export const DataTable = (p: DataTableProps) => {
 
         referenceContainer.current.querySelectorAll(`#reference-target`).forEach(target => {
           const t = target as HTMLElement | undefined
+
           if (t) {
-            t.style.height = `${containerHeight - filtersHeight - spacerHeight}px`
+            t.style.height = `${Math.ceil(containerHeight - filtersHeight - spacerHeight)}px`
           }
         })
       }
@@ -760,6 +764,21 @@ export const DataTable = (p: DataTableProps) => {
       box-shadow: unset;
     }
 
+    .${cssScope} #reference-target {
+      position: relative;
+    }
+
+    .${cssScope} #reference-target:after {
+      content: "";
+      position: absolute;
+      left: 1px;
+      top: -2px;
+      width: calc(100% - 2px);
+      height: 4px;
+      background-color: white;
+      z-index: 99999;
+    }
+
     @media print {
       .ka {
         zoom: 0.5 !important;
@@ -831,12 +850,12 @@ export const DataTable = (p: DataTableProps) => {
                   {!p.exportDisable ? (
                     <Export>
                       <InputButtonIconTertiary
-                        size="small"
+                        size="large"
                         iconName="csv"
                         onClick={() => csv(p.data, p.columns as Column[])}
                       />
 
-                      <InputButtonIconTertiary size="small" iconName="print" onClick={() => print()} />
+                      <InputButtonIconTertiary size="large" iconName="print" onClick={() => print()} />
                     </Export>
                   ) : (
                     <></>
