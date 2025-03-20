@@ -4,7 +4,7 @@ import { Color } from "@new/Color"
 
 export type InputButtonIconLinkProps = Pick<
   InputButtonProps,
-  "id" | "size" | "hug" | "loading" | "disabled" | "onClick" | "preventDefault" | "data-playwright-testid"
+  "id" | "size" | "hug" | "loading" | "disabled" | "onClick" | "preventDefault" | "data-playwright-testid" | "title"
 > & {
   iconName: string
   href: InputButtonProps["href"]
@@ -25,6 +25,7 @@ export const InputButtonIconLink = forwardRef<HTMLButtonElement, InputButtonIcon
       disabled={p.disabled ? true : undefined}
       iconName={p.iconName}
       iconPlacement="labelNotSpecified"
+      title={p.title}
       onClick={p.onClick}
       preventDefault={p.preventDefault}
       data-playwright-testid={p["data-playwright-testid"]}

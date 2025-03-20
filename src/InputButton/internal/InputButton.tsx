@@ -45,6 +45,8 @@ export type InputButtonProps = ComponentBaseProps &
     destructive?: boolean
 
     content?: ReactElement<StackProps> | null | undefined
+
+    title?: string
   }
 
 const computeHeight = (p: InputButtonProps): string => {
@@ -230,8 +232,8 @@ export const InputButton = forwardRef<HTMLButtonElement | HTMLAnchorElement, Inp
   const click =
     href && variant !== "link"
       ? () => {
-          router.push(href)
-        }
+        router.push(href)
+      }
       : onClick
 
   return (
@@ -250,10 +252,11 @@ export const InputButton = forwardRef<HTMLButtonElement | HTMLAnchorElement, Inp
           }
         }
       }}
-      onClick={disabled ? () => {} : click}
+      onClick={disabled ? () => { } : click}
       _width={width}
       _height={computeHeight(p)}
       data-playwright-testid={p["data-playwright-testid"]}
+      title={p.title}
       {...pp}
     >
       <Children

@@ -50,10 +50,10 @@ const formatValue = (value: string, dataType: DataType): string => {
     case DataType.Number:
       return value
         ? new Intl.NumberFormat(undefined, {
-            style: "decimal",
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2,
-          }).format(Number(value))
+          style: "decimal",
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
+        }).format(Number(value))
         : "–"
 
     case DataType.Date:
@@ -239,15 +239,6 @@ const CellHeadLink = styled.a({
   userSelect: "none",
 })
 
-const Export = styled.div({
-  all: "inherit",
-
-  "& a": {
-    all: "unset",
-    cursor: "pointer",
-  },
-})
-
 export enum DataType {
   Internal = "internal",
   Boolean = "boolean",
@@ -275,18 +266,18 @@ export type Column = {
 
     configure: (rowData: ICellTextProps["rowData"]) =>
       | {
-          value: number
-          color: Color
-        }
+        value: number
+        color: Color
+      }
       | undefined
   }
 
   status?: {
     configure: (rowData: ICellTextProps["rowData"]) =>
       | {
-          color: Color
-          label: string
-        }
+        color: Color
+        label: string
+      }
       | undefined
   }
 }
@@ -343,6 +334,7 @@ export const DataTable = (p: DataTableProps) => {
       }
 
       const containerHeight = size.height || 0
+
       if (referenceContainer.current && containerHeight > 0) {
         const filtersHeight = referenceContainer.current.querySelector(`#reference-filters`)?.clientHeight || 0
         const spacerHeight = referenceContainer.current.querySelector(`#reference-spacer`)?.clientHeight || 0
@@ -549,8 +541,8 @@ export const DataTable = (p: DataTableProps) => {
     .${cssScope} .ka .ka-table-wrapper {
       background-color: unset;
       width: calc(100% - 2px);
-      margin-left: 1px;
-      margin-bottom: 1px;
+      height: calc(100% - 2px);
+      margin: 1px;
     }
 
     .${cssScope} .ka colgroup {
@@ -750,6 +742,7 @@ export const DataTable = (p: DataTableProps) => {
       font-size: ${StyleBodySmall.fontSize};
       line-height: ${StyleBodySmall.lineHeight};
       height: calc(var(--BU) * 16);
+      border-bottom: dotted 1px ${computeColor(p.stroke || [Color.Neutral, 100])};
     }
 
     .${cssScope} .ka-thead-cell-resize {
@@ -772,17 +765,6 @@ export const DataTable = (p: DataTableProps) => {
       position: relative;
       width: inherit;
       height: inherit;
-    }
-
-    .${cssScope} #reference-target:after {
-      content: "";
-      position: absolute;
-      left: 1px;
-      top: -2px;
-      width: calc(100% - 2px);
-      height: 4px;
-      background-color: white;
-      z-index: 99999;
     }
 
     @media print {
@@ -818,22 +800,17 @@ export const DataTable = (p: DataTableProps) => {
         <Stack
           vertical
           hug
-          stroke={p.stroke || [Color.Neutral, 100]}
-          fill={p.fill || [Color.Transparent]}
-          cornerRadius="large"
           loading={p.loading}
-          overflowHidden
-          explodeHeight
         >
           <Align left hug="height" horizontal id="reference-filters">
-            <Stack hug="partly" horizontal>
+            <Stack hug horizontal>
               <Align left horizontal>
                 {p.mode === "filter" ? (
                   <InputTextSingle
                     iconNameLeft="search"
                     value={filter}
                     width="fixed"
-                    size="small"
+                    size="large"
                     placeholder="Search"
                     onChange={v => setFilter(v)}
                     color={Color.Neutral}
@@ -849,427 +826,434 @@ export const DataTable = (p: DataTableProps) => {
                     {child}
                   </>
                 ))}
+              </Align>
 
-                <Spacer large />
+              <Spacer large />
 
-                <Align right horizontal>
-                  {!p.exportDisable ? (
-                    <Export>
-                      <InputButtonIconTertiary
-                        size="large"
-                        iconName="csv"
-                        onClick={() => csv(p.data, p.columns as Column[])}
-                      />
+              <Align right horizontal>
+                {!p.exportDisable ? (
+                  <>
+                    <InputButtonIconTertiary
+                      size="large"
+                      iconName="csv"
+                      title="Export to CSV"
+                      onClick={() => csv(p.data, p.columns as Column[])}
+                    />
 
-                      <InputButtonIconTertiary size="large" iconName="print" onClick={() => print()} />
-                    </Export>
-                  ) : (
-                    <></>
-                  )}
-                </Align>
+                    <InputButtonIconTertiary size="large" iconName="print" title="Print table contents" onClick={() => print()} />
+                  </>
+                ) : (
+                  <></>
+                )}
               </Align>
             </Stack>
           </Align>
 
-          {p.mode === "filter" ? <Spacer small id="reference-spacer" /> : <></>}
+          <Spacer small id="reference-spacer" />
 
           <Align left vertical>
             <div id="reference-target" ref={referencePrint}>
-              <Table
-                table={table}
-                columns={nativeColumns as any}
-                data={p.data}
-                rowKeyField={p.rowKeyField}
-                sortingMode={SortingMode.Single}
-                rowReordering={p.mode === "edit"}
-                noData={{ text: "Nothing found" }}
-                searchText={filter}
-                virtualScrolling={p.mode !== "edit" && p.virtualScrolling ? { enabled: true } : undefined}
-                search={({ searchText: searchTextValue, rowData, column }) => {
-                  if (column.dataType === DataType.Boolean) {
-                    const b = rowData[column.key]
-                    const s = searchTextValue.toLowerCase()
+              <Stack
+                vertical
+                hug
+                stroke={p.stroke || [Color.Neutral, 100]}
+                fill={p.fill || [Color.Transparent]}
+                cornerRadius="large"
+              >
+                <Align topLeft vertical>
+                  <Table
+                    table={table}
+                    columns={nativeColumns as any}
+                    data={p.data}
+                    rowKeyField={p.rowKeyField}
+                    sortingMode={SortingMode.Single}
+                    rowReordering={p.mode === "edit"}
+                    noData={{ text: "Nothing found" }}
+                    searchText={filter}
+                    virtualScrolling={p.mode !== "edit" && p.virtualScrolling ? { enabled: true } : undefined}
+                    search={({ searchText: searchTextValue, rowData, column }) => {
+                      if (column.dataType === DataType.Boolean) {
+                        const b = rowData[column.key]
+                        const s = searchTextValue.toLowerCase()
 
-                    return (s === "yes" && b === true) || (s === "no" && b === false)
-                  }
-                }}
-                childComponents={{
-                  tableWrapper: {
-                    elementAttributes: () => {
-                      if (p.mode !== "edit" && p.virtualScrolling) {
-                        return {
-                          className: "override-ka-virtual",
-                        }
+                        return (s === "yes" && b === true) || (s === "no" && b === false)
                       }
-
-                      if (p.mode === "edit") {
-                        return {
-                          className: "override-ka-reorder",
-                        }
-                      }
-                    },
-                  },
-
-                  dataRow: {
-                    elementAttributes: dataRowElementAttributes => {
-                      if (dataRowElementAttributes.rowKeyValue === editId) {
-                        return {
-                          className: "override-ka-editing-row",
-                        }
-                      }
-                    },
-                  },
-
-                  headCell: {
-                    content: headCellContent => {
-                      if (
-                        headCellContent.column.key === KEY_DRAG ||
-                        headCellContent.column.key === KEY_ACTIONS_EDIT ||
-                        headCellContent.column.key === KEY_ACTIONS
-                      ) {
-                        return <></>
-                      }
-
-                      let iconName = ""
-
-                      if (headCellContent.column.sortDirection === SortDirection.Ascend) {
-                        iconName = "keyboard_arrow_up"
-                      } else if (headCellContent.column.sortDirection === SortDirection.Descend) {
-                        iconName = "keyboard_arrow_down"
-                      } else {
-                        iconName = "unfold_more"
-                      }
-
-                      const alignmentRight = headCellContent.column.dataType === DataType.Number
-                      const firstColumn = headCellContent.column.key === nativeColumns[0].key
-
-                      const headCellContentAsColumn = headCellContent.column as Column
-
-                      return (
-                        <Stack hug horizontal>
-                          {(p.mode === "simple" || p.mode === "filter") && p.selectKeyField && firstColumn ? (
-                            <>
-                              <Align left horizontal hug>
-                                <InputCheckbox
-                                  size="small"
-                                  color={Color.Neutral}
-                                  value={
-                                    selectedFields === p.data.length
-                                      ? true
-                                      : selectedFields === 0
-                                        ? false
-                                        : "indeterminate"
-                                  }
-                                  onChange={value => updateSelectFieldAll(value)}
-                                />
-                              </Align>
-
-                              <Spacer xsmall />
-                            </>
-                          ) : (
-                            <></>
-                          )}
-
-                          <Align horizontal left={!alignmentRight} right={alignmentRight}>
-                            {p.mode === "edit" ||
-                            headCellContentAsColumn.dataType === DataType.ProgressIndicator ||
-                            headCellContentAsColumn.dataType === DataType.Status ? (
-                              <Text fill={[Color.Neutral, 700]} xsmall>
-                                <b>{headCellContent.column.title}</b>
-                              </Text>
-                            ) : (
-                              <CellHeadLink onClick={() => table.updateSortDirection(headCellContent.column.key)}>
-                                <Text fill={[Color.Neutral, 700]} xsmall>
-                                  <b>{headCellContent.column.title}</b>
-                                </Text>
-
-                                <Spacer tiny />
-
-                                <Icon medium name={iconName} fill={[Color.Neutral, 700]} />
-                              </CellHeadLink>
-                            )}
-                          </Align>
-                        </Stack>
-                      )
-                    },
-
-                    elementAttributes: headCellElementAttributes => {
-                      if (p.fixedKeyField === headCellElementAttributes.column.key) {
-                        return {
-                          className: "override-ka-fixed-left",
-                        }
-                      }
-
-                      if (
-                        headCellElementAttributes.column.key === KEY_DRAG ||
-                        headCellElementAttributes.column.key === KEY_ACTIONS_EDIT ||
-                        headCellElementAttributes.column.key === KEY_ACTIONS
-                      ) {
-                        return {
-                          className: "override-ka-fixed-right",
-                        }
-                      }
-                    },
-                  },
-
-                  cellText: {
-                    content: cellTextContent => {
-                      if (cellTextContent.column.key === KEY_ACTIONS_EDIT) {
-                        return (
-                          <Stack horizontal hug>
-                            <Align horizontal right>
-                              <InputButtonIconTertiary
-                                size="small"
-                                iconName="delete"
-                                onClick={() => setDeleteId(cellTextContent.rowKeyValue)}
-                                disabled={editId !== null}
-                                destructive
-                              />
-
-                              <ActionEdit {...cellTextContent} disabled={editId !== null} />
-                            </Align>
-                          </Stack>
-                        )
-                      } else if (cellTextContent.column.key === KEY_ACTIONS && p.rowActions) {
-                        const ra: ReactNode[] = []
-
-                        Children.toArray(p.rowActions(cellTextContent.rowData)).forEach(r => {
-                          ra.push(r)
-                          ra.push(<Spacer xsmall />)
-                        })
-
-                        ra.pop()
-
-                        return (
-                          <Stack horizontal hug>
-                            <Align horizontal right>
-                              {ra}
-                            </Align>
-                          </Stack>
-                        )
-                      } else {
-                        const monospace =
-                          cellTextContent.column.dataType === DataType.Date ||
-                          cellTextContent.column.dataType === DataType.Number ||
-                          cellTextContent.column.dataType === DataType.Boolean
-
-                        const alignmentRight = cellTextContent.column.dataType === DataType.Number
-                        const firstColumn = cellTextContent.column.key === nativeColumns[0].key
-
-                        const avatar = cellTextContent.column["avatar"] as Column["avatar"]
-                        const link = cellTextContent.column["link"] as Column["link"]
-                        const tooltip = cellTextContent.column["tooltip"] as Column["tooltip"]
-
-                        let avatarSrc
-                        let linkEffect
-                        let tooltipElement
-
-                        if (typeof avatar === "function") {
-                          avatarSrc = avatar(cellTextContent.rowData)
-                        }
-
-                        if (typeof link === "function") {
-                          linkEffect = link(cellTextContent.rowData)
-                        }
-
-                        if (typeof tooltip === "function") {
-                          tooltipElement = tooltip(cellTextContent.rowData)
-                        }
-
-                        let output = <></>
-
-                        if ((cellTextContent.column as Column).dataType === DataType.ProgressIndicator) {
-                          output = <CellProgressIndicator {...cellTextContent} />
-                        } else if ((cellTextContent.column as Column).dataType === DataType.Status) {
-                          output = <CellStatus {...cellTextContent} />
-                        } else {
-                          const text = formatValue(
-                            cellTextContent.value?.toString(),
-                            cellTextContent.column.dataType || DataType.String,
-                          )
-
-                          const avatar = avatarSrc ? (
-                            <>
-                              <Avatar size="small" src={avatarSrc} title={text} />
-
-                              <Spacer xsmall />
-                            </>
-                          ) : (
-                            <></>
-                          )
-
-                          output =
-                            linkEffect && text !== "–" ? (
-                              <>
-                                {avatar}
-
-                                <Text fill={[Color.Neutral, 700]} small monospace={monospace}>
-                                  {typeof linkEffect === "string" ? (
-                                    <Link href={linkEffect}>{text}</Link>
-                                  ) : (
-                                    <InputButtonLink size="large" label={text} onClick={linkEffect} />
-                                  )}
-                                </Text>
-                              </>
-                            ) : (
-                              <>
-                                {avatar}
-
-                                <Text fill={[Color.Neutral, 700]} small monospace={monospace}>
-                                  {text}
-                                </Text>
-                              </>
-                            )
-
-                          if (tooltipElement) {
-                            output = <Tooltip trigger={output}>{tooltipElement}</Tooltip>
+                    }}
+                    childComponents={{
+                      tableWrapper: {
+                        elementAttributes: () => {
+                          if (p.mode !== "edit" && p.virtualScrolling) {
+                            return {
+                              className: "override-ka-virtual",
+                            }
                           }
-                        }
 
-                        return (
-                          <Stack hug horizontal>
-                            {p.mode === "edit" && firstColumn ? (
-                              <Align left horizontal hug>
-                                <Icon name="drag_indicator" medium fill={[Color.Neutral, 700]} />
+                          if (p.mode === "edit") {
+                            return {
+                              className: "override-ka-reorder",
+                            }
+                          }
+                        },
+                      },
 
-                                <Spacer xsmall />
+                      dataRow: {
+                        elementAttributes: dataRowElementAttributes => {
+                          if (dataRowElementAttributes.rowKeyValue === editId) {
+                            return {
+                              className: "override-ka-editing-row",
+                            }
+                          }
+                        },
+                      },
+
+                      headCell: {
+                        content: headCellContent => {
+                          if (
+                            headCellContent.column.key === KEY_DRAG ||
+                            headCellContent.column.key === KEY_ACTIONS_EDIT ||
+                            headCellContent.column.key === KEY_ACTIONS
+                          ) {
+                            return <></>
+                          }
+
+                          let iconName = ""
+
+                          if (headCellContent.column.sortDirection === SortDirection.Ascend) {
+                            iconName = "keyboard_arrow_up"
+                          } else if (headCellContent.column.sortDirection === SortDirection.Descend) {
+                            iconName = "keyboard_arrow_down"
+                          } else {
+                            iconName = "unfold_more"
+                          }
+
+                          const alignmentRight = headCellContent.column.dataType === DataType.Number
+                          const firstColumn = headCellContent.column.key === nativeColumns[0].key
+
+                          const headCellContentAsColumn = headCellContent.column as Column
+
+                          return (
+                            <Stack hug horizontal>
+                              {(p.mode === "simple" || p.mode === "filter") && p.selectKeyField && firstColumn ? (
+                                <>
+                                  <Align left horizontal hug>
+                                    <InputCheckbox
+                                      size="small"
+                                      color={Color.Neutral}
+                                      value={
+                                        selectedFields === p.data.length
+                                          ? true
+                                          : selectedFields === 0
+                                            ? false
+                                            : "indeterminate"
+                                      }
+                                      onChange={value => updateSelectFieldAll(value)}
+                                    />
+                                  </Align>
+
+                                  <Spacer xsmall />
+                                </>
+                              ) : (
+                                <></>
+                              )}
+
+                              <Align horizontal left={!alignmentRight} right={alignmentRight}>
+                                {p.mode === "edit" ||
+                                  headCellContentAsColumn.dataType === DataType.ProgressIndicator ||
+                                  headCellContentAsColumn.dataType === DataType.Status ? (
+                                  <Text fill={[Color.Neutral, 700]} xsmall>
+                                    <b>{headCellContent.column.title}</b>
+                                  </Text>
+                                ) : (
+                                  <CellHeadLink onClick={() => table.updateSortDirection(headCellContent.column.key)}>
+                                    <Text fill={[Color.Neutral, 700]} xsmall>
+                                      <b>{headCellContent.column.title}</b>
+                                    </Text>
+
+                                    <Spacer tiny />
+
+                                    <Icon medium name={iconName} fill={[Color.Neutral, 700]} />
+                                  </CellHeadLink>
+                                )}
                               </Align>
-                            ) : (
-                              <></>
-                            )}
+                            </Stack>
+                          )
+                        },
 
-                            {(p.mode === "simple" || p.mode === "filter") && p.selectKeyField && firstColumn ? (
-                              <>
-                                <Align left horizontal hug>
-                                  <InputCheckbox
+                        elementAttributes: headCellElementAttributes => {
+                          if (p.fixedKeyField === headCellElementAttributes.column.key) {
+                            return {
+                              className: "override-ka-fixed-left",
+                            }
+                          }
+
+                          if (
+                            headCellElementAttributes.column.key === KEY_DRAG ||
+                            headCellElementAttributes.column.key === KEY_ACTIONS_EDIT ||
+                            headCellElementAttributes.column.key === KEY_ACTIONS
+                          ) {
+                            return {
+                              className: "override-ka-fixed-right",
+                            }
+                          }
+                        },
+                      },
+
+                      cellText: {
+                        content: cellTextContent => {
+                          if (cellTextContent.column.key === KEY_ACTIONS_EDIT) {
+                            return (
+                              <Stack horizontal hug>
+                                <Align horizontal right>
+                                  <InputButtonIconTertiary
                                     size="small"
-                                    color={Color.Neutral}
-                                    disabled={
-                                      p.selectDisabledField
-                                        ? p.data[cellTextContent.rowKeyValue]?.[p.selectDisabledField]
-                                        : false
-                                    }
-                                    value={p.data[cellTextContent.rowKeyValue]?.[p.selectKeyField] ?? false}
-                                    onChange={value => {
-                                      updateSelectField(cellTextContent.rowKeyValue, value)
-                                    }}
+                                    iconName="delete"
+                                    onClick={() => setDeleteId(cellTextContent.rowKeyValue)}
+                                    disabled={editId !== null}
+                                    destructive
                                   />
+
+                                  <ActionEdit {...cellTextContent} disabled={editId !== null} />
                                 </Align>
+                              </Stack>
+                            )
+                          } else if (cellTextContent.column.key === KEY_ACTIONS && p.rowActions) {
+                            const ra: ReactNode[] = []
 
-                                <Spacer xsmall />
-                              </>
-                            ) : (
-                              <></>
-                            )}
+                            Children.toArray(p.rowActions(cellTextContent.rowData)).forEach(r => {
+                              ra.push(r)
+                              ra.push(<Spacer xsmall />)
+                            })
 
-                            <Align left={!alignmentRight} right={alignmentRight} horizontal>
-                              {output}
-                            </Align>
-                          </Stack>
-                        )
-                      }
-                    },
-                  },
+                            ra.pop()
 
-                  cellEditor: {
-                    content: cellEditorContent => {
-                      const firstColumn = cellEditorContent.column.key === nativeColumns[0].key
+                            return (
+                              <Stack horizontal hug>
+                                <Align horizontal right>
+                                  {ra}
+                                </Align>
+                              </Stack>
+                            )
+                          } else {
+                            const monospace =
+                              cellTextContent.column.dataType === DataType.Date ||
+                              cellTextContent.column.dataType === DataType.Number ||
+                              cellTextContent.column.dataType === DataType.Boolean
 
-                      return (
-                        <Stack hug horizontal>
-                          {p.mode === "edit" && firstColumn ? (
-                            <Align left horizontal hug>
-                              <Icon name="drag_indicator" medium fill={[Color.Neutral, 700]} />
+                            const alignmentRight = cellTextContent.column.dataType === DataType.Number
+                            const firstColumn = cellTextContent.column.key === nativeColumns[0].key
 
-                              <Spacer xsmall />
-                            </Align>
-                          ) : (
-                            <></>
-                          )}
+                            const avatar = cellTextContent.column["avatar"] as Column["avatar"]
+                            const link = cellTextContent.column["link"] as Column["link"]
+                            const tooltip = cellTextContent.column["tooltip"] as Column["tooltip"]
 
-                          {(cellEditorContent.column as Column).dataType === DataType.ProgressIndicator ? (
-                            <Align left horizontal>
-                              <CellProgressIndicator {...cellEditorContent} />
-                            </Align>
-                          ) : (
-                            <></>
-                          )}
+                            let avatarSrc
+                            let linkEffect
+                            let tooltipElement
 
-                          {(cellEditorContent.column as Column).dataType === DataType.Status ? (
-                            <Align left horizontal>
-                              <CellStatus {...cellEditorContent} />
-                            </Align>
-                          ) : (
-                            <></>
-                          )}
+                            if (typeof avatar === "function") {
+                              avatarSrc = avatar(cellTextContent.rowData)
+                            }
 
-                          {cellEditorContent.column.dataType === DataType.Boolean ? (
-                            <Align left horizontal>
-                              <CellInputCheckbox {...cellEditorContent} />
-                            </Align>
-                          ) : (
-                            <></>
-                          )}
+                            if (typeof link === "function") {
+                              linkEffect = link(cellTextContent.rowData)
+                            }
 
-                          {cellEditorContent.column.dataType === DataType.Date ? (
-                            <Align left horizontal>
-                              <CellInputTextDate {...cellEditorContent} />
-                            </Align>
-                          ) : (
-                            <></>
-                          )}
+                            if (typeof tooltip === "function") {
+                              tooltipElement = tooltip(cellTextContent.rowData)
+                            }
 
-                          {cellEditorContent.column.dataType === DataType.Number ||
-                          cellEditorContent.column.dataType === DataType.String ? (
-                            <Align left horizontal>
-                              <CellInputTextSingle {...cellEditorContent} />
-                            </Align>
-                          ) : (
-                            <></>
-                          )}
+                            let output = <></>
 
-                          {cellEditorContent.column.key === KEY_ACTIONS_EDIT ? (
-                            <Align left horizontal>
-                              <ActionSaveCancel {...cellEditorContent} />
-                            </Align>
-                          ) : (
-                            <></>
-                          )}
-                        </Stack>
-                      )
-                    },
-                  },
+                            if ((cellTextContent.column as Column).dataType === DataType.ProgressIndicator) {
+                              output = <CellProgressIndicator {...cellTextContent} />
+                            } else if ((cellTextContent.column as Column).dataType === DataType.Status) {
+                              output = <CellStatus {...cellTextContent} />
+                            } else {
+                              const text = formatValue(
+                                cellTextContent.value?.toString(),
+                                cellTextContent.column.dataType || DataType.String,
+                              )
 
-                  cell: {
-                    elementAttributes: cellElementAttributes => {
-                      if (p.fixedKeyField === cellElementAttributes.column.key) {
-                        return {
-                          className: "override-ka-fixed-left",
-                        }
-                      }
+                              const avatar = avatarSrc ? (
+                                <>
+                                  <Avatar size="small" src={avatarSrc} title={text} />
 
-                      if (
-                        cellElementAttributes.column.key === KEY_ACTIONS_EDIT ||
-                        cellElementAttributes.column.key === KEY_ACTIONS
-                      ) {
-                        return {
-                          className: "override-ka-fixed-right",
-                        }
-                      }
-                    },
-                  },
-                }}
-              />
-            </div>
-          </Align>
+                                  <Spacer xsmall />
+                                </>
+                              ) : (
+                                <></>
+                              )
 
-          {p.mode === "edit" ? (
-            <>
-              <Divider horizontal fill={[Color.Neutral, 100]} />
+                              output =
+                                linkEffect && text !== "–" ? (
+                                  <>
+                                    {avatar}
 
-              <Align left horizontal>
-                <Stack hug="partly" horizontal fill={[Color.White]} cornerRadius="medium">
-                  <Align center horizontal>
+                                    <Text fill={[Color.Neutral, 700]} small monospace={monospace}>
+                                      {typeof linkEffect === "string" ? (
+                                        <Link href={linkEffect}>{text}</Link>
+                                      ) : (
+                                        <InputButtonLink size="large" label={text} onClick={linkEffect} />
+                                      )}
+                                    </Text>
+                                  </>
+                                ) : (
+                                  <>
+                                    {avatar}
+
+                                    <Text fill={[Color.Neutral, 700]} small monospace={monospace}>
+                                      {text}
+                                    </Text>
+                                  </>
+                                )
+
+                              if (tooltipElement) {
+                                output = <Tooltip trigger={output}>{tooltipElement}</Tooltip>
+                              }
+                            }
+
+                            return (
+                              <Stack hug horizontal>
+                                {p.mode === "edit" && firstColumn ? (
+                                  <Align left horizontal hug>
+                                    <Icon name="drag_indicator" medium fill={[Color.Neutral, 700]} />
+
+                                    <Spacer xsmall />
+                                  </Align>
+                                ) : (
+                                  <></>
+                                )}
+
+                                {(p.mode === "simple" || p.mode === "filter") && p.selectKeyField && firstColumn ? (
+                                  <>
+                                    <Align left horizontal hug>
+                                      <InputCheckbox
+                                        size="small"
+                                        color={Color.Neutral}
+                                        disabled={
+                                          p.selectDisabledField
+                                            ? p.data[cellTextContent.rowKeyValue]?.[p.selectDisabledField]
+                                            : false
+                                        }
+                                        value={p.data[cellTextContent.rowKeyValue]?.[p.selectKeyField] ?? false}
+                                        onChange={value => {
+                                          updateSelectField(cellTextContent.rowKeyValue, value)
+                                        }}
+                                      />
+                                    </Align>
+
+                                    <Spacer xsmall />
+                                  </>
+                                ) : (
+                                  <></>
+                                )}
+
+                                <Align left={!alignmentRight} right={alignmentRight} horizontal>
+                                  {output}
+                                </Align>
+                              </Stack>
+                            )
+                          }
+                        },
+                      },
+
+                      cellEditor: {
+                        content: cellEditorContent => {
+                          const firstColumn = cellEditorContent.column.key === nativeColumns[0].key
+
+                          return (
+                            <Stack hug horizontal>
+                              {p.mode === "edit" && firstColumn ? (
+                                <Align left horizontal hug>
+                                  <Icon name="drag_indicator" medium fill={[Color.Neutral, 700]} />
+
+                                  <Spacer xsmall />
+                                </Align>
+                              ) : (
+                                <></>
+                              )}
+
+                              {(cellEditorContent.column as Column).dataType === DataType.ProgressIndicator ? (
+                                <Align left horizontal>
+                                  <CellProgressIndicator {...cellEditorContent} />
+                                </Align>
+                              ) : (
+                                <></>
+                              )}
+
+                              {(cellEditorContent.column as Column).dataType === DataType.Status ? (
+                                <Align left horizontal>
+                                  <CellStatus {...cellEditorContent} />
+                                </Align>
+                              ) : (
+                                <></>
+                              )}
+
+                              {cellEditorContent.column.dataType === DataType.Boolean ? (
+                                <Align left horizontal>
+                                  <CellInputCheckbox {...cellEditorContent} />
+                                </Align>
+                              ) : (
+                                <></>
+                              )}
+
+                              {cellEditorContent.column.dataType === DataType.Date ? (
+                                <Align left horizontal>
+                                  <CellInputTextDate {...cellEditorContent} />
+                                </Align>
+                              ) : (
+                                <></>
+                              )}
+
+                              {cellEditorContent.column.dataType === DataType.Number ||
+                                cellEditorContent.column.dataType === DataType.String ? (
+                                <Align left horizontal>
+                                  <CellInputTextSingle {...cellEditorContent} />
+                                </Align>
+                              ) : (
+                                <></>
+                              )}
+
+                              {cellEditorContent.column.key === KEY_ACTIONS_EDIT ? (
+                                <Align left horizontal>
+                                  <ActionSaveCancel {...cellEditorContent} />
+                                </Align>
+                              ) : (
+                                <></>
+                              )}
+                            </Stack>
+                          )
+                        },
+                      },
+
+                      cell: {
+                        elementAttributes: cellElementAttributes => {
+                          if (p.fixedKeyField === cellElementAttributes.column.key) {
+                            return {
+                              className: "override-ka-fixed-left",
+                            }
+                          }
+
+                          if (
+                            cellElementAttributes.column.key === KEY_ACTIONS_EDIT ||
+                            cellElementAttributes.column.key === KEY_ACTIONS
+                          ) {
+                            return {
+                              className: "override-ka-fixed-right",
+                            }
+                          }
+                        },
+                      },
+                    }}
+                  />
+                </Align>
+
+                {p.mode === "edit" ? (
+                  <Align center vertical>
+                    <Divider fill={[Color.Neutral, 100]} />
+
+                    <Spacer xsmall />
+
                     <InputButtonTertiary
                       width="auto"
                       size="small"
@@ -1283,13 +1267,15 @@ export const DataTable = (p: DataTableProps) => {
                         })
                       }}
                     />
+
+                    <Spacer xsmall />
                   </Align>
-                </Stack>
-              </Align>
-            </>
-          ) : (
-            <></>
-          )}
+                ) : (
+                  <></>
+                )}
+              </Stack>
+            </div>
+          </Align>
         </Stack>
       </div>
 
