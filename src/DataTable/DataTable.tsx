@@ -744,10 +744,12 @@ export const DataTable = (p: DataTableProps) => {
     }
 
     .${cssScope} .ka-no-data-cell {
-      ${StyleFontFamily}
-      ${StyleBodySmall}
-      padding: var(--BU) calc(var(--BU) * 2);
-      height: calc(var(--BU) * 10);
+      font-family: ${StyleFontFamily.fontFamily};
+      font-style: ${StyleFontFamily.fontStyle};
+      font-weight: ${StyleFontFamily.fontWeight};
+      font-size: ${StyleBodySmall.fontSize};
+      line-height: ${StyleBodySmall.lineHeight};
+      height: calc(var(--BU) * 16);
     }
 
     .${cssScope} .ka-thead-cell-resize {

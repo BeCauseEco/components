@@ -29,22 +29,38 @@ const ContentMiddle = styled.div({
   flexGrow: 1,
 })
 
-const ContentEnd = styled.div({
+const ContentCountEnd = styled.div({
   display: "flex",
   flexDirection: "row",
   padding: "calc(var(--BU) * 4)",
+  justifyContent: "space-between",
+})
+
+const ContentCount = styled.div({
+  display: "flex",
+  alignSelf: "flex-start",
+  flexDirection: "row",
+  height: "100%",
+  alignItems: "center",
+})
+
+const ContentEnd = styled.div({
+  display: "flex",
+  flexDirection: "row",
+  alignSelf: "flex-end",
   justifyContent: "flex-end",
 })
 
 export type TLayoutDialog = TLayoutBase & {
   contentStart?: ReactNode | ReactNode[]
   contentMiddle: ReactNode | ReactNode[]
+  buttonsText?: ReactNode
   contentEnd: ReactNode | ReactNode[]
   buttonClose: ReactNode
   omitPadding?: boolean
 }
 
-export const LayoutDialog = ({ contentStart, contentMiddle, contentEnd, buttonClose }: TLayoutDialog) => {
+export const LayoutDialog = ({ contentStart, contentMiddle, contentEnd, buttonClose, buttonsText }: TLayoutDialog) => {
   return (
     <Container className="layout-container">
       <ContentStart>
@@ -55,7 +71,11 @@ export const LayoutDialog = ({ contentStart, contentMiddle, contentEnd, buttonCl
 
       <ContentMiddle>{contentMiddle}</ContentMiddle>
 
-      <ContentEnd>{contentEnd}</ContentEnd>
+      <ContentCountEnd>
+        <ContentCount>{buttonsText}</ContentCount>
+
+        <ContentEnd>{contentEnd}</ContentEnd>
+      </ContentCountEnd>
     </Container>
   )
 }

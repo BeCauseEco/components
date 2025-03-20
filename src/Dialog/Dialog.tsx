@@ -113,6 +113,7 @@ export type TDialog = PlaywrightProps & {
   title?: ReactElement<TextProps>
   description?: ReactElement<TextProps> | ReactElement<TextProps | SpacerProps>[]
   message?: ["notice" | "warning" | "error" | "hidden", string]
+  buttonsText?: string | number | undefined
   buttonPrimary?: ReactElement<InputButtonPrimaryProps>
   buttonSecondary?: ReactElement<InputButtonSecondaryProps>
   buttonTertiary?: ReactElement<InputButtonTertiaryProps>
@@ -200,6 +201,11 @@ export const Dialog = (p: TDialog) => {
                     </>
                   )}
                 </>
+              }
+              buttonsText={
+                <Text small fill={[Color.Neutral, 700]}>
+                  {p.buttonsText}
+                </Text>
               }
               buttonClose={
                 <RadixDialogClose asChild>
