@@ -38,8 +38,8 @@ import { Tooltip } from "@new/Tooltip/Tooltip"
 export { SortDirection } from "ka-table"
 
 const KEY_DRAG = "DRAG"
-const KEY_ACTIONS_EDIT = "ACTIONS"
-const KEY_ACTIONS = "ACTIONS2"
+const KEY_ACTIONS_EDIT = "ACTIONS_EDIT"
+const KEY_ACTIONS = "ACTIONS"
 
 const createNewRow = (data: DataTableProps["data"]): object => {
   return { id: Math.max(...data.map(d => d.id)) + 1 }
@@ -50,10 +50,10 @@ const formatValue = (value: string, dataType: DataType): string => {
     case DataType.Number:
       return value
         ? new Intl.NumberFormat(undefined, {
-          style: "decimal",
-          minimumFractionDigits: 2,
-          maximumFractionDigits: 2,
-        }).format(Number(value))
+            style: "decimal",
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+          }).format(Number(value))
         : "–"
 
     case DataType.Date:
@@ -266,18 +266,18 @@ export type Column = {
 
     configure: (rowData: ICellTextProps["rowData"]) =>
       | {
-        value: number
-        color: Color
-      }
+          value: number
+          color: Color
+        }
       | undefined
   }
 
   status?: {
     configure: (rowData: ICellTextProps["rowData"]) =>
       | {
-        color: Color
-        label: string
-      }
+          color: Color
+          label: string
+        }
       | undefined
   }
 }
@@ -797,11 +797,7 @@ export const DataTable = (p: DataTableProps) => {
       <style suppressHydrationWarning>{css}</style>
 
       <div className={cssScope} style={{ display: "flex", width: "100%", height: "100%" }} ref={referenceContainer}>
-        <Stack
-          vertical
-          hug
-          loading={p.loading}
-        >
+        <Stack vertical hug loading={p.loading}>
           <Align left hug="height" horizontal id="reference-filters">
             <Stack hug horizontal>
               <Align left horizontal>
@@ -840,7 +836,12 @@ export const DataTable = (p: DataTableProps) => {
                       onClick={() => csv(p.data, p.columns as Column[])}
                     />
 
-                    <InputButtonIconTertiary size="large" iconName="print" title="Print table contents" onClick={() => print()} />
+                    <InputButtonIconTertiary
+                      size="large"
+                      iconName="print"
+                      title="Print table contents"
+                      onClick={() => print()}
+                    />
                   </>
                 ) : (
                   <></>
@@ -958,8 +959,8 @@ export const DataTable = (p: DataTableProps) => {
 
                               <Align horizontal left={!alignmentRight} right={alignmentRight}>
                                 {p.mode === "edit" ||
-                                  headCellContentAsColumn.dataType === DataType.ProgressIndicator ||
-                                  headCellContentAsColumn.dataType === DataType.Status ? (
+                                headCellContentAsColumn.dataType === DataType.ProgressIndicator ||
+                                headCellContentAsColumn.dataType === DataType.Status ? (
                                   <Text fill={[Color.Neutral, 700]} xsmall>
                                     <b>{headCellContent.column.title}</b>
                                   </Text>
@@ -1206,7 +1207,7 @@ export const DataTable = (p: DataTableProps) => {
                               )}
 
                               {cellEditorContent.column.dataType === DataType.Number ||
-                                cellEditorContent.column.dataType === DataType.String ? (
+                              cellEditorContent.column.dataType === DataType.String ? (
                                 <Align left horizontal>
                                   <CellInputTextSingle {...cellEditorContent} />
                                 </Align>
