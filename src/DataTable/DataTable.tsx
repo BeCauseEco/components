@@ -1163,7 +1163,7 @@ export const DataTable = (p: DataTableProps) => {
                             )}
 
                             <Align left={!alignmentRight} right={alignmentRight} horizontal>
-                              {tooltipElement ? output : output}
+                              {output}
                             </Align>
                           </Stack>
                         )
