@@ -765,7 +765,11 @@ export const DataTable = (p: DataTableProps) => {
     }
 
     .${cssScope} #reference-target {
+      display: flex;
+      flexDirection: column;
       position: relative;
+      width: inherit;
+      height: inherit;
     }
 
     .${cssScope} #reference-target:after {
@@ -868,11 +872,7 @@ export const DataTable = (p: DataTableProps) => {
           {p.mode === "filter" ? <Spacer small id="reference-spacer" /> : <></>}
 
           <Align left vertical>
-            <div
-              id="reference-target"
-              style={{ display: "flex", flexDirection: "column", width: "inherit", height: "inherit" }}
-              ref={referencePrint}
-            >
+            <div id="reference-target" ref={referencePrint}>
               <Table
                 table={table}
                 columns={nativeColumns as any}
