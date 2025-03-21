@@ -259,7 +259,7 @@ export type Column = {
 
   avatar?: (rowData: ICellTextProps["rowData"]) => string | undefined
   link?: (rowData: ICellTextProps["rowData"]) => string | (() => void) | undefined
-  tooltip?: (rowData: ICellTextProps["rowData"]) => ReactElement<AlignProps> | undefined
+  tooltip?: (rowData: ICellTextProps["rowData"]) => ReactElement<AlignProps> | string | undefined
 
   progressIndicator?: {
     type: "bar" | "circle"
@@ -1072,6 +1072,16 @@ export const DataTable = (p: DataTableProps) => {
 
                             if (typeof tooltip === "function") {
                               tooltipElement = tooltip(cellTextContent.rowData)
+
+                              if (typeof tooltipElement === "string") {
+                                tooltipElement = (
+                                  <Align horizontal left>
+                                    <Text small fill={[Color.Neutral, 700]}>
+                                      {tooltipElement}
+                                    </Text>
+                                  </Align>
+                                )
+                              }
                             }
 
                             let output = <></>
