@@ -15,7 +15,7 @@ import { InputCheckbox, InputCheckboxProps } from "@new/InputCheckbox/InputCheck
 import { StyleBodySmall, StyleFontFamily, Text } from "@new/Text/Text"
 import { Icon } from "@new/Icon/Icon"
 import styled from "@emotion/styled"
-import { Children, ReactElement, ReactNode, useId, useRef, useState } from "react"
+import { Children, PropsWithChildren, ReactElement, ReactNode, useId, useRef, useState } from "react"
 import { useReactToPrint } from "react-to-print"
 import { InputButtonIconTertiary } from "@new/InputButton/InputButtonIconTertiary"
 import { Divider } from "@new/Divider/Divider"
@@ -318,6 +318,12 @@ export type DataTableProps = {
   fill?: ColorWithLightness
   stroke?: ColorWithLightness
   children?: Children | Children[]
+
+  /**
+   * @deprecated
+   * See DataType enum and/or Column enum for available alternatives - tooltips, links, progress indicators, etc. are all possible using these.
+   */
+  DEPRICATED_customCellRenderer?: (cellProps: PropsWithChildren<ICellTextProps>) => ReactElement | null
 }
 
 export const DataTable = (p: DataTableProps) => {
@@ -1001,7 +1007,12 @@ export const DataTable = (p: DataTableProps) => {
 
                       cellText: {
                         content: cellTextContent => {
-                          if (cellTextContent.column.key === KEY_ACTIONS_EDIT) {
+                          if (p.DEPRICATED_customCellRenderer) {
+                            const customCell = p.DEPRICATED_customCellRenderer(cellTextContent)
+                            if (customCell !== null) {
+                              return customCell
+                            }
+                          } else if (cellTextContent.column.key === KEY_ACTIONS_EDIT) {
                             return (
                               <Stack horizontal hug>
                                 <Align horizontal right>
