@@ -439,7 +439,7 @@ export const DataTable = (p: DataTableProps) => {
 
     const d = [...p.data]
 
-    d.forEach(row => {
+    d.filter(d => p.selectDisabledField !== undefined && !d[p.selectDisabledField]).forEach(row => {
       if (p.selectKeyField) {
         row[p.selectKeyField] = value
       }
@@ -947,7 +947,10 @@ export const DataTable = (p: DataTableProps) => {
                                       size="small"
                                       color={Color.Neutral}
                                       value={
-                                        selectedFields === p.data.length
+                                        selectedFields ===
+                                        p.data.filter(
+                                          d => p.selectDisabledField !== undefined && d[p.selectDisabledField],
+                                        ).length
                                           ? true
                                           : selectedFields === 0
                                             ? false
