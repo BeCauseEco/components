@@ -439,7 +439,7 @@ export const DataTable = (p: DataTableProps) => {
 
     const d = [...p.data]
 
-    d.forEach(row => {
+    d.filter(d => p.selectDisabledField === undefined || !d[p.selectDisabledField]).forEach(row => {
       if (p.selectKeyField) {
         row[p.selectKeyField] = value
       }
@@ -937,6 +937,11 @@ export const DataTable = (p: DataTableProps) => {
                           const firstColumn = headCellContent.column.key === nativeColumns[0].key
 
                           const headCellContentAsColumn = headCellContent.column as Column
+                          const totalSelectableFields = p.data.filter(d =>
+                            p.selectDisabledField !== undefined && d[p.selectDisabledField]
+                              ? d[p.selectKeyField!]
+                              : true,
+                          ).length
 
                           return (
                             <Stack hug horizontal>
@@ -947,7 +952,7 @@ export const DataTable = (p: DataTableProps) => {
                                       size="small"
                                       color={Color.Neutral}
                                       value={
-                                        selectedFields === p.data.length
+                                        selectedFields === totalSelectableFields
                                           ? true
                                           : selectedFields === 0
                                             ? false
