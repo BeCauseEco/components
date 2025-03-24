@@ -335,6 +335,8 @@ export const DataTable = (p: DataTableProps) => {
     ref: referenceContainer,
     box: "border-box",
     onResize: size => {
+      console.log("resize", size)
+
       if (p.mode === "edit") {
         return
       }
@@ -1128,7 +1130,9 @@ export const DataTable = (p: DataTableProps) => {
                                       {typeof linkEffect === "string" ? (
                                         <Link href={linkEffect}>{text}</Link>
                                       ) : (
-                                        <InputButtonLink size="large" label={text} onClick={linkEffect} />
+                                        <a href="javascript: void(0);" onClick={linkEffect}>
+                                          {text}
+                                        </a>
                                       )}
                                     </Text>
                                   </>
@@ -1302,7 +1306,8 @@ export const DataTable = (p: DataTableProps) => {
                               width: column.key === nativeColumns[0].key ? "100%" : "auto",
                               "min-width": column.minWidth || "auto",
                               "max-width": column.maxWidth || "100%",
-                              "overflow-x": column.maxWidth !== undefined ? "hidden" : "visible",
+                              "overflow-x": column.maxWidth !== undefined ? "hidden" : "",
+                              "overflow-y": column.maxWidth !== undefined ? "hidden" : "",
                             },
                           }
                         },

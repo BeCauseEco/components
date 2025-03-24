@@ -72,6 +72,8 @@ const Container = styled.p<Omit<TextProps, "fill"> & { _fill: TextProps["fill"] 
   "& a": {
     color: computeColor([Color.Quarternary, 700]),
     textDecoration: "none",
+    overflow: "inherit",
+    textOverflow: "inherit",
   },
 
   "& a:hover": {
@@ -94,11 +96,8 @@ const Container = styled.p<Omit<TextProps, "fill"> & { _fill: TextProps["fill"] 
   },
 
   ...((p.maxWidth || p.textOverflow) && {
-    overflowX: "hidden",
-    overflowY: "hidden",
+    overflow: "hidden",
     textOverflow: "ellipsis",
-    textWrap: "nowrap",
-    display: "inline-block",
     maxWidth: p.maxWidth || "auto",
   }),
 
