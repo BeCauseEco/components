@@ -254,8 +254,8 @@ export type Column = {
   key: string
   title: string
   dataType: DataType
-  width?: `${number}${"px" | "%"}`
-  minWidth?: `calc(var(--BU) * ${number})`
+  maxWidth?: `${number}${"px"}`
+  minWidth?: `${number}${"px"}`
 
   avatar?: (rowData: ICellTextProps["rowData"]) => string | undefined
   link?: (rowData: ICellTextProps["rowData"]) => string | (() => void) | undefined
@@ -335,6 +335,8 @@ export const DataTable = (p: DataTableProps) => {
     ref: referenceContainer,
     box: "border-box",
     onResize: size => {
+      console.log("resize", size)
+
       if (p.mode === "edit") {
         return
       }
@@ -385,10 +387,8 @@ export const DataTable = (p: DataTableProps) => {
       link: column.link,
       tooltip: column.tooltip,
       sortDirection: sortDirection,
-      style: {
-        width: column.width || "auto",
-        "min-width": column.minWidth || "0px",
-      },
+      minWidth: column.minWidth,
+      maxWidth: column.maxWidth,
     }
   })
 
@@ -588,6 +588,11 @@ export const DataTable = (p: DataTableProps) => {
       height: calc(var(--BU) * 10);
       line-height: unset;
       color: unset;
+    }
+
+    .${cssScope} .ka-cell-text {
+      overflow: inherit;
+      width: inherit;
     }
 
     .${cssScope} .ka-cell.override-ka-fixed-right {
@@ -987,31 +992,34 @@ export const DataTable = (p: DataTableProps) => {
                         },
 
                         elementAttributes: headCellElementAttributes => {
-                          if (p.fixedKeyField === headCellElementAttributes.column.key) {
-                            return {
-                              className: "override-ka-fixed-left",
-                            }
+                          const column = headCellElementAttributes.column as Column
+                          const classNames: string[] = []
+
+                          if (p.fixedKeyField === column.key) {
+                            classNames.push("override-ka-fixed-left")
                           }
 
                           if (
-                            headCellElementAttributes.column.key === KEY_DRAG ||
-                            headCellElementAttributes.column.key === KEY_ACTIONS_EDIT ||
-                            headCellElementAttributes.column.key === KEY_ACTIONS
+                            column.key === KEY_DRAG ||
+                            column.key === KEY_ACTIONS_EDIT ||
+                            column.key === KEY_ACTIONS
                           ) {
-                            return {
-                              className: "override-ka-fixed-right",
-                            }
+                            classNames.push("override-ka-fixed-right")
+                          }
+
+                          return {
+                            className: classNames.join(" "),
                           }
                         },
                       },
 
                       cellText: {
                         content: cellTextContent => {
-                          if (p.DEPRICATED_customCellRenderer) {
-                            const customCell = p.DEPRICATED_customCellRenderer(cellTextContent)
-                            if (customCell !== null) {
-                              return customCell
-                            }
+                          if (
+                            p.DEPRICATED_customCellRenderer &&
+                            typeof p.DEPRICATED_customCellRenderer === "function"
+                          ) {
+                            return p.DEPRICATED_customCellRenderer(cellTextContent)
                           } else if (cellTextContent.column.key === KEY_ACTIONS_EDIT) {
                             return (
                               <Stack horizontal hug>
@@ -1046,17 +1054,19 @@ export const DataTable = (p: DataTableProps) => {
                               </Stack>
                             )
                           } else {
+                            const column = cellTextContent.column as Column
+
                             const monospace =
-                              cellTextContent.column.dataType === DataType.Date ||
-                              cellTextContent.column.dataType === DataType.Number ||
-                              cellTextContent.column.dataType === DataType.Boolean
+                              column.dataType === DataType.Date ||
+                              column.dataType === DataType.Number ||
+                              column.dataType === DataType.Boolean
 
-                            const alignmentRight = cellTextContent.column.dataType === DataType.Number
-                            const firstColumn = cellTextContent.column.key === nativeColumns[0].key
+                            const alignmentRight = column.dataType === DataType.Number
+                            const firstColumn = column.key === nativeColumns[0].key
 
-                            const avatar = cellTextContent.column["avatar"] as Column["avatar"]
-                            const link = cellTextContent.column["link"] as Column["link"]
-                            const tooltip = cellTextContent.column["tooltip"] as Column["tooltip"]
+                            const avatar = column.avatar as Column["avatar"]
+                            const link = column.link as Column["link"]
+                            const tooltip = column.tooltip as Column["tooltip"]
 
                             let avatarSrc
                             let linkEffect
@@ -1086,14 +1096,14 @@ export const DataTable = (p: DataTableProps) => {
 
                             let output = <></>
 
-                            if ((cellTextContent.column as Column).dataType === DataType.ProgressIndicator) {
+                            if (column.dataType === DataType.ProgressIndicator) {
                               output = <CellProgressIndicator {...cellTextContent} />
-                            } else if ((cellTextContent.column as Column).dataType === DataType.Status) {
+                            } else if (column.dataType === DataType.Status) {
                               output = <CellStatus {...cellTextContent} />
                             } else {
                               const text = formatValue(
                                 cellTextContent.value?.toString(),
-                                cellTextContent.column.dataType || DataType.String,
+                                column.dataType || DataType.String,
                               )
 
                               const avatar = avatarSrc ? (
@@ -1111,7 +1121,12 @@ export const DataTable = (p: DataTableProps) => {
                                   <>
                                     {avatar}
 
-                                    <Text fill={[Color.Neutral, 700]} small monospace={monospace}>
+                                    <Text
+                                      fill={[Color.Neutral, 700]}
+                                      small
+                                      monospace={monospace}
+                                      textOverflow={column.maxWidth !== undefined}
+                                    >
                                       {typeof linkEffect === "string" ? (
                                         <Link href={linkEffect}>{text}</Link>
                                       ) : (
@@ -1123,14 +1138,35 @@ export const DataTable = (p: DataTableProps) => {
                                   <>
                                     {avatar}
 
-                                    <Text fill={[Color.Neutral, 700]} small monospace={monospace}>
+                                    <Text
+                                      fill={[Color.Neutral, 700]}
+                                      small
+                                      monospace={monospace}
+                                      textOverflow={column.maxWidth !== undefined}
+                                    >
                                       {text}
                                     </Text>
                                   </>
                                 )
 
                               if (tooltipElement) {
-                                output = <Tooltip trigger={output}>{tooltipElement}</Tooltip>
+                                output = (
+                                  <Tooltip trigger={output} hug="trigger">
+                                    {tooltipElement}
+                                  </Tooltip>
+                                )
+                              }
+
+                              if (column.maxWidth && text !== "–") {
+                                output = (
+                                  <Tooltip trigger={output}>
+                                    <Align horizontal left>
+                                      <Text small fill={[Color.Neutral, 700]} wrap>
+                                        {text}
+                                      </Text>
+                                    </Align>
+                                  </Tooltip>
+                                )
                               }
                             }
 
@@ -1250,19 +1286,26 @@ export const DataTable = (p: DataTableProps) => {
 
                       cell: {
                         elementAttributes: cellElementAttributes => {
-                          if (p.fixedKeyField === cellElementAttributes.column.key) {
-                            return {
-                              className: "override-ka-fixed-left",
-                            }
+                          const column = cellElementAttributes.column as Column
+                          const classNames: string[] = []
+
+                          if (p.fixedKeyField === column.key) {
+                            classNames.push("override-ka-fixed-left")
                           }
 
-                          if (
-                            cellElementAttributes.column.key === KEY_ACTIONS_EDIT ||
-                            cellElementAttributes.column.key === KEY_ACTIONS
-                          ) {
-                            return {
-                              className: "override-ka-fixed-right",
-                            }
+                          if (column.key === KEY_ACTIONS_EDIT || column.key === KEY_ACTIONS) {
+                            classNames.push("override-ka-fixed-right")
+                          }
+
+                          return {
+                            className: classNames.join(" "),
+
+                            style: {
+                              width: column.key === nativeColumns[0].key ? "100%" : "auto",
+                              "min-width": column.minWidth || "auto",
+                              "max-width": column.maxWidth || "100%",
+                              "overflow-x": column.maxWidth !== undefined ? "hidden" : "visible",
+                            },
                           }
                         },
                       },
