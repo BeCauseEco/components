@@ -32,7 +32,6 @@ import { PopoverProps } from "@new/Popover/Popover"
 import { Badge } from "@new/Badge/Badge"
 import { Avatar } from "@new/Avatar/Avatar"
 import Link from "next/link"
-import { InputButtonLink } from "@new/InputButton/InputButtonLink"
 import { Tooltip } from "@new/Tooltip/Tooltip"
 
 export { SortDirection } from "ka-table"
@@ -1152,11 +1151,7 @@ export const DataTable = (p: DataTableProps) => {
                                 )
 
                               if (tooltipElement) {
-                                output = (
-                                  <Tooltip trigger={output} hug="trigger">
-                                    {tooltipElement}
-                                  </Tooltip>
-                                )
+                                output = <Tooltip trigger={output}>{tooltipElement}</Tooltip>
                               }
 
                               if (column.maxWidth && text !== "–") {

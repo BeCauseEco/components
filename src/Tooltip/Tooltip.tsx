@@ -12,7 +12,7 @@ export type TooltipProps = ComponentBaseProps & {
 
   trigger: ReactElement
 
-  hug?: "trigger" | "content" | "trigger-and-content"
+  hug?: boolean
 
   children: ReactElement<AlignProps>
 }
@@ -70,26 +70,30 @@ const Content = styled(RadixTooltip.Content)({
   },
 })
 
-const Trigger = styled(RadixTooltip.Trigger)<Pick<TooltipProps, "hug">>(p => ({
+const Trigger = styled(RadixTooltip.Trigger)({
   all: "unset",
   display: "inherit",
   flexDirection: "inherit",
-  width: p.hug === "trigger" || p.hug === "trigger-and-content" ? "fit-content" : "inherit",
-  cursor: "help",
-  borderBottom: `2px dotted ${computeColor([Color.Neutral, 200])}`,
-}))
+  width: "inherit",
+  justifyContent: "inherit",
+
+  "& > *": {
+    cursor: "help",
+    borderBottom: `2px dotted ${computeColor([Color.Neutral, 200])}`,
+  },
+})
 
 export const Tooltip = (p: TooltipProps) => {
   return (
     <RadixTooltip.Provider delayDuration={100} skipDelayDuration={0}>
       <Root>
-        <Trigger hug={p.hug}>{p.trigger}</Trigger>
+        <Trigger>{p.trigger}</Trigger>
 
         <RadixTooltip.Portal>
           <Content side="bottom" sideOffset={4} alignOffset={4} align="start">
             <Stack
               vertical
-              hug={p.hug === "content" || p.hug === "trigger-and-content" ? true : "partly"}
+              hug={p.hug ? true : "partly"}
               fill={[Color.White]}
               cornerRadius="medium"
               dropShadow="medium"
