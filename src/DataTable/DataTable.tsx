@@ -335,8 +335,6 @@ export const DataTable = (p: DataTableProps) => {
     ref: referenceContainer,
     box: "border-box",
     onResize: size => {
-      console.log("resize", size)
-
       if (p.mode === "edit") {
         return
       }
