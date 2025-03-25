@@ -1017,7 +1017,8 @@ export const DataTable = (p: DataTableProps) => {
                             if (customCell !== null) {
                               return customCell
                             }
-                          } else if (cellTextContent.column.key === KEY_ACTIONS_EDIT) {
+                          }
+                          if (cellTextContent.column.key === KEY_ACTIONS_EDIT) {
                             return (
                               <Stack horizontal hug>
                                 <Align horizontal right>
