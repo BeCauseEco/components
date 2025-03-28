@@ -40,6 +40,33 @@ export type Lightness = 50 | 100 | 200 | 300 | 400 | 500 | 600 | 700 | 800 | 900
 
 export type ColorWithLightness = [Color, Lightness] | [Color.White] | [Color.Transparent] | [THexColor, Lightness]
 
+export const adjustLightness = (color: ColorWithLightness, steps: number): ColorWithLightness => {
+  const c = color[0]
+  const l = color[1] as number
+
+  let r: ColorWithLightness = color
+
+  if (steps > 0) {
+    if (l === 50) {
+      r = [c, 100]
+    } else if (l === 1000) {
+      // ...
+    } else {
+      r = [c, (l + steps * 100) as Lightness]
+    }
+  } else {
+    if (l === 50) {
+      // ...
+    } else if (l === 100) {
+      r = [c, 50]
+    } else {
+      r = [c, (l + steps * 100) as Lightness]
+    }
+  }
+
+  return r
+}
+
 export const computeColor = (color: ColorWithLightness) => {
   const c = color[0]
   const l = color[1] || 700

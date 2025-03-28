@@ -13,6 +13,7 @@ export type TooltipProps = ComponentBaseProps & {
   trigger: ReactElement
 
   hug?: boolean
+  highlight?: boolean
 
   children: ReactElement<AlignProps>
 }
@@ -70,24 +71,31 @@ const Content = styled(RadixTooltip.Content)({
   },
 })
 
-const Trigger = styled(RadixTooltip.Trigger)({
+const Trigger = styled(RadixTooltip.Trigger)<Pick<TooltipProps, "highlight">>(p => ({
   all: "unset",
   display: "inherit",
   flexDirection: "inherit",
   width: "inherit",
+  height: "inherit",
   justifyContent: "inherit",
+  alignItems: "inherit",
+  outline: "solid 1px cyan",
+  userSelect: "all",
 
-  "& > *": {
+  ...(p.highlight && {
     cursor: "help",
-    borderBottom: `2px dotted ${computeColor([Color.Neutral, 200])}`,
-  },
-})
+
+    "& > *": {
+      borderBottom: `2px dotted ${computeColor([Color.Neutral, 200])}`,
+    },
+  }),
+}))
 
 export const Tooltip = (p: TooltipProps) => {
   return (
-    <RadixTooltip.Provider delayDuration={100} skipDelayDuration={0}>
+    <RadixTooltip.Provider delayDuration={200} skipDelayDuration={200}>
       <Root>
-        <Trigger>{p.trigger}</Trigger>
+        <Trigger highlight={p.highlight}>{p.trigger}</Trigger>
 
         <RadixTooltip.Portal>
           <Content side="bottom" sideOffset={4} alignOffset={4} align="start">
