@@ -61,7 +61,6 @@ const Container = styled.p<Omit<TextProps, "fill"> & { _fill: TextProps["fill"] 
   textDecoration: "inherit",
   textTransform: "inherit",
   textWrap: !p.maxWidth && p.wrap ? "pretty" : "nowrap",
-  // wordBreak: !p.maxWidth && p.wrap ? "break-all" : "normal",
   textAlign: "left",
   alignItems: "inherit",
   margin: 0,
@@ -89,13 +88,15 @@ const Container = styled.p<Omit<TextProps, "fill"> & { _fill: TextProps["fill"] 
     // filter: "brightness(0.8)",
   },
 
-  ...(p.maxWidth && {
-    overflowX: "hidden",
-    overflowY: "hidden",
+  "&[title]": {
+    borderBottom: `dotted 2px ${computeColor([p._fill[0], 200])}`,
+    cursor: "help",
+  },
+
+  ...((p.maxWidth || p.textOverflow) && {
+    overflow: "hidden",
     textOverflow: "ellipsis",
-    textWrap: "nowrap",
-    display: "inline-block",
-    maxWidth: p.maxWidth,
+    maxWidth: p.maxWidth || "auto",
   }),
 
   ...(p.tiny && StyleBodyTiny),
@@ -129,6 +130,7 @@ export type TextProps = PlaywrightProps & {
   fill: ColorWithLightness
 
   wrap?: boolean
+  textOverflow?: boolean
 
   /**
    * Last resort for triggering text-overflow: ellipsis
@@ -136,6 +138,8 @@ export type TextProps = PlaywrightProps & {
   maxWidth?: `${number}${"px"}`
 
   monospace?: boolean
+
+  title?: string
 }
 
 export const Text = forwardRef<HTMLHeadingElement | HTMLParagraphElement, PropsWithChildren<TextProps>>((p, ref) => {
@@ -155,6 +159,8 @@ export const Text = forwardRef<HTMLHeadingElement | HTMLParagraphElement, PropsW
     maxWidth,
 
     monospace = false,
+
+    title = undefined,
 
     children,
 
@@ -177,6 +183,7 @@ export const Text = forwardRef<HTMLHeadingElement | HTMLParagraphElement, PropsW
       wrap={wrap ? true : undefined}
       maxWidth={maxWidth}
       monospace={monospace}
+      title={title}
       data-playwright-testid={p["data-playwright-testid"]}
       {...rest}
     >

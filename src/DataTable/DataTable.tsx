@@ -9,7 +9,7 @@ import { InputButtonPrimary, InputButtonPrimaryProps } from "@new/InputButton/In
 import { Spacer } from "@new/Stack/Spacer"
 import { InputButtonTertiary, InputButtonTertiaryProps } from "@new/InputButton/InputButtonTertiary"
 import { InputTextSingle, InputTextSingleProps } from "@new/InputText/InputTextSingle"
-import { Color, ColorWithLightness, computeColor, Lightness } from "@new/Color"
+import { adjustLightness, Color, ColorWithLightness, computeColor } from "@new/Color"
 import { InputTextDate, InputTextDateProps } from "@new/InputText/InputTextDate"
 import { InputCheckbox, InputCheckboxProps } from "@new/InputCheckbox/InputCheckbox"
 import { StyleBodySmall, StyleFontFamily, Text } from "@new/Text/Text"
@@ -32,7 +32,6 @@ import { PopoverProps } from "@new/Popover/Popover"
 import { Badge } from "@new/Badge/Badge"
 import { Avatar } from "@new/Avatar/Avatar"
 import Link from "next/link"
-import { InputButtonLink } from "@new/InputButton/InputButtonLink"
 import { Tooltip } from "@new/Tooltip/Tooltip"
 
 export { SortDirection } from "ka-table"
@@ -40,6 +39,8 @@ export { SortDirection } from "ka-table"
 const KEY_DRAG = "DRAG"
 const KEY_ACTIONS_EDIT = "ACTIONS_EDIT"
 const KEY_ACTIONS = "ACTIONS"
+
+const TABLE_CELL_EMPTY_STRING = "–"
 
 const createNewRow = (data: DataTableProps["data"]): object => {
   return { id: Math.max(...data.map(d => d.id)) + 1 }
@@ -54,19 +55,19 @@ const formatValue = (value: string, dataType: DataType): string => {
             minimumFractionDigits: 2,
             maximumFractionDigits: 2,
           }).format(Number(value))
-        : "–"
+        : TABLE_CELL_EMPTY_STRING
 
     case DataType.Date:
-      return value ? new Date(value).toLocaleDateString() : "–"
+      return value ? new Date(value).toLocaleDateString() : TABLE_CELL_EMPTY_STRING
 
     case DataType.Boolean:
-      return value ? (value === "true" ? "Yes" : "No") : "–"
+      return value ? (value === "true" ? "Yes" : "No") : TABLE_CELL_EMPTY_STRING
 
     case DataType.String:
-      return value || "–"
+      return value || TABLE_CELL_EMPTY_STRING
 
     default:
-      return "–"
+      return TABLE_CELL_EMPTY_STRING
   }
 }
 
@@ -195,9 +196,6 @@ const CellProgressIndicator = (cellTextProps: ICellTextProps | ICellEditorProps)
   const type = progressIndicator?.type || "bar"
   const { value, color } = progressIndicator?.configure(cellTextProps.rowData) || { value: 0, color: Color.Neutral }
 
-  // const tooltip = cellTextProps.column["tooltip"] as Column["tooltip"]
-  // const tooltipElement = tooltip?.(cellTextProps.rowData)
-
   return (
     <Stack hug horizontal>
       <Align horizontal left={type === "bar"} center={type === "circle"}>
@@ -254,12 +252,14 @@ export type Column = {
   key: string
   title: string
   dataType: DataType
-  width?: `${number}${"px" | "%"}`
-  minWidth?: `calc(var(--BU) * ${number})`
+  maxWidth?: `${number}${"%"}`
+  minWidth?: `${number}${"%"}`
+  explodeWidth?: boolean
+  preventContentCollapse?: boolean
 
   avatar?: (rowData: ICellTextProps["rowData"]) => string | undefined
   link?: (rowData: ICellTextProps["rowData"]) => string | (() => void) | undefined
-  tooltip?: (rowData: ICellTextProps["rowData"]) => ReactElement<AlignProps> | string | undefined
+  tooltip?: ((rowData: ICellTextProps["rowData"]) => ReactElement<AlignProps> | string | undefined) | boolean
 
   progressIndicator?: {
     type: "bar" | "circle"
@@ -329,6 +329,7 @@ export type DataTableProps = {
 export const DataTable = (p: DataTableProps) => {
   const cssScope = useId().replace(/:/g, "datatable")
   const referenceContainer = useRef<HTMLDivElement>(null)
+  const [containerWidth, setContainerWidth] = useState<number>(0)
 
   // TODO @cllpse: this seems super hacky, but this is to auto-adjust the height of the table to simplify use
   useResizeObserver({
@@ -339,7 +340,12 @@ export const DataTable = (p: DataTableProps) => {
         return
       }
 
+      const containerWidth = size.width || 0
       const containerHeight = size.height || 0
+
+      if (referenceContainer.current && containerWidth > 0) {
+        setContainerWidth(Math.floor(containerWidth - 16 - 2))
+      }
 
       if (referenceContainer.current && containerHeight > 0) {
         const filtersHeight = referenceContainer.current.querySelector(`#reference-filters`)?.clientHeight || 0
@@ -385,10 +391,10 @@ export const DataTable = (p: DataTableProps) => {
       link: column.link,
       tooltip: column.tooltip,
       sortDirection: sortDirection,
-      style: {
-        width: column.width || "auto",
-        "min-width": column.minWidth || "0px",
-      },
+      minWidth: column.minWidth,
+      maxWidth: column.maxWidth,
+      explodeWidth: column.explodeWidth,
+      preventContentCollapse: column.preventContentCollapse,
     }
   })
 
@@ -439,7 +445,7 @@ export const DataTable = (p: DataTableProps) => {
 
     const d = [...p.data]
 
-    d.filter(d => p.selectDisabledField === undefined || !d[p.selectDisabledField]).forEach(row => {
+    d.forEach(row => {
       if (p.selectKeyField) {
         row[p.selectKeyField] = value
       }
@@ -455,6 +461,14 @@ export const DataTable = (p: DataTableProps) => {
   const table = useTable({
     onDispatch: d => {
       const rowKeyValue = d.rowKeyValue
+
+      if (d.type === "ComponentDidMount") {
+        if (p.data && p.data.length > 0 && !p.data.some(d => d[p.rowKeyField])) {
+          throw new Error(
+            `DataTable: data must contain key defined by property: "rowKeyField" (current value: '${p.rowKeyField}').`,
+          )
+        }
+      }
 
       if (d.type === "OpenRowEditors") {
         setEditId(d.rowKeyValue)
@@ -501,21 +515,6 @@ export const DataTable = (p: DataTableProps) => {
 
   const referencePrint = useRef<HTMLDivElement>(null)
   const print = useReactToPrint({ contentRef: referencePrint, documentTitle: p.exportName })
-
-  let colorRowHover: ColorWithLightness = [Color.Neutral, 50]
-
-  if (p.fill) {
-    const c = p.fill[0] as Color
-    let l = p.fill[1] as Lightness
-
-    if (l == 50) {
-      l = 100
-    } else {
-      l + 100
-    }
-
-    colorRowHover = [c, l]
-  }
 
   const css = `
     .${cssScope} .ka {
@@ -584,10 +583,22 @@ export const DataTable = (p: DataTableProps) => {
     }
 
     .${cssScope} .ka-cell {
-      padding: var(--BU) calc(var(--BU) * 4);
+      padding: 0 calc(var(--BU) * 4);
       height: calc(var(--BU) * 10);
       line-height: unset;
       color: unset;
+    }
+
+    .${cssScope} .ka-cell-text {
+      display: flex;
+      overflow: hidden;
+      width: 100%;
+      height: 100%;
+    }
+
+    .${cssScope} .override-ka-prevent-content-collapse .ka-cell-text,
+    .${cssScope} .override-ka-prevent-content-collapse .ka-cell-text p {
+      overflow: visible;
     }
 
     .${cssScope} .ka-cell.override-ka-fixed-right {
@@ -625,8 +636,15 @@ export const DataTable = (p: DataTableProps) => {
       background-color: unset;
     }
 
-    .${cssScope} .ka-row:hover {
-      background-color: ${computeColor(colorRowHover)};
+    .${cssScope} .ka-row:hover,
+    .${cssScope} .ka-row:hover .override-ka-fixed-left,
+    .${cssScope} .ka-row:hover .override-ka-fixed-right {
+      background-color: ${computeColor(p.fill ? adjustLightness(p.fill, 1) : [Color.Neutral, 50])};
+    }
+
+    .${cssScope} .ka-row:hover .override-ka-fixed-left:after,
+    .${cssScope} .ka-row:hover .override-ka-fixed-right:after {
+      background: transparent;
     }
 
     .${cssScope} .ka-row-selected {
@@ -677,7 +695,7 @@ export const DataTable = (p: DataTableProps) => {
       height: 8px;
       width: 100%;
       border-top: solid 1px ${computeColor(p.stroke || [Color.Neutral, 100])};
-      background: linear-gradient(to bottom, ${computeColor(p.fill || [Color.Neutral, 50])}, transparent);
+      background: linear-gradient(to bottom, ${computeColor(p.fill ? adjustLightness(p.fill, 1) : [Color.Neutral, 50])}, transparent);
     }
 
     .${cssScope} .override-ka-reorder .ka-row {
@@ -701,18 +719,13 @@ export const DataTable = (p: DataTableProps) => {
     .${cssScope} .override-ka-fixed-left:after {
       right: -8px;
       border-left: solid 1px ${computeColor(p.stroke || [Color.Neutral, 100])};
-      background: linear-gradient(to right, ${computeColor(p.fill || [Color.Neutral, 50])}, transparent);
+      background: linear-gradient(to right, ${computeColor(p.fill ? adjustLightness(p.fill, 1) : [Color.Neutral, 50])}, transparent);
     }
 
     .${cssScope} .override-ka-fixed-right:after {
       left: -8px;
       border-right: solid 1px ${computeColor(p.stroke || [Color.Neutral, 100])};
-      background: linear-gradient(to left, ${computeColor(p.fill || [Color.Neutral, 50])}, transparent);
-    }
-
-    .${cssScope} .ka-row:hover .override-ka-fixed-left,
-    .${cssScope} .ka-row:hover .override-ka-fixed-right {
-      background-color: ${computeColor(colorRowHover)};
+      background: linear-gradient(to left, ${computeColor(p.fill ? adjustLightness(p.fill, 1) : [Color.Neutral, 50])}, transparent);
     }
 
     .${cssScope} .override-ka-editing-row,
@@ -937,11 +950,6 @@ export const DataTable = (p: DataTableProps) => {
                           const firstColumn = headCellContent.column.key === nativeColumns[0].key
 
                           const headCellContentAsColumn = headCellContent.column as Column
-                          const totalSelectableFields = p.data.filter(d =>
-                            p.selectDisabledField !== undefined && d[p.selectDisabledField]
-                              ? d[p.selectKeyField!]
-                              : true,
-                          ).length
 
                           return (
                             <Stack hug horizontal>
@@ -952,7 +960,7 @@ export const DataTable = (p: DataTableProps) => {
                                       size="small"
                                       color={Color.Neutral}
                                       value={
-                                        selectedFields === totalSelectableFields
+                                        selectedFields === p.data.length
                                           ? true
                                           : selectedFields === 0
                                             ? false
@@ -992,33 +1000,30 @@ export const DataTable = (p: DataTableProps) => {
                         },
 
                         elementAttributes: headCellElementAttributes => {
-                          if (p.fixedKeyField === headCellElementAttributes.column.key) {
-                            return {
-                              className: "override-ka-fixed-left",
-                            }
+                          const column = headCellElementAttributes.column as Column
+
+                          if (p.fixedKeyField === column.key) {
+                            return { className: "override-ka-fixed-left" }
                           }
 
                           if (
-                            headCellElementAttributes.column.key === KEY_DRAG ||
-                            headCellElementAttributes.column.key === KEY_ACTIONS_EDIT ||
-                            headCellElementAttributes.column.key === KEY_ACTIONS
+                            column.key === KEY_DRAG ||
+                            column.key === KEY_ACTIONS_EDIT ||
+                            column.key === KEY_ACTIONS
                           ) {
-                            return {
-                              className: "override-ka-fixed-right",
-                            }
+                            return { className: "override-ka-fixed-right" }
                           }
                         },
                       },
 
                       cellText: {
                         content: cellTextContent => {
-                          if (p.DEPRICATED_customCellRenderer) {
-                            const customCell = p.DEPRICATED_customCellRenderer(cellTextContent)
-                            if (customCell !== null) {
-                              return customCell
-                            }
-                          }
-                          if (cellTextContent.column.key === KEY_ACTIONS_EDIT) {
+                          if (
+                            p.DEPRICATED_customCellRenderer &&
+                            typeof p.DEPRICATED_customCellRenderer === "function"
+                          ) {
+                            return p.DEPRICATED_customCellRenderer(cellTextContent)
+                          } else if (cellTextContent.column.key === KEY_ACTIONS_EDIT) {
                             return (
                               <Stack horizontal hug>
                                 <Align horizontal right>
@@ -1035,54 +1040,54 @@ export const DataTable = (p: DataTableProps) => {
                               </Stack>
                             )
                           } else if (cellTextContent.column.key === KEY_ACTIONS && p.rowActions) {
-                            const ra: ReactNode[] = []
+                            const actionElements: ReactNode[] = []
 
                             Children.toArray(p.rowActions(cellTextContent.rowData)).forEach(r => {
-                              ra.push(r)
-                              ra.push(<Spacer xsmall />)
+                              actionElements.push(r)
+                              actionElements.push(<Spacer xsmall />)
                             })
 
-                            ra.pop()
+                            actionElements.pop()
 
                             return (
                               <Stack horizontal hug>
                                 <Align horizontal right>
-                                  {ra}
+                                  {actionElements}
                                 </Align>
                               </Stack>
                             )
                           } else {
-                            const monospace =
-                              cellTextContent.column.dataType === DataType.Date ||
-                              cellTextContent.column.dataType === DataType.Number ||
-                              cellTextContent.column.dataType === DataType.Boolean
+                            const column = cellTextContent.column as Column
 
-                            const alignmentRight = cellTextContent.column.dataType === DataType.Number
-                            const firstColumn = cellTextContent.column.key === nativeColumns[0].key
+                            let output = <></>
 
-                            const avatar = cellTextContent.column["avatar"] as Column["avatar"]
-                            const link = cellTextContent.column["link"] as Column["link"]
-                            const tooltip = cellTextContent.column["tooltip"] as Column["tooltip"]
+                            const alignmentRight = column.dataType === DataType.Number
+                            const firstColumn = column.key === nativeColumns[0].key
 
-                            let avatarSrc
-                            let linkEffect
+                            const text = formatValue(
+                              cellTextContent.value?.toString(),
+                              column.dataType || DataType.String,
+                            )
+
+                            const tooltip = column.tooltip as Column["tooltip"]
+
                             let tooltipElement
 
-                            if (typeof avatar === "function") {
-                              avatarSrc = avatar(cellTextContent.rowData)
-                            }
-
-                            if (typeof link === "function") {
-                              linkEffect = link(cellTextContent.rowData)
-                            }
-
-                            if (typeof tooltip === "function") {
+                            if (typeof tooltip === "boolean" && text !== TABLE_CELL_EMPTY_STRING) {
+                              tooltipElement = (
+                                <Align horizontal left>
+                                  <Text small fill={[Color.Neutral, 700]} wrap>
+                                    {text}
+                                  </Text>
+                                </Align>
+                              )
+                            } else if (typeof tooltip === "function") {
                               tooltipElement = tooltip(cellTextContent.rowData)
 
                               if (typeof tooltipElement === "string") {
                                 tooltipElement = (
                                   <Align horizontal left>
-                                    <Text small fill={[Color.Neutral, 700]}>
+                                    <Text small fill={[Color.Neutral, 700]} wrap>
                                       {tooltipElement}
                                     </Text>
                                   </Align>
@@ -1090,54 +1095,72 @@ export const DataTable = (p: DataTableProps) => {
                               }
                             }
 
-                            let output = <></>
-
-                            if ((cellTextContent.column as Column).dataType === DataType.ProgressIndicator) {
+                            if (column.dataType === DataType.ProgressIndicator) {
                               output = <CellProgressIndicator {...cellTextContent} />
-                            } else if ((cellTextContent.column as Column).dataType === DataType.Status) {
+                            } else if (column.dataType === DataType.Status) {
                               output = <CellStatus {...cellTextContent} />
                             } else {
-                              const text = formatValue(
-                                cellTextContent.value?.toString(),
-                                cellTextContent.column.dataType || DataType.String,
-                              )
+                              const monospace =
+                                column.dataType === DataType.Date ||
+                                column.dataType === DataType.Number ||
+                                column.dataType === DataType.Boolean
 
-                              const avatar = avatarSrc ? (
+                              const avatar = column.avatar as Column["avatar"]
+                              const link = column.link as Column["link"]
+
+                              let avatarSrc
+                              let linkEffect
+
+                              if (typeof avatar === "function") {
+                                avatarSrc = avatar(cellTextContent.rowData)
+                              }
+
+                              if (typeof link === "function") {
+                                linkEffect = link(cellTextContent.rowData)
+                              }
+
+                              const avatarElement = avatarSrc ? (
                                 <>
                                   <Avatar size="small" src={avatarSrc} title={text} />
 
                                   <Spacer xsmall />
                                 </>
-                              ) : (
-                                <></>
-                              )
+                              ) : null
 
                               output =
-                                linkEffect && text !== "–" ? (
+                                linkEffect && text !== TABLE_CELL_EMPTY_STRING ? (
                                   <>
-                                    {avatar}
+                                    {avatarElement}
 
-                                    <Text fill={[Color.Neutral, 700]} small monospace={monospace}>
+                                    <Text
+                                      fill={[Color.Neutral, 700]}
+                                      small
+                                      monospace={monospace}
+                                      textOverflow={column.maxWidth !== undefined}
+                                    >
                                       {typeof linkEffect === "string" ? (
                                         <Link href={linkEffect}>{text}</Link>
                                       ) : (
-                                        <InputButtonLink size="large" label={text} onClick={linkEffect} />
+                                        <a href="javascript: void(0);" onClick={linkEffect}>
+                                          {text}
+                                        </a>
                                       )}
                                     </Text>
                                   </>
                                 ) : (
                                   <>
-                                    {avatar}
+                                    {avatarElement}
 
-                                    <Text fill={[Color.Neutral, 700]} small monospace={monospace}>
+                                    <Text
+                                      fill={[Color.Neutral, 700]}
+                                      small
+                                      monospace={monospace}
+                                      textOverflow={column.maxWidth !== undefined}
+                                    >
                                       {text}
                                     </Text>
                                   </>
                                 )
-
-                              if (tooltipElement) {
-                                output = <Tooltip trigger={output}>{tooltipElement}</Tooltip>
-                              }
                             }
 
                             return (
@@ -1177,7 +1200,7 @@ export const DataTable = (p: DataTableProps) => {
                                 )}
 
                                 <Align left={!alignmentRight} right={alignmentRight} horizontal>
-                                  {output}
+                                  {tooltipElement ? <Tooltip trigger={output}>{tooltipElement}</Tooltip> : output}
                                 </Align>
                               </Stack>
                             )
@@ -1256,19 +1279,40 @@ export const DataTable = (p: DataTableProps) => {
 
                       cell: {
                         elementAttributes: cellElementAttributes => {
-                          if (p.fixedKeyField === cellElementAttributes.column.key) {
-                            return {
-                              className: "override-ka-fixed-left",
-                            }
+                          const column = cellElementAttributes.column as Column
+                          const classNames: string[] = []
+
+                          if (p.fixedKeyField === column.key) {
+                            classNames.push("override-ka-fixed-left")
                           }
 
-                          if (
-                            cellElementAttributes.column.key === KEY_ACTIONS_EDIT ||
-                            cellElementAttributes.column.key === KEY_ACTIONS
-                          ) {
-                            return {
-                              className: "override-ka-fixed-right",
-                            }
+                          if (column.key === KEY_ACTIONS_EDIT || column.key === KEY_ACTIONS) {
+                            classNames.push("override-ka-fixed-right")
+                          }
+
+                          let minWidth: number | string = "auto"
+                          let maxWidth: number | string = "auto"
+
+                          if (column.minWidth) {
+                            minWidth = (containerWidth / 100) * parseFloat(column.minWidth)
+                          }
+
+                          if (column.maxWidth) {
+                            maxWidth = (containerWidth / 100) * parseFloat(column.maxWidth)
+                          }
+
+                          if (column.preventContentCollapse) {
+                            classNames.push("override-ka-prevent-content-collapse")
+                          }
+
+                          return {
+                            className: classNames.join(" "),
+
+                            style: {
+                              width: column.explodeWidth ? "100%" : "auto",
+                              "min-width": minWidth,
+                              "max-width": maxWidth,
+                            },
                           }
                         },
                       },

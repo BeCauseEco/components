@@ -12,6 +12,9 @@ export type TooltipProps = ComponentBaseProps & {
 
   trigger: ReactElement
 
+  hug?: boolean
+  highlight?: boolean
+
   children: ReactElement<AlignProps>
 }
 
@@ -45,6 +48,7 @@ const Content = styled(RadixTooltip.Content)({
   animationTimingFunction: "cubic-bezier(0.16, 1, 0.3, 1)",
   willChange: "transform, opacity",
   zIndex: 999999,
+  maxWidth: "calc(var(--BU) * 160)",
 
   ":focus": {
     outline: "none",
@@ -67,31 +71,43 @@ const Content = styled(RadixTooltip.Content)({
   },
 })
 
-const Arrow = styled(RadixTooltip.Arrow)({
-  fill: computeColor([Color.White]),
-})
-
-const Trigger = styled(RadixTooltip.Trigger)({
+const Trigger = styled(RadixTooltip.Trigger)<Pick<TooltipProps, "highlight">>(p => ({
   all: "unset",
   display: "inherit",
   flexDirection: "inherit",
-  cursor: "help",
-  borderBottom: `2px dotted ${computeColor([Color.Neutral, 200])}`,
-})
+  width: "inherit",
+  height: "inherit",
+  justifyContent: "inherit",
+  alignItems: "inherit",
+  outline: "solid 1px cyan",
+  userSelect: "all",
+
+  ...(p.highlight && {
+    cursor: "help",
+
+    "& > *": {
+      borderBottom: `2px dotted ${computeColor([Color.Neutral, 200])}`,
+    },
+  }),
+}))
 
 export const Tooltip = (p: TooltipProps) => {
   return (
-    <RadixTooltip.Provider delayDuration={100} skipDelayDuration={0}>
+    <RadixTooltip.Provider delayDuration={200} skipDelayDuration={200}>
       <Root>
-        <Trigger>{p.trigger}</Trigger>
+        <Trigger highlight={p.highlight}>{p.trigger}</Trigger>
 
         <RadixTooltip.Portal>
-          <Content sideOffset={5}>
-            <Stack vertical hug="partly" fill={[Color.White]} cornerRadius="medium" dropShadow="medium">
+          <Content side="bottom" sideOffset={4} alignOffset={4} align="start">
+            <Stack
+              vertical
+              hug={p.hug ? true : "partly"}
+              fill={[Color.White]}
+              cornerRadius="medium"
+              dropShadow="medium"
+            >
               {p.children}
             </Stack>
-
-            <Arrow />
           </Content>
         </RadixTooltip.Portal>
       </Root>
