@@ -30,16 +30,15 @@ export type AlignProps = ComponentBaseProps & {
   hug?: boolean | "width" | "height"
 }
 
-const Container = styled.div<AlignProps>(p => ({
+const Container = styled.div<AlignProps & { _wrap: AlignProps["wrap"] }>(p => ({
   display: "flex",
-  flexWrap: p["wrap"] ? "wrap" : "nowrap",
+  flexWrap: p["_wrap"] ? "wrap" : "nowrap",
   flexDirection: p["vertical"] ? "column" : "row",
-  overflow: "inherit",
   padding: 0,
   margin: 0,
 
-  ...(p["wrap"] && {
-    gap: p["wrap"] === "partly" ? "calc(var(--BU) * 2)" : "calc(var(--BU) * 4)",
+  ...(p["_wrap"] && {
+    gap: p["_wrap"] === "partly" ? "calc(var(--BU) * 2)" : "calc(var(--BU) * 4)",
   }),
 
   ...computeWidthHeight(p),
@@ -57,7 +56,7 @@ export const Align = (p: PropsWithChildren<AlignProps>) => {
       className={`<Align />${generateErrorClassName(invalidChildren)} `}
       vertical={p["vertical"]}
       horizontal={p["horizontal"]}
-      wrap={p["wrap"]}
+      _wrap={p["wrap"]}
       topLeft={p["topLeft"]}
       topCenter={p["topCenter"]}
       topRight={p["topRight"]}

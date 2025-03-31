@@ -819,7 +819,7 @@ export const DataTable = (p: DataTableProps) => {
         <Stack vertical hug loading={p.loading}>
           <Align left hug="height" horizontal id="reference-filters">
             <Stack hug horizontal>
-              <Align left horizontal>
+              <Align left horizontal wrap>
                 {p.mode === "filter" ? (
                   <InputTextSingle
                     iconNameLeft="search"
@@ -834,18 +834,12 @@ export const DataTable = (p: DataTableProps) => {
                   <></>
                 )}
 
-                {Children.toArray(p.children).map(child => (
-                  <>
-                    <Spacer medium />
-
-                    {child}
-                  </>
-                ))}
+                {Children.toArray(p.children).map(child => child)}
               </Align>
 
               <Spacer large />
 
-              <Align right horizontal>
+              <Align bottomRight horizontal hug>
                 {!p.exportDisable ? (
                   <>
                     <InputButtonIconTertiary
@@ -1018,12 +1012,7 @@ export const DataTable = (p: DataTableProps) => {
 
                       cellText: {
                         content: cellTextContent => {
-                          if (
-                            p.DEPRICATED_customCellRenderer &&
-                            typeof p.DEPRICATED_customCellRenderer === "function"
-                          ) {
-                            return p.DEPRICATED_customCellRenderer(cellTextContent)
-                          } else if (cellTextContent.column.key === KEY_ACTIONS_EDIT) {
+                          if (cellTextContent.column.key === KEY_ACTIONS_EDIT) {
                             return (
                               <Stack horizontal hug>
                                 <Align horizontal right>
@@ -1163,6 +1152,11 @@ export const DataTable = (p: DataTableProps) => {
                                 )
                             }
 
+                            const DEPRICATED_customCellRendererElement =
+                              p.DEPRICATED_customCellRenderer && typeof p.DEPRICATED_customCellRenderer === "function"
+                                ? p.DEPRICATED_customCellRenderer(cellTextContent)
+                                : null
+
                             return (
                               <Stack hug horizontal>
                                 {p.mode === "edit" && firstColumn ? (
@@ -1200,7 +1194,13 @@ export const DataTable = (p: DataTableProps) => {
                                 )}
 
                                 <Align left={!alignmentRight} right={alignmentRight} horizontal>
-                                  {tooltipElement ? <Tooltip trigger={output}>{tooltipElement}</Tooltip> : output}
+                                  {DEPRICATED_customCellRendererElement ? (
+                                    DEPRICATED_customCellRendererElement
+                                  ) : tooltipElement ? (
+                                    <Tooltip trigger={output}>{tooltipElement}</Tooltip>
+                                  ) : (
+                                    output
+                                  )}
                                 </Align>
                               </Stack>
                             )
