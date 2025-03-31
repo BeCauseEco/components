@@ -34,7 +34,6 @@ const Container = styled.div<AlignProps & { _wrap: AlignProps["wrap"] }>(p => ({
   display: "flex",
   flexWrap: p["_wrap"] ? "wrap" : "nowrap",
   flexDirection: p["vertical"] ? "column" : "row",
-  overflow: "inherit",
   padding: 0,
   margin: 0,
 
