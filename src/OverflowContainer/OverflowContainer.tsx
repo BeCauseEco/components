@@ -33,11 +33,7 @@ export type OverflowContainerProps = ComponentBaseProps & {
 }
 
 const computeMaxHeight = (maxHeight: OverflowContainerProps["maxHeight"]): string => {
-  if (maxHeight?.endsWith("px")) {
-    return maxHeight
-  }
-
-  if (maxHeight?.endsWith("vh")) {
+  if (maxHeight?.endsWith("px") || maxHeight?.endsWith("vh")) {
     return maxHeight
   }
 
