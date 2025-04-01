@@ -53,7 +53,7 @@ export const StyleBodyHuge = {
 }
 
 const Container = styled.p<Omit<TextProps, "fill"> & { _fill: TextProps["fill"] }>(p => ({
-  display: "inline",
+  display: "inline-block",
 
   ...(p.monospace ? StyleMonospace : StyleFontFamily),
 
@@ -64,6 +64,7 @@ const Container = styled.p<Omit<TextProps, "fill"> & { _fill: TextProps["fill"] 
   textAlign: "left",
   alignItems: "inherit",
   margin: 0,
+  overflowWrap: "anywhere",
 
   "& strong, & b": {
     fontWeight: 600,
