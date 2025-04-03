@@ -5,6 +5,8 @@ The main purpose of this checklist is to enable a more transparent approach to g
 
 This list is not meant to exhaustive – if you can tick off most of the items, you should be in the clear 🚀
 
+_Note: this is a starting-point. This process will be refined as-we-go._
+
 
 ## 1. Define and scope
 
