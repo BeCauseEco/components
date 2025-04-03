@@ -52,8 +52,10 @@ __Note:__ this is a starting-point. This process will be refined as we learn mor
 
 - [ ] We have a plan for ongoing feedback-loops and for communicating progress to relevant stakeholders.
 
-- [ ] __Mandatory__ points below has been communicated thought the #growth-hacking Teams channel.
-  - asdasd
+- [ ] __Mandatory__ points below has been communicated in the #growth-hacking Teams channel.
+  - Short description of the problem and solution.
+  - Target audience.
+  - People implementing this shit.
 
 
 ## 3. Tying up loose ends
