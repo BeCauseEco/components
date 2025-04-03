@@ -58,7 +58,8 @@ __Note:__ this is an evolving process, which will be refined as-we-go.
 
 
 ## 3. Tying up loose ends
-
+- [ ] When the feature is launched, do still communicate it as a new feature in the Product Updates channel. 
+      
 - [ ] We have a plan for the future of this MVP
 
   _(will it go into product long-track after completion?, does it warrant further refinement?, etc.)_
