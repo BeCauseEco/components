@@ -1,7 +1,7 @@
 
 # Growth hacking sanity checklist
 
-The main purpose of this checklist is to enable a more transparent approach to growth hacking, focusing on speed of execution and disturbing in-cycle work efforts as little as possible.
+The main purpose of this checklist is to enable a more transparent approach to growth hacking, focusing on speed of execution and not disturbing in-cycle work efforts.
 
 This list is not meant to exhaustive – if you can tick off most of the items, you should be in the clear 🚀
 
