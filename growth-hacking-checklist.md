@@ -52,13 +52,13 @@ __Note:__ this is an evolving process, which will be refined as-we-go.
 
 - [ ] We have a plan for ongoing feedback-loops and for communicating progress to relevant stakeholders.
 
-- [ ] __Mandatory:__ points below have been communicated in the "growth-hacking" [Teams channel](https://teams.microsoft.com/l/channel/19%3A7807720ebd1d478dbabc9082267da9b4%40thread.tacv2/growth-hacking?groupId=a7b6e749-52f6-425e-a702-1b2a691624fa&tenantId=1499dcc1-b83d-4414-9703-401eb796aee4).
+- [ ] __Mandatory:__ points below have been communicated in the "Growth Hacking" [Teams channel](https://teams.microsoft.com/l/channel/19%3A7807720ebd1d478dbabc9082267da9b4%40thread.tacv2/Growth%20Hacking?groupId=a7b6e749-52f6-425e-a702-1b2a691624fa&tenantId=1499dcc1-b83d-4414-9703-401eb796aee4).
   1. A brief description of the "why" and "how" – if customer-centric; describe the customer need(s).
   2. A list of people involved with the MVP.
 
 
 ## 3. Tying up loose ends
-- [ ] When the feature is launched, do still communicate it as a new feature in the Product Updates channel. 
+- [ ] When the feature is launched, communicate it as a new feature in the "Product Updates" [Teams channel](https://teams.microsoft.com/l/channel/19%3Afa1726d1db87475b8b1b234a23b32b71%40thread.tacv2/Product%20updates?groupId=a7b6e749-52f6-425e-a702-1b2a691624fa&tenantId=1499dcc1-b83d-4414-9703-401eb796aee4).
       
 - [ ] We have a plan for the future of this MVP
 
