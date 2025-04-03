@@ -9,7 +9,10 @@ This list is not meant to exhaustive – if you can tick off most of the items, 
 ## 1. Define and scope
 
 - [ ] The core problem we are trying to solve is clear to us.
+
+
 - [ ] The main value proposition is clear to us.
+
 - [ ] The absolute minimal requirements needed to solve the problem is clear to us – __both design and code__.
 - [ ] Metrics for measuring outcomes are clear to us.
 - [ ] This MVP can be implemented in a short timeframe, and as a single deliverable.
