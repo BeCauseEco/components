@@ -38,7 +38,7 @@ This list is not meant to exhaustive – if you can tick off most of the items, 
 > [!CAUTION]
 > Reaching out to a product owner is mandatory if the MVP affects multiple customers or if the MVP would introduce significant changes to multiple users.
 
-- [ ] Early feedback from above stakeholders has not affected the output of [1. Define and scope](#1-define-and-scope)  – __if it has it must be re-visited__.
+- [ ] Early feedback from above stakeholders has not affected the output of [1. define and scope](#1-define-and-scope)  – __if it has it must be re-visited__.
 
 - [ ] We have considered if other departments need a heads up some point in the process.
 
