@@ -52,7 +52,7 @@ __Note:__ this is an evolving process, which will be refined as-we-go.
 
 - [ ] We have a plan for ongoing feedback-loops and for communicating progress to relevant stakeholders.
 
-- [ ] __Mandatory:__ points below have been communicated in the #growth-hacking Teams channel.
+- [ ] __Mandatory:__ points below have been communicated in the growth-hacking [Teams channel](https://teams.microsoft.com/l/channel/19%3A7807720ebd1d478dbabc9082267da9b4%40thread.tacv2/growth-hacking?groupId=a7b6e749-52f6-425e-a702-1b2a691624fa&tenantId=1499dcc1-b83d-4414-9703-401eb796aee4).
   - If customer-centric; a brief description of customer needs. Otherwise a brief description of the "why" and "how".
   - The people involved in the MVP.
 
