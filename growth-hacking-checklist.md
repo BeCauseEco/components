@@ -5,7 +5,7 @@ The main purpose of this checklist is to enable a more transparent approach to g
 
 This list is not meant to exhaustive – if you can tick off most of the items, you should be in the clear 🚀
 
-__Note:__ this is a starting-point. This process will be refined as we learn more.
+__Note:__ this is an evolving process, which will be refined as-we-go.
 
 
 ## 1. Define and scope
@@ -34,7 +34,7 @@ __Note:__ this is a starting-point. This process will be refined as we learn mor
 > [!TIP]
 > Jonas Bruun Jacobsen is considered a developer.
 
-- [ ] __Optional__ a product owner has been introduced to, and accepts the MVP without raising any strong concerns.
+- [ ] __Optional:__ a product owner has been introduced to, and accepts the MVP without raising any strong concerns.
 
 > [!NOTE]
 > In most cases an MVP does not need attention from product before it has been proven successful.
@@ -52,10 +52,9 @@ __Note:__ this is a starting-point. This process will be refined as we learn mor
 
 - [ ] We have a plan for ongoing feedback-loops and for communicating progress to relevant stakeholders.
 
-- [ ] __Mandatory__ points below has been communicated in the #growth-hacking Teams channel.
-  - Short description of the problem and solution.
-  - Target audience.
-  - People implementing this shit.
+- [ ] __Mandatory:__ points below have been communicated in the #growth-hacking Teams channel.
+  - If customer-centric; a brief description of customer needs. Otherwise a brief description of the "why" and "how".
+  - The people involved in the MVP.
 
 
 ## 3. Tying up loose ends
