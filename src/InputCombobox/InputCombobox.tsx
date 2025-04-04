@@ -13,7 +13,7 @@ import { InputCheckbox } from "@new/InputCheckbox/InputCheckbox"
 import { Virtuoso } from "react-virtuoso"
 import { Badge } from "@new/Badge/Badge"
 import { Stack } from "@new/Stack/Stack"
-import { Align } from "@new/Stack/Align"
+import { Align, AlignProps } from "@new/Stack/Align"
 import { ComponentBaseProps } from "@new/ComponentBaseProps"
 import { OverflowContainer } from "@new/OverflowContainer/OverflowContainer"
 import { Divider } from "@new/Divider/Divider"
@@ -57,6 +57,8 @@ export type InputComboboxProps = ComponentBaseProps & {
   loading?: boolean
 
   required?: boolean
+
+  error?: string
 }
 
 const Container = styled.div<Pick<InputComboboxProps, "size" | "width">>(p => ({
@@ -350,163 +352,180 @@ export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<InputC
     alignItems: "center",
   })
 
+  let errorEitherSide: ReactElement<AlignProps> = <></>
+  if (p.error) {
+    errorEitherSide = (
+      <Align vertical left hug="width">
+        <Spacer xsmall={p.size === "small"} small={p.size === "large"} />
+
+        <Text tiny={p.size === "small"} xsmall={p.size !== "small"} fill={[Color.Error, 700]}>
+          {p.error}
+        </Text>
+      </Align>
+    )
+  }
+
   return (
-    <Container
-      ref={ref}
-      id={p.id}
-      data-playwright-testid={p["data-playwright-testid"]}
-      className="<InputCombobox /> - "
-      size={p.size}
-      width={p.width}
-    >
-      <Stack vertical hug>
-        {p.label && p.label[0] === "outside" ? (
-          <>
-            <Align vertical left hug="width">
-              <Label>
-                <Text xsmall={p.size === "small"} small={p.size !== "small"} fill={[p.color, 700]}>
-                  <b>{p?.label?.[1]}</b>
-                </Text>
-                {p.required && (
-                  <>
-                    <Spacer tiny={p.size === "small"} xsmall={p.size === "large"} />
+    <>
+      <Container
+        ref={ref}
+        id={p.id}
+        data-playwright-testid={p["data-playwright-testid"]}
+        className="<InputCombobox /> - "
+        size={p.size}
+        width={p.width}
+      >
+        <Stack vertical hug>
+          {p.label && p.label[0] === "outside" ? (
+            <>
+              <Align vertical left hug="width">
+                <Label>
+                  <Text xsmall={p.size === "small"} small={p.size !== "small"} fill={[p.color, 700]}>
+                    <b>{p?.label?.[1]}</b>
+                  </Text>
+                  {p.required && (
+                    <>
+                      <Spacer tiny={p.size === "small"} xsmall={p.size === "large"} />
 
-                    <Icon
-                      name="asterisk"
-                      small={p.size === "small"}
-                      medium={p.size === "large"}
-                      fill={[Color.Error, 700]}
-                    />
-                  </>
-                )}
-              </Label>
-
-              <Spacer xsmall={p.size === "small"} small={p.size === "large"} />
-            </Align>
-
-            {p.hint ? (
-              <Align vertical left hug>
-                <Text tiny={p.size === "small"} xsmall={p.size !== "small"} fill={[p.color, 700]}>
-                  {p.hint}
-                </Text>
+                      <Icon
+                        name="asterisk"
+                        small={p.size === "small"}
+                        medium={p.size === "large"}
+                        fill={[Color.Error, 700]}
+                      />
+                    </>
+                  )}
+                </Label>
 
                 <Spacer xsmall={p.size === "small"} small={p.size === "large"} />
               </Align>
-            ) : (
-              <></>
-            )}
-          </>
-        ) : (
-          <></>
-        )}
-      </Stack>
 
-      <Popover
-        alignment="start"
-        open={p.disabled || p.loading ? false : open}
-        onOpenChange={p.disabled || p.loading ? () => {} : setOpen}
-        trigger={
-          <InputButton
-            size={p.size}
-            width="full"
-            variant="outlined"
-            colorForeground={[p.color, 700]}
-            colorOutline={p.disabled ? [p.color, 100] : [p.color, 300]}
-            colorOutlineHover={p.disabled ? [p.color, 100] : [p.color, 700]}
-            colorBackground={p.disabled ? [p.color, 50] : [Color.White]}
-            colorBackgroundHover={[p.color, 50]}
-            colorLoading={[p.color, 700]}
-            iconName={open ? "keyboard_arrow_up" : "keyboard_arrow_down"}
-            iconPlacement="afterLabel"
-            disabled={p.disabled ? true : undefined}
-            loading={p.loading ? true : undefined}
-            content={
-              <Stack horizontal hug>
-                <Align horizontal left>
-                  {p.label && p.label[0] === "inside" ? (
-                    <>
-                      <Text xsmall={p.size === "small"} small={p.size === "large"} fill={[p.color, 500]}>
-                        {p.label[1]}
-                      </Text>
+              {p.hint ? (
+                <Align vertical left hug>
+                  <Text tiny={p.size === "small"} xsmall={p.size !== "small"} fill={[p.color, 700]}>
+                    {p.hint}
+                  </Text>
 
-                      <Spacer xsmall={p.size === "small"} small={p.size === "large"} />
-                    </>
+                  <Spacer xsmall={p.size === "small"} small={p.size === "large"} />
+                </Align>
+              ) : (
+                <></>
+              )}
+            </>
+          ) : (
+            <></>
+          )}
+        </Stack>
+
+        <Popover
+          alignment="start"
+          open={p.disabled || p.loading ? false : open}
+          onOpenChange={p.disabled || p.loading ? () => {} : setOpen}
+          trigger={
+            <InputButton
+              size={p.size}
+              width="full"
+              variant="outlined"
+              colorForeground={[p.color, 700]}
+              colorOutline={p.disabled ? [p.color, 100] : [p.error ? Color.Error : p.color, 300]}
+              colorOutlineHover={p.disabled ? [p.color, 100] : [p.color, 700]}
+              colorBackground={p.disabled ? [p.color, 50] : [Color.White]}
+              colorBackgroundHover={[p.color, 50]}
+              colorLoading={[p.color, 700]}
+              iconName={open ? "keyboard_arrow_up" : "keyboard_arrow_down"}
+              iconPlacement="afterLabel"
+              disabled={p.disabled ? true : undefined}
+              loading={p.loading ? true : undefined}
+              content={
+                <Stack horizontal hug>
+                  <Align horizontal left>
+                    {p.label && p.label[0] === "inside" ? (
+                      <>
+                        <Text xsmall={p.size === "small"} small={p.size === "large"} fill={[p.color, 500]}>
+                          {p.label[1]}
+                        </Text>
+
+                        <Spacer xsmall={p.size === "small"} small={p.size === "large"} />
+                      </>
+                    ) : (
+                      <></>
+                    )}
+
+                    <div style={{ display: "flex", width: "100%", flexShrink: 1, flexGrow: 1, overflow: "hidden" }}>
+                      {generateCurrentValueLabel(p.multiple)}
+                    </div>
+                  </Align>
+
+                  {p.resettable && ((!p.multiple && !p.clearable) || (p.multiple && p.value.length > 1)) ? (
+                    <Align horizontal center hug="width">
+                      {!p.multiple ? <Spacer xsmall={p.size === "small"} small={p.size === "large"} /> : <></>}
+
+                      <InputButton
+                        variant="blank"
+                        width="auto"
+                        size={p.size}
+                        colorForeground={p.value ? [p.color, 700] : [Color.Transparent]}
+                        iconName="clear"
+                        iconPlacement="labelNotSpecified"
+                        onClick={() => {
+                          if (p.onChange) {
+                            p.onChange(p.multiple ? [] : "")
+                          }
+                        }}
+                      />
+
+                      <Divider vertical fill={p.value ? [p.color, 300] : [Color.Transparent]} overrideHeight="50%" />
+                    </Align>
                   ) : (
                     <></>
                   )}
-
-                  <div style={{ display: "flex", width: "100%", flexShrink: 1, flexGrow: 1, overflow: "hidden" }}>
-                    {generateCurrentValueLabel(p.multiple)}
-                  </div>
-                </Align>
-
-                {p.resettable && ((!p.multiple && !p.clearable) || (p.multiple && p.value.length > 1)) ? (
-                  <Align horizontal center hug="width">
-                    {!p.multiple ? <Spacer xsmall={p.size === "small"} small={p.size === "large"} /> : <></>}
-
-                    <InputButton
-                      variant="blank"
-                      width="auto"
-                      size={p.size}
-                      colorForeground={p.value ? [p.color, 700] : [Color.Transparent]}
-                      iconName="clear"
-                      iconPlacement="labelNotSpecified"
-                      onClick={() => {
-                        if (p.onChange) {
-                          p.onChange(p.multiple ? [] : "")
-                        }
-                      }}
-                    />
-
-                    <Divider vertical fill={p.value ? [p.color, 300] : [Color.Transparent]} overrideHeight="50%" />
-                  </Align>
-                ) : (
-                  <></>
-                )}
-              </Stack>
-            }
-          />
-        }
-      >
-        <Align vertical topLeft>
-          {p.filterOptions && Object.keys(items).length > 9 && (
-            <InputTextSingle
-              size="small"
-              width="auto"
-              color={p.color}
-              value={search}
-              placeholder={p.filterOptions.textFilterPlaceholder}
-              onChange={value => {
-                setSearch(value)
-                filterWithDebounce(value)
-              }}
+                </Stack>
+              }
             />
-          )}
+          }
+        >
+          <Align vertical topLeft>
+            {p.filterOptions && Object.keys(items).length > 9 && (
+              <InputTextSingle
+                size="small"
+                width="auto"
+                color={p.color}
+                value={search}
+                placeholder={p.filterOptions.textFilterPlaceholder}
+                onChange={value => {
+                  setSearch(value)
+                  filterWithDebounce(value)
+                }}
+              />
+            )}
 
-          <Spacer tiny={p.size === "small"} xsmall={p.size === "large"} />
+            <Spacer tiny={p.size === "small"} xsmall={p.size === "large"} />
 
-          <OverflowContainer
-            axes="vertical"
-            colorBackground={[Color.White]}
-            colorForeground={Color.Neutral}
-            maxHeight="radix-popover-content-available-height-SAFE-AREA-INPUTTEXT"
-            hug
-          >
-            <Command loop>
-              {p.filterOptions && (
-                <CommandEmptyStyled>
-                  <Text fill={[p.color, 700]} xsmall={p.size === "small"} small={p.size !== "small"}>
-                    {p.filterOptions.textFilterNoResults}
-                  </Text>
-                </CommandEmptyStyled>
-              )}
+            <OverflowContainer
+              axes="vertical"
+              colorBackground={[Color.White]}
+              colorForeground={Color.Neutral}
+              maxHeight="radix-popover-content-available-height-SAFE-AREA-INPUTTEXT"
+              hug
+            >
+              <Command loop>
+                {p.filterOptions && (
+                  <CommandEmptyStyled>
+                    <Text fill={[p.color, 700]} xsmall={p.size === "small"} small={p.size !== "small"}>
+                      {p.filterOptions.textFilterNoResults}
+                    </Text>
+                  </CommandEmptyStyled>
+                )}
 
-              <CommandList>{commandListItems}</CommandList>
-            </Command>
-          </OverflowContainer>
-        </Align>
-      </Popover>
-    </Container>
+                <CommandList>{commandListItems}</CommandList>
+              </Command>
+            </OverflowContainer>
+          </Align>
+        </Popover>
+      </Container>
+
+      {errorEitherSide}
+    </>
   )
 })
 
