@@ -94,6 +94,7 @@ export const InputCheckbox = (p: InputCheckboxProps) => {
                   small={p.size !== "small"}
                   fill={[Color.Neutral, 700]}
                   maxWidth={p.maxWidth}
+                  title={p.label}
                   textOverflow
                 >
                   {p.label}

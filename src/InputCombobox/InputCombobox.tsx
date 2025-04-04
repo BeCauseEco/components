@@ -282,7 +282,13 @@ export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<InputC
                 </>
               ) : null}
 
-              <Text xsmall={p.size === "small"} small={p.size === "large"} fill={[p.color, 700]} textOverflow>
+              <Text
+                xsmall={p.size === "small"}
+                small={p.size === "large"}
+                fill={[p.color, 700]}
+                textOverflow
+                title={item.label}
+              >
                 {item.label}
               </Text>
             </Align>
