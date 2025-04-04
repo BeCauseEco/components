@@ -36,6 +36,8 @@ const Container = styled.div<AlignProps & { _wrap: AlignProps["wrap"] }>(p => ({
   flexDirection: p["vertical"] ? "column" : "row",
   padding: 0,
   margin: 0,
+  maxWidth: "inherit",
+  overflow: "inherit",
 
   ...(p["_wrap"] && {
     gap: p["_wrap"] === "partly" ? "calc(var(--BU) * 2)" : "calc(var(--BU) * 4)",

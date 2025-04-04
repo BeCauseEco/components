@@ -695,7 +695,7 @@ export const DataTable = (p: DataTableProps) => {
       height: 8px;
       width: 100%;
       border-top: solid 1px ${computeColor(p.stroke || [Color.Neutral, 100])};
-      background: linear-gradient(to bottom, ${computeColor(p.fill ? adjustLightness(p.fill, 1) : [Color.Neutral, 50])}, transparent);
+      background: linear-gradient(to bottom, ${computeColor(p.fill || [Color.White])}, transparent);
     }
 
     .${cssScope} .override-ka-reorder .ka-row {
@@ -719,13 +719,13 @@ export const DataTable = (p: DataTableProps) => {
     .${cssScope} .override-ka-fixed-left:after {
       right: -8px;
       border-left: solid 1px ${computeColor(p.stroke || [Color.Neutral, 100])};
-      background: linear-gradient(to right, ${computeColor(p.fill ? adjustLightness(p.fill, 1) : [Color.Neutral, 50])}, transparent);
+      background: linear-gradient(to right, ${computeColor(p.fill || [Color.White])}, transparent);
     }
 
     .${cssScope} .override-ka-fixed-right:after {
       left: -8px;
       border-right: solid 1px ${computeColor(p.stroke || [Color.Neutral, 100])};
-      background: linear-gradient(to left, ${computeColor(p.fill ? adjustLightness(p.fill, 1) : [Color.Neutral, 50])}, transparent);
+      background: linear-gradient(to left, ${computeColor(p.fill || [Color.White])}, transparent);
     }
 
     .${cssScope} .override-ka-editing-row,
