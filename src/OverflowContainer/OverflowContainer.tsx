@@ -14,10 +14,10 @@ export type OverflowContainerProps = ComponentBaseProps & {
   colorBackground: ColorWithLightness
   colorForeground: Color
 
-  minWidth?: NumberInPixelsOrPercentage
+  minWidth?: NumberInPixelsOrPercentage | "radix-popover-trigger-width"
   minHeight?: NumberInPixelsOrPercentage
 
-  maxWidth?: NumberInPixelsOrPercentage | NumberInPixelsOrPercentageBaseUnitFactor
+  maxWidth?: NumberInPixelsOrPercentage | NumberInPixelsOrPercentageBaseUnitFactor | "radix-popover-trigger-width"
 
   maxHeight?:
     | "auto"
@@ -40,7 +40,7 @@ const computeMaxHeight = (maxHeight: OverflowContainerProps["maxHeight"]): strin
   switch (maxHeight) {
     case "auto":
     default:
-      return "none"
+      return "auto"
 
     case "radix-accordion-content-height":
       return "var(--radix-accordion-content-height)"
@@ -50,6 +50,34 @@ const computeMaxHeight = (maxHeight: OverflowContainerProps["maxHeight"]): strin
 
     case "radix-popover-content-available-height-SAFE-AREA-INPUTTEXT":
       return "calc(var(--radix-popover-content-available-height) - var(--BU) * 24)"
+  }
+}
+
+const computeMinWidth = (minWidth: OverflowContainerProps["minWidth"]): string => {
+  if (minWidth?.endsWith("px")) {
+    return minWidth
+  }
+
+  switch (minWidth) {
+    default:
+      return "auto"
+
+    case "radix-popover-trigger-width":
+      return "calc(var(--radix-popover-trigger-width) - var(--BU) * 4)"
+  }
+}
+
+const computeMaxWidth = (maxWidth: OverflowContainerProps["maxWidth"]): string => {
+  if (maxWidth?.endsWith("px")) {
+    return maxWidth
+  }
+
+  switch (maxWidth) {
+    default:
+      return "auto"
+
+    case "radix-popover-trigger-width":
+      return "calc(var(--radix-popover-trigger-width) - var(--BU) * 4)"
   }
 }
 
@@ -66,8 +94,8 @@ const Container = styled.div<
   height: "inherit",
   padding: p.hug ? (p.hug === "partly" ? "calc(var(--BU) * 2)" : 0) : "calc(var(--BU) * 4)",
 
-  ...(p.minWidth && { minWidth: p.minWidth }),
-  ...(p.maxWidth && { maxWidth: p.maxWidth }),
+  ...(p.minWidth !== undefined && { minWidth: computeMinWidth(p.minWidth) }),
+  ...(p.maxWidth !== undefined && { maxWidth: computeMaxWidth(p.maxWidth) }),
   ...(p.minHeight && { minHeight: p.minHeight }),
   ...(p.maxHeight !== undefined && { maxHeight: computeMaxHeight(p.maxHeight) }),
 

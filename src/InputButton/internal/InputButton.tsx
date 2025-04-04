@@ -13,7 +13,8 @@ import { ComponentBaseProps } from "@new/ComponentBaseProps"
 import { useRouter } from "next/router"
 
 export type InputButtonProps = ComponentBaseProps &
-  PlaywrightProps & {
+  PlaywrightProps &
+  Pick<StackProps, "overflowHidden"> & {
     variant: "link" | "solid" | "outlined" | "transparent" | "blank"
 
     size: "small" | "large"
@@ -131,7 +132,7 @@ const Children = (p: Omit<InputButtonProps, "width">) => {
 
     if (p.iconPlacement === "beforeLabel") {
       iconBeforeLabel = (
-        <Align horizontal left>
+        <Align horizontal hug="width" left>
           {icon}
 
           <Spacer xsmall={p.size === "small"} small={p.size === "large"} />
@@ -141,7 +142,7 @@ const Children = (p: Omit<InputButtonProps, "width">) => {
 
     if (p.iconPlacement === "afterLabel") {
       iconAfterLabel = (
-        <Align horizontal right>
+        <Align horizontal hug="width" right>
           <Spacer xsmall={p.size === "small"} small={p.size === "large"} />
 
           {icon}
@@ -171,6 +172,7 @@ const Children = (p: Omit<InputButtonProps, "width">) => {
       disabled={p.disabled ? true : undefined}
       aspectRatio={p.iconPlacement === "labelNotSpecified" ? "1" : "auto"}
       explodeHeight
+      overflowHidden={p.overflowHidden}
       hug
     >
       <>
@@ -277,6 +279,7 @@ export const InputButton = forwardRef<HTMLButtonElement | HTMLAnchorElement, Inp
         hug={p.hug}
         href={p.href}
         target={p.target}
+        overflowHidden={p.overflowHidden}
       />
     </Output>
   )

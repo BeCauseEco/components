@@ -82,6 +82,7 @@ const Container = styled.div<ContainerProps>(p => ({
   display: "flex",
   flexShrink: 1,
   width: "100%",
+  maxWidth: "inherit",
   height: p.explodeHeight ? "100%" : "auto",
   overflow: p.overflowHidden ? "hidden" : "visible",
   cursor: "inherit",
@@ -91,7 +92,6 @@ const Container = styled.div<ContainerProps>(p => ({
   transition: "background-color 0.1s ease-in-out",
   willChange: "background-color",
   aspectRatio: p.aspectRatio || "auto",
-  content: `'${p.aspectRatio}'`,
   boxShadow: computeShadow(p.dropShadow),
 
   ...(p.stroke && {
