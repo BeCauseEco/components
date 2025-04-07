@@ -89,10 +89,10 @@ const Container = styled.p<Omit<TextProps, "fill"> & { _fill: TextProps["fill"] 
     // filter: "brightness(0.8)",
   },
 
-  "&[title]": {
-    borderBottom: `dotted 2px ${computeColor([p._fill[0], 200])}`,
-    cursor: "help",
-  },
+  // "&[title]": {
+  //   borderBottom: `dotted 2px ${computeColor([p._fill[0], 200])}`,
+  //   cursor: "help",
+  // },
 
   ...((p.maxWidth || p.textOverflow) && {
     overflow: "hidden",
