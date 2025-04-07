@@ -2,6 +2,10 @@ import { Color, computeColor } from "@new/Color"
 import { ProgressIndicatorItemProps } from "@new/ProgressIndicator/ProgressIndicatorItem"
 import { Children, isValidElement, ReactElement } from "react"
 import styled from "@emotion/styled"
+import { Stack } from "@new/Stack/Stack"
+import { Align } from "@new/Stack/Align"
+import { Text } from "@new/Text/Text"
+import { Spacer } from "@new/Stack/Spacer"
 
 export type ProgressIndicatorProps = {
   type: "bar" | "circle"
@@ -180,8 +184,36 @@ export const ProgressIndicator = (p: ProgressIndicatorProps) => {
   }
 
   return (
-    <Container type={p.type} size={p.size} color={p.color}>
-      <SegmentContainer>{output}</SegmentContainer>
-    </Container>
+    <Stack horizontal hug>
+      {p.labelStart ? (
+        <Align horizontal left hug="width">
+          <Text xsmall={p.size === "small"} small={p.size === "large"} fill={[p.color, 400]}>
+            {p.labelStart}
+          </Text>
+
+          <Spacer xsmall={p.size === "small"} small={p.size === "large"} />
+        </Align>
+      ) : (
+        <></>
+      )}
+
+      <Align horizontal center>
+        <Container type={p.type} size={p.size} color={p.color}>
+          <SegmentContainer>{output}</SegmentContainer>
+        </Container>
+      </Align>
+
+      {p.labelEnd ? (
+        <Align horizontal right hug="width">
+          <Spacer xsmall={p.size === "small"} small={p.size === "large"} />
+
+          <Text xsmall={p.size === "small"} small={p.size === "large"} fill={[p.color, 400]}>
+            {p.labelEnd}
+          </Text>
+        </Align>
+      ) : (
+        <></>
+      )}
+    </Stack>
   )
 }

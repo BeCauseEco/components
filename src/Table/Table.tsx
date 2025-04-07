@@ -14,7 +14,7 @@ const Container = styled.table<TContainerProperties>(p => ({
   outlineOffset: -1,
   border: "solid 1px transparent",
   borderRadius: Size.Tiny,
-  width: "100%",
+  width: p.hug ? "0" : "100%",
 
   "& thead td": {
     borderBottom: `solid 1px ${computeColor(p.colorBorder)}`,
@@ -48,6 +48,7 @@ export type TTable = PlaywrightProps & {
   colorBorder: ColorWithLightness
   colorCellSeparator: ColorWithLightness
   colorRowHover: ColorWithLightness
+  hug?: boolean
 }
 
 export const Table = (p: TTable) => (
@@ -56,6 +57,7 @@ export const Table = (p: TTable) => (
     colorCellSeparator={p.colorCellSeparator}
     colorRowHover={p.colorRowHover}
     data-playwright-testid={p["data-playwright-testid"]}
+    hug={p.hug}
   >
     <Head>{p.head}</Head>
 
