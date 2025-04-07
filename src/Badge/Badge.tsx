@@ -33,6 +33,7 @@ export type BadgeProps = ComponentBaseProps &
     variant: "solid" | "outlined" | "opaque" | "transparent"
 
     label: string
+    title?: string
 
     color: Color
     iconName?: string
@@ -87,7 +88,7 @@ export const Badge = (p: BadgeProps) => {
     <>
       {icon}
 
-      <Align horizontal center>
+      <Align horizontal left>
         {p.iconName ? null : <Spacer xsmall={p.size === "small"} small={p.size === "large"} />}
 
         <Text
@@ -174,6 +175,7 @@ export const Badge = (p: BadgeProps) => {
       size={p.size}
       data-playwright-testid={p["data-playwright-testid"]}
       textOverflow={p.textOverflow}
+      title={p.title}
     >
       {stack}
     </Container>

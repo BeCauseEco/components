@@ -122,8 +122,8 @@ export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<InputC
     width: "100%",
     maxWidth: "100%",
 
-    "& [class^='<Badge']": {
-      // minWidth: "30%",
+    "& [class^='<Badge']:not(:nth-child(n+4))": {
+      minWidth: "25%",
     },
   })
 
@@ -137,6 +137,7 @@ export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<InputC
             size={p.size}
             variant={p.disabled ? "opaque" : "solid"}
             label={selectedItem.label}
+            title={selectedItem.label}
             color={p.disabled ? p.color : Color.Primary}
             onClear={() => {
               p.onChange("")
@@ -189,6 +190,7 @@ export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<InputC
             <Badge
               key={index}
               label={item}
+              title={item}
               size={p.size}
               variant={p.disabled ? "opaque" : "solid"}
               color={p.disabled ? p.color : Color.Primary}
@@ -516,7 +518,7 @@ export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<InputC
               colorForeground={Color.Neutral}
               maxHeight="radix-popover-content-available-height-SAFE-AREA-INPUTTEXT"
               minWidth="radix-popover-trigger-width"
-              maxWidth="radix-popover-trigger-width"
+              maxWidth="radix-popover-content-available-width"
               hug
             >
               <Command loop>
@@ -534,6 +536,18 @@ export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<InputC
           )}
         </Align>
       </Popover>
+
+      {p.error ? (
+        <Align vertical left hug>
+          <Spacer xsmall={p.size === "small"} small={p.size === "large"} />
+
+          <Text tiny={p.size === "small"} xsmall={p.size !== "small"} fill={[Color.Error, 700]}>
+            {p.error}
+          </Text>
+        </Align>
+      ) : (
+        <></>
+      )}
     </Container>
   )
 })

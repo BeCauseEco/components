@@ -17,7 +17,11 @@ export type OverflowContainerProps = ComponentBaseProps & {
   minWidth?: NumberInPixelsOrPercentage | "radix-popover-trigger-width"
   minHeight?: NumberInPixelsOrPercentage
 
-  maxWidth?: NumberInPixelsOrPercentage | NumberInPixelsOrPercentageBaseUnitFactor | "radix-popover-trigger-width"
+  maxWidth?:
+    | NumberInPixelsOrPercentage
+    | NumberInPixelsOrPercentageBaseUnitFactor
+    | "radix-popover-trigger-width"
+    | "radix-popover-content-available-width"
 
   maxHeight?:
     | "auto"
@@ -78,6 +82,9 @@ const computeMaxWidth = (maxWidth: OverflowContainerProps["maxWidth"]): string =
 
     case "radix-popover-trigger-width":
       return "calc(var(--radix-popover-trigger-width) - var(--BU) * 4)"
+
+    case "radix-popover-content-available-width":
+      return "calc(var(--radix-popover-content-available-width) - var(--BU) * 4)"
   }
 }
 

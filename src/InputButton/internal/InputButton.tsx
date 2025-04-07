@@ -181,6 +181,7 @@ const Children = (p: Omit<InputButtonProps, "width">) => {
         )}
 
         {iconBeforeLabel}
+
         {label}
 
         {p.content ? (
@@ -192,6 +193,7 @@ const Children = (p: Omit<InputButtonProps, "width">) => {
         )}
 
         {iconAfterLabel}
+
         {iconLabelNotSpecified}
 
         {!iconLabelNotSpecified && p.variant !== "link" && (
