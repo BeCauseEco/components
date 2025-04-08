@@ -54,6 +54,7 @@ export const StyleBodyHuge = {
 
 const Container = styled.p<Omit<TextProps, "fill"> & { _fill: TextProps["fill"] }>(p => ({
   display: "inline-block",
+  textBoxTrim: "trim-both",
 
   ...(p.monospace ? StyleMonospace : StyleFontFamily),
 
@@ -109,13 +110,13 @@ const Container = styled.p<Omit<TextProps, "fill"> & { _fill: TextProps["fill"] 
   ...(p.huge && StyleBodyHuge),
 
   // TODO: @cllpse: investigate why !important is needed here
-  ...(!p.wrap && p.tiny && { lineHeight: `calc(${StyleBodyTiny.fontSize} * 1.75) !important` }),
-  ...(!p.wrap && p.xsmall && { lineHeight: `calc(${StyleBodyXsmall.fontSize} * 1.75) !important` }),
-  ...(!p.wrap && p.small && { lineHeight: `calc(${StyleBodySmall.fontSize} * 1.75) !important` }),
-  ...(!p.wrap && p.medium && { lineHeight: `calc(${StyleBodyMedium.fontSize} * 1.75) !important` }),
-  ...(!p.wrap && p.large && { lineHeight: `calc(${StyleBodyLarge.fontSize} * 1.75) !important` }),
-  ...(!p.wrap && p.xLarge && { lineHeight: `calc(${StyleBodyXLarge.fontSize} * 1.75) !important` }),
-  ...(!p.wrap && p.huge && { lineHeight: `calc(${StyleBodyHuge.fontSize} * 1.75) !important` }),
+  ...(!p.wrap && p.tiny && { lineHeight: `${StyleBodyTiny.fontSize} !important` }),
+  ...(!p.wrap && p.xsmall && { lineHeight: `${StyleBodyXsmall.fontSize} !important` }),
+  ...(!p.wrap && p.small && { lineHeight: `${StyleBodySmall.fontSize} !important` }),
+  ...(!p.wrap && p.medium && { lineHeight: `${StyleBodyMedium.fontSize} !important` }),
+  ...(!p.wrap && p.large && { lineHeight: `${StyleBodyLarge.fontSize} !important` }),
+  ...(!p.wrap && p.xLarge && { lineHeight: `${StyleBodyXLarge.fontSize} !important` }),
+  ...(!p.wrap && p.huge && { lineHeight: `${StyleBodyHuge.fontSize} !important` }),
 }))
 
 export type TextProps = PlaywrightProps & {
