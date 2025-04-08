@@ -10,9 +10,11 @@ import { Spacer } from "@new/Stack/Spacer"
 import styled from "@emotion/styled"
 import { ComponentBaseProps } from "@new/ComponentBaseProps"
 
-const Container = styled.div<Pick<BadgeProps, "size">>(p => ({
+const Container = styled.div<Pick<BadgeProps, "size" | "textOverflow">>(p => ({
   display: "flex",
-  width: "fit-content",
+  width: "auto",
+  maxWidth: "inherit",
+  ...(p.textOverflow && { overflow: "hidden" }),
   height: p.size === "small" ? "calc(var(--BU) * 6)" : "calc(var(--BU) * 8)",
 
   "& > *": {
@@ -22,6 +24,7 @@ const Container = styled.div<Pick<BadgeProps, "size">>(p => ({
 
 export type BadgeProps = ComponentBaseProps &
   Pick<TextProps, "maxWidth"> &
+  Pick<TextProps, "textOverflow"> &
   PlaywrightProps & {
     disabled?: boolean
 
@@ -30,6 +33,7 @@ export type BadgeProps = ComponentBaseProps &
     variant: "solid" | "outlined" | "opaque" | "transparent"
 
     label: string
+    title?: string
 
     color: Color
     iconName?: string
@@ -84,7 +88,7 @@ export const Badge = (p: BadgeProps) => {
     <>
       {icon}
 
-      <Align horizontal center hug="width">
+      <Align horizontal left>
         {p.iconName ? null : <Spacer xsmall={p.size === "small"} small={p.size === "large"} />}
 
         <Text
@@ -92,6 +96,7 @@ export const Badge = (p: BadgeProps) => {
           small={p.size !== "small"}
           fill={p.variant === "transparent" ? [Color.Neutral, 700] : [p.color, p.variant === "solid" ? 50 : 700]}
           maxWidth={p.maxWidth}
+          textOverflow={p.textOverflow}
         >
           {p.label}
         </Text>
@@ -106,7 +111,14 @@ export const Badge = (p: BadgeProps) => {
   switch (p.variant) {
     case "solid":
       stack = (
-        <Stack horizontal fill={[p.color, 700]} cornerRadius="medium" disabled={p.disabled ? true : undefined} hug>
+        <Stack
+          horizontal
+          fill={[p.color, 700]}
+          cornerRadius="medium"
+          disabled={p.disabled ? true : undefined}
+          hug
+          overflowHidden={p.textOverflow}
+        >
           {children}
         </Stack>
       )
@@ -114,7 +126,14 @@ export const Badge = (p: BadgeProps) => {
 
     case "outlined":
       stack = (
-        <Stack horizontal stroke={[p.color, 300]} cornerRadius="medium" disabled={p.disabled ? true : undefined} hug>
+        <Stack
+          horizontal
+          stroke={[p.color, 300]}
+          cornerRadius="medium"
+          disabled={p.disabled ? true : undefined}
+          hug
+          overflowHidden={p.textOverflow}
+        >
           {children}
         </Stack>
       )
@@ -122,7 +141,14 @@ export const Badge = (p: BadgeProps) => {
 
     case "opaque":
       stack = (
-        <Stack horizontal fill={[p.color, 100]} cornerRadius="medium" disabled={p.disabled ? true : undefined} hug>
+        <Stack
+          horizontal
+          fill={[p.color, 100]}
+          cornerRadius="medium"
+          disabled={p.disabled ? true : undefined}
+          hug
+          overflowHidden={p.textOverflow}
+        >
           {children}
         </Stack>
       )
@@ -130,7 +156,13 @@ export const Badge = (p: BadgeProps) => {
 
     case "transparent":
       stack = (
-        <Stack horizontal cornerRadius="medium" disabled={p.disabled ? true : undefined} hug>
+        <Stack
+          horizontal
+          cornerRadius="medium"
+          disabled={p.disabled ? true : undefined}
+          hug
+          overflowHidden={p.textOverflow}
+        >
           {children}
         </Stack>
       )
@@ -142,6 +174,8 @@ export const Badge = (p: BadgeProps) => {
       className={`<Badge /> - ${p.className}`}
       size={p.size}
       data-playwright-testid={p["data-playwright-testid"]}
+      textOverflow={p.textOverflow}
+      title={p.title}
     >
       {stack}
     </Container>

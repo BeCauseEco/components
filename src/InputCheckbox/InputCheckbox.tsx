@@ -11,6 +11,8 @@ import { ComponentBaseProps } from "@new/ComponentBaseProps"
 
 const Container = styled.div({
   display: "flex",
+  maxWidth: "inherit",
+  overflow: "inherit",
 
   "& button": {
     all: "unset",
@@ -31,6 +33,8 @@ const Label = styled.label({
   display: "flex",
   userSelect: "none",
   cursor: "pointer",
+  maxWidth: "inherit",
+  overflow: "inherit",
 })
 
 export type InputCheckboxProps = ComponentBaseProps &
@@ -55,7 +59,7 @@ export const InputCheckbox = (p: InputCheckboxProps) => {
 
   return (
     <Container className="<InputCheckbox /> -" data-playwright-testid={p["data-playwright-testid"]}>
-      <Stack horizontal hug disabled={p.disabled ? true : undefined}>
+      <Stack horizontal hug disabled={p.disabled ? true : undefined} overflowHidden>
         <Align horizontal left hug>
           <Root id={key} checked={p.value} onCheckedChange={checked => p.onChange(checked === true)}>
             {p.value === "indeterminate" && (
@@ -90,6 +94,8 @@ export const InputCheckbox = (p: InputCheckboxProps) => {
                   small={p.size !== "small"}
                   fill={[Color.Neutral, 700]}
                   maxWidth={p.maxWidth}
+                  title={p.label}
+                  textOverflow
                 >
                   {p.label}
                 </Text>
