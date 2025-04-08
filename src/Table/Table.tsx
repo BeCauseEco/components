@@ -26,8 +26,8 @@ const Container = styled.table<TContainerProperties>(p => ({
 
   "& td": {
     border: `dotted 1px ${computeColor(p.colorCellSeparator)}`,
-    height: p.hug ? "0" : "calc(var(--BU) * 10)",
-    ...(p.hug && { padding: "var(--BU) calc(var(--BU) * 2) !important" }),
+    height: p.hug ? "0  !important" : "calc(var(--BU) * 10)",
+    ...(p.hug && { padding: "calc(var(--BU) / 2) calc(var(--BU) * 2) !important" }),
   },
 
   "& td:first-child": {
