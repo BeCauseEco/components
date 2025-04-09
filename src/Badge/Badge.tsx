@@ -12,7 +12,7 @@ import { ComponentBaseProps } from "@new/ComponentBaseProps"
 
 const Container = styled.div<Pick<BadgeProps, "size" | "textOverflow">>(p => ({
   display: "flex",
-  width: "auto",
+  width: "fit-content",
   maxWidth: "inherit",
   ...(p.textOverflow && { overflow: "hidden" }),
   height: p.size === "small" ? "calc(var(--BU) * 6)" : "calc(var(--BU) * 8)",

@@ -54,6 +54,7 @@ export const StyleBodyHuge = {
 
 const Container = styled.p<Omit<TextProps, "fill"> & { _fill: TextProps["fill"] }>(p => ({
   display: "inline-block",
+  textBoxTrim: "trim-both",
 
   ...(p.monospace ? StyleMonospace : StyleFontFamily),
 

@@ -1,7 +1,12 @@
 import { Color, computeColor } from "@new/Color"
-import { ProgressIndicatorItemProps } from "@new/ProgressIndicator/ProgressIndicatorItem"
+import { ProgressIndicatorItemSegmentProps } from "@new/ProgressIndicator/ProgressIndicatorSegment"
+import { ProgressIndicatorItemTickProps } from "@new/ProgressIndicator/ProgressIndicatorTick"
 import { Children, isValidElement, ReactElement } from "react"
 import styled from "@emotion/styled"
+import { Stack } from "@new/Stack/Stack"
+import { Align } from "@new/Stack/Align"
+import { Text } from "@new/Text/Text"
+import { Spacer } from "@new/Stack/Spacer"
 
 export type ProgressIndicatorProps = {
   type: "bar" | "circle"
@@ -9,12 +14,9 @@ export type ProgressIndicatorProps = {
   color: Color
   labelStart?: string
   labelEnd?: string
-  children: ReactElement<ProgressIndicatorItemProps> | ReactElement<ProgressIndicatorItemProps>[]
-}
-
-type Segment = {
-  width: string
-  color: Color
+  children:
+    | ReactElement<ProgressIndicatorItemSegmentProps | ProgressIndicatorItemTickProps>
+    | ReactElement<ProgressIndicatorItemSegmentProps | ProgressIndicatorItemTickProps>[]
 }
 
 const clipPathDoughnut =
@@ -104,10 +106,22 @@ const SegmentContainer = styled.div({
   zIndex: 1,
 })
 
-const SegmentBar = styled.div<Segment>(p => ({
+const SegmentBar = styled.div<{ width: string; color: Color }>(p => ({
   display: "flex",
   width: p.width,
   height: "100%",
+  backgroundColor: computeColor([p.color, 700]),
+}))
+
+const TickMarkBar = styled.div<{ offset: string; color: Color }>(p => ({
+  position: "absolute",
+  display: "flex",
+  width: "calc(var(--BU) * 2)",
+  left: p.offset,
+  height: "100%",
+  borderLeft: `solid calc(var(--BU) * 0.5) ${computeColor([p.color, 50])}`,
+  borderRight: `solid calc(var(--BU) * 0.5) ${computeColor([p.color, 50])}`,
+  zIndex: 1,
   backgroundColor: computeColor([p.color, 700]),
 }))
 
@@ -140,14 +154,15 @@ export const ProgressIndicator = (p: ProgressIndicatorProps) => {
   if (p.type === "bar") {
     childrenArray.map((child, index) => {
       if (isValidElement(child)) {
-        output.push(
-          <SegmentBar
-            key={index}
-            title={child.props["width"]}
-            width={child.props["width"]}
-            color={child.props["color"]}
-          />,
-        )
+        if (child.props["offset"]) {
+          const cp = child.props as ProgressIndicatorItemTickProps
+
+          output.push(<TickMarkBar key={index} offset={cp.offset} color={cp.color} />)
+        } else {
+          const cp = child.props as ProgressIndicatorItemSegmentProps
+
+          output.push(<SegmentBar key={index} title={cp.width} width={cp.width} color={cp.color} />)
+        }
       }
     })
   } else {
@@ -180,8 +195,36 @@ export const ProgressIndicator = (p: ProgressIndicatorProps) => {
   }
 
   return (
-    <Container type={p.type} size={p.size} color={p.color}>
-      <SegmentContainer>{output}</SegmentContainer>
-    </Container>
+    <Stack horizontal hug>
+      {p.labelStart ? (
+        <Align horizontal left hug="width">
+          <Text xsmall={p.size === "small"} small={p.size === "large"} fill={[p.color, 400]} monospace>
+            {p.labelStart}
+          </Text>
+
+          <Spacer xsmall={p.size === "small"} small={p.size === "large"} />
+        </Align>
+      ) : (
+        <></>
+      )}
+
+      <Align horizontal center>
+        <Container type={p.type} size={p.size} color={p.color}>
+          <SegmentContainer>{output}</SegmentContainer>
+        </Container>
+      </Align>
+
+      {p.labelEnd ? (
+        <Align horizontal right hug="width">
+          <Spacer xsmall={p.size === "small"} small={p.size === "large"} />
+
+          <Text xsmall={p.size === "small"} small={p.size === "large"} fill={[p.color, 400]} monospace>
+            {p.labelEnd}
+          </Text>
+        </Align>
+      ) : (
+        <></>
+      )}
+    </Stack>
   )
 }
