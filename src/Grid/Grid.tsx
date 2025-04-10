@@ -6,6 +6,9 @@ import { generateErrorClassName, generateErrorStyles, useValidateChildren } from
 
 const computeGridTemplateColumns = (columns: GridProps["columns"]): string => {
   switch (columns) {
+    case "one":
+      return "1fr"
+
     case "two":
       return "1fr 1fr"
 
@@ -32,7 +35,7 @@ const Container = styled.div<Pick<GridProps, "columns" | "hug" | "validateChildr
 }))
 
 export type GridProps = ComponentBaseProps & {
-  columns: "two" | "three" | "four"
+  columns: "one" | "two" | "three" | "four"
 
   hug?: boolean
 
