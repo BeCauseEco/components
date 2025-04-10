@@ -23,7 +23,7 @@ import { kaPropsUtils } from "ka-table/utils"
 import { Alert } from "@new/Alert/Alert"
 import { InputComboboxProps } from "@new/InputCombobox/InputCombobox"
 import { ProgressIndicator } from "@new/ProgressIndicator/ProgressIndicator"
-import { ProgressIndicatorItem } from "@new/ProgressIndicator/ProgressIndicatorItem"
+import { ProgressIndicatorSegment } from "@new/ProgressIndicator/ProgressIndicatorSegment"
 import { useResizeObserver } from "usehooks-ts"
 import { InputButtonIconPrimaryProps } from "@new/InputButton/InputButtonIconPrimary"
 import { InputButtonSecondaryProps } from "@new/InputButton/InputButtonSecondary"
@@ -200,7 +200,7 @@ const CellProgressIndicator = (cellTextProps: ICellTextProps | ICellEditorProps)
     <Stack hug horizontal>
       <Align horizontal left={type === "bar"} center={type === "circle"}>
         <ProgressIndicator type={type} size="large" color={Color.Neutral}>
-          <ProgressIndicatorItem width={`${value}%`} color={color} />
+          <ProgressIndicatorSegment width={`${value}%`} color={color} />
         </ProgressIndicator>
       </Align>
     </Stack>
