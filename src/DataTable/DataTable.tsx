@@ -256,7 +256,7 @@ export type Column = {
   minWidth?: `${number}${"%"}`
   explodeWidth?: boolean
   preventContentCollapse?: boolean
-  sort?: (sortDirection: SortDirection) => (a: string, b: string) => number
+  sort?: (sortDirection: SortDirection) => (a: any, b: any) => number
   avatar?: (rowData: ICellTextProps["rowData"]) => string | undefined
   link?: (rowData: ICellTextProps["rowData"]) => string | (() => void) | undefined
   tooltip?: ((rowData: ICellTextProps["rowData"]) => ReactElement<AlignProps> | string | undefined) | boolean
