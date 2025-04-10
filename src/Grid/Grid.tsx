@@ -25,6 +25,7 @@ const Container = styled.div<Pick<GridProps, "columns" | "hug" | "validateChildr
   gap: p.hug ? 0 : "calc(var(--BU) * 4)",
   gridTemplateColumns: computeGridTemplateColumns(p.columns),
   gridTemplateRows: "auto",
+  width: "inherit",
   height: "inherit",
 
   ...p.validateChildrenErrorStyles,
