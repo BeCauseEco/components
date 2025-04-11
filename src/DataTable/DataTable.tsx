@@ -23,7 +23,7 @@ import { kaPropsUtils } from "ka-table/utils"
 import { Alert } from "@new/Alert/Alert"
 import { InputComboboxProps } from "@new/InputCombobox/InputCombobox"
 import { ProgressIndicator } from "@new/ProgressIndicator/ProgressIndicator"
-import { ProgressIndicatorItem } from "@new/ProgressIndicator/ProgressIndicatorItem"
+import { ProgressIndicatorSegment } from "@new/ProgressIndicator/ProgressIndicatorSegment"
 import { useResizeObserver } from "usehooks-ts"
 import { InputButtonIconPrimaryProps } from "@new/InputButton/InputButtonIconPrimary"
 import { InputButtonSecondaryProps } from "@new/InputButton/InputButtonSecondary"
@@ -200,7 +200,7 @@ const CellProgressIndicator = (cellTextProps: ICellTextProps | ICellEditorProps)
     <Stack hug horizontal>
       <Align horizontal left={type === "bar"} center={type === "circle"}>
         <ProgressIndicator type={type} size="large" color={Color.Neutral}>
-          <ProgressIndicatorItem width={`${value}%`} color={color} />
+          <ProgressIndicatorSegment width={`${value}%`} color={color} />
         </ProgressIndicator>
       </Align>
     </Stack>
@@ -256,7 +256,7 @@ export type Column = {
   minWidth?: `${number}${"%"}`
   explodeWidth?: boolean
   preventContentCollapse?: boolean
-
+  sort?: (sortDirection: SortDirection) => (a: any, b: any) => number
   avatar?: (rowData: ICellTextProps["rowData"]) => string | undefined
   link?: (rowData: ICellTextProps["rowData"]) => string | (() => void) | undefined
   tooltip?: ((rowData: ICellTextProps["rowData"]) => ReactElement<AlignProps> | string | undefined) | boolean
@@ -385,6 +385,7 @@ export const DataTable = (p: DataTableProps) => {
       status: column.status,
       avatar: column.avatar,
       link: column.link,
+      sort: column.sort,
       tooltip: column.tooltip,
       sortDirection: sortDirection,
       minWidth: column.minWidth,
@@ -889,6 +890,11 @@ export const DataTable = (p: DataTableProps) => {
                         return (s === "yes" && b === true) || (s === "no" && b === false)
                       }
                     }}
+                    sort={({ column }) => {
+                      if (column["sort"]) {
+                        return column["sort"](column.sortDirection)
+                      }
+                    }}
                     childComponents={{
                       tableWrapper: {
                         elementAttributes: () => {
@@ -946,6 +952,11 @@ export const DataTable = (p: DataTableProps) => {
                               : true,
                           ).length
 
+                          const allowSort =
+                            p.mode !== "edit" &&
+                            headCellContentAsColumn.dataType !== DataType.ProgressIndicator &&
+                            headCellContentAsColumn.dataType !== DataType.Status
+
                           return (
                             <Stack hug horizontal>
                               {(p.mode === "simple" || p.mode === "filter") && p.selectKeyField && firstColumn ? (
@@ -972,13 +983,7 @@ export const DataTable = (p: DataTableProps) => {
                               )}
 
                               <Align horizontal left={!alignmentRight} right={alignmentRight}>
-                                {p.mode === "edit" ||
-                                headCellContentAsColumn.dataType === DataType.ProgressIndicator ||
-                                headCellContentAsColumn.dataType === DataType.Status ? (
-                                  <Text fill={[Color.Neutral, 700]} xsmall>
-                                    <b>{headCellContent.column.title}</b>
-                                  </Text>
-                                ) : (
+                                {allowSort || headCellContentAsColumn.sort ? (
                                   <CellHeadLink onClick={() => table.updateSortDirection(headCellContent.column.key)}>
                                     <Text fill={[Color.Neutral, 700]} xsmall>
                                       <b>{headCellContent.column.title}</b>
@@ -988,6 +993,10 @@ export const DataTable = (p: DataTableProps) => {
 
                                     <Icon medium name={iconName} fill={[Color.Neutral, 700]} />
                                   </CellHeadLink>
+                                ) : (
+                                  <Text fill={[Color.Neutral, 700]} xsmall>
+                                    <b>{headCellContent.column.title}</b>
+                                  </Text>
                                 )}
                               </Align>
                             </Stack>
