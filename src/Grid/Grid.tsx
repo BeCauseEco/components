@@ -6,6 +6,9 @@ import { generateErrorClassName, generateErrorStyles, useValidateChildren } from
 
 const computeGridTemplateColumns = (columns: GridProps["columns"]): string => {
   switch (columns) {
+    case "one":
+      return "1fr"
+
     case "two":
       return "1fr 1fr"
 
@@ -25,13 +28,14 @@ const Container = styled.div<Pick<GridProps, "columns" | "hug" | "validateChildr
   gap: p.hug ? 0 : "calc(var(--BU) * 4)",
   gridTemplateColumns: computeGridTemplateColumns(p.columns),
   gridTemplateRows: "auto",
+  width: "inherit",
   height: "inherit",
 
   ...p.validateChildrenErrorStyles,
 }))
 
 export type GridProps = ComponentBaseProps & {
-  columns: "two" | "three" | "four"
+  columns: "one" | "two" | "three" | "four"
 
   hug?: boolean
 
