@@ -375,11 +375,7 @@ export const DataTable = (p: DataTableProps) => {
   nativeColumns = p.columns.map(c => {
     const column = c as Column
 
-    let sortDirection = p.mode !== "edit" && column.key === p.defaultSortColumn ? p.defaultSortDirection : undefined
-
-    if (p.defaultSortDirection) {
-      sortDirection = p.defaultSortDirection
-    }
+    const sortDirection = p.mode !== "edit" && column.key === p.defaultSortColumn ? p.defaultSortDirection : undefined
 
     return {
       key: column.key,
