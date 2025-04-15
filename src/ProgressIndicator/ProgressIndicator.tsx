@@ -117,7 +117,7 @@ const TickMarkBar = styled.div<{ offset: string; color: Color }>(p => ({
   position: "absolute",
   display: "flex",
   width: "calc(var(--BU) * 2)",
-  left: p.offset,
+  left: `calc(${p.offset} - calc(var(--BU) + calc(var(--BU) * 0.5)))`,
   height: "100%",
   borderLeft: `solid calc(var(--BU) * 0.5) ${computeColor([p.color, 50])}`,
   borderRight: `solid calc(var(--BU) * 0.5) ${computeColor([p.color, 50])}`,
