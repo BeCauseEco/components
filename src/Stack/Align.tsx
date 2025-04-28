@@ -55,7 +55,7 @@ export const Align = (p: PropsWithChildren<AlignProps>) => {
   return (
     <Container
       id={p.id}
-      className={`<Align />${generateErrorClassName(invalidChildren)} `}
+      className={`<Align />${generateErrorClassName(invalidChildren)} ${p.className}`}
       vertical={p["vertical"]}
       horizontal={p["horizontal"]}
       _wrap={p["wrap"]}

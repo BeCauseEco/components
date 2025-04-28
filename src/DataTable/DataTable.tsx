@@ -46,6 +46,8 @@ const createNewRow = (data: DataTableProps["data"]): object => {
   return { id: Math.max(...data.map(d => d.id)) + 1 }
 }
 
+const dateFormatter = new Intl.DateTimeFormat(navigator?.language || "en-US")
+
 const formatValue = (value: string, dataType: DataType): string => {
   switch (dataType) {
     case DataType.Number:
@@ -58,7 +60,7 @@ const formatValue = (value: string, dataType: DataType): string => {
         : TABLE_CELL_EMPTY_STRING
 
     case DataType.Date:
-      return value ? new Date(value).toLocaleDateString() : TABLE_CELL_EMPTY_STRING
+      return value ? dateFormatter.format(new Date(value)) : TABLE_CELL_EMPTY_STRING
 
     case DataType.Boolean:
       return value ? (value === "true" ? "Yes" : "No") : TABLE_CELL_EMPTY_STRING
@@ -260,6 +262,8 @@ export type Column = {
   avatar?: (rowData: ICellTextProps["rowData"]) => string | undefined
   link?: (rowData: ICellTextProps["rowData"]) => string | (() => void) | undefined
   tooltip?: ((rowData: ICellTextProps["rowData"]) => ReactElement<AlignProps> | string | undefined) | boolean
+  hidden?: boolean
+  disableSort?: boolean
 
   progressIndicator?: {
     type: "bar" | "circle"
@@ -392,6 +396,8 @@ export const DataTable = (p: DataTableProps) => {
       maxWidth: column.maxWidth,
       explodeWidth: column.explodeWidth,
       preventContentCollapse: column.preventContentCollapse,
+      hidden: column.hidden,
+      disableSort: column.disableSort,
     }
   })
 
@@ -928,10 +934,13 @@ export const DataTable = (p: DataTableProps) => {
 
                       headCell: {
                         content: headCellContent => {
+                          const headCellContentAsColumn = headCellContent.column as Column
+
                           if (
                             headCellContent.column.key === KEY_DRAG ||
                             headCellContent.column.key === KEY_ACTIONS_EDIT ||
-                            headCellContent.column.key === KEY_ACTIONS
+                            headCellContent.column.key === KEY_ACTIONS ||
+                            headCellContentAsColumn.hidden
                           ) {
                             return <></>
                           }
@@ -949,7 +958,6 @@ export const DataTable = (p: DataTableProps) => {
                           const alignmentRight = headCellContent.column.dataType === DataType.Number
                           const firstColumn = headCellContent.column.key === nativeColumns[0].key
 
-                          const headCellContentAsColumn = headCellContent.column as Column
                           const totalSelectableFields = p.data.filter(d =>
                             p.selectDisabledField !== undefined && d[p.selectDisabledField]
                               ? d[p.selectKeyField!]
@@ -959,7 +967,14 @@ export const DataTable = (p: DataTableProps) => {
                           const allowSort =
                             p.mode !== "edit" &&
                             headCellContentAsColumn.dataType !== DataType.ProgressIndicator &&
-                            headCellContentAsColumn.dataType !== DataType.Status
+                            headCellContentAsColumn.dataType !== DataType.Status &&
+                            headCellContentAsColumn.disableSort !== true
+
+                          const text = (
+                            <Text fill={[Color.Neutral, 700]} xsmall>
+                              <b>{headCellContent.column.title}</b>
+                            </Text>
+                          )
 
                           return (
                             <Stack hug horizontal>
@@ -989,18 +1004,14 @@ export const DataTable = (p: DataTableProps) => {
                               <Align horizontal left={!alignmentRight} right={alignmentRight}>
                                 {allowSort || headCellContentAsColumn.sort ? (
                                   <CellHeadLink onClick={() => table.updateSortDirection(headCellContent.column.key)}>
-                                    <Text fill={[Color.Neutral, 700]} xsmall>
-                                      <b>{headCellContent.column.title}</b>
-                                    </Text>
+                                    {text}
 
                                     <Spacer tiny />
 
                                     <Icon medium name={iconName} fill={[Color.Neutral, 700]} />
                                   </CellHeadLink>
                                 ) : (
-                                  <Text fill={[Color.Neutral, 700]} xsmall>
-                                    <b>{headCellContent.column.title}</b>
-                                  </Text>
+                                  text
                                 )}
                               </Align>
                             </Stack>

@@ -50,7 +50,7 @@ const computeMinSize = (size: TDialog["size"], fixedWidth: TDialog["fixedWidth"]
 
     case Size.Large:
       return {
-        minWidth: "calc(var(--BU) * 320)",
+        minWidth: "calc(var(--BU) * 240)",
         ...(fixedWidth ? { maxWidth: "calc(var(--BU) * 320)" } : {}),
         minHeight: "auto",
       }
@@ -176,31 +176,35 @@ export const Dialog = (p: TDialog) => {
                     </>
                   )}
 
-                  <Divider
-                    fill={[computeMessageColor(p.message), p.message && p.message[0] !== "hidden" ? 200 : 100]}
-                  />
+                  {p.buttonPrimary || p.buttonSecondary || p.buttonTertiary ? (
+                    <Divider
+                      fill={[computeMessageColor(p.message), p.message && p.message[0] !== "hidden" ? 200 : 100]}
+                    />
+                  ) : null}
                 </>
               }
               contentEnd={
-                <>
-                  {p.buttonTertiary && p.buttonTertiary}
+                p.buttonPrimary || p.buttonSecondary || p.buttonTertiary ? (
+                  <>
+                    {p.buttonTertiary && p.buttonTertiary}
 
-                  {p.buttonSecondary && (
-                    <>
-                      <Spacer small />
+                    {p.buttonSecondary && (
+                      <>
+                        <Spacer small />
 
-                      {p.buttonSecondary}
-                    </>
-                  )}
+                        {p.buttonSecondary}
+                      </>
+                    )}
 
-                  {p.buttonPrimary && (
-                    <>
-                      <Spacer small />
+                    {p.buttonPrimary && (
+                      <>
+                        <Spacer small />
 
-                      {p.buttonPrimary}
-                    </>
-                  )}
-                </>
+                        {p.buttonPrimary}
+                      </>
+                    )}
+                  </>
+                ) : null
               }
               buttonsText={
                 <Text small fill={[Color.Neutral, 700]}>

@@ -171,3 +171,60 @@ export const translateBorderRadius = (cornerRadius: StackProps["cornerRadius"]):
       return "0"
   }
 }
+
+export const highlightText = (textHighlight?: string): void => {
+  CSS.highlights.clear()
+
+  if (!textHighlight) {
+    return
+  }
+
+  const textHighlightTrimmed = textHighlight.trim().toLowerCase()
+
+  const article = document.querySelector(`[x-highlight="${textHighlight}"]`)
+
+  if (!article) {
+    return
+  }
+
+  const treeWalker = document.createTreeWalker(article, NodeFilter.SHOW_TEXT)
+
+  const allTextNodes: Node[] = []
+
+  let currentNode = treeWalker.nextNode()
+
+  while (currentNode) {
+    allTextNodes.push(currentNode)
+
+    currentNode = treeWalker.nextNode()
+  }
+
+  const ranges = allTextNodes
+    .map(el => {
+      return { el, text: el?.textContent?.toLowerCase() }
+    })
+    .map(({ text, el }) => {
+      const t = text || ""
+      const indices: number[] = []
+      let startPos = 0
+      while (startPos < t.length) {
+        const index = t.indexOf(textHighlightTrimmed, startPos)
+        if (index === -1) {
+          break
+        }
+        indices.push(index)
+        startPos = index + textHighlightTrimmed.length
+      }
+
+      return indices.map(index => {
+        const range = new Range()
+        range.setStart(el, index)
+        range.setEnd(el, index + textHighlightTrimmed.length)
+        return range
+      })
+    })
+
+  const searchResultsHighlight = new Highlight(...ranges.flat())
+
+  CSS.highlights.set("stack-highlight", searchResultsHighlight)
+}

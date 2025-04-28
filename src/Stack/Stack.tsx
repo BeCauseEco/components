@@ -1,4 +1,4 @@
-import React, { ReactElement } from "react"
+import React, { MouseEvent, ReactElement, useEffect } from "react"
 import styled from "@emotion/styled"
 import { AlignProps } from "@new/Stack/Align"
 import { computeColor, Color, ColorWithLightness } from "@new/Color"
@@ -7,7 +7,7 @@ import { Loader } from "./internal/Loader"
 import { Spinner } from "./internal/Spinner"
 import { GridProps } from "@new/Grid/Grid"
 import { SpacerProps } from "@new/Stack/Spacer"
-import { translateBorderRadius } from "./internal/Functions"
+import { highlightText, translateBorderRadius } from "./internal/Functions"
 import { generateErrorClassName, generateErrorStyles, useValidateChildren } from "@new/useValidateChildren"
 
 export type StackProps = ComponentBaseProps & {
@@ -43,6 +43,10 @@ export type StackProps = ComponentBaseProps & {
    * WARNING: internal property - only to be used within /components
    */
   aspectRatio?: "auto" | "1"
+
+  onClick?: (event: MouseEvent<HTMLDivElement>) => void
+
+  textHighlight?: string
 
   children:
     | ReactElement<AlignProps | SpacerProps | null>
@@ -94,6 +98,10 @@ const Container = styled.div<ContainerProps>(p => ({
   aspectRatio: p.aspectRatio || "auto",
   boxShadow: computeShadow(p.dropShadow),
 
+  ...(p.onClick !== undefined && {
+    cursor: "pointer",
+  }),
+
   ...(p.stroke && {
     outline: `solid 1px ${computeColor(p.stroke || [Color.Transparent])}`,
     outlineOffset: "-1px",
@@ -120,6 +128,10 @@ const Children = styled.div<Pick<StackProps, "loading" | "disabled" | "hug"> & {
     transition: "opacity 0.2s ease-in-out",
     willChange: "opacity",
     overflow: "inherit",
+
+    "::highlight(stack-highlight)": {
+      backgroundColor: computeColor([Color.Warning, 400]),
+    },
 
     ...(p.loading
       ? {
@@ -151,6 +163,10 @@ const Children = styled.div<Pick<StackProps, "loading" | "disabled" | "hug"> & {
 export const Stack = (p: StackProps) => {
   const [invalidChildren] = useValidateChildren("Stack", ["Align", "Spacer", "Grid", "Divider"], ["Stack"], p.children)
 
+  useEffect(() => {
+    highlightText(p.textHighlight)
+  }, [p.textHighlight])
+
   return (
     <Container
       className={p.className || `<Stack />${generateErrorClassName(invalidChildren)} `}
@@ -165,6 +181,8 @@ export const Stack = (p: StackProps) => {
       cornerRadius={p.cornerRadius}
       aspectRatio={p.aspectRatio}
       validateChildrenErrorStyles={generateErrorStyles(invalidChildren)}
+      onClick={p.onClick}
+      x-highlight={p.textHighlight?.trim().toLowerCase()}
     >
       {p.loading !== undefined ? (
         <Loader className="<Stack: loader /> " loading={p.loading ? true : undefined}>

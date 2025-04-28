@@ -49,13 +49,15 @@ const ContentEnd = styled.div({
   flexDirection: "row",
   alignSelf: "flex-end",
   justifyContent: "flex-end",
+  outline: "solid 1px red",
+  outlineOffset: "-1px",
 })
 
 export type TLayoutDialog = TLayoutBase & {
   contentStart?: ReactNode | ReactNode[]
   contentMiddle: ReactNode | ReactNode[]
   buttonsText?: ReactNode
-  contentEnd: ReactNode | ReactNode[]
+  contentEnd?: ReactNode | ReactNode[]
   buttonClose: ReactNode
   omitPadding?: boolean
 }
@@ -71,11 +73,13 @@ export const LayoutDialog = ({ contentStart, contentMiddle, contentEnd, buttonCl
 
       <ContentMiddle>{contentMiddle}</ContentMiddle>
 
-      <ContentCountEnd>
-        <ContentCount>{buttonsText}</ContentCount>
+      {!buttonsText && !contentEnd ? (
+        <ContentCountEnd>
+          <ContentCount>{buttonsText}</ContentCount>
 
-        <ContentEnd>{contentEnd}</ContentEnd>
-      </ContentCountEnd>
+          <ContentEnd>{contentEnd}</ContentEnd>
+        </ContentCountEnd>
+      ) : null}
     </Container>
   )
 }
