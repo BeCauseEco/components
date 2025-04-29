@@ -88,8 +88,8 @@ export const computeColor = (color: ColorWithLightness) => {
         .map(formatHex)
 
       const combined = [
-        colorsLight[1],
-        colorsMedium[2],
+        colorsLight[2],
+        colorsMedium[3],
         colorsMedium[6],
         colorsMedium[8],
         colorsMedium[10],

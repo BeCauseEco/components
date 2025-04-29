@@ -184,7 +184,7 @@ export const Dialog = (p: TDialog) => {
                 </>
               }
               contentEnd={
-                p.buttonPrimary || p.buttonSecondary || p.buttonTertiary ? (
+                p.buttonPrimary !== undefined || p.buttonSecondary !== undefined || p.buttonTertiary !== undefined ? (
                   <>
                     {p.buttonTertiary && p.buttonTertiary}
 
@@ -207,9 +207,11 @@ export const Dialog = (p: TDialog) => {
                 ) : null
               }
               buttonsText={
-                <Text small fill={[Color.Neutral, 700]}>
-                  {p.buttonsText}
-                </Text>
+                p.buttonsText !== undefined ? (
+                  <Text small fill={[Color.Neutral, 700]}>
+                    {p.buttonsText}
+                  </Text>
+                ) : null
               }
               buttonClose={
                 <RadixDialogClose asChild>

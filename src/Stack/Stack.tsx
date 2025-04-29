@@ -129,8 +129,8 @@ const Children = styled.div<Pick<StackProps, "loading" | "disabled" | "hug"> & {
     willChange: "opacity",
     overflow: "inherit",
 
-    "::highlight(stack-highlight)": {
-      backgroundColor: computeColor([Color.Warning, 400]),
+    "& *::highlight(stack-highlight)": {
+      backgroundColor: `${computeColor([Color.Warning, 400])} !important`,
     },
 
     ...(p.loading
