@@ -2,7 +2,7 @@
 
 import { Stack } from "@new/Stack/Stack"
 import { Align, AlignProps } from "@new/Stack/Align"
-import { InsertRowPosition, SortDirection, SortingMode, Table, useTable, useTableInstance } from "ka-table"
+import { EditingMode, InsertRowPosition, SortDirection, SortingMode, Table, useTable, useTableInstance } from "ka-table"
 import { ICellEditorProps, ICellTextProps } from "ka-table/props"
 import { closeRowEditors, deleteRow, openRowEditors, saveRowEditors } from "ka-table/actionCreators"
 import { InputButtonPrimary, InputButtonPrimaryProps } from "@new/InputButton/InputButtonPrimary"
@@ -318,6 +318,7 @@ export type DataTableProps = {
   fill?: ColorWithLightness
   stroke?: ColorWithLightness
   children?: Children | Children[]
+  editingMode?: EditingMode
 
   /**
    * @deprecated
@@ -876,6 +877,7 @@ export const DataTable = (p: DataTableProps) => {
                     table={table}
                     columns={nativeColumns as any}
                     data={p.data}
+                    editingMode={p.editingMode}
                     rowKeyField={p.rowKeyField}
                     sortingMode={SortingMode.Single}
                     rowReordering={p.mode === "edit"}
