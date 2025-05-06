@@ -396,7 +396,7 @@ export const DataTable = (p: DataTableProps) => {
     }
   })
 
-  if (p.mode === "edit") {
+  if (p.mode === "edit" && p.editingMode !== EditingMode.Cell) {
     nativeColumns = [
       ...nativeColumns,
       {
@@ -1028,7 +1028,7 @@ export const DataTable = (p: DataTableProps) => {
 
                       cellText: {
                         content: cellTextContent => {
-                          if (cellTextContent.column.key === KEY_ACTIONS_EDIT) {
+                          if (cellTextContent.column.key === KEY_ACTIONS_EDIT && p.editingMode !== EditingMode.Cell) {
                             return (
                               <Stack horizontal hug>
                                 <Align horizontal right>
@@ -1336,7 +1336,7 @@ export const DataTable = (p: DataTableProps) => {
                   />
                 </Align>
 
-                {p.mode === "edit" ? (
+                {p.mode === "edit" && p.editingMode !== EditingMode.Cell ? (
                   <Align center vertical>
                     <Divider fill={[Color.Neutral, 100]} />
 
