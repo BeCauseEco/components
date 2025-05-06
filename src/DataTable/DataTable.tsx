@@ -572,6 +572,10 @@ export const DataTable = (p: DataTableProps) => {
       z-index: 3;
     }
 
+    .${cssScope} .ka-thead-row  {
+      border-bottom: solid 1px transparent;
+    }
+
     .${cssScope} .ka-thead-row .ka-thead-cell:first-child {
       padding-left: calc(var(--BU) * 2);
     }
