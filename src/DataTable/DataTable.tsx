@@ -4,7 +4,7 @@ import { Stack } from "@new/Stack/Stack"
 import { Align, AlignProps } from "@new/Stack/Align"
 import { EditingMode, InsertRowPosition, SortDirection, SortingMode, Table, useTable, useTableInstance } from "ka-table"
 import { ICellEditorProps, ICellTextProps } from "ka-table/props"
-import { closeRowEditors, deleteRow, openRowEditors, saveRowEditors } from "ka-table/actionCreators"
+import { closeEditor, closeRowEditors, deleteRow, openRowEditors, saveRowEditors } from "ka-table/actionCreators"
 import { InputButtonPrimary, InputButtonPrimaryProps } from "@new/InputButton/InputButtonPrimary"
 import { Spacer } from "@new/Stack/Spacer"
 import { InputButtonTertiary, InputButtonTertiaryProps } from "@new/InputButton/InputButtonTertiary"
@@ -317,6 +317,9 @@ export type DataTableProps = {
   fill?: ColorWithLightness
   stroke?: ColorWithLightness
   children?: Children | Children[]
+  // `editingMode` determines the editing behavior of the table if mode is set to "edit".
+  // - `EditingMode.Cell`: Enables cell-level editing, allowing users to edit individual cells directly.
+  // - `EditingMode.None` or `undefined`: Enables row-level editing, where users can edit an entire row at once using buttons.
   editingMode?: EditingMode
 
   /**
@@ -363,7 +366,8 @@ export const DataTable = (p: DataTableProps) => {
   })
 
   const [filter, setFilter] = useState("")
-  const [editId, setEditId] = useState<number | null>(null)
+  const [editRowId, setEditRowId] = useState<number | null>(null)
+  const [editColumnId, setEditColumnId] = useState<string>("")
   const [deleteId, setDeleteId] = useState<number | null>(null)
   const [selectedFields, setSelectedFields] = useState<number>(
     p.data.filter(d => p.selectKeyField && d[p.selectKeyField]).length,
@@ -468,11 +472,11 @@ export const DataTable = (p: DataTableProps) => {
 
       if (p.editingMode === EditingMode.Cell) {
         if (d.type === "OpenEditor") {
-          if (editId !== null && editId !== rowKeyValue) {
-            table.dispatch(closeRowEditors(editId))
+          if (editRowId !== null && (editRowId !== rowKeyValue || editColumnId !== d.columnKey)) {
+            table.dispatch(closeEditor(editRowId, editColumnId))
           }
-
-          setEditId(rowKeyValue)
+          setEditRowId(rowKeyValue)
+          setEditColumnId(d.columnKey)
           setDataTemp(p.data)
         }
 
@@ -489,7 +493,7 @@ export const DataTable = (p: DataTableProps) => {
       }
 
       if (d.type === "OpenRowEditors") {
-        setEditId(d.rowKeyValue)
+        setEditRowId(d.rowKeyValue)
         setDataTemp(p.data)
       }
 
@@ -498,7 +502,7 @@ export const DataTable = (p: DataTableProps) => {
       }
 
       if (d.type === "CloseRowEditors") {
-        setEditId(null)
+        setEditRowId(null)
 
         if (p.onChange) {
           p.onChange(dataTemp)
@@ -511,7 +515,7 @@ export const DataTable = (p: DataTableProps) => {
         const data = kaPropsUtils.getData(table.props)
 
         if (d.type !== "ReorderRows") {
-          setEditId(null)
+          setEditRowId(null)
         }
 
         if (p.onChange) {
@@ -840,9 +844,9 @@ export const DataTable = (p: DataTableProps) => {
         !referenceContainer.current.contains(event.target as Node) &&
         p.editingMode === EditingMode.Cell
       ) {
-        if (editId !== null) {
-          table.dispatch(closeRowEditors(editId))
-          setEditId(null)
+        if (editRowId !== null) {
+          table.dispatch(closeRowEditors(editRowId))
+          setEditRowId(null)
         }
       }
     }
@@ -851,7 +855,7 @@ export const DataTable = (p: DataTableProps) => {
     return () => {
       document.removeEventListener("mousedown", handleClickOutside)
     }
-  }, [editId, p.editingMode, table])
+  }, [editRowId, p.editingMode, table])
 
   return (
     <>
@@ -960,7 +964,10 @@ export const DataTable = (p: DataTableProps) => {
 
                       dataRow: {
                         elementAttributes: dataRowElementAttributes => {
-                          if (dataRowElementAttributes.rowKeyValue === editId && p.editingMode !== EditingMode.Cell) {
+                          if (
+                            dataRowElementAttributes.rowKeyValue === editRowId &&
+                            p.editingMode !== EditingMode.Cell
+                          ) {
                             return {
                               className: "override-ka-editing-row",
                             }
@@ -1076,11 +1083,11 @@ export const DataTable = (p: DataTableProps) => {
                                     size="small"
                                     iconName="delete"
                                     onClick={() => setDeleteId(cellTextContent.rowKeyValue)}
-                                    disabled={editId !== null}
+                                    disabled={editRowId !== null}
                                     destructive
                                   />
 
-                                  <ActionEdit {...cellTextContent} disabled={editId !== null} />
+                                  <ActionEdit {...cellTextContent} disabled={editRowId !== null} />
                                 </Align>
                               </Stack>
                             )
@@ -1386,7 +1393,7 @@ export const DataTable = (p: DataTableProps) => {
                       size="small"
                       iconNameLeft="add"
                       label="Add row"
-                      disabled={editId !== null}
+                      disabled={editRowId !== null}
                       onClick={() => {
                         table.insertRow(createNewRow(p.data), {
                           rowKeyValue: p.data[p.data.length - 1]?.key || 0,
