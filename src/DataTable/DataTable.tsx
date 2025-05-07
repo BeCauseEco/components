@@ -2,9 +2,9 @@
 
 import { Stack } from "@new/Stack/Stack"
 import { Align, AlignProps } from "@new/Stack/Align"
-import { InsertRowPosition, SortDirection, SortingMode, Table, useTable, useTableInstance } from "ka-table"
+import { EditingMode, InsertRowPosition, SortDirection, SortingMode, Table, useTable, useTableInstance } from "ka-table"
 import { ICellEditorProps, ICellTextProps } from "ka-table/props"
-import { closeRowEditors, deleteRow, openRowEditors, saveRowEditors } from "ka-table/actionCreators"
+import { closeEditor, closeRowEditors, deleteRow, openRowEditors, saveRowEditors } from "ka-table/actionCreators"
 import { InputButtonPrimary, InputButtonPrimaryProps } from "@new/InputButton/InputButtonPrimary"
 import { Spacer } from "@new/Stack/Spacer"
 import { InputButtonTertiary, InputButtonTertiaryProps } from "@new/InputButton/InputButtonTertiary"
@@ -15,7 +15,7 @@ import { InputCheckbox, InputCheckboxProps } from "@new/InputCheckbox/InputCheck
 import { StyleBodySmall, StyleFontFamily, Text } from "@new/Text/Text"
 import { Icon } from "@new/Icon/Icon"
 import styled from "@emotion/styled"
-import { Children, PropsWithChildren, ReactElement, ReactNode, useId, useRef, useState } from "react"
+import { Children, PropsWithChildren, ReactElement, ReactNode, useEffect, useId, useRef, useState } from "react"
 import { useReactToPrint } from "react-to-print"
 import { InputButtonIconTertiary } from "@new/InputButton/InputButtonIconTertiary"
 import { Divider } from "@new/Divider/Divider"
@@ -260,7 +260,6 @@ export type Column = {
   avatar?: (rowData: ICellTextProps["rowData"]) => string | undefined
   link?: (rowData: ICellTextProps["rowData"]) => string | (() => void) | undefined
   tooltip?: ((rowData: ICellTextProps["rowData"]) => ReactElement<AlignProps> | string | undefined) | boolean
-
   progressIndicator?: {
     type: "bar" | "circle"
 
@@ -318,6 +317,10 @@ export type DataTableProps = {
   fill?: ColorWithLightness
   stroke?: ColorWithLightness
   children?: Children | Children[]
+  // `editingMode` determines the editing behavior of the table if mode is set to "edit".
+  // - `EditingMode.Cell`: Enables cell-level editing, allowing users to edit individual cells directly.
+  // - `EditingMode.None` or `undefined`: Enables row-level editing, where users can edit an entire row at once using buttons.
+  editingMode?: EditingMode
 
   /**
    * @deprecated
@@ -363,7 +366,8 @@ export const DataTable = (p: DataTableProps) => {
   })
 
   const [filter, setFilter] = useState("")
-  const [editId, setEditId] = useState<number | null>(null)
+  const [editRowId, setEditRowId] = useState<number | null>(null)
+  const [editColumnId, setEditColumnId] = useState<string>("")
   const [deleteId, setDeleteId] = useState<number | null>(null)
   const [selectedFields, setSelectedFields] = useState<number>(
     p.data.filter(d => p.selectKeyField && d[p.selectKeyField]).length,
@@ -395,7 +399,7 @@ export const DataTable = (p: DataTableProps) => {
     }
   })
 
-  if (p.mode === "edit") {
+  if (p.mode === "edit" && p.editingMode !== EditingMode.Cell) {
     nativeColumns = [
       ...nativeColumns,
       {
@@ -458,7 +462,6 @@ export const DataTable = (p: DataTableProps) => {
   const table = useTable({
     onDispatch: d => {
       const rowKeyValue = d.rowKeyValue
-
       if (d.type === "ComponentDidMount") {
         if (p.data && p.data.length > 0 && !p.data.some(d => d[p.rowKeyField])) {
           throw new Error(
@@ -467,8 +470,30 @@ export const DataTable = (p: DataTableProps) => {
         }
       }
 
+      if (p.editingMode === EditingMode.Cell) {
+        if (d.type === "OpenEditor") {
+          if (editRowId !== null && (editRowId !== rowKeyValue || editColumnId !== d.columnKey)) {
+            table.dispatch(closeEditor(editRowId, editColumnId))
+          }
+          setEditRowId(rowKeyValue)
+          setEditColumnId(d.columnKey)
+          setDataTemp(p.data)
+        }
+
+        if (d.type === "UpdateCellValue") {
+          const updatedData = kaPropsUtils.getData(table.props)
+
+          setDataTemp(updatedData)
+
+          if (p.onChange) {
+            p.onChange(updatedData)
+          }
+        }
+        return
+      }
+
       if (d.type === "OpenRowEditors") {
-        setEditId(d.rowKeyValue)
+        setEditRowId(d.rowKeyValue)
         setDataTemp(p.data)
       }
 
@@ -477,7 +502,7 @@ export const DataTable = (p: DataTableProps) => {
       }
 
       if (d.type === "CloseRowEditors") {
-        setEditId(null)
+        setEditRowId(null)
 
         if (p.onChange) {
           p.onChange(dataTemp)
@@ -490,7 +515,7 @@ export const DataTable = (p: DataTableProps) => {
         const data = kaPropsUtils.getData(table.props)
 
         if (d.type !== "ReorderRows") {
-          setEditId(null)
+          setEditRowId(null)
         }
 
         if (p.onChange) {
@@ -812,6 +837,26 @@ export const DataTable = (p: DataTableProps) => {
     }
   `
 
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        referenceContainer.current &&
+        !referenceContainer.current.contains(event.target as Node) &&
+        p.editingMode === EditingMode.Cell
+      ) {
+        if (editRowId !== null) {
+          table.dispatch(closeRowEditors(editRowId))
+          setEditRowId(null)
+        }
+      }
+    }
+
+    document.addEventListener("mousedown", handleClickOutside)
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside)
+    }
+  }, [editRowId, p.editingMode, table])
+
   return (
     <>
       <style suppressHydrationWarning>{css}</style>
@@ -882,7 +927,8 @@ export const DataTable = (p: DataTableProps) => {
                     data={p.data}
                     rowKeyField={p.rowKeyField}
                     sortingMode={SortingMode.Single}
-                    rowReordering={p.mode === "edit"}
+                    editingMode={p.editingMode}
+                    rowReordering={p.mode === "edit" && p.editingMode !== EditingMode.Cell}
                     noData={{ text: "Nothing found" }}
                     searchText={filter}
                     virtualScrolling={p.mode !== "edit" && p.virtualScrolling ? { enabled: true } : undefined}
@@ -908,7 +954,7 @@ export const DataTable = (p: DataTableProps) => {
                             }
                           }
 
-                          if (p.mode === "edit") {
+                          if (p.mode === "edit" && p.editingMode !== EditingMode.Cell) {
                             return {
                               className: "override-ka-reorder",
                             }
@@ -918,7 +964,10 @@ export const DataTable = (p: DataTableProps) => {
 
                       dataRow: {
                         elementAttributes: dataRowElementAttributes => {
-                          if (dataRowElementAttributes.rowKeyValue === editId) {
+                          if (
+                            dataRowElementAttributes.rowKeyValue === editRowId &&
+                            p.editingMode !== EditingMode.Cell
+                          ) {
                             return {
                               className: "override-ka-editing-row",
                             }
@@ -1026,7 +1075,7 @@ export const DataTable = (p: DataTableProps) => {
 
                       cellText: {
                         content: cellTextContent => {
-                          if (cellTextContent.column.key === KEY_ACTIONS_EDIT) {
+                          if (cellTextContent.column.key === KEY_ACTIONS_EDIT && p.editingMode !== EditingMode.Cell) {
                             return (
                               <Stack horizontal hug>
                                 <Align horizontal right>
@@ -1034,11 +1083,11 @@ export const DataTable = (p: DataTableProps) => {
                                     size="small"
                                     iconName="delete"
                                     onClick={() => setDeleteId(cellTextContent.rowKeyValue)}
-                                    disabled={editId !== null}
+                                    disabled={editRowId !== null}
                                     destructive
                                   />
 
-                                  <ActionEdit {...cellTextContent} disabled={editId !== null} />
+                                  <ActionEdit {...cellTextContent} disabled={editRowId !== null} />
                                 </Align>
                               </Stack>
                             )
@@ -1173,7 +1222,7 @@ export const DataTable = (p: DataTableProps) => {
 
                             return (
                               <Stack hug horizontal>
-                                {p.mode === "edit" && firstColumn ? (
+                                {p.mode === "edit" && firstColumn && p.editingMode !== EditingMode.Cell ? (
                                   <Align left horizontal hug>
                                     <Icon name="drag_indicator" medium fill={[Color.Neutral, 700]} />
 
@@ -1225,10 +1274,9 @@ export const DataTable = (p: DataTableProps) => {
                       cellEditor: {
                         content: cellEditorContent => {
                           const firstColumn = cellEditorContent.column.key === nativeColumns[0].key
-
                           return (
                             <Stack hug horizontal>
-                              {p.mode === "edit" && firstColumn ? (
+                              {p.mode === "edit" && firstColumn && p.editingMode !== EditingMode.Cell ? (
                                 <Align left horizontal hug>
                                   <Icon name="drag_indicator" medium fill={[Color.Neutral, 700]} />
 
@@ -1334,7 +1382,7 @@ export const DataTable = (p: DataTableProps) => {
                   />
                 </Align>
 
-                {p.mode === "edit" ? (
+                {p.mode === "edit" && p.editingMode !== EditingMode.Cell ? (
                   <Align center vertical>
                     <Divider fill={[Color.Neutral, 100]} />
 
@@ -1345,7 +1393,7 @@ export const DataTable = (p: DataTableProps) => {
                       size="small"
                       iconNameLeft="add"
                       label="Add row"
-                      disabled={editId !== null}
+                      disabled={editRowId !== null}
                       onClick={() => {
                         table.insertRow(createNewRow(p.data), {
                           rowKeyValue: p.data[p.data.length - 1]?.key || 0,
