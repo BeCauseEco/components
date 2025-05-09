@@ -101,7 +101,7 @@ export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<InputC
     const output: { [value: string]: InputComboboxItemProps } = {}
 
     React.Children.forEach(p.children, child => {
-      if (React.isValidElement(child)) {
+      if (React.isValidElement<InputComboboxItemProps>(child)) {
         output[child.props.value] = child.props
       }
     })
