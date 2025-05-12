@@ -363,7 +363,7 @@ export const DataTable = (p: DataTableProps) => {
 
   // TODO @cllpse: this seems super hacky, but this is to auto-adjust the height of the table to simplify use
   useResizeObserver({
-    ref: referenceContainer,
+    ref: referenceContainer as React.RefObject<HTMLElement>,
     box: "border-box",
     onResize: size => {
       if (p.mode === "edit" && p.editingMode !== EditingMode.Cell) {

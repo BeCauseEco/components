@@ -116,7 +116,7 @@ const Children = (p: Omit<InputButtonProps, "width">) => {
       )
     } else {
       label = (
-        <Align horizontal left>
+        <Align horizontal center>
           <Text xsmall={p.size === "small"} small={p.size === "large"} fill={p.colorForeground}>
             {p.label}
           </Text>

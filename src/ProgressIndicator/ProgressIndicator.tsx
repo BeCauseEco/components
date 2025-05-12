@@ -153,8 +153,8 @@ export const ProgressIndicator = (p: ProgressIndicatorProps) => {
 
   if (p.type === "bar") {
     childrenArray.map((child, index) => {
-      if (isValidElement(child)) {
-        if (child.props["offset"]) {
+      if (isValidElement<ProgressIndicatorItemSegmentProps | ProgressIndicatorItemTickProps>(child)) {
+        if ("offset" in child.props) {
           const cp = child.props as ProgressIndicatorItemTickProps
 
           output.push(<TickMarkBar key={index} offset={cp.offset} color={cp.color} />)
@@ -173,8 +173,9 @@ export const ProgressIndicator = (p: ProgressIndicatorProps) => {
 
     childrenArray.map(child => {
       if (isValidElement(child)) {
-        const width = parseInt(child.props["width"], 10)
-        const color = child.props["color"]
+        const cp = child.props as ProgressIndicatorItemSegmentProps //Safe to do because of the isValidElement check
+        const width = parseInt(cp["width"], 10)
+        const color = cp["color"]
 
         gradients.push(
           `
