@@ -104,7 +104,7 @@ export const computeColor = (color: ColorWithLightness) => {
       return combined[l === 50 ? 0 : l / 100]
     }
   } catch (e) {
-    // eslint-disable-next-line no-console
+    console.error(e)
     console.error(
       "Color.ts - missing color* property on component. Run a local build (`yarn build`) to type-check for missing color properties.",
     )
