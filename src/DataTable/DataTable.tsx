@@ -21,7 +21,7 @@ import { InputButtonIconTertiary } from "@new/InputButton/InputButtonIconTertiar
 import { Divider } from "@new/Divider/Divider"
 import { kaPropsUtils } from "ka-table/utils"
 import { Alert } from "@new/Alert/Alert"
-import { InputComboboxProps } from "@new/InputCombobox/InputCombobox"
+import { InputCombobox, InputComboboxProps } from "@new/InputCombobox/InputCombobox"
 import { ProgressIndicator } from "@new/ProgressIndicator/ProgressIndicator"
 import { ProgressIndicatorSegment } from "@new/ProgressIndicator/ProgressIndicatorSegment"
 import { useResizeObserver } from "usehooks-ts"
@@ -33,6 +33,7 @@ import { Badge } from "@new/Badge/Badge"
 import { Avatar } from "@new/Avatar/Avatar"
 import Link from "next/link"
 import { Tooltip } from "@new/Tooltip/Tooltip"
+import { InputComboboxItem } from "@new/InputCombobox/InputComboboxItem"
 
 export { SortDirection } from "ka-table"
 
@@ -145,7 +146,6 @@ const ActionSaveCancel = ({ dispatch, rowKeyValue }: ICellEditorProps) => {
 
 const CellInputTextSingle = ({ column, rowKeyValue, value }: ICellEditorProps) => {
   const table = useTableInstance()
-
   return (
     <InputTextSingle
       value={value}
@@ -188,6 +188,30 @@ const CellInputCheckbox = ({ column, rowKeyValue, value }: ICellEditorProps) => 
       }}
       color={Color.Neutral}
     />
+  )
+}
+
+const CellInputCombobox = ({ column, rowKeyValue, value, rowData }: ICellEditorProps) => {
+  const table = useTableInstance()
+
+  if (!rowData.selectableOptions || rowData.selectableOptions.length === 0) {
+    return null
+  }
+  return (
+    <InputCombobox
+      textNoSelection=""
+      value={value}
+      onChange={v => {
+        table.updateCellValue(rowKeyValue, column.key, v)
+      }}
+      size="small"
+      width="auto"
+      color={Color.Neutral}
+    >
+      {rowData.selectableOptions.map(option => (
+        <InputComboboxItem key={option.value} label={option.label} value={option.value} />
+      ))}
+    </InputCombobox>
   )
 }
 
@@ -246,6 +270,8 @@ export enum DataType {
   String = "string",
   ProgressIndicator = "progressindicator",
   Status = "status",
+  // When using the List dataType, the selectableOptions property must be set in rowData
+  List = "list",
 }
 
 export type Column = {
@@ -260,6 +286,7 @@ export type Column = {
   avatar?: (rowData: ICellTextProps["rowData"]) => string | undefined
   link?: (rowData: ICellTextProps["rowData"]) => string | (() => void) | undefined
   tooltip?: ((rowData: ICellTextProps["rowData"]) => ReactElement<AlignProps> | string | undefined) | boolean
+  isEditable?: boolean
   progressIndicator?: {
     type: "bar" | "circle"
 
@@ -339,7 +366,7 @@ export const DataTable = (p: DataTableProps) => {
     ref: referenceContainer,
     box: "border-box",
     onResize: size => {
-      if (p.mode === "edit") {
+      if (p.mode === "edit" && p.editingMode !== EditingMode.Cell) {
         return
       }
 
@@ -396,6 +423,7 @@ export const DataTable = (p: DataTableProps) => {
       maxWidth: column.maxWidth,
       explodeWidth: column.explodeWidth,
       preventContentCollapse: column.preventContentCollapse,
+      isEditable: column.isEditable,
     }
   })
 
@@ -844,6 +872,12 @@ export const DataTable = (p: DataTableProps) => {
         !referenceContainer.current.contains(event.target as Node) &&
         p.editingMode === EditingMode.Cell
       ) {
+        const isDropdownClick = (event.target as HTMLElement).closest(
+          "[data-radix-popper-content-wrapper], [data-radix-dropdown-menu]",
+        )
+        if (isDropdownClick) {
+          return // Ignore clicks inside dropdowns
+        }
         if (editRowId !== null) {
           table.dispatch(closeRowEditors(editRowId))
           setEditRowId(null)
@@ -883,11 +917,10 @@ export const DataTable = (p: DataTableProps) => {
                 {Children.toArray(p.children).map(child => child)}
               </Align>
 
-              <Spacer large />
-
               <Align bottomRight horizontal hug>
                 {!p.exportDisable ? (
                   <>
+                    <Spacer large />
                     <InputButtonIconTertiary
                       size="large"
                       iconName="csv"
@@ -1151,6 +1184,21 @@ export const DataTable = (p: DataTableProps) => {
                               output = <CellProgressIndicator {...cellTextContent} />
                             } else if (column.dataType === DataType.Status) {
                               output = <CellStatus {...cellTextContent} />
+                            } else if (column.dataType === DataType.List) {
+                              const selectedOption = cellTextContent.rowData?.selectableOptions?.find(
+                                o => o.value === cellTextContent.value,
+                              )
+                              if (!selectedOption) {
+                                return null
+                              }
+
+                              return (
+                                <Align horizontal left>
+                                  <Text fill={[Color.Neutral, 700]} small textOverflow={column.maxWidth !== undefined}>
+                                    {selectedOption.label}
+                                  </Text>
+                                </Align>
+                              )
                             } else {
                               const monospace =
                                 column.dataType === DataType.Date ||
@@ -1202,7 +1250,6 @@ export const DataTable = (p: DataTableProps) => {
                                 ) : (
                                   <>
                                     {avatarElement}
-
                                     <Text
                                       fill={[Color.Neutral, 700]}
                                       small
@@ -1289,6 +1336,14 @@ export const DataTable = (p: DataTableProps) => {
                               {(cellEditorContent.column as Column).dataType === DataType.ProgressIndicator ? (
                                 <Align left horizontal>
                                   <CellProgressIndicator {...cellEditorContent} />
+                                </Align>
+                              ) : (
+                                <></>
+                              )}
+
+                              {(cellEditorContent.column as Column).dataType === DataType.List ? (
+                                <Align left horizontal>
+                                  <CellInputCombobox {...cellEditorContent} />
                                 </Align>
                               ) : (
                                 <></>
