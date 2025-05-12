@@ -1189,16 +1189,20 @@ export const DataTable = (p: DataTableProps) => {
                                 o => o.value === cellTextContent.value,
                               )
                               if (!selectedOption) {
-                                return null
+                                output = <></>
+                              } else {
+                                output = (
+                                  <Align horizontal left>
+                                    <Text
+                                      fill={[Color.Neutral, 700]}
+                                      small
+                                      textOverflow={column.maxWidth !== undefined}
+                                    >
+                                      {selectedOption.label}
+                                    </Text>
+                                  </Align>
+                                )
                               }
-
-                              return (
-                                <Align horizontal left>
-                                  <Text fill={[Color.Neutral, 700]} small textOverflow={column.maxWidth !== undefined}>
-                                    {selectedOption.label}
-                                  </Text>
-                                </Align>
-                              )
                             } else {
                               const monospace =
                                 column.dataType === DataType.Date ||
