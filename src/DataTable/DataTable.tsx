@@ -278,8 +278,8 @@ export type Column = {
   key: string
   title: string
   dataType: DataType
-  maxWidth?: `${number}${"%"}`
-  minWidth?: `${number}${"%"}`
+  maxWidth?: number | `${number}${"%"}`
+  minWidth?: number | `${number}${"%"}`
   explodeWidth?: boolean
   preventContentCollapse?: boolean
   sort?: (sortDirection: SortDirection) => (a: any, b: any) => number
@@ -649,6 +649,10 @@ export const DataTable = (p: DataTableProps) => {
       width: 100%;
       height: 100%;
     }
+    
+    .${cssScope} .ka-cell:hover {
+      background-color: unset;
+    }
 
     .${cssScope} .override-ka-prevent-content-collapse .ka-cell-text,
     .${cssScope} .override-ka-prevent-content-collapse .ka-cell-text p {
@@ -673,8 +677,14 @@ export const DataTable = (p: DataTableProps) => {
       border-right: dotted 1px ${computeColor(p.stroke || [Color.Neutral, 100])};
     }
 
-    .${cssScope} .ka-cell:hover {
-      background-color: unset;
+    .${cssScope}[data-mode="edit"] .ka-cell.ka-cell-editable:hover {
+      background-color: ${computeColor([Color.Neutral, 100])};
+      cursor: pointer;
+    }
+    
+    .${cssScope} .ka-cell-editor {
+      min-width: 160px !important;
+      max-width: 200px;
     }
 
     .${cssScope} .ka-row {
@@ -895,7 +905,12 @@ export const DataTable = (p: DataTableProps) => {
     <>
       <style suppressHydrationWarning>{css}</style>
 
-      <div className={cssScope} style={{ display: "flex", width: "100%", height: "100%" }} ref={referenceContainer}>
+      <div
+        className={cssScope}
+        data-mode={p.mode}
+        style={{ display: "flex", width: "100%", height: "100%" }}
+        ref={referenceContainer}
+      >
         <Stack vertical hug loading={p.loading}>
           <Align left hug="height" horizontal id="reference-filters">
             <Stack hug horizontal>
@@ -1415,15 +1430,31 @@ export const DataTable = (p: DataTableProps) => {
                           let maxWidth: number | string = "auto"
 
                           if (column.minWidth) {
-                            minWidth = (containerWidth / 100) * parseFloat(column.minWidth)
+                            if (typeof column.minWidth === "string" && column.minWidth.endsWith("%")) {
+                              minWidth = (containerWidth / 100) * parseFloat(column.minWidth)
+                            } else {
+                              minWidth = `${parseFloat(column.minWidth as string)}px`
+                            }
                           }
 
                           if (column.maxWidth) {
-                            maxWidth = (containerWidth / 100) * parseFloat(column.maxWidth)
+                            if (typeof column.maxWidth === "string" && column.maxWidth.endsWith("%")) {
+                              maxWidth = (containerWidth / 100) * parseFloat(column.maxWidth)
+                            } else {
+                              maxWidth = `${parseFloat(column.maxWidth as string)}px`
+                            }
                           }
 
                           if (column.preventContentCollapse) {
                             classNames.push("override-ka-prevent-content-collapse")
+                          }
+
+                          if (
+                            p.mode === "edit" &&
+                            p.editingMode === EditingMode.Cell &&
+                            (column.isEditable || column.isEditable === undefined)
+                          ) {
+                            classNames.push("ka-cell-editable")
                           }
 
                           return {
