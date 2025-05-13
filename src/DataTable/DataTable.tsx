@@ -1445,7 +1445,7 @@ export const DataTable = (p: DataTableProps) => {
                             if (typeof column.minWidth === "string" && column.minWidth.endsWith("%")) {
                               minWidth = (containerWidth / 100) * parseFloat(column.minWidth)
                             } else {
-                              minWidth = `${parseFloat(column.minWidth as string)}px`
+                              minWidth = `${column.minWidth}px`
                             }
                           }
 
@@ -1453,7 +1453,7 @@ export const DataTable = (p: DataTableProps) => {
                             if (typeof column.maxWidth === "string" && column.maxWidth.endsWith("%")) {
                               maxWidth = (containerWidth / 100) * parseFloat(column.maxWidth)
                             } else {
-                              maxWidth = `${parseFloat(column.maxWidth as string)}px`
+                              maxWidth = `${column.maxWidth}px`
                             }
                           }
 
