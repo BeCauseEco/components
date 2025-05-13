@@ -26,7 +26,7 @@ export const Chart = ({ type, direction, xAxis, yAxis, data, height, children }:
   const items: TChartItem[] = []
 
   React.Children.forEach(children, child => {
-    if (React.isValidElement(child)) {
+    if (React.isValidElement<TChartItem>(child)) {
       items.push(child.props)
     }
   })

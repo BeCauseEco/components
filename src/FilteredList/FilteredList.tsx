@@ -75,7 +75,7 @@ export const FilteredList = forwardRef<HTMLDivElement, PropsWithChildren<Filtere
   const output: ReactElement[] = []
 
   React.Children.forEach(p.children, child => {
-    if (isValidElement(child)) {
+    if (isValidElement<FilteredListItemProps>(child)) {
       const label = child.props["label"]
       const value = child.props["value"]
       const avatarTitle = child.props["title"]
