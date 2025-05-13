@@ -146,8 +146,15 @@ const ActionSaveCancel = ({ dispatch, rowKeyValue }: ICellEditorProps) => {
 
 const CellInputTextSingle = ({ column, rowKeyValue, value }: ICellEditorProps) => {
   const table = useTableInstance()
+  const inputRef = useRef<HTMLInputElement>(null)
+
+  useEffect(() => {
+    inputRef.current?.focus()
+  }, [])
+
   return (
     <InputTextSingle
+      ref={inputRef}
       value={value}
       width="auto"
       size="small"
@@ -1361,9 +1368,9 @@ export const DataTable = (p: DataTableProps) => {
                               )}
 
                               {(cellEditorContent.column as Column).dataType === DataType.List ? (
-                                <Align left horizontal>
+                                <Stack vertical hug>
                                   <CellInputCombobox {...cellEditorContent} />
-                                </Align>
+                                </Stack>
                               ) : (
                                 <></>
                               )}
