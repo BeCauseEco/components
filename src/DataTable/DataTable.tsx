@@ -316,6 +316,7 @@ export type Column = {
   avatar?: (rowData: ICellTextProps["rowData"]) => string | undefined
   link?: (rowData: ICellTextProps["rowData"]) => string | (() => void) | undefined
   tooltip?: ((rowData: ICellTextProps["rowData"]) => ReactElement<AlignProps> | string | undefined) | boolean
+  showTooltipIcon?: boolean
   isEditable?: boolean
   progressIndicator?: {
     type: "bar" | "circle"
@@ -448,6 +449,7 @@ export const DataTable = (p: DataTableProps) => {
       link: column.link,
       sort: column.sort,
       tooltip: column.tooltip,
+      showTooltipIcon: column.showTooltipIcon,
       sortDirection: sortDirection,
       minWidth: column.minWidth,
       maxWidth: column.maxWidth,
@@ -1359,7 +1361,8 @@ export const DataTable = (p: DataTableProps) => {
                                     <Tooltip
                                       trigger={
                                         column.dataType !== DataType.Status &&
-                                        column.dataType !== DataType.ProgressIndicator ? (
+                                        column.dataType !== DataType.ProgressIndicator &&
+                                        column.showTooltipIcon === true ? (
                                           <Align horizontal center hug>
                                             {output}
                                             <Spacer xsmall />
