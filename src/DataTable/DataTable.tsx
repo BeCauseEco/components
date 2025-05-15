@@ -162,12 +162,12 @@ const CellInputTextSingle = ({ column, rowKeyValue, value, autoFocus }: ICellEdi
   // - This approach allows users to type numbers naturally, including partial/incomplete numbers, and supports both decimal separators, but always stores and displays the normalized value with a dot.
   // - If the user enters a value like `12.` or `12,`, it will be accepted and displayed as `12.`, but only the integer part will be shown until more digits are entered after the decimal.
   const displayValue =
-    column.dataType === DataType.Number && typeof value === "string" ? value.replace(/,/g, ".") : value ?? ""
+    column.dataType === DataType.Number && typeof value === "string" ? value.replace(/,/g, ".") : value
 
   return (
     <InputTextSingle
       ref={inputRef}
-      value={displayValue}
+      value={displayValue ?? ""}
       width="auto"
       size="small"
       color={Color.Neutral}
