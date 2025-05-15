@@ -154,15 +154,36 @@ const CellInputTextSingle = ({ column, rowKeyValue, value, autoFocus }: ICellEdi
     }
   }, [autoFocus])
 
+  // This logic ensures that only valid positive numeric input is accepted for number-type columns.
+  // - It allows both ',' and '.' as decimal separators for user convenience, always displaying and storing '.' internally.
+  // - The regex `/[^0-9.]/g` strips out any characters except digits and dot, preventing invalid input (minus is not allowed).
+  // - The check for `""` or `"."` allows the user to temporarily enter incomplete numbers (e.g., just a decimal point) without immediately rejecting the input, but stores `undefined` until a valid number is entered.
+  // - The regex `/^\d*\.?\d*$/` ensures the input is a valid positive number format (digits, optional decimal, more digits).
+  // - This approach allows users to type numbers naturally, including partial/incomplete numbers, and supports both decimal separators, but always stores and displays the normalized value with a dot.
+  // - If the user enters a value like `12.` or `12,`, it will be accepted and displayed as `12.`, but only the integer part will be shown until more digits are entered after the decimal.
+  const displayValue =
+    column.dataType === DataType.Number && typeof value === "string" ? value.replace(/,/g, ".") : value ?? ""
+
   return (
     <InputTextSingle
       ref={inputRef}
-      value={value}
+      value={displayValue}
       width="auto"
       size="small"
       color={Color.Neutral}
       onChange={v => {
-        table.updateCellValue(rowKeyValue, column.key, v)
+        if (column.dataType === DataType.Number) {
+          const normalized = v.replace(/,/g, ".").replace(/[^0-9.]/g, "")
+          if (normalized === "" || normalized === ".") {
+            table.updateCellValue(rowKeyValue, column.key, undefined)
+            return
+          }
+          if (/^\d*\.?\d*$/.test(normalized)) {
+            table.updateCellValue(rowKeyValue, column.key, normalized)
+          }
+        } else {
+          table.updateCellValue(rowKeyValue, column.key, v)
+        }
       }}
     />
   )
@@ -1335,7 +1356,22 @@ export const DataTable = (p: DataTableProps) => {
                                   {DEPRICATED_customCellRendererElement ? (
                                     DEPRICATED_customCellRendererElement
                                   ) : tooltipElement ? (
-                                    <Tooltip trigger={output}>{tooltipElement}</Tooltip>
+                                    <Tooltip
+                                      trigger={
+                                        column.dataType !== DataType.Status &&
+                                        column.dataType !== DataType.ProgressIndicator ? (
+                                          <Align horizontal center hug>
+                                            {output}
+                                            <Spacer xsmall />
+                                            <Icon name="info" small fill={[Color.Neutral, 200]} />
+                                          </Align>
+                                        ) : (
+                                          output
+                                        )
+                                      }
+                                    >
+                                      {tooltipElement}
+                                    </Tooltip>
                                   ) : (
                                     output
                                   )}
