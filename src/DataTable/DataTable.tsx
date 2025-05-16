@@ -756,6 +756,7 @@ export const DataTable = (p: DataTableProps) => {
 
     .${cssScope} .override-ka-fixed-left {
       left: 0;
+      border-bottom: solid 2px ${computeColor(p.stroke || [Color.Neutral, 100])};
     }
 
     .${cssScope} .override-ka-fixed-right {
