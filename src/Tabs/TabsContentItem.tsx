@@ -8,6 +8,7 @@ import styled from "@emotion/styled"
 export type TTabsContentItem = PlaywrightProps & {
   contentTargetId: string
   children: ReactElement<TComposition>
+  forceMount?: boolean
 }
 
 const TabsContent = styled(Tabs.Content)({
