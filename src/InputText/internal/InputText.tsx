@@ -137,7 +137,8 @@ const Label = styled.label({
 })
 
 export const InputText = forwardRef<HTMLInputElement | HTMLTextAreaElement, InputTextProps>((p, ref) => {
-  const key = useId()
+  const generatedId = useId()
+  const key = p.id ?? generatedId
 
   const [focusCapture, setFocusCapture] = useState(false)
 
