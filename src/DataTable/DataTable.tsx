@@ -253,8 +253,22 @@ const CellProgressIndicator = (cellTextProps: ICellTextProps | ICellEditorProps)
   return (
     <Stack hug horizontal>
       <Align horizontal left={type === "bar"} center={type === "circle"}>
-        <ProgressIndicator type={type} size="large" color={Color.Neutral}>
-          <ProgressIndicatorSegment width={`${value}%`} color={color} />
+        <ProgressIndicator
+          type={type}
+          size="large"
+          color={Color.Neutral}
+          labelStart={
+            typeof cellTextProps.column["startAdornment"] === "function"
+              ? cellTextProps.column["startAdornment"](cellTextProps.rowData)
+              : undefined
+          }
+          labelEnd={
+            typeof cellTextProps.column["endAdornment"] === "function"
+              ? cellTextProps.column["endAdornment"](cellTextProps.rowData)
+              : undefined
+          }
+        >
+          <ProgressIndicatorSegment width={`${value}%`} color={color} label={`${value}%`} />
         </ProgressIndicator>
       </Align>
     </Stack>
@@ -318,6 +332,8 @@ export type Column = {
   tooltip?: ((rowData: ICellTextProps["rowData"]) => ReactElement<AlignProps> | string | undefined) | boolean
   showTooltipIcon?: boolean
   isEditable?: boolean
+  endAdornment?: (rowData: ICellTextProps["rowData"]) => ReactElement<AlignProps> | string | undefined
+  startAdornment?: (rowData: ICellTextProps["rowData"]) => ReactElement<AlignProps> | string | undefined
   progressIndicator?: {
     type: "bar" | "circle"
 
@@ -456,6 +472,8 @@ export const DataTable = (p: DataTableProps) => {
       explodeWidth: column.explodeWidth,
       preventContentCollapse: column.preventContentCollapse,
       isEditable: column.isEditable,
+      endAdornment: column.endAdornment,
+      startAdornment: column.startAdornment,
     }
   })
 
@@ -1301,14 +1319,26 @@ export const DataTable = (p: DataTableProps) => {
                                 ) : (
                                   <>
                                     {avatarElement}
-                                    <Text
-                                      fill={[Color.Neutral, 700]}
-                                      small
-                                      monospace={monospace}
-                                      textOverflow={column.maxWidth !== undefined}
-                                    >
-                                      {text}
-                                    </Text>
+                                      {column?.startAdornment?.(cellTextContent.rowData) && (
+                                        <>
+                                          {column.startAdornment(cellTextContent.rowData)}
+                                          <Spacer xsmall />
+                                        </>
+                                      )}
+                                      <Text
+                                        fill={[Color.Neutral, 700]}
+                                        small
+                                        monospace={monospace}
+                                        textOverflow={column.maxWidth !== undefined}
+                                      >
+                                        {text}
+                                      </Text>
+                                      {column?.endAdornment?.(cellTextContent.rowData) && (
+                                        <>
+                                          <Spacer xsmall />
+                                          {column.endAdornment(cellTextContent.rowData)}
+                                        </>
+                                      )}
                                   </>
                                 )
                             }
