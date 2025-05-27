@@ -138,7 +138,7 @@ const Label = styled.label({
 
 export const InputText = forwardRef<HTMLInputElement | HTMLTextAreaElement, InputTextProps>((p, ref) => {
   const generatedId = useId()
-  const key = p.id ?? generatedId
+  const id = p.id ?? generatedId
 
   const [focusCapture, setFocusCapture] = useState(false)
 
@@ -155,7 +155,7 @@ export const InputText = forwardRef<HTMLInputElement | HTMLTextAreaElement, Inpu
       <Align horizontal left hug="width">
         <Spacer xsmall={p.size === "small"} small={p.size === "large"} />
 
-        <Label htmlFor={key}>
+        <Label htmlFor={id}>
           <Text xsmall={p.size === "small"} small={p.size === "large"} fill={[p.color, 500]}>
             {p.label[1]}
           </Text>
@@ -187,7 +187,7 @@ export const InputText = forwardRef<HTMLInputElement | HTMLTextAreaElement, Inpu
   if (p.label && p.label[0] === "outside") {
     labelOutside = (
       <Align vertical left hug="width">
-        <Label htmlFor={key}>
+        <Label htmlFor={id}>
           <Text xsmall={p.size === "small"} small={p.size !== "small"} fill={[p.color, 700]}>
             <b>{p.label[1]}</b>
           </Text>
@@ -302,7 +302,7 @@ export const InputText = forwardRef<HTMLInputElement | HTMLTextAreaElement, Inpu
               ref={ref}
               as={p.rows === 1 ? "input" : "textarea"}
               type={p.type}
-              id={key}
+              id={id}
               value={p.value}
               rows={p.rows || 1}
               color={p.error ? Color.Error : p.color}
