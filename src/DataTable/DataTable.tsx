@@ -1467,6 +1467,9 @@ export const DataTable = (p: DataTableProps) => {
                       cell: {
                         elementAttributes: cellElementAttributes => {
                           const column = cellElementAttributes.column as Column
+                          const id = cellElementAttributes?.rowData?.id
+                            ? `cell-${column.key}-${cellElementAttributes?.rowData?.id}`
+                            : null
                           const classNames: string[] = []
 
                           if (p.fixedKeyField === column.key) {
@@ -1509,6 +1512,7 @@ export const DataTable = (p: DataTableProps) => {
                           }
 
                           return {
+                            id: id,
                             className: classNames.join(" "),
 
                             style: {

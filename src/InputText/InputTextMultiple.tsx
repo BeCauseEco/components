@@ -4,6 +4,7 @@ import { Color } from "@new/Color"
 
 export type InputTextMultipleProps = Pick<
   InputTextProps,
+  | "id"
   | "size"
   | "width"
   | "label"
@@ -40,6 +41,7 @@ export const InputTextMultiple = forwardRef<HTMLTextAreaElement, InputTextMultip
       disabled={p.disabled ? true : undefined}
       value={p.value}
       data-playwright-testid={p["data-playwright-testid"]}
+      id={p.id}
     />
   )
 })
