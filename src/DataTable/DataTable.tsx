@@ -1469,7 +1469,7 @@ export const DataTable = (p: DataTableProps) => {
                           const column = cellElementAttributes.column as Column
                           const id = cellElementAttributes?.rowData?.id
                             ? `cell-${column.key}-${cellElementAttributes?.rowData?.id}`
-                            : null
+                            : undefined
                           const classNames: string[] = []
 
                           if (p.fixedKeyField === column.key) {
