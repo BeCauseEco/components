@@ -212,15 +212,9 @@ export const Dialog = (p: TDialog) => {
 
         {/* Conditionally add p.id because if not provided, Radix will auto-generate one. 
         If id={undefined}, Radix omits the id entirely, which may impact accessibility. */}
-        {p.id ? (
-          <Content {...contentProps} {...(p.id ? { id: p.id } : {})}>
-            <DialogContentChildren {...p} />
-          </Content>
-        ) : (
-          <Content {...contentProps}>
-            <DialogContentChildren {...p} />
-          </Content>
-        )}
+        <Content {...contentProps} {...(p.id ? { id: p.id } : {})}>
+          <DialogContentChildren {...p} />
+        </Content>
       </RadixDialog.Portal>
     </RadixDialog.Root>
   )
