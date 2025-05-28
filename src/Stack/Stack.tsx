@@ -153,6 +153,7 @@ export const Stack = (p: StackProps) => {
 
   return (
     <Container
+      id={p.id}
       className={p.className || `<Stack />${generateErrorClassName(invalidChildren)} `}
       data-playwright-testid={p["data-playwright-testid"]}
       fill={p.fill}

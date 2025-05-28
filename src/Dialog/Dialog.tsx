@@ -10,7 +10,6 @@ import { EOpacity } from "@new/Opacity"
 import { Spacer, SpacerProps } from "@new/Stack/Spacer"
 import { EShadow } from "@new/EShadow"
 import { Text, TextProps } from "@new/Text/Text"
-// import { Icon } from "@new/Icon/Icon"
 import { PlaywrightProps } from "@new/Playwright"
 import { InputButtonPrimaryProps } from "@new/InputButton/InputButtonPrimary"
 import { InputButtonSecondaryProps } from "@new/InputButton/InputButtonSecondary"
@@ -117,106 +116,111 @@ export type TDialog = PlaywrightProps & {
   buttonPrimary?: ReactElement<InputButtonPrimaryProps>
   buttonSecondary?: ReactElement<InputButtonSecondaryProps>
   buttonTertiary?: ReactElement<InputButtonTertiaryProps>
+  id?: string
+}
+
+const DialogContentChildren = (p: TDialog) => {
+  return (
+    <Composition>
+      <BackgroundCard colorBackground={[Color.White]} borderRadius={Size.Tiny} shadow={EShadow.Large} />
+
+      <LayoutDialog
+        contentStart={
+          <TitleAndDescription>
+            {p.title}
+
+            {p.description && <Spacer xsmall />}
+
+            {p.description}
+          </TitleAndDescription>
+        }
+        contentMiddle={
+          <>
+            <Divider fill={[Color.Neutral, 100]} />
+
+            {p.content}
+
+            {p.message && p.message[0] !== "hidden" && (
+              <>
+                <Divider fill={[computeMessageColor(p.message), 200]} />
+
+                <Stack horizontal fill={[computeMessageColor(p.message), 100]}>
+                  <Align horizontal hug="width" left>
+                    {p.message[0] === "notice" && (
+                      <Icon large name="info" fill={[computeMessageColor(p.message), 800]} style="filled" />
+                    )}
+
+                    {(p.message[0] === "warning" || p.message[0] === "error") && (
+                      <Icon large name="warning" fill={[computeMessageColor(p.message), 800]} style="filled" />
+                    )}
+                  </Align>
+
+                  <Spacer xsmall />
+
+                  <Align horizontal left>
+                    <Text xsmall fill={[computeMessageColor(p.message), 800]}>
+                      {p.message[1]}
+                    </Text>
+                  </Align>
+                </Stack>
+              </>
+            )}
+
+            <Divider fill={[computeMessageColor(p.message), p.message && p.message[0] !== "hidden" ? 200 : 100]} />
+          </>
+        }
+        contentEnd={
+          <>
+            {p.buttonTertiary && p.buttonTertiary}
+
+            {p.buttonSecondary && (
+              <>
+                <Spacer small />
+
+                {p.buttonSecondary}
+              </>
+            )}
+
+            {p.buttonPrimary && (
+              <>
+                <Spacer small />
+
+                {p.buttonPrimary}
+              </>
+            )}
+          </>
+        }
+        buttonsText={
+          <Text small fill={[Color.Neutral, 700]}>
+            {p.buttonsText}
+          </Text>
+        }
+        buttonClose={<RadixDialogClose asChild></RadixDialogClose>}
+      />
+    </Composition>
+  )
 }
 
 export const Dialog = (p: TDialog) => {
+  const { size, collapseHeight, fixedWidth } = p
+  const contentProps: TDialogContentProperties = { size, collapseHeight, fixedWidth }
+
   return (
     <RadixDialog.Root open={p.open} onOpenChange={p.onOpenChange}>
       <RadixDialog.Portal>
         <Overlay />
 
-        <Content
-          size={p.size}
-          collapseHeight={p.collapseHeight}
-          fixedWidth={p.fixedWidth}
-          data-playwright-testid={p["data-playwright-testid"]}
-        >
-          <Composition>
-            <BackgroundCard colorBackground={[Color.White]} borderRadius={Size.Tiny} shadow={EShadow.Large} />
-
-            <LayoutDialog
-              contentStart={
-                <TitleAndDescription>
-                  {p.title}
-
-                  {p.description && <Spacer xsmall />}
-
-                  {p.description}
-                </TitleAndDescription>
-              }
-              contentMiddle={
-                <>
-                  <Divider fill={[Color.Neutral, 100]} />
-
-                  {p.content}
-
-                  {p.message && p.message[0] !== "hidden" && (
-                    <>
-                      <Divider fill={[computeMessageColor(p.message), 200]} />
-
-                      <Stack horizontal fill={[computeMessageColor(p.message), 100]}>
-                        <Align horizontal hug="width" left>
-                          {p.message[0] === "notice" && (
-                            <Icon large name="info" fill={[computeMessageColor(p.message), 800]} style="filled" />
-                          )}
-
-                          {(p.message[0] === "warning" || p.message[0] === "error") && (
-                            <Icon large name="warning" fill={[computeMessageColor(p.message), 800]} style="filled" />
-                          )}
-                        </Align>
-
-                        <Spacer xsmall />
-
-                        <Align horizontal left>
-                          <Text xsmall fill={[computeMessageColor(p.message), 800]}>
-                            {p.message[1]}
-                          </Text>
-                        </Align>
-                      </Stack>
-                    </>
-                  )}
-
-                  <Divider
-                    fill={[computeMessageColor(p.message), p.message && p.message[0] !== "hidden" ? 200 : 100]}
-                  />
-                </>
-              }
-              contentEnd={
-                <>
-                  {p.buttonTertiary && p.buttonTertiary}
-
-                  {p.buttonSecondary && (
-                    <>
-                      <Spacer small />
-
-                      {p.buttonSecondary}
-                    </>
-                  )}
-
-                  {p.buttonPrimary && (
-                    <>
-                      <Spacer small />
-
-                      {p.buttonPrimary}
-                    </>
-                  )}
-                </>
-              }
-              buttonsText={
-                <Text small fill={[Color.Neutral, 700]}>
-                  {p.buttonsText}
-                </Text>
-              }
-              buttonClose={
-                <RadixDialogClose asChild>
-                  {/* <InputButtonPrimary medium>
-                    <Icon name="close" size={Size.Large} color={[Color.Neutral, 700]} />
-                  </InputButtonPrimary> */}
-                </RadixDialogClose>
-              }
-            />
-          </Composition>
-        </Content>
+        {/* Conditionally add p.id because if not provided, Radix will auto-generate one. 
+        If id={undefined}, Radix omits the id entirely, which may impact accessibility. */}
+        {p.id ? (
+          <Content {...contentProps} {...(p.id ? { id: p.id } : {})}>
+            <DialogContentChildren {...p} />
+          </Content>
+        ) : (
+          <Content {...contentProps}>
+            <DialogContentChildren {...p} />
+          </Content>
+        )}
       </RadixDialog.Portal>
     </RadixDialog.Root>
   )
