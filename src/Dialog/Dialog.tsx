@@ -119,7 +119,7 @@ export type TDialog = PlaywrightProps & {
   id?: string
 }
 
-const DialogContentChildren = (p: TDialog) => {
+const DialogContentInner = (p: TDialog) => {
   return (
     <Composition>
       <BackgroundCard colorBackground={[Color.White]} borderRadius={Size.Tiny} shadow={EShadow.Large} />
@@ -213,7 +213,7 @@ export const Dialog = (p: TDialog) => {
         {/* Conditionally add p.id because if not provided, Radix will auto-generate one. 
         If id={undefined}, Radix omits the id entirely, which may impact accessibility. */}
         <Content {...contentProps} {...(p.id ? { id: p.id } : {})}>
-          <DialogContentChildren {...p} />
+          <DialogContentInner {...p} />
         </Content>
       </RadixDialog.Portal>
     </RadixDialog.Root>
