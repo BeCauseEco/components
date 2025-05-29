@@ -1347,10 +1347,12 @@ export const DataTable = (p: DataTableProps) => {
                                     cornerRadius="small"
                                   >
                                     <>
+                                      const startAdornment = column?.startAdornment?.(cellTextContent.rowData);
+                                      const endAdornment = column?.endAdornment?.(cellTextContent.rowData);
                                       {avatarElement}
-                                      {column?.startAdornment?.(cellTextContent.rowData) && (
+                                      {startAdornment && (
                                         <>
-                                          {column.startAdornment(cellTextContent.rowData)}
+                                          {startAdornment}
                                           <Spacer xsmall />
                                         </>
                                       )}
