@@ -9,7 +9,7 @@ import { InputButtonPrimary, InputButtonPrimaryProps } from "@new/InputButton/In
 import { Spacer } from "@new/Stack/Spacer"
 import { InputButtonTertiary, InputButtonTertiaryProps } from "@new/InputButton/InputButtonTertiary"
 import { InputTextSingle, InputTextSingleProps } from "@new/InputText/InputTextSingle"
-import { adjustLightness, Color, ColorWithLightness, computeColor } from "@new/Color"
+import { adjustLightness, Color, ColorWithLightness, computeColor, Lightness } from "@new/Color"
 import { InputTextDate, InputTextDateProps } from "@new/InputText/InputTextDate"
 import { InputCheckbox, InputCheckboxProps } from "@new/InputCheckbox/InputCheckbox"
 import { StyleBodySmall, StyleFontFamily, Text } from "@new/Text/Text"
@@ -353,6 +353,7 @@ export type Column = {
         }
       | undefined
   }
+  fill?: ((rowData: ICellTextProps["rowData"]) => Color) | Color | undefined
 }
 
 type Children =
@@ -474,6 +475,7 @@ export const DataTable = (p: DataTableProps) => {
       isEditable: column.isEditable,
       endAdornment: column.endAdornment,
       startAdornment: column.startAdornment,
+      fill: column.fill,
     }
   })
 
@@ -1296,6 +1298,23 @@ export const DataTable = (p: DataTableProps) => {
                                 </>
                               ) : null
 
+                              let fillColor: Color | undefined
+                              if (typeof column.fill === "function") {
+                                fillColor = column.fill(cellTextContent.rowData)
+                              } else if (typeof column.fill !== "undefined") {
+                                fillColor = column.fill
+                              }
+
+                              const getColorWithLightness = (
+                                color: Color | undefined,
+                                lightness: Lightness = 700,
+                              ): [Color, Lightness] => {
+                                if (typeof color === "undefined") {
+                                  return [Color.Neutral, lightness]
+                                }
+                                return [color, lightness]
+                              }
+
                               output =
                                 linkEffect && text !== TABLE_CELL_EMPTY_STRING ? (
                                   <>
@@ -1317,8 +1336,18 @@ export const DataTable = (p: DataTableProps) => {
                                     </Text>
                                   </>
                                 ) : (
-                                  <>
-                                    {avatarElement}
+                                  <Stack
+                                    horizontal
+                                    hug={typeof fillColor !== "undefined" ? "partly" : true}
+                                    fill={
+                                      typeof fillColor !== "undefined"
+                                        ? getColorWithLightness(fillColor, 100)
+                                        : undefined
+                                    }
+                                    cornerRadius="small"
+                                  >
+                                    <>
+                                      {avatarElement}
                                       {column?.startAdornment?.(cellTextContent.rowData) && (
                                         <>
                                           {column.startAdornment(cellTextContent.rowData)}
@@ -1326,7 +1355,7 @@ export const DataTable = (p: DataTableProps) => {
                                         </>
                                       )}
                                       <Text
-                                        fill={[Color.Neutral, 700]}
+                                        fill={getColorWithLightness(fillColor, 700)}
                                         small
                                         monospace={monospace}
                                         textOverflow={column.maxWidth !== undefined}
@@ -1339,7 +1368,8 @@ export const DataTable = (p: DataTableProps) => {
                                           {column.endAdornment(cellTextContent.rowData)}
                                         </>
                                       )}
-                                  </>
+                                    </>
+                                  </Stack>
                                 )
                             }
 
