@@ -1314,7 +1314,8 @@ export const DataTable = (p: DataTableProps) => {
                                 }
                                 return [color, lightness]
                               }
-
+                              const startAdornment = column?.startAdornment?.(cellTextContent.rowData)
+                              const endAdornment = column?.endAdornment?.(cellTextContent.rowData)
                               output =
                                 linkEffect && text !== TABLE_CELL_EMPTY_STRING ? (
                                   <>
@@ -1347,8 +1348,6 @@ export const DataTable = (p: DataTableProps) => {
                                     cornerRadius="small"
                                   >
                                     <>
-                                      const startAdornment = column?.startAdornment?.(cellTextContent.rowData);
-                                      const endAdornment = column?.endAdornment?.(cellTextContent.rowData);
                                       {avatarElement}
                                       {startAdornment && (
                                         <>
@@ -1364,10 +1363,10 @@ export const DataTable = (p: DataTableProps) => {
                                       >
                                         {text}
                                       </Text>
-                                      {column?.endAdornment?.(cellTextContent.rowData) && (
+                                      {endAdornment && (
                                         <>
+                                          {endAdornment}
                                           <Spacer xsmall />
-                                          {column.endAdornment(cellTextContent.rowData)}
                                         </>
                                       )}
                                     </>
