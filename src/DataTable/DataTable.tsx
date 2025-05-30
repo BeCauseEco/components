@@ -1105,10 +1105,7 @@ export const DataTable = (p: DataTableProps) => {
                               : true,
                           ).length
 
-                          const allowSort =
-                            p.mode !== "edit" &&
-                            headCellContentAsColumn.dataType !== DataType.ProgressIndicator &&
-                            headCellContentAsColumn.dataType !== DataType.Status
+                          const allowSort = p.mode !== "edit" && headCellContentAsColumn.dataType !== DataType.Status
 
                           return (
                             <Stack hug horizontal>
@@ -1578,8 +1575,8 @@ export const DataTable = (p: DataTableProps) => {
 
                             style: {
                               width: column.explodeWidth ? "100%" : "auto",
-                              "min-width": minWidth,
-                              "max-width": maxWidth,
+                              minWidth: minWidth,
+                              maxWidth: maxWidth,
                             },
                           }
                         },
