@@ -6,18 +6,20 @@ import { Color } from "@new/Color"
 import { Spacer } from "@new/Stack/Spacer"
 
 const ManagerPageBase = ({
+  isLoading,
   title,
   subtitle,
   actionArea,
   children,
 }: {
+  isLoading?: boolean
   title: string
   subtitle: string
   actionArea?: ReactNode
   children?: ReactNode
 }) => {
   return (
-    <Stack hug vertical>
+    <Stack hug vertical loading={isLoading}>
       <Align vertical>
         <Stack hug horizontal>
           <Align vertical>
