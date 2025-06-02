@@ -1362,8 +1362,8 @@ export const DataTable = (p: DataTableProps) => {
                                       </Text>
                                       {endAdornment && (
                                         <>
-                                          {endAdornment}
                                           <Spacer xsmall />
+                                          {endAdornment}
                                         </>
                                       )}
                                     </>
