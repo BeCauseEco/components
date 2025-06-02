@@ -9,7 +9,7 @@ import { InputButtonPrimary, InputButtonPrimaryProps } from "@new/InputButton/In
 import { Spacer } from "@new/Stack/Spacer"
 import { InputButtonTertiary, InputButtonTertiaryProps } from "@new/InputButton/InputButtonTertiary"
 import { InputTextSingle, InputTextSingleProps } from "@new/InputText/InputTextSingle"
-import { adjustLightness, Color, ColorWithLightness, computeColor } from "@new/Color"
+import { adjustLightness, Color, ColorWithLightness, computeColor, Lightness } from "@new/Color"
 import { InputTextDate, InputTextDateProps } from "@new/InputText/InputTextDate"
 import { InputCheckbox, InputCheckboxProps } from "@new/InputCheckbox/InputCheckbox"
 import { StyleBodySmall, StyleFontFamily, Text } from "@new/Text/Text"
@@ -253,8 +253,22 @@ const CellProgressIndicator = (cellTextProps: ICellTextProps | ICellEditorProps)
   return (
     <Stack hug horizontal>
       <Align horizontal left={type === "bar"} center={type === "circle"}>
-        <ProgressIndicator type={type} size="large" color={Color.Neutral}>
-          <ProgressIndicatorSegment width={`${value}%`} color={color} />
+        <ProgressIndicator
+          type={type}
+          size="large"
+          color={Color.Neutral}
+          labelStart={
+            typeof cellTextProps.column["startAdornment"] === "function"
+              ? cellTextProps.column["startAdornment"](cellTextProps.rowData)
+              : undefined
+          }
+          labelEnd={
+            typeof cellTextProps.column["endAdornment"] === "function"
+              ? cellTextProps.column["endAdornment"](cellTextProps.rowData)
+              : undefined
+          }
+        >
+          <ProgressIndicatorSegment width={`${value}%`} color={color} label={`${value}%`} />
         </ProgressIndicator>
       </Align>
     </Stack>
@@ -318,6 +332,8 @@ export type Column = {
   tooltip?: ((rowData: ICellTextProps["rowData"]) => ReactElement<AlignProps> | string | undefined) | boolean
   showTooltipIcon?: boolean
   isEditable?: boolean
+  endAdornment?: (rowData: ICellTextProps["rowData"]) => ReactElement<AlignProps> | string | undefined
+  startAdornment?: (rowData: ICellTextProps["rowData"]) => ReactElement<AlignProps> | string | undefined
   progressIndicator?: {
     type: "bar" | "circle"
 
@@ -337,6 +353,7 @@ export type Column = {
         }
       | undefined
   }
+  fill?: ((rowData: ICellTextProps["rowData"]) => Color) | Color | undefined
 }
 
 type Children =
@@ -456,6 +473,9 @@ export const DataTable = (p: DataTableProps) => {
       explodeWidth: column.explodeWidth,
       preventContentCollapse: column.preventContentCollapse,
       isEditable: column.isEditable,
+      endAdornment: column.endAdornment,
+      startAdornment: column.startAdornment,
+      fill: column.fill,
     }
   })
 
@@ -1085,10 +1105,7 @@ export const DataTable = (p: DataTableProps) => {
                               : true,
                           ).length
 
-                          const allowSort =
-                            p.mode !== "edit" &&
-                            headCellContentAsColumn.dataType !== DataType.ProgressIndicator &&
-                            headCellContentAsColumn.dataType !== DataType.Status
+                          const allowSort = p.mode !== "edit" && headCellContentAsColumn.dataType !== DataType.Status
 
                           return (
                             <Stack hug horizontal>
@@ -1278,6 +1295,24 @@ export const DataTable = (p: DataTableProps) => {
                                 </>
                               ) : null
 
+                              let fillColor: Color | undefined
+                              if (typeof column.fill === "function") {
+                                fillColor = column.fill(cellTextContent.rowData)
+                              } else if (typeof column.fill !== "undefined") {
+                                fillColor = column.fill
+                              }
+
+                              const getColorWithLightness = (
+                                color: Color | undefined,
+                                lightness: Lightness = 700,
+                              ): [Color, Lightness] => {
+                                if (typeof color === "undefined") {
+                                  return [Color.Neutral, lightness]
+                                }
+                                return [color, lightness]
+                              }
+                              const startAdornment = column?.startAdornment?.(cellTextContent.rowData)
+                              const endAdornment = column?.endAdornment?.(cellTextContent.rowData)
                               output =
                                 linkEffect && text !== TABLE_CELL_EMPTY_STRING ? (
                                   <>
@@ -1299,17 +1334,40 @@ export const DataTable = (p: DataTableProps) => {
                                     </Text>
                                   </>
                                 ) : (
-                                  <>
-                                    {avatarElement}
-                                    <Text
-                                      fill={[Color.Neutral, 700]}
-                                      small
-                                      monospace={monospace}
-                                      textOverflow={column.maxWidth !== undefined}
-                                    >
-                                      {text}
-                                    </Text>
-                                  </>
+                                  <Stack
+                                    horizontal
+                                    hug={typeof fillColor !== "undefined" ? "partly" : true}
+                                    fill={
+                                      typeof fillColor !== "undefined"
+                                        ? getColorWithLightness(fillColor, 100)
+                                        : undefined
+                                    }
+                                    cornerRadius="small"
+                                  >
+                                    <>
+                                      {avatarElement}
+                                      {startAdornment && (
+                                        <>
+                                          {startAdornment}
+                                          <Spacer xsmall />
+                                        </>
+                                      )}
+                                      <Text
+                                        fill={getColorWithLightness(fillColor, 700)}
+                                        small
+                                        monospace={monospace}
+                                        textOverflow={column.maxWidth !== undefined}
+                                      >
+                                        {text}
+                                      </Text>
+                                      {endAdornment && (
+                                        <>
+                                          {endAdornment}
+                                          <Spacer xsmall />
+                                        </>
+                                      )}
+                                    </>
+                                  </Stack>
                                 )
                             }
 
@@ -1467,6 +1525,9 @@ export const DataTable = (p: DataTableProps) => {
                       cell: {
                         elementAttributes: cellElementAttributes => {
                           const column = cellElementAttributes.column as Column
+                          const id = cellElementAttributes?.rowData?.id
+                            ? `cell-${column.key}-${cellElementAttributes?.rowData?.id}`
+                            : undefined
                           const classNames: string[] = []
 
                           if (p.fixedKeyField === column.key) {
@@ -1509,12 +1570,13 @@ export const DataTable = (p: DataTableProps) => {
                           }
 
                           return {
+                            id: id,
                             className: classNames.join(" "),
 
                             style: {
                               width: column.explodeWidth ? "100%" : "auto",
-                              "min-width": minWidth,
-                              "max-width": maxWidth,
+                              minWidth: minWidth,
+                              maxWidth: maxWidth,
                             },
                           }
                         },

@@ -4,6 +4,7 @@ import { Color } from "@new/Color"
 
 export type InputTextSingleProps = Pick<
   InputTextProps,
+  | "id"
   | "size"
   | "width"
   | "label"
@@ -44,6 +45,7 @@ export const InputTextSingle = forwardRef<HTMLInputElement, InputTextSingleProps
       disabled={p.disabled ? true : undefined}
       value={p.value}
       data-playwright-testid={p["data-playwright-testid"]}
+      id={p.id}
     />
   )
 })

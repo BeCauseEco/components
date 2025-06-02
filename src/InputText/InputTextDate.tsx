@@ -4,6 +4,7 @@ import { Color } from "@new/Color"
 
 export type InputTextDateProps = Pick<
   InputTextProps,
+  | "id"
   | "size"
   | "width"
   | "label"
@@ -44,6 +45,7 @@ export const InputTextDate = forwardRef<HTMLInputElement, InputTextDateProps>((p
       dateMin={p.min}
       dateMax={p.max}
       data-playwright-testid={p["data-playwright-testid"]}
+      id={p.id}
     />
   )
 })
