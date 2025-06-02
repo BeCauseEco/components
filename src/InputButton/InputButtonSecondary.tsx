@@ -1,6 +1,6 @@
 import { forwardRef } from "react"
 import { InputButtonProps, InputButton } from "@new/InputButton/internal/InputButton"
-import { Color } from "@new/Color"
+import { Color, ColorWithLightness } from "@new/Color"
 
 export type InputButtonSecondaryProps = Pick<
   InputButtonProps,
@@ -17,6 +17,7 @@ export type InputButtonSecondaryProps = Pick<
   | "data-playwright-testid"
 > & {
   label: string
+  transparent?: boolean
   iconNameLeft?: string
   iconNameRight?: string
 }
@@ -33,6 +34,11 @@ export const InputButtonSecondary = forwardRef<HTMLButtonElement, InputButtonSec
     iconPlacement = "afterLabel"
   }
 
+  let colorBackground: ColorWithLightness | undefined = [Color.White, 100]
+  if (p.destructive || p.transparent) {
+    colorBackground = undefined
+  }
+
   return (
     <InputButton
       className="<InputButtonSecondary /> -"
@@ -41,7 +47,7 @@ export const InputButtonSecondary = forwardRef<HTMLButtonElement, InputButtonSec
       variant="outlined"
       size={p.size}
       width={p.width}
-      colorBackground={p.destructive ? undefined : [Color.White, 100]}
+      colorBackground={colorBackground}
       colorForeground={[Color.Primary, 700]}
       colorOutline={[Color.Primary, 700]}
       colorBackgroundHover={[Color.Primary, 100]}
