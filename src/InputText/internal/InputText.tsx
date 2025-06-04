@@ -23,6 +23,7 @@ export type InputTextProps = ComponentBaseProps & {
 
   value: string
   onChange: (value: string) => void
+  hideValue?: boolean
 
   loading?: boolean
   disabled?: boolean
@@ -301,7 +302,7 @@ export const InputText = forwardRef<HTMLInputElement | HTMLTextAreaElement, Inpu
               // @ts-expect-error TypeScript can't infer the type of the `ref` prop when using as="...".
               ref={ref}
               as={p.rows === 1 ? "input" : "textarea"}
-              type={p.type}
+              type={p.hideValue ? "password" : p.type}
               id={id}
               value={p.value}
               rows={p.rows || 1}

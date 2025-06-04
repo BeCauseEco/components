@@ -6,6 +6,7 @@ export type InputButtonPrimaryProps = Pick<
   InputButtonProps,
   | "id"
   | "size"
+  | "title"
   | "width"
   | "hug"
   | "loading"
@@ -56,6 +57,7 @@ export const InputButtonPrimary = forwardRef<HTMLButtonElement, InputButtonPrima
       preventDefault={p.preventDefault}
       href={p.href}
       data-playwright-testid={p["data-playwright-testid"]}
+      title={p.title}
     />
   )
 })

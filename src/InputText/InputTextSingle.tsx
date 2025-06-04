@@ -21,6 +21,7 @@ export type InputTextSingleProps = Pick<
   | "data-playwright-testid"
 > & {
   color: Color
+  hideValue?: boolean
 }
 
 export const InputTextSingle = forwardRef<HTMLInputElement, InputTextSingleProps>((p, ref) => {
@@ -28,6 +29,7 @@ export const InputTextSingle = forwardRef<HTMLInputElement, InputTextSingleProps
     <InputText
       className="<InputTextSingle /> -"
       type="text"
+      hideValue={p.hideValue}
       ref={ref}
       size={p.size}
       width={p.width}
