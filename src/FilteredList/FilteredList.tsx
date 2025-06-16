@@ -1,29 +1,23 @@
 import styled from "@emotion/styled"
-import { Command, CommandEmpty, CommandItem, CommandList } from "cmdk"
-import { PropsWithChildren, ReactElement, forwardRef, isValidElement, useState } from "react"
+import { Command, CommandEmpty, CommandList } from "cmdk"
+import { PropsWithChildren, ReactElement, forwardRef, useState } from "react"
 import { FilteredListItemProps } from "./FilteredListItem"
 import React from "react"
 import { Text } from "@new/Text/Text"
-import { computeColor, Color, ColorWithLightness } from "@new/Color"
+import { Color } from "@new/Color"
 import { InputTextSingle } from "@new/InputText/InputTextSingle"
 import { Spacer } from "@new/Stack/Spacer"
 import { Stack } from "@new/Stack/Stack"
 import { Align } from "@new/Stack/Align"
 import { ComponentBaseProps } from "@new/ComponentBaseProps"
 import { OverflowContainer, OverflowContainerProps } from "@new/OverflowContainer/OverflowContainer"
-import { Avatar } from "@new/Avatar/Avatar"
 
 export type FilteredListProps = ComponentBaseProps & {
   color: Color
 
   maxHeight?: OverflowContainerProps["maxHeight"]
-
   value: string
-
-  onChange: (value: string) => void
-
   children: ReactElement<FilteredListItemProps> | ReactElement<FilteredListItemProps>[]
-
   disabled?: boolean
   loading?: boolean
 }
@@ -42,26 +36,6 @@ const Container = styled.div({
   },
 })
 
-const CommandItemStyled = styled(CommandItem)<{
-  selected: boolean
-  colorSelected: ColorWithLightness
-  colorBackgroundHover: ColorWithLightness
-  colorForeground: ColorWithLightness
-}>(p => ({
-  display: "flex",
-  flexDirection: "column",
-  width: "100%",
-  padding: "calc(var(--BU) * 2)",
-  borderRadius: "var(--BU)",
-  cursor: "pointer",
-  userSelect: "none",
-  backgroundColor: "transparent",
-
-  "&[data-selected='true']": {
-    backgroundColor: computeColor(p.colorBackgroundHover),
-  },
-}))
-
 const CommandEmptyStyled = styled(CommandEmpty)({
   display: "flex",
   flexDirection: "column",
@@ -72,45 +46,6 @@ const CommandEmptyStyled = styled(CommandEmpty)({
 
 export const FilteredList = forwardRef<HTMLDivElement, PropsWithChildren<FilteredListProps>>((p, ref) => {
   const [filter, setFilter] = useState("")
-  const output: ReactElement[] = []
-
-  React.Children.forEach(p.children, child => {
-    if (isValidElement<FilteredListItemProps>(child)) {
-      const label = child.props["label"]
-      const value = child.props["value"]
-      const avatarTitle = child.props["title"]
-      const avatarSrc = child.props["src"]
-      const playwrightTestId = child.props["data-playwright-testid"]
-
-      if (label.toLowerCase().includes(filter.toLowerCase())) {
-        output.push(
-          <CommandItemStyled
-            value={value}
-            onSelect={value => p.onChange(value)}
-            selected={p.value === value}
-            colorSelected={[p.color, 400]}
-            colorBackgroundHover={[p.color, 50]}
-            colorForeground={[p.color, 700]}
-            data-playwright-testid={playwrightTestId}
-          >
-            <Stack horizontal hug>
-              <Align horizontal left hug>
-                <Avatar size="large" src={avatarSrc} title={avatarTitle} />
-              </Align>
-
-              <Spacer xsmall />
-
-              <Align horizontal left>
-                <Text small fill={[p.color, 700]}>
-                  {label}
-                </Text>
-              </Align>
-            </Stack>
-          </CommandItemStyled>,
-        )
-      }
-    }
-  })
 
   return (
     <Container ref={ref} id={p.id} data-playwright-testid={p["data-playwright-testid"]} className="<FilteredList /> - ">
@@ -143,7 +78,7 @@ export const FilteredList = forwardRef<HTMLDivElement, PropsWithChildren<Filtere
                     maxHeight={p.maxHeight}
                     hug
                   >
-                    {output}
+                    {p.children}
                   </OverflowContainer>
                 </Align>
               </Stack>
