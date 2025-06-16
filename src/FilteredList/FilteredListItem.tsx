@@ -9,7 +9,7 @@ import styled from "@emotion/styled"
 import { CommandItem } from "cmdk"
 import { Color, ColorWithLightness, computeColor } from "@new/Color"
 
-const CommandItemStyled = styled(CommandItem)<{
+const Container = styled(CommandItem)<{
   selected: boolean
   colorSelected: ColorWithLightness
   colorBackgroundHover: ColorWithLightness
@@ -29,13 +29,12 @@ const CommandItemStyled = styled(CommandItem)<{
   },
 }))
 
-export type FilteredListItemProps = PlaywrightProps &
+export type FilteredListItemElementProps = PlaywrightProps &
   AvatarProps & {
     value: string
     label: string
     onChange: (value: string) => void
     color: Color
-    labelFilter?: string
   }
 
 export const FilteredListItem = ({
@@ -45,15 +44,10 @@ export const FilteredListItem = ({
   src,
   title,
   color,
-  labelFilter,
   "data-playwright-testid": playwrightTestId,
-}: FilteredListItemProps) => {
-  if (labelFilter && !label?.toLowerCase().includes(labelFilter.toLowerCase())) {
-    return null
-  }
-
+}: FilteredListItemElementProps) => {
   return (
-    <CommandItemStyled
+    <Container
       value={value}
       onSelect={value => onChange(value)}
       selected={value === value}
@@ -75,6 +69,6 @@ export const FilteredListItem = ({
           </Text>
         </Align>
       </Stack>
-    </CommandItemStyled>
+    </Container>
   )
 }
