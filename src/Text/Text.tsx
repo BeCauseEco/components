@@ -52,7 +52,9 @@ export const StyleBodyHuge = {
   lineHeight: "40px",
 }
 
-const Container = styled.p<Omit<TextProps, "fill"> & { _fill: TextProps["fill"] }>(p => ({
+const Container = styled.p.withConfig({
+  shouldForwardProp: (prop) => prop !== 'wrap'
+})<Omit<TextProps, "fill"> & { _fill: TextProps["fill"] }>(p => ({
   display: "inline-block",
   textBoxTrim: "trim-both",
 
@@ -182,7 +184,7 @@ export const Text = forwardRef<HTMLHeadingElement | HTMLParagraphElement, PropsW
       xxLarge={xxLarge}
       huge={huge}
       _fill={fill}
-      wrap={wrap ? true : undefined}
+      wrap={wrap}
       maxWidth={maxWidth}
       monospace={monospace}
       title={title}
