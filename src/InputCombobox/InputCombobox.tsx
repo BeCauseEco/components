@@ -107,7 +107,6 @@ export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<InputC
     })
 
     return output
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [p.children])
 
   useEffect(() => {
