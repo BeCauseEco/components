@@ -77,7 +77,7 @@ const Spinner = styled(
   "div",
   makePropsNonTransient(["loading"]),
 )<Pick<TComposition, "loading"> & { color: ColorWithLightness }>(p => ({
-  diplay: "flex",
+  display: "flex",
   height: "100%",
   aspectRatio: "1",
   borderRadius: "50%",
