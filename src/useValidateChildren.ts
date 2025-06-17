@@ -48,7 +48,6 @@ const getComponentName = (parentTypeName: string, child: Children): string | und
 
   if (isReactElement) {
     if (emotionBaseIsComponent) {
-      // eslint-disable-next-line no-console
       // console.groupCollapsed(
       //   `⚠️ <${parentTypeName} /> contains a Styled(Component) See https://github.com/BeCauseEco/ui?tab=readme-ov-file#overriding-styles for more information.`,
       // )

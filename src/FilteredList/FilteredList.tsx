@@ -1,31 +1,30 @@
 import styled from "@emotion/styled"
-import { Command, CommandEmpty, CommandItem, CommandList } from "cmdk"
-import { PropsWithChildren, ReactElement, forwardRef, isValidElement, useState } from "react"
-import { FilteredListItemProps } from "./FilteredListItem"
+import { useState, useMemo } from "react"
 import React from "react"
 import { Text } from "@new/Text/Text"
-import { computeColor, Color, ColorWithLightness } from "@new/Color"
+import { Color } from "@new/Color"
 import { InputTextSingle } from "@new/InputText/InputTextSingle"
 import { Spacer } from "@new/Stack/Spacer"
 import { Stack } from "@new/Stack/Stack"
 import { Align } from "@new/Stack/Align"
 import { ComponentBaseProps } from "@new/ComponentBaseProps"
-import { OverflowContainer, OverflowContainerProps } from "@new/OverflowContainer/OverflowContainer"
-import { Avatar } from "@new/Avatar/Avatar"
+import { OverflowContainerProps } from "@new/OverflowContainer/OverflowContainer"
+import { FixedSizeList } from "react-window"
+import { FilteredVirtualListItem } from "@new/FilteredList/FilteredVirtualListItem"
+import { PlaywrightProps } from "@new/Playwright"
+
+export type ListItemProps = PlaywrightProps & { value: string; label: string; labelFilter?: string; avatarSrc: string }
 
 export type FilteredListProps = ComponentBaseProps & {
   color: Color
-
-  maxHeight?: OverflowContainerProps["maxHeight"]
-
+  maxHeight: OverflowContainerProps["maxHeight"]
   value: string
-
-  onChange: (value: string) => void
-
-  children: ReactElement<FilteredListItemProps> | ReactElement<FilteredListItemProps>[]
-
   disabled?: boolean
   loading?: boolean
+  itemHeight?: number
+  items: ListItemProps[]
+
+  onChange: (value: string) => void
 }
 
 const Container = styled.div({
@@ -42,115 +41,69 @@ const Container = styled.div({
   },
 })
 
-const CommandItemStyled = styled(CommandItem)<{
-  selected: boolean
-  colorSelected: ColorWithLightness
-  colorBackgroundHover: ColorWithLightness
-  colorForeground: ColorWithLightness
-}>(p => ({
-  display: "flex",
-  flexDirection: "column",
+const VirtualizedListContainer = styled.div({
   width: "100%",
-  padding: "calc(var(--BU) * 2)",
-  borderRadius: "var(--BU)",
-  cursor: "pointer",
-  userSelect: "none",
-  backgroundColor: "transparent",
-
-  "&[data-selected='true']": {
-    backgroundColor: computeColor(p.colorBackgroundHover),
+  "& [cmdk-item]": {
+    display: "block !important",
   },
-}))
-
-const CommandEmptyStyled = styled(CommandEmpty)({
-  display: "flex",
-  flexDirection: "column",
-  padding: "calc(var(--BU) * 2) 0",
-  width: "100%",
-  userSelect: "none",
 })
 
-export const FilteredList = forwardRef<HTMLDivElement, PropsWithChildren<FilteredListProps>>((p, ref) => {
+export const FilteredList = ({
+  maxHeight,
+  id,
+  itemHeight,
+  color,
+  "data-playwright-testid": playwrightTestId,
+  items,
+  value,
+  onChange,
+}: FilteredListProps) => {
   const [filter, setFilter] = useState("")
-  const output: ReactElement[] = []
 
-  React.Children.forEach(p.children, child => {
-    if (isValidElement<FilteredListItemProps>(child)) {
-      const label = child.props["label"]
-      const value = child.props["value"]
-      const avatarTitle = child.props["title"]
-      const avatarSrc = child.props["src"]
-      const playwrightTestId = child.props["data-playwright-testid"]
+  const maxHeightAsNumber = typeof maxHeight === "number" ? maxHeight : 300
+  const itemHeightAsNumber = itemHeight || 60
 
-      if (label.toLowerCase().includes(filter.toLowerCase())) {
-        output.push(
-          <CommandItemStyled
-            value={value}
-            onSelect={value => p.onChange(value)}
-            selected={p.value === value}
-            colorSelected={[p.color, 400]}
-            colorBackgroundHover={[p.color, 50]}
-            colorForeground={[p.color, 700]}
-            data-playwright-testid={playwrightTestId}
-          >
-            <Stack horizontal hug>
-              <Align horizontal left hug>
-                <Avatar size="large" src={avatarSrc} title={avatarTitle} />
-              </Align>
-
-              <Spacer xsmall />
-
-              <Align horizontal left>
-                <Text small fill={[p.color, 700]}>
-                  {label}
-                </Text>
-              </Align>
-            </Stack>
-          </CommandItemStyled>,
-        )
-      }
-    }
-  })
+  const filteredItems = useMemo(() => {
+    return items?.filter(item => item.label.toLowerCase().includes(filter.toLowerCase())) ?? []
+  }, [items, filter])
 
   return (
-    <Container ref={ref} id={p.id} data-playwright-testid={p["data-playwright-testid"]} className="<FilteredList /> - ">
-      <Stack vertical data-playwright-testid={p["data-playwright-testid"]}>
+    <Container id={id} data-playwright-testid={playwrightTestId} className="<FilteredList /> - ">
+      <Stack vertical data-playwright-testid={playwrightTestId}>
         <Align vertical topLeft>
-          <Command loop>
-            <InputTextSingle
-              size="large"
-              width="auto"
-              color={p.color}
-              value={filter}
-              onChange={value => setFilter(value)}
-            />
+          <InputTextSingle
+            size="large"
+            width="auto"
+            color={color}
+            value={filter}
+            onChange={value => setFilter(value)}
+          />
 
-            <Spacer xsmall />
-
-            <CommandList>
-              <CommandEmptyStyled>
-                <Text fill={[p.color, 700]} small>
-                  Nothing found
-                </Text>
-              </CommandEmptyStyled>
-
-              <Stack vertical hug>
-                <Align vertical topLeft>
-                  <OverflowContainer
-                    axes="vertical"
-                    colorBackground={[Color.White]}
-                    colorForeground={Color.Neutral}
-                    maxHeight={p.maxHeight}
-                    hug
-                  >
-                    {output}
-                  </OverflowContainer>
-                </Align>
-              </Stack>
-            </CommandList>
-          </Command>
+          <Spacer xsmall />
+          {filteredItems?.length > 0 ? (
+            <VirtualizedListContainer>
+              <FixedSizeList
+                height={Math.min(maxHeightAsNumber, filteredItems.length * itemHeightAsNumber)}
+                itemCount={filteredItems.length}
+                itemSize={itemHeightAsNumber}
+                itemData={{
+                  items: filteredItems,
+                  selectedValue: value,
+                  onChange: onChange,
+                  color: color,
+                }}
+                width="100%"
+              >
+                {FilteredVirtualListItem}
+              </FixedSizeList>
+            </VirtualizedListContainer>
+          ) : (
+            <Text fill={[color, 700]} small>
+              Nothing found
+            </Text>
+          )}
         </Align>
       </Stack>
     </Container>
   )
-})
+}
