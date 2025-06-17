@@ -12,10 +12,12 @@ import { TLayoutBase } from "./TLayoutBase"
 import { PlaywrightProps } from "@new/Playwright"
 import { computeColor, Color, ColorWithLightness } from "@new/Color"
 import { TBackground } from "./Background"
+import { makePropsNonTransient } from "@new/_internal/emotionUtilities"
 
-const Container = styled.div<
-  Pick<TComposition, "loading" | "disabled" | "explodeHeight" | "overflowHidden" | "onClick">
->(p => ({
+const Container = styled(
+  "div",
+  makePropsNonTransient(["loading", "explodeHeight", "overflowHidden"]),
+)<Pick<TComposition, "loading" | "disabled" | "explodeHeight" | "overflowHidden" | "onClick">>(p => ({
   display: "flex",
   flexDirection: "column",
   position: "relative",
@@ -38,7 +40,10 @@ const Background = styled.div({
   cursor: "inherit",
 })
 
-const Loader = styled.div<Pick<TComposition, "loading">>(p => ({
+const Loader = styled(
+  "div",
+  makePropsNonTransient(["loading"]),
+)<Pick<TComposition, "loading">>(p => ({
   display: p.loading ? "flex" : "none",
   position: "absolute",
   width: "100%",
@@ -68,7 +73,10 @@ const keyframeB = keyframes({
   "100%": { transform: "scaleY(-1) rotate(-135deg)" },
 })
 
-const Spinner = styled.div<Pick<TComposition, "loading"> & { color: ColorWithLightness }>(p => ({
+const Spinner = styled(
+  "div",
+  makePropsNonTransient(["loading"]),
+)<Pick<TComposition, "loading"> & { color: ColorWithLightness }>(p => ({
   diplay: "flex",
   height: "100%",
   aspectRatio: "1",
@@ -93,7 +101,10 @@ const Spinner = styled.div<Pick<TComposition, "loading"> & { color: ColorWithLig
   },
 }))
 
-const Layout = styled.div<Pick<TComposition, "loading" | "disabled">>(p => ({
+const Layout = styled(
+  "div",
+  makePropsNonTransient(["loading"]),
+)<Pick<TComposition, "loading" | "disabled">>(p => ({
   display: "flex",
   flexDirection: "column",
   zIndex: 1,

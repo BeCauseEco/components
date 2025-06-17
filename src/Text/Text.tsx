@@ -2,6 +2,7 @@ import { PropsWithChildren, forwardRef } from "react"
 import styled from "@emotion/styled"
 import { Color, ColorWithLightness, computeColor } from "@new/Color"
 import { PlaywrightProps } from "@new/Playwright"
+import { makePropsNonTransient } from "@new/_internal/emotionUtilities"
 
 export const StyleMonospace = {
   fontFamily: "monospace",
@@ -52,9 +53,23 @@ export const StyleBodyHuge = {
   lineHeight: "40px",
 }
 
-const Container = styled.p.withConfig({
-  shouldForwardProp: (prop) => prop !== 'wrap'
-})<Omit<TextProps, "fill"> & { _fill: TextProps["fill"] }>(p => ({
+const Container = styled(
+  "p",
+  makePropsNonTransient([
+    "wrap",
+    "tiny",
+    "xsmall",
+    "small",
+    "medium",
+    "large",
+    "xLarge",
+    "xxLarge",
+    "huge",
+    "textOverflow",
+    "maxWidth",
+    "monospace",
+  ]),
+)<Omit<TextProps, "fill"> & { _fill: TextProps["fill"] }>(p => ({
   display: "inline-block",
   textBoxTrim: "trim-both",
 
