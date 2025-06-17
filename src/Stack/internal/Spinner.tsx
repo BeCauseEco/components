@@ -23,7 +23,7 @@ const keyframeB = keyframes({
 
 export const Spinner = styled(
   "div",
-  makePropsNonTransient(["loading"]),
+  makePropsNonTransient(["loading", "fillLoading"]),
 )<Pick<StackProps, "loading" | "fillLoading">>(p => ({
   diplay: "flex",
   height: "100%",

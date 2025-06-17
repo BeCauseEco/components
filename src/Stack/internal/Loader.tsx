@@ -1,7 +1,11 @@
 import styled from "@emotion/styled"
 import { StackProps } from "../Stack"
+import { makePropsNonTransient } from "@new/_internal/emotionUtilities"
 
-export const Loader = styled.div<Pick<StackProps, "loading">>(p => ({
+export const Loader = styled(
+  "div",
+  makePropsNonTransient(["loading"]),
+)<Pick<StackProps, "loading">>(p => ({
   display: p.loading ? "flex" : "none",
   position: "absolute",
   width: "100%",
