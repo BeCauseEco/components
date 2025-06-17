@@ -24,7 +24,6 @@ const computeSize = (p: IconProps) => {
   return size
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const computeStyle = (p: IconProps) => {
   return p.style === "outlined" ? "0" : "1"
 }
