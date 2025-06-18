@@ -18,6 +18,7 @@ import { Stack } from "@new/Stack/Stack"
 import { Align } from "@new/Stack/Align"
 import { Divider } from "@new/Divider/Divider"
 import { Icon } from "@new/Icon/Icon"
+import { makePropsNonTransient } from "@new/_internal/emotionUtilities"
 
 const computeMessageColor = (message?: TDialog["message"]) => {
   if (!message) {
@@ -81,7 +82,10 @@ const RadixDialogClose = styled(RadixDialog.Close)({
 
 type TDialogContentProperties = Pick<TDialog, "size" | "collapseHeight" | "fixedWidth">
 
-const Content = styled(RadixDialog.Content)<TDialogContentProperties>(p => ({
+const Content = styled(
+  RadixDialog.Content,
+  makePropsNonTransient(["collapseHeight", "fixedWidth"]),
+)<TDialogContentProperties>(p => ({
   display: "flex",
   position: "fixed",
   top: p.size === Size.Medium || p.size === Size.Large ? "50%" : `calc(50% + ${offsetTop} / 2)`,
