@@ -1,4 +1,4 @@
-import { PropsWithChildren } from "react"
+import { ReactNode } from "react"
 import styled from "@emotion/styled"
 import { ComponentBaseProps } from "@new/ComponentBaseProps"
 import { computeAlignment, computeWidthHeight } from "./internal/Functions"
@@ -28,6 +28,8 @@ export type AlignProps = ComponentBaseProps & {
   bottomRight?: boolean
 
   hug?: boolean | "width" | "height"
+
+  children?: ReactNode | undefined
 }
 
 const Container = styled.div<AlignProps & { _wrap: AlignProps["wrap"] }>(p => ({
@@ -49,7 +51,7 @@ const Container = styled.div<AlignProps & { _wrap: AlignProps["wrap"] }>(p => ({
   ...p.validateChildrenErrorStyles,
 }))
 
-export const Align = (p: PropsWithChildren<AlignProps>) => {
+export const Align = (p: AlignProps) => {
   const [invalidChildren] = useValidateChildren("Align", [], ["Align"], p.children)
 
   return (
