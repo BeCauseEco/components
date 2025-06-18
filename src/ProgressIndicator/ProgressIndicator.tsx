@@ -7,6 +7,7 @@ import { Stack } from "@new/Stack/Stack"
 import { Align } from "@new/Stack/Align"
 import { Text } from "@new/Text/Text"
 import { Spacer } from "@new/Stack/Spacer"
+import ReactIs from "react-is"
 
 export type ProgressIndicatorProps = {
   type: "bar" | "circle"
@@ -153,6 +154,11 @@ export const ProgressIndicator = (p: ProgressIndicatorProps) => {
 
   if (p.type === "bar") {
     childrenArray.map((child, index) => {
+      // The isValidElement underneath fails in detecting if it is a fragment
+      if (ReactIs.isFragment(child)) {
+        return null
+      }
+
       if (isValidElement<ProgressIndicatorItemSegmentProps | ProgressIndicatorItemTickProps>(child)) {
         if ("offset" in child.props) {
           const cp = child.props as ProgressIndicatorItemTickProps

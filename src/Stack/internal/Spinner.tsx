@@ -2,6 +2,7 @@ import styled from "@emotion/styled"
 import { StackProps } from "../Stack"
 import { keyframes } from "@emotion/react"
 import { computeColor, Color } from "@new/Color"
+import { makePropsNonTransient } from "@new/_internal/emotionUtilities"
 
 const keyframeA = keyframes({
   "0%": { clipPath: "polygon(50% 50%, 0 0,50% 0%, 50% 0%, 50% 0%, 50% 0%, 50% 0% )" },
@@ -20,7 +21,10 @@ const keyframeB = keyframes({
   "100%": { transform: "scaleY(-1) rotate(-135deg)" },
 })
 
-export const Spinner = styled.div<Pick<StackProps, "loading" | "fillLoading">>(p => ({
+export const Spinner = styled(
+  "div",
+  makePropsNonTransient(["loading", "fillLoading"]),
+)<Pick<StackProps, "loading" | "fillLoading">>(p => ({
   diplay: "flex",
   height: "100%",
   aspectRatio: "1",

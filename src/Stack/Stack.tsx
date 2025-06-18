@@ -9,6 +9,7 @@ import { GridProps } from "@new/Grid/Grid"
 import { SpacerProps } from "@new/Stack/Spacer"
 import { translateBorderRadius } from "./internal/Functions"
 import { generateErrorClassName, generateErrorStyles, useValidateChildren } from "@new/useValidateChildren"
+import { makePropsNonTransient } from "@new/_internal/emotionUtilities"
 
 export type StackProps = ComponentBaseProps & {
   loading?: boolean
@@ -78,7 +79,23 @@ type ContainerProps = Pick<
   | "data-playwright-testid"
 >
 
-const Container = styled.div<ContainerProps>(p => ({
+const Container = styled(
+  "div",
+  makePropsNonTransient([
+    "loading",
+    "fillLoading",
+    "fill",
+    "fillHover",
+    "stroke",
+    "strokeHover",
+    "dropShadow",
+    "explodeHeight",
+    "overflowHidden",
+    "cornerRadius",
+    "aspectRatio",
+    "validateChildrenErrorStyles",
+  ]),
+)<ContainerProps>(p => ({
   display: "flex",
   flexShrink: 1,
   width: "100%",
