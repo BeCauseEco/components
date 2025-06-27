@@ -15,7 +15,17 @@ import { InputCheckbox, InputCheckboxProps } from "@new/InputCheckbox/InputCheck
 import { StyleBodySmall, StyleFontFamily, Text } from "@new/Text/Text"
 import { Icon } from "@new/Icon/Icon"
 import styled from "@emotion/styled"
-import { Children, PropsWithChildren, ReactElement, ReactNode, useEffect, useId, useRef, useState } from "react"
+import {
+  Children,
+  PropsWithChildren,
+  ReactElement,
+  ReactNode,
+  useCallback,
+  useEffect,
+  useId,
+  useRef,
+  useState,
+} from "react"
 import { useReactToPrint } from "react-to-print"
 import { InputButtonIconTertiary } from "@new/InputButton/InputButtonIconTertiary"
 import { Divider } from "@new/Divider/Divider"
@@ -479,6 +489,13 @@ export const DataTable = (p: DataTableProps) => {
     }
   })
 
+  const getRowById = useCallback(
+    (id: any) => {
+      return p.data.find(r => r[p.rowKeyField] === id)
+    },
+    [p.data, p.rowKeyField],
+  )
+
   if (p.mode === "edit" && p.editingMode !== EditingMode.Cell) {
     nativeColumns = [
       ...nativeColumns,
@@ -499,21 +516,25 @@ export const DataTable = (p: DataTableProps) => {
     ]
   }
 
-  const updateSelectField = (index: number, value: boolean) => {
+  const updateSelectField = (key: any, value: boolean) => {
     if (p.selectKeyField === undefined) {
       return
     }
 
     const d = [...p.data]
+    const row = d.find(r => r[p.rowKeyField] === key)
 
-    d[index][p.selectKeyField] = value
+    if (!row) {
+      return
+    }
+    row[p.selectKeyField] = value
 
     if (p.onChange) {
       p.onChange(d)
     }
 
     if (p.onChangeRow) {
-      p.onChangeRow(d[index])
+      p.onChangeRow(row)
     }
 
     setSelectedFields(d.filter(d => p.selectKeyField && d[p.selectKeyField]).length)
@@ -1396,10 +1417,10 @@ export const DataTable = (p: DataTableProps) => {
                                         color={Color.Neutral}
                                         disabled={
                                           p.selectDisabledField
-                                            ? p.data[cellTextContent.rowKeyValue]?.[p.selectDisabledField]
+                                            ? getRowById(cellTextContent.rowKeyValue)?.[p.selectDisabledField]
                                             : false
                                         }
-                                        value={p.data[cellTextContent.rowKeyValue]?.[p.selectKeyField] ?? false}
+                                        value={getRowById(cellTextContent.rowKeyValue)?.[p.selectKeyField] ?? false}
                                         onChange={value => {
                                           updateSelectField(cellTextContent.rowKeyValue, value)
                                         }}
