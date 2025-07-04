@@ -371,6 +371,8 @@ type Children =
   | ReactElement<InputComboboxProps>
   | ReactElement<InputTextSingleProps>
   | ReactElement<InputTextDateProps>
+  | boolean
+  | null
 
 type RowActionsElement =
   | ReactElement<InputButtonPrimaryProps>
@@ -1001,8 +1003,10 @@ export const DataTable = (p: DataTableProps) => {
                 ) : (
                   <></>
                 )}
-
-                {Children.toArray(p.children).map(child => child)}
+                {/*Filter out values such as null, undefined, boolean(false) or empty strings*/}
+                {Children.toArray(p.children)
+                  .filter(child => !!child)
+                  .map(child => child)}
               </Align>
 
               <Align bottomRight horizontal hug>

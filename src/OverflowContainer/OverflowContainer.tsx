@@ -33,7 +33,7 @@ export type OverflowContainerProps = ComponentBaseProps & {
     | NumberInPixelsOrPercentageBaseUnitFactor
 
   hug?: boolean | "partly"
-  children: ReactElement | ReactElement[]
+  children: ReactElement | ReactElement[] | boolean
 }
 
 const computeMaxHeight = (maxHeight: OverflowContainerProps["maxHeight"]): string => {
@@ -108,23 +108,6 @@ const Container = styled.div<
 
   overflowX: p.axes === "both" || p.axes === "horizontal" ? "auto" : "hidden",
   overflowY: p.axes === "both" || p.axes === "vertical" ? "auto" : "hidden",
-
-  // "&:before, &:after": {
-  //   content: `""`,
-  //   position: "absolute",
-  //   top: 0,
-  //   left: "calc(100% - var(--BU) * 4)",
-  //   height: "100%",
-  //   width: "calc(var(--BU) * 2)",
-  //   zIndex: 1,
-  //   backgroundImage: `linear-gradient(to right, transparent, ${computeColor(p.colorBackground)})`,
-  // },
-
-  // "&:before": {
-  //   right: "auto",
-  //   left: 0,
-  //   backgroundImage: `linear-gradient(to left, transparent, ${computeColor(p.colorBackground)})`,
-  // },
 
   "&::-webkit-scrollbar-track": {
     backgroundColor: computeColor(p.colorBackground),
