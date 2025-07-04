@@ -49,6 +49,7 @@ export type StackProps = ComponentBaseProps & {
     | ReactElement<AlignProps | SpacerProps | null>
     | ReactElement<AlignProps | SpacerProps | null>[]
     | ReactElement<GridProps | null>
+    | boolean
 }
 
 const computeShadow = (shadow?: StackProps["dropShadow"]): string => {
