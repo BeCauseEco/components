@@ -1,6 +1,9 @@
-import { ColorWithLightness, computeColor } from "@new/Color"
+import { Color, ColorWithLightness, computeColor } from "@new/Color"
 import styled from "@emotion/styled"
 import { PlaywrightProps } from "@new/Playwright"
+import { Align } from "@new/Stack/Align"
+import { Tooltip } from "@new/Tooltip/Tooltip"
+import { Text } from "@new/Text/Text"
 
 const computeSize = (p: IconProps) => {
   let size = "0"
@@ -77,17 +80,37 @@ export type IconProps = PlaywrightProps & {
   // TODO: @cllpse: fix it
   // eslint-disable-next-line
   onClick?: any
+  tooltip?: string
 }
 
-export const Icon = (p: IconProps) => (
-  <Container
-    className="<Icon /> - material-symbols-rounded"
-    size={computeSize(p)}
-    fontVariationSettings={computeFontVariantSettings(p)}
-    _fill={p.fill}
-    onClick={p.onClick}
-    data-playwright-testid={p["data-playwright-testid"]}
-  >
-    {p.name === "blank" ? null : p.name}
-  </Container>
-)
+export const Icon = (p: IconProps) => {
+  const iconElement = (
+    <Container
+      className="<Icon /> - material-symbols-rounded"
+      size={computeSize(p)}
+      fontVariationSettings={computeFontVariantSettings(p)}
+      _fill={p.fill}
+      onClick={p.onClick}
+      data-playwright-testid={p["data-playwright-testid"]}
+    >
+      {p.name === "blank" ? null : p.name}
+    </Container>
+  )
+  return (
+    <Align horizontal hug>
+      {p.tooltip ? (
+        <Tooltip trigger={iconElement}>
+          {typeof p.tooltip === "string" ? (
+            <Text small fill={[Color.Neutral, 700]} wrap>
+              {p.tooltip}
+            </Text>
+          ) : (
+            p.tooltip
+          )}
+        </Tooltip>
+      ) : (
+        iconElement
+      )}
+    </Align>
+  )
+}
