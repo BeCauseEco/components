@@ -79,7 +79,6 @@ const Trigger = styled(RadixTooltip.Trigger)<Pick<TooltipProps, "highlight">>(p 
   height: "inherit",
   justifyContent: "inherit",
   alignItems: "inherit",
-  outline: "solid 1px cyan",
   userSelect: "all",
 
   ...(p.highlight && {
