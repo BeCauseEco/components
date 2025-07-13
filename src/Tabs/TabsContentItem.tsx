@@ -16,10 +16,10 @@ const TabsContent = styled(Tabs.Content)({
 })
 
 export const TabsContentItem = forwardRef<
-  Tabs.TabsContentProps & RefAttributes<HTMLDivElement>,
+  HTMLDivElement,
   PropsWithChildren<TTabsContentItem>
 >((p, ref) => {
-  const { contentTargetId, children } = p
+  const { contentTargetId, children, forceMount, ...rest } = p
 
   return (
     <TabsContent
@@ -27,7 +27,8 @@ export const TabsContentItem = forwardRef<
       ref={ref}
       value={contentTargetId}
       data-playwright-testid={p["data-playwright-testid"]}
-      {...(p as any)}
+      forceMount={forceMount === true ? true : undefined}
+      {...rest}
       asChild
     >
       <>

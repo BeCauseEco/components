@@ -128,7 +128,10 @@ const Container = styled(
   ...p.validateChildrenErrorStyles,
 }))
 
-const Children = styled.div<Pick<StackProps, "loading" | "disabled" | "hug"> & { flexDirection: "column" | "row" }>(
+const Children = styled(
+  "div",
+  makePropsNonTransient(["loading", "disabled", "hug", "flexDirection"])
+)<Pick<StackProps, "loading" | "disabled" | "hug"> & { flexDirection: "column" | "row" }>(
   p => ({
     display: "inherit",
     flexDirection: p.flexDirection,
