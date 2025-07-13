@@ -68,6 +68,7 @@ const Container = styled(
     "textOverflow",
     "maxWidth",
     "monospace",
+    "applyLinkStyling",
   ]),
 )<Omit<TextProps, "fill"> & { _fill: TextProps["fill"] }>(p => ({
   display: "inline-block",
@@ -111,6 +112,11 @@ const Container = styled(
   //   borderBottom: `dotted 2px ${computeColor([p._fill[0], 200])}`,
   //   cursor: "help",
   // },
+
+  ":hover": {
+    textDecoration: p.applyLinkHover ? "underline" : undefined,
+    cursor: p.applyLinkHover ? "pointer" : undefined,
+  },
 
   ...((p.maxWidth || p.textOverflow) && {
     overflow: "hidden",
@@ -159,6 +165,10 @@ export type TextProps = PlaywrightProps & {
   monospace?: boolean
 
   title?: string
+
+  onClick?: () => void
+
+  applyLinkHover?: boolean
 }
 
 export const Text = forwardRef<HTMLHeadingElement | HTMLParagraphElement, PropsWithChildren<TextProps>>((p, ref) => {
@@ -180,6 +190,9 @@ export const Text = forwardRef<HTMLHeadingElement | HTMLParagraphElement, PropsW
     monospace = false,
 
     title = undefined,
+
+    onClick,
+    applyLinkHover,
 
     children,
 
@@ -204,6 +217,8 @@ export const Text = forwardRef<HTMLHeadingElement | HTMLParagraphElement, PropsW
       monospace={monospace}
       title={title}
       data-playwright-testid={p["data-playwright-testid"]}
+      onClick={onClick}
+      applyLinkHover={applyLinkHover}
       {...rest}
     >
       {children}
