@@ -3,7 +3,7 @@ import { SpacerProps } from "@new/Stack/Spacer"
 import { TextProps } from "@new/Text/Text"
 import styled from "@emotion/styled"
 import * as Tabs from "@radix-ui/react-tabs"
-import { PropsWithChildren, ReactElement, RefAttributes, forwardRef } from "react"
+import { PropsWithChildren, ReactElement, forwardRef } from "react"
 import { PlaywrightProps } from "@new/Playwright"
 import { Color, computeColor } from "@new/Color"
 
@@ -37,10 +37,7 @@ export type TTabsNavigationItem = PlaywrightProps & {
   disabled?: boolean
 }
 
-export const TabsNavigationItem = forwardRef<
-  HTMLButtonElement,
-  PropsWithChildren<TTabsNavigationItem>
->((p, ref) => {
+export const TabsNavigationItem = forwardRef<HTMLButtonElement, PropsWithChildren<TTabsNavigationItem>>((p, ref) => {
   const { contentTargetId, children, onClick, disabled, ...rest } = p
 
   return (
