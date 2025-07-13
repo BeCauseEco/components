@@ -434,7 +434,6 @@ export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<InputC
             iconPlacement="afterLabel"
             disabled={p.disabled ? true : undefined}
             loading={p.loading ? true : undefined}
-            overflowHidden
             content={
               <Stack horizontal hug>
                 <Align horizontal left>
