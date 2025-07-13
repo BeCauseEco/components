@@ -1,5 +1,5 @@
 import * as Tabs from "@radix-ui/react-tabs"
-import { PropsWithChildren, ReactElement, RefAttributes, forwardRef } from "react"
+import { PropsWithChildren, ReactElement, forwardRef } from "react"
 import { TComposition } from "@new/Composition/Composition"
 import { Spacer } from "@new/Stack/Spacer"
 import { PlaywrightProps } from "@new/Playwright"
@@ -15,11 +15,8 @@ const TabsContent = styled(Tabs.Content)({
   width: "inherit",
 })
 
-export const TabsContentItem = forwardRef<
-  Tabs.TabsContentProps & RefAttributes<HTMLDivElement>,
-  PropsWithChildren<TTabsContentItem>
->((p, ref) => {
-  const { contentTargetId, children } = p
+export const TabsContentItem = forwardRef<HTMLDivElement, PropsWithChildren<TTabsContentItem>>((p, ref) => {
+  const { contentTargetId, children, forceMount, ...rest } = p
 
   return (
     <TabsContent
@@ -27,7 +24,8 @@ export const TabsContentItem = forwardRef<
       ref={ref}
       value={contentTargetId}
       data-playwright-testid={p["data-playwright-testid"]}
-      {...(p as any)}
+      forceMount={forceMount === true ? true : undefined}
+      {...rest}
       asChild
     >
       <>

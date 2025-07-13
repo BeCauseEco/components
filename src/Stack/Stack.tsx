@@ -128,43 +128,44 @@ const Container = styled(
   ...p.validateChildrenErrorStyles,
 }))
 
-const Children = styled.div<Pick<StackProps, "loading" | "disabled" | "hug"> & { flexDirection: "column" | "row" }>(
-  p => ({
-    display: "inherit",
-    flexDirection: p.flexDirection,
-    width: "inherit",
-    height: "inherit",
-    padding: p.hug ? (p.hug === "partly" ? "calc(var(--BU) * 2)" : 0) : "calc(var(--BU) * 4)",
-    transition: "opacity 0.2s ease-in-out",
-    willChange: "opacity",
-    overflow: "inherit",
+const Children = styled(
+  "div",
+  makePropsNonTransient(["loading", "disabled", "hug", "flexDirection"]),
+)<Pick<StackProps, "loading" | "disabled" | "hug"> & { flexDirection: "column" | "row" }>(p => ({
+  display: "inherit",
+  flexDirection: p.flexDirection,
+  width: "inherit",
+  height: "inherit",
+  padding: p.hug ? (p.hug === "partly" ? "calc(var(--BU) * 2)" : 0) : "calc(var(--BU) * 4)",
+  transition: "opacity 0.2s ease-in-out",
+  willChange: "opacity",
+  overflow: "inherit",
 
-    ...(p.loading
-      ? {
-          height: "unset",
-          maxHeight: "calc(var(--BU) * 40)",
-          opacity: 0,
-          overflow: "hidden",
-          cursor: "wait",
+  ...(p.loading
+    ? {
+        height: "unset",
+        maxHeight: "calc(var(--BU) * 40)",
+        opacity: 0,
+        overflow: "hidden",
+        cursor: "wait",
 
-          "& *": {
-            pointerEvents: "none",
-          },
-        }
-      : {}),
+        "& *": {
+          pointerEvents: "none",
+        },
+      }
+    : {}),
 
-    ...(!p.loading && p.disabled
-      ? {
-          opacity: 0.6,
-          cursor: "not-allowed",
+  ...(!p.loading && p.disabled
+    ? {
+        opacity: 0.6,
+        cursor: "not-allowed",
 
-          "& *": {
-            pointerEvents: "none",
-          },
-        }
-      : {}),
-  }),
-)
+        "& *": {
+          pointerEvents: "none",
+        },
+      }
+    : {}),
+}))
 
 export const Stack = (p: StackProps) => {
   const [invalidChildren] = useValidateChildren("Stack", ["Align", "Spacer", "Grid", "Divider"], ["Stack"], p.children)
