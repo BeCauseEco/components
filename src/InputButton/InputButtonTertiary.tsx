@@ -17,6 +17,7 @@ export type InputButtonTertiaryProps = Pick<
   | "data-playwright-testid"
 > & {
   label: string
+  alignLabel?: "left" | "center" | "right"
   iconNameLeft?: string
   iconNameRight?: string
 }
@@ -45,6 +46,7 @@ export const InputButtonTertiary = forwardRef<HTMLButtonElement, InputButtonTert
       colorBackgroundHover={[Color.Primary, 100]}
       colorLoading={[Color.Primary, 700]}
       label={p.label}
+      alignLabel={p.alignLabel}
       hug={p.hug}
       loading={p.loading ? true : undefined}
       disabled={p.disabled ? true : undefined}

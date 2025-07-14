@@ -314,8 +314,9 @@ export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<InputC
       <Virtuoso
         style={{
           height: "calc(var(--radix-popover-content-available-height) / 2)",
-          minWidth: `calc(var(--radix-popover-trigger-width) - var(--BU) * 4)`,
-          maxWidth: `calc(var(--radix-popover-trigger-width) - var(--BU) * 4)`,
+          minWidth: "100%",
+          maxWidth: "calc(var(--radix-popover-content-available-width) - var(--BU) * 4)",
+
           overflowX: "hidden",
         }}
         increaseViewportBy={100}
@@ -434,7 +435,6 @@ export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<InputC
             iconPlacement="afterLabel"
             disabled={p.disabled ? true : undefined}
             loading={p.loading ? true : undefined}
-            overflowHidden
             content={
               <Stack horizontal hug>
                 <Align horizontal left>
@@ -499,7 +499,7 @@ export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<InputC
           <Spacer tiny={p.size === "small"} xsmall={p.size === "large"} />
 
           {p.enableVirtuoso ? (
-            <Command loop>
+            <Command style={{ width: "100%" }} loop>
               {p.filterOptions && (
                 <CommandEmptyStyled>
                   <Text fill={[p.color, 700]} xsmall={p.size === "small"} small={p.size !== "small"} textOverflow>

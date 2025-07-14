@@ -52,18 +52,20 @@ const computeFontVariantSettings = (p: IconProps) => {
   return `'FILL' ${computeStyle(p)}, 'wght' ${w}, 'GRAD' ${g}, 'opsz' 48`
 }
 
-const Container = styled.i<{ size: string; fontVariationSettings: string; _fill: IconProps["fill"] }>(p => ({
-  display: "flex !important",
-  flexShrink: 0,
-  width: "fit-content",
-  height: p.size,
-  lineHeight: `${p.size} !important`,
-  fontSize: `calc(${p.size} * 0.875) !important`,
-  color: computeColor(p._fill),
-  fontVariationSettings: p.fontVariationSettings,
-  userSelect: "none",
-  cursor: "inherit",
-}))
+const Container = styled.i<{ size: string; fontVariationSettings: string; _fill: IconProps["fill"]; cursor: string }>(
+  p => ({
+    display: "flex !important",
+    flexShrink: 0,
+    width: "fit-content",
+    height: p.size,
+    lineHeight: `${p.size} !important`,
+    fontSize: `calc(${p.size} * 0.875) !important`,
+    color: computeColor(p._fill),
+    fontVariationSettings: p.fontVariationSettings,
+    userSelect: "none",
+    cursor: p.cursor,
+  }),
+)
 
 export type IconProps = PlaywrightProps & {
   name: string | "blank"
@@ -92,6 +94,7 @@ export const Icon = (p: IconProps) => {
       _fill={p.fill}
       onClick={p.onClick}
       data-playwright-testid={p["data-playwright-testid"]}
+      cursor={p.onClick ? "pointer" : "inherit"}
     >
       {p.name === "blank" ? null : p.name}
     </Container>

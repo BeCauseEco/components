@@ -32,6 +32,7 @@ export type InputButtonProps = ComponentBaseProps &
     disabled?: boolean
 
     label?: string
+    alignLabel?: "left" | "center" | "right"
 
     iconName?: string
     iconPlacement?: "beforeLabel" | "afterLabel" | "labelNotSpecified"
@@ -116,7 +117,12 @@ const Children = (p: Omit<InputButtonProps, "width">) => {
       )
     } else {
       label = (
-        <Align horizontal center>
+        <Align
+          horizontal
+          center={p.alignLabel === "center" || !p.alignLabel}
+          left={p.alignLabel === "left"}
+          right={p.alignLabel === "right"}
+        >
           <Text xsmall={p.size === "small"} small={p.size === "large"} fill={p.colorForeground}>
             {p.label}
           </Text>
@@ -269,6 +275,7 @@ export const InputButton = forwardRef<HTMLButtonElement | HTMLAnchorElement, Inp
         loading={p.loading}
         disabled={p.disabled ? true : undefined}
         label={p.label}
+        alignLabel={p.alignLabel}
         iconName={p.iconName}
         iconPlacement={p.iconPlacement}
         colorForeground={computeColorDestructive(p.colorForeground, p.destructive) || p.colorForeground}
