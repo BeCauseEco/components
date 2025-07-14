@@ -28,11 +28,11 @@ export const TabsContentItem = forwardRef<HTMLDivElement, PropsWithChildren<TTab
       {...rest}
       asChild
     >
-      <>
+      <div>
         <Spacer large />
 
         {children}
-      </>
+      </div>
     </TabsContent>
   )
 })

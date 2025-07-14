@@ -69,6 +69,7 @@ const Container = styled(
     "maxWidth",
     "monospace",
     "applyLinkStyling",
+    "applyLinkHover",
   ]),
 )<Omit<TextProps, "fill"> & { _fill: TextProps["fill"] }>(p => ({
   display: "inline-block",
@@ -186,6 +187,7 @@ export const Text = forwardRef<HTMLHeadingElement | HTMLParagraphElement, PropsW
 
     wrap = false,
     maxWidth,
+    textOverflow,
 
     monospace = false,
 
@@ -214,6 +216,7 @@ export const Text = forwardRef<HTMLHeadingElement | HTMLParagraphElement, PropsW
       _fill={fill}
       wrap={wrap}
       maxWidth={maxWidth}
+      textOverflow={textOverflow}
       monospace={monospace}
       title={title}
       data-playwright-testid={p["data-playwright-testid"]}
