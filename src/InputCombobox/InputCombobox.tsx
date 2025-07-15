@@ -1,10 +1,9 @@
 import styled from "@emotion/styled"
 import { Command, CommandEmpty, CommandGroup, CommandItem, CommandList } from "cmdk"
-import { PropsWithChildren, ReactElement, forwardRef, useCallback, useEffect, useMemo, useState } from "react"
+import React, { forwardRef, PropsWithChildren, ReactElement, useCallback, useEffect, useMemo, useState } from "react"
 import { InputComboboxItemProps } from "./InputComboboxItem"
-import React from "react"
 import { Text } from "@new/Text/Text"
-import { computeColor, Color, ColorWithLightness } from "@new/Color"
+import { Color, ColorWithLightness, computeColor } from "@new/Color"
 import { Popover } from "@new/Popover/Popover"
 import { InputButton } from "@new/InputButton/internal/InputButton"
 import { InputTextSingle } from "@new/InputText/InputTextSingle"
@@ -65,6 +64,16 @@ const Container = styled.div<Pick<InputComboboxProps, "size" | "width">>(p => ({
   flexDirection: "column",
   width: p.width === "fixed" ? (p.size === "small" ? "calc(var(--BU) * 70)" : "calc(var(--BU) * 80)") : "auto",
 }))
+
+const CommandGroupStyled = styled(CommandGroup)({
+  margin: "0 0 10px 0",
+
+  "[cmdk-group-heading]": {
+    color: computeColor([Color.Neutral, 400]),
+    fontSize: "14px",
+    marginBottom: "5px",
+  },
+})
 
 const CommandItemStyled = styled(CommandItem)<{
   multiple?: boolean
@@ -307,6 +316,7 @@ export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<InputC
       .map(([, value]) => value)
   }, [filteredValues, items])
 
+  //Grouping logic created with claude code
   const groupedItems = useMemo(() => {
     const groups: { [groupName: string]: InputComboboxItemProps[] } = {}
     let hasAnyGroupingLabel = false
@@ -316,7 +326,7 @@ export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<InputC
       if (item.groupingLabel) {
         hasAnyGroupingLabel = true
       }
-      
+
       if (!groups[groupName]) {
         groups[groupName] = []
       }
@@ -362,9 +372,9 @@ export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<InputC
       commandListItems = (
         <>
           {Object.entries(groupedItems).map(([groupName, groupItems]) => (
-            <CommandGroup key={groupName} heading={groupName}>
+            <CommandGroupStyled key={groupName} heading={groupName}>
               {groupItems.map((item, index) => getCommandItem(index, item))}
-            </CommandGroup>
+            </CommandGroupStyled>
           ))}
         </>
       )
