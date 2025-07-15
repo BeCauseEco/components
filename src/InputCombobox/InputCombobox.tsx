@@ -389,13 +389,17 @@ export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<InputC
     if (groupedItems) {
       // Render grouped items
       const groupEntries = Object.entries(groupedItems)
-      
+
       // Sort group names alphabetically if sortAlphabetically is true
       if (p.sortAlphabetically) {
         groupEntries.sort(([a], [b]) => {
           // Ensure "Other" group always appears last
-          if (a === "Other") return 1
-          if (b === "Other") return -1
+          if (a === "Other") {
+            return 1
+          }
+          if (b === "Other") {
+            return -1
+          }
           return a.localeCompare(b)
         })
       }
