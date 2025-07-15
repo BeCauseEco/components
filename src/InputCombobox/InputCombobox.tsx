@@ -1,5 +1,5 @@
 import styled from "@emotion/styled"
-import { Command, CommandEmpty, CommandItem, CommandList } from "cmdk"
+import { Command, CommandEmpty, CommandGroup, CommandItem, CommandList } from "cmdk"
 import { PropsWithChildren, ReactElement, forwardRef, useCallback, useEffect, useMemo, useState } from "react"
 import { InputComboboxItemProps } from "./InputComboboxItem"
 import React from "react"
@@ -307,9 +307,41 @@ export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<InputC
       .map(([, value]) => value)
   }, [filteredValues, items])
 
+  const groupedItems = useMemo(() => {
+    const groups: { [groupName: string]: InputComboboxItemProps[] } = {}
+    let hasAnyGroupingLabel = false
+
+    filteredItems.forEach(item => {
+      const groupName = item.groupingLabel || ""
+      if (item.groupingLabel) {
+        hasAnyGroupingLabel = true
+      }
+      
+      if (!groups[groupName]) {
+        groups[groupName] = []
+      }
+      groups[groupName].push(item)
+    })
+
+    // If no grouping labels exist, return null to use flat rendering
+    if (!hasAnyGroupingLabel) {
+      return null
+    }
+
+    // If grouping labels exist, rename the empty group to "Other"
+    if (groups[""]) {
+      groups["Other"] = groups[""]
+      delete groups[""]
+    }
+
+    return groups
+  }, [filteredItems])
+
   let commandListItems: ReactElement | null = null
 
   if (p.enableVirtuoso) {
+    // For virtuoso, we need to use flat rendering even with groups
+    // TODO: Future enhancement could add virtuoso support for groups
     commandListItems = (
       <Virtuoso
         style={{
@@ -325,7 +357,21 @@ export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<InputC
       />
     )
   } else {
-    commandListItems = <>{filteredItems.map((item, index) => getCommandItem(index, item))}</>
+    if (groupedItems) {
+      // Render grouped items
+      commandListItems = (
+        <>
+          {Object.entries(groupedItems).map(([groupName, groupItems]) => (
+            <CommandGroup key={groupName} heading={groupName}>
+              {groupItems.map((item, index) => getCommandItem(index, item))}
+            </CommandGroup>
+          ))}
+        </>
+      )
+    } else {
+      // Render flat items
+      commandListItems = <>{filteredItems.map((item, index) => getCommandItem(index, item))}</>
+    }
   }
 
   const handleRemoveItem = (label: string) => {
