@@ -1,10 +1,9 @@
 import styled from "@emotion/styled"
-import { Command, CommandEmpty, CommandItem, CommandList } from "cmdk"
-import { PropsWithChildren, ReactElement, forwardRef, useCallback, useEffect, useMemo, useState } from "react"
+import { Command, CommandEmpty, CommandGroup, CommandItem, CommandList } from "cmdk"
+import React, { forwardRef, PropsWithChildren, ReactElement, useCallback, useEffect, useMemo, useState } from "react"
 import { InputComboboxItemProps } from "./InputComboboxItem"
-import React from "react"
 import { Text } from "@new/Text/Text"
-import { computeColor, Color, ColorWithLightness } from "@new/Color"
+import { Color, ColorWithLightness, computeColor } from "@new/Color"
 import { Popover } from "@new/Popover/Popover"
 import { InputButton } from "@new/InputButton/internal/InputButton"
 import { InputTextSingle } from "@new/InputText/InputTextSingle"
@@ -58,6 +57,11 @@ export type InputComboboxProps = ComponentBaseProps & {
   loading?: boolean
 
   required?: boolean
+
+  /**
+   * When true, sorts items alphabetically by label. When items are grouped, groups are also sorted alphabetically.
+   */
+  sortAlphabetically?: boolean
 }
 
 const Container = styled.div<Pick<InputComboboxProps, "size" | "width">>(p => ({
@@ -65,6 +69,16 @@ const Container = styled.div<Pick<InputComboboxProps, "size" | "width">>(p => ({
   flexDirection: "column",
   width: p.width === "fixed" ? (p.size === "small" ? "calc(var(--BU) * 70)" : "calc(var(--BU) * 80)") : "auto",
 }))
+
+const CommandGroupStyled = styled(CommandGroup)({
+  margin: "0 0 10px 0",
+
+  "[cmdk-group-heading]": {
+    color: computeColor([Color.Neutral, 400]),
+    fontSize: "14px",
+    marginBottom: "5px",
+  },
+})
 
 const CommandItemStyled = styled(CommandItem)<{
   multiple?: boolean
@@ -302,14 +316,61 @@ export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<InputC
   const filteredItems = useMemo(() => {
     const filteredItemIdsSet = new Set(filteredValues)
 
-    return Object.entries(items)
+    const itemsList = Object.entries(items)
       .filter(([id]) => filteredItemIdsSet.has(id))
       .map(([, value]) => value)
-  }, [filteredValues, items])
+
+    // Sort items alphabetically if sortAlphabetically is true
+    if (p.sortAlphabetically) {
+      return itemsList.sort((a, b) => a.label.localeCompare(b.label))
+    }
+
+    return itemsList
+  }, [filteredValues, items, p.sortAlphabetically])
+
+  //Grouping logic created with claude code
+  const groupedItems = useMemo(() => {
+    const groups: { [groupName: string]: InputComboboxItemProps[] } = {}
+    let hasAnyGroupingLabel = false
+
+    filteredItems.forEach(item => {
+      const groupName = item.groupingLabel || ""
+      if (item.groupingLabel) {
+        hasAnyGroupingLabel = true
+      }
+
+      if (!groups[groupName]) {
+        groups[groupName] = []
+      }
+      groups[groupName].push(item)
+    })
+
+    // If no grouping labels exist, return null to use flat rendering
+    if (!hasAnyGroupingLabel) {
+      return null
+    }
+
+    // If grouping labels exist, rename the empty group to "Other"
+    if (groups[""]) {
+      groups["Other"] = groups[""]
+      delete groups[""]
+    }
+
+    // Sort items within each group alphabetically if sortAlphabetically is true
+    if (p.sortAlphabetically) {
+      Object.keys(groups).forEach(groupName => {
+        groups[groupName].sort((a, b) => a.label.localeCompare(b.label))
+      })
+    }
+
+    return groups
+  }, [filteredItems, p.sortAlphabetically])
 
   let commandListItems: ReactElement | null = null
 
   if (p.enableVirtuoso) {
+    // For virtuoso, we need to use flat rendering even with groups
+    // TODO: Future enhancement could add virtuoso support for groups
     commandListItems = (
       <Virtuoso
         style={{
@@ -325,7 +386,37 @@ export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<InputC
       />
     )
   } else {
-    commandListItems = <>{filteredItems.map((item, index) => getCommandItem(index, item))}</>
+    if (groupedItems) {
+      // Render grouped items
+      const groupEntries = Object.entries(groupedItems)
+
+      // Sort group names alphabetically if sortAlphabetically is true
+      if (p.sortAlphabetically) {
+        groupEntries.sort(([a], [b]) => {
+          // Ensure "Other" group always appears last
+          if (a === "Other") {
+            return 1
+          }
+          if (b === "Other") {
+            return -1
+          }
+          return a.localeCompare(b)
+        })
+      }
+
+      commandListItems = (
+        <>
+          {groupEntries.map(([groupName, groupItems]) => (
+            <CommandGroupStyled key={groupName} heading={groupName}>
+              {groupItems.map((item, index) => getCommandItem(index, item))}
+            </CommandGroupStyled>
+          ))}
+        </>
+      )
+    } else {
+      // Render flat items
+      commandListItems = <>{filteredItems.map((item, index) => getCommandItem(index, item))}</>
+    }
   }
 
   const handleRemoveItem = (label: string) => {
