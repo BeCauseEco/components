@@ -57,6 +57,11 @@ export type InputComboboxProps = ComponentBaseProps & {
   loading?: boolean
 
   required?: boolean
+
+  /**
+   * When true, sorts items alphabetically by label. When items are grouped, groups are also sorted alphabetically.
+   */
+  sortAlphabetically?: boolean
 }
 
 const Container = styled.div<Pick<InputComboboxProps, "size" | "width">>(p => ({
@@ -311,10 +316,17 @@ export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<InputC
   const filteredItems = useMemo(() => {
     const filteredItemIdsSet = new Set(filteredValues)
 
-    return Object.entries(items)
+    const itemsList = Object.entries(items)
       .filter(([id]) => filteredItemIdsSet.has(id))
       .map(([, value]) => value)
-  }, [filteredValues, items])
+
+    // Sort items alphabetically if sortAlphabetically is true
+    if (p.sortAlphabetically) {
+      return itemsList.sort((a, b) => a.label.localeCompare(b.label))
+    }
+
+    return itemsList
+  }, [filteredValues, items, p.sortAlphabetically])
 
   //Grouping logic created with claude code
   const groupedItems = useMemo(() => {
@@ -344,8 +356,15 @@ export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<InputC
       delete groups[""]
     }
 
+    // Sort items within each group alphabetically if sortAlphabetically is true
+    if (p.sortAlphabetically) {
+      Object.keys(groups).forEach(groupName => {
+        groups[groupName].sort((a, b) => a.label.localeCompare(b.label))
+      })
+    }
+
     return groups
-  }, [filteredItems])
+  }, [filteredItems, p.sortAlphabetically])
 
   let commandListItems: ReactElement | null = null
 
@@ -369,9 +388,21 @@ export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<InputC
   } else {
     if (groupedItems) {
       // Render grouped items
+      const groupEntries = Object.entries(groupedItems)
+      
+      // Sort group names alphabetically if sortAlphabetically is true
+      if (p.sortAlphabetically) {
+        groupEntries.sort(([a], [b]) => {
+          // Ensure "Other" group always appears last
+          if (a === "Other") return 1
+          if (b === "Other") return -1
+          return a.localeCompare(b)
+        })
+      }
+
       commandListItems = (
         <>
-          {Object.entries(groupedItems).map(([groupName, groupItems]) => (
+          {groupEntries.map(([groupName, groupItems]) => (
             <CommandGroupStyled key={groupName} heading={groupName}>
               {groupItems.map((item, index) => getCommandItem(index, item))}
             </CommandGroupStyled>
