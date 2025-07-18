@@ -4,7 +4,7 @@ import styled from "@emotion/styled"
 export const ToastViewport = styled(RadixToastViewport)({
   "--viewport-padding": "15px",
   padding: "var(--viewport-padding)",
-  paddingTop: "calc(var(--viewport-padding) + 55px)",
+  paddingTop: "calc(var(--viewport-padding) + 45px)",
   position: "fixed",
   top: 0,
   right: 0,
