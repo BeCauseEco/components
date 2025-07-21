@@ -1,6 +1,6 @@
 import { forwardRef } from "react"
 import { InputButtonProps, InputButton } from "@new/InputButton/internal/InputButton"
-import { Color, ColorWithLightness } from "@new/Color"
+import { Color } from "@new/Color"
 
 export type InputButtonIconSecondaryProps = Pick<
   InputButtonProps,
