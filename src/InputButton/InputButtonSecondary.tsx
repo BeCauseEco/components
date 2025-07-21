@@ -21,6 +21,8 @@ export type InputButtonSecondaryProps = Pick<
   transparent?: boolean
   iconNameLeft?: string
   iconNameRight?: string
+  customColor?: Color
+  customColorOutline?: ColorWithLightness
 }
 
 export const InputButtonSecondary = forwardRef<HTMLButtonElement, InputButtonSecondaryProps>((p, ref) => {
@@ -49,10 +51,10 @@ export const InputButtonSecondary = forwardRef<HTMLButtonElement, InputButtonSec
       size={p.size}
       width={p.width}
       colorBackground={colorBackground}
-      colorForeground={[Color.Primary, 700]}
-      colorOutline={[Color.Primary, 700]}
-      colorBackgroundHover={[Color.Primary, 100]}
-      colorLoading={[Color.Primary, 700]}
+      colorForeground={[p.customColor || Color.Primary, 700]}
+      colorOutline={p.customColorOutline || [p.customColor || Color.Primary, 700]}
+      colorBackgroundHover={[p.customColor || Color.Primary, 100]}
+      colorLoading={[p.customColor || Color.Primary, 700]}
       label={p.label}
       hug={p.hug}
       loading={p.loading ? true : undefined}
