@@ -62,6 +62,15 @@ export type InputComboboxProps = ComponentBaseProps & {
    * When true, sorts items alphabetically by label. When items are grouped, groups are also sorted alphabetically.
    */
   sortAlphabetically?: boolean
+
+  /**
+   * When provided, displays the combobox trigger as a button with the specified label and optional icon.
+   * If undefined, shows the default behavior with selected values.
+   */
+  button?: {
+    label: string
+    icon?: string
+  }
 }
 
 const Container = styled.div<Pick<InputComboboxProps, "size" | "width">>(p => ({
@@ -522,52 +531,73 @@ export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<InputC
             colorBackground={p.disabled ? [p.color, 50] : [Color.White]}
             colorBackgroundHover={[p.color, 50]}
             colorLoading={[p.color, 700]}
-            iconName={open ? "keyboard_arrow_up" : "keyboard_arrow_down"}
-            iconPlacement="afterLabel"
+            iconName={p.button ? undefined : open ? "keyboard_arrow_up" : "keyboard_arrow_down"}
+            iconPlacement={p.button ? undefined : "afterLabel"}
             disabled={p.disabled ? true : undefined}
             loading={p.loading ? true : undefined}
             content={
-              <Stack horizontal hug>
-                <Align horizontal left>
-                  {p.label && p.label[0] === "inside" ? (
-                    <>
-                      <Text xsmall={p.size === "small"} small={p.size === "large"} fill={[p.color, 500]}>
-                        {p.label[1]}
-                      </Text>
+              p.button ? (
+                <Stack horizontal hug>
+                  <Align horizontal left>
+                    {p.button.icon && (
+                      <>
+                        <Icon
+                          name={p.button.icon}
+                          small={p.size === "small"}
+                          medium={p.size === "large"}
+                          fill={[p.color, 700]}
+                        />
+                        <Spacer xsmall />
+                      </>
+                    )}
+                    <Text xsmall={p.size === "small"} small={p.size === "large"} fill={[p.color, 700]}>
+                      {p.button.label}
+                    </Text>
+                  </Align>
+                </Stack>
+              ) : (
+                <Stack horizontal hug>
+                  <Align horizontal left>
+                    {p.label && p.label[0] === "inside" ? (
+                      <>
+                        <Text xsmall={p.size === "small"} small={p.size === "large"} fill={[p.color, 500]}>
+                          {p.label[1]}
+                        </Text>
 
+                        <Spacer xsmall={p.size === "small"} small={p.size === "large"} />
+                      </>
+                    ) : (
+                      <></>
+                    )}
+
+                    <LabelContainer>{generateCurrentValueLabel(p.multiple)}</LabelContainer>
+                  </Align>
+
+                  {p.resettable && ((!p.multiple && !p.clearable) || (p.multiple && p.value.length > 1)) ? (
+                    <Align horizontal right hug="width">
                       <Spacer xsmall={p.size === "small"} small={p.size === "large"} />
-                    </>
+
+                      <InputButton
+                        variant="blank"
+                        width="auto"
+                        size={p.size}
+                        colorForeground={p.value ? [p.color, 700] : [Color.Transparent]}
+                        iconName="clear"
+                        iconPlacement="labelNotSpecified"
+                        onClick={() => {
+                          if (p.onChange) {
+                            p.onChange(p.multiple ? [] : "")
+                          }
+                        }}
+                      />
+
+                      <Divider vertical fill={p.value ? [p.color, 300] : [Color.Transparent]} overrideHeight="50%" />
+                    </Align>
                   ) : (
                     <></>
                   )}
-
-                  <LabelContainer>{generateCurrentValueLabel(p.multiple)}</LabelContainer>
-                </Align>
-
-                {p.resettable && ((!p.multiple && !p.clearable) || (p.multiple && p.value.length > 1)) ? (
-                  <Align horizontal right hug="width">
-                    <Spacer xsmall={p.size === "small"} small={p.size === "large"} />
-
-                    <InputButton
-                      variant="blank"
-                      width="auto"
-                      size={p.size}
-                      colorForeground={p.value ? [p.color, 700] : [Color.Transparent]}
-                      iconName="clear"
-                      iconPlacement="labelNotSpecified"
-                      onClick={() => {
-                        if (p.onChange) {
-                          p.onChange(p.multiple ? [] : "")
-                        }
-                      }}
-                    />
-
-                    <Divider vertical fill={p.value ? [p.color, 300] : [Color.Transparent]} overrideHeight="50%" />
-                  </Align>
-                ) : (
-                  <></>
-                )}
-              </Stack>
+                </Stack>
+              )
             }
           />
         }
