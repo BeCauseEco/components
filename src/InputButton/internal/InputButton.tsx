@@ -170,7 +170,7 @@ const Children = (p: Omit<InputButtonProps, "width">) => {
       horizontal
       fill={p.colorBackground}
       fillHover={p.colorBackgroundHover}
-      stroke={p.colorOutline}
+      stroke={p.disabled && p.colorOutline?.[0] ? [p.colorOutline[0], 200] : p.colorOutline}
       strokeHover={p.colorOutlineHover}
       fillLoading={p.colorLoading}
       cornerRadius="medium"
