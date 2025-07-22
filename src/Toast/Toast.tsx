@@ -66,7 +66,7 @@ type ToastProps = {
   open: boolean
   onOpenChange: (value: boolean) => void
   title: string
-  description: string
+  description?: string
   severity: "info" | "success" | "warning" | "error"
 }
 
@@ -82,18 +82,22 @@ export const Toast = ({ open, onOpenChange, severity, title, description }: Toas
 
         <Align vertical>
           <RadixToast.Title asChild>
-            <Text fill={colorWithLightness} small>
+            <Text fill={colorWithLightness} small wrap>
               <b>{title}</b>
             </Text>
           </RadixToast.Title>
 
-          <Spacer xsmall />
+          {description && (
+            <>
+              <Spacer xsmall />
 
-          <RadixToast.Description asChild>
-            <Text fill={colorWithLightness} xsmall wrap>
-              {description}
-            </Text>
-          </RadixToast.Description>
+              <RadixToast.Description asChild>
+                <Text fill={colorWithLightness} xsmall wrap>
+                  {description}
+                </Text>
+              </RadixToast.Description>
+            </>
+          )}
         </Align>
 
         <Spacer small />
