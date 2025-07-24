@@ -119,7 +119,9 @@ export const DataTable = (p: DataTableProps) => {
 
   // Optimization 2: Memoize selected fields count
   const selectedFields = useMemo(() => {
-    if (!p.selectKeyField) return 0
+    if (!p.selectKeyField) {
+      return 0
+    }
     return p.data.filter(d => p.selectKeyField && d[p.selectKeyField]).length
   }, [p.data, p.selectKeyField])
 
