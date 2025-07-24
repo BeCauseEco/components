@@ -24,7 +24,7 @@ interface OptimizedCellProps {
 // Memoized cell component for better performance
 export const OptimizedCell = memo(
   (props: OptimizedCellProps) => {
-    const { column, value, rowData, firstColumn, tooltipElement, ...restProps } = props
+    const { column, value, rowData } = props
     const alignmentRight = column.dataType === DataType.Number
     const text = formatValue(value?.toString(), column.dataType || DataType.String)
 
@@ -99,14 +99,16 @@ export const OptimizedCell = memo(
               <Spacer xsmall />
             </>
           )}
-          <Text
-            fill={getColorWithLightness(fillColor, 700)}
-            small
-            monospace={monospace}
-            textOverflow={column.maxWidth !== undefined}
-          >
-            {text}
-          </Text>
+          <Align horizontal right={alignmentRight} left={!alignmentRight}>
+            <Text
+              fill={getColorWithLightness(fillColor, 700)}
+              small
+              monospace={monospace}
+              textOverflow={column.maxWidth !== undefined}
+            >
+              {text}
+            </Text>
+          </Align>
           {endAdornment && (
             <>
               <Spacer xsmall />
