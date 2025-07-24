@@ -8,11 +8,12 @@ import { InputButtonPrimary } from "@new/InputButton/InputButtonPrimary"
 import { Spacer } from "@new/Stack/Spacer"
 import { InputButtonTertiary } from "@new/InputButton/InputButtonTertiary"
 import { InputTextSingle } from "@new/InputText/InputTextSingle"
-import { Color, Lightness } from "@new/Color"
+import { Color } from "@new/Color"
 import { Text } from "@new/Text/Text"
 import { Icon } from "@new/Icon/Icon"
 import styled from "@emotion/styled"
-import { Children, ReactNode, useCallback, useEffect, useId, useRef, useState } from "react"
+import { Children, ReactNode, useCallback, useEffect, useId, useRef, useState, useMemo } from "react"
+import _debounce from "lodash/debounce"
 import { useReactToPrint } from "react-to-print"
 import { InputButtonIconTertiary } from "@new/InputButton/InputButtonIconTertiary"
 import { InputCheckbox } from "@new/InputCheckbox/InputCheckbox"
@@ -20,8 +21,6 @@ import { Divider } from "@new/Divider/Divider"
 import { kaPropsUtils } from "ka-table/utils"
 import { Alert } from "@new/Alert/Alert"
 import { useResizeObserver } from "usehooks-ts"
-import { Avatar } from "@new/Avatar/Avatar"
-import Link from "next/link"
 import { Tooltip } from "@new/Tooltip/Tooltip"
 
 // Import from our new modular structure
@@ -32,6 +31,7 @@ import { ActionEdit, ActionSaveCancel } from "./internal/ActionComponents"
 import { CellInputTextSingle, CellInputTextDate, CellInputCheckbox, CellInputCombobox } from "./internal/CellEditors"
 import { CellProgressIndicator, CellStatus } from "./internal/CellRenderers"
 import { KEY_DRAG, KEY_ACTIONS_EDIT, KEY_ACTIONS, TABLE_CELL_EMPTY_STRING } from "./internal/constants"
+import { OptimizedCell } from "./internal/OptimizedCellComponents"
 
 // Re-export for backward compatibility
 export { SortDirection } from "ka-table"
@@ -50,74 +50,141 @@ export const DataTable = (p: DataTableProps) => {
   const referenceContainer = useRef<HTMLDivElement>(null)
   const [containerWidth, setContainerWidth] = useState<number>(0)
 
+  // Optimization 5: Performance monitoring hook for development
+  const usePerformanceMonitoring = (label: string, deps: any[]) => {
+    useEffect(() => {
+      if (process.env.NODE_ENV === "development") {
+        const startTime = performance.now()
+        return () => {
+          const endTime = performance.now()
+          const duration = endTime - startTime
+          if (duration > 16) {
+            // Log if render takes more than one frame (16ms)
+            console.log(`⚡ DataTable ${label}: ${duration.toFixed(2)}ms`)
+          }
+        }
+      }
+    }, deps)
+  }
+
+  // Optimization 4: Debounced resize handler to reduce performance impact
+  const debouncedResizeHandler = useMemo(
+    () =>
+      _debounce((size: { width?: number; height?: number }) => {
+        if (p.mode === "edit" && p.editingMode !== EditingMode.Cell) {
+          return
+        }
+
+        const containerWidth = size.width || 0
+        const containerHeight = size.height || 0
+
+        if (referenceContainer.current && containerWidth > 0) {
+          setContainerWidth(Math.floor(containerWidth - 16 - 2))
+        }
+
+        if (referenceContainer.current && containerHeight > 0) {
+          // Cache DOM queries
+          const filtersElement = referenceContainer.current.querySelector(`#reference-filters`)
+          const spacerElement = referenceContainer.current.querySelector(`#reference-spacer`)
+          const targetElements = referenceContainer.current.querySelectorAll(`#reference-target`)
+
+          if (filtersElement && spacerElement && targetElements.length > 0) {
+            const filtersHeight = filtersElement.clientHeight || 0
+            const spacerHeight = spacerElement.clientHeight || 0
+            const newHeight = `${Math.ceil(containerHeight - filtersHeight - spacerHeight)}px`
+
+            targetElements.forEach(target => {
+              const t = target as HTMLElement
+              if (t) {
+                t.style.height = newHeight
+              }
+            })
+          }
+        }
+      }, 100), // 100ms debounce
+    [p.mode, p.editingMode],
+  )
+
   useResizeObserver({
     ref: referenceContainer as React.RefObject<HTMLElement>,
     box: "border-box",
-    onResize: size => {
-      if (p.mode === "edit" && p.editingMode !== EditingMode.Cell) {
-        return
-      }
-
-      const containerWidth = size.width || 0
-      const containerHeight = size.height || 0
-
-      if (referenceContainer.current && containerWidth > 0) {
-        setContainerWidth(Math.floor(containerWidth - 16 - 2))
-      }
-
-      if (referenceContainer.current && containerHeight > 0) {
-        const filtersHeight = referenceContainer.current.querySelector(`#reference-filters`)?.clientHeight || 0
-        const spacerHeight = referenceContainer.current.querySelector(`#reference-spacer`)?.clientHeight || 0
-
-        referenceContainer.current.querySelectorAll(`#reference-target`).forEach(target => {
-          const t = target as HTMLElement | undefined
-
-          if (t) {
-            t.style.height = `${Math.ceil(containerHeight - filtersHeight - spacerHeight)}px`
-          }
-        })
-      }
-    },
+    onResize: debouncedResizeHandler,
   })
 
   const [filter, setFilter] = useState("")
   const [editRowId, setEditRowId] = useState<number | null>(null)
   const [editColumnId, setEditColumnId] = useState<string>("")
   const [deleteId, setDeleteId] = useState<number | null>(null)
-  const [selectedFields, setSelectedFields] = useState<number>(
-    p.data.filter(d => p.selectKeyField && d[p.selectKeyField]).length,
-  )
   const [dataTemp, setDataTemp] = useState<DataTableProps["data"]>([])
 
-  let nativeColumns: Column[] = []
-
-  nativeColumns = p.columns.map(c => {
-    const column = c as Column
-
-    const sortDirection = p.mode !== "edit" && column.key === p.defaultSortColumn ? p.defaultSortDirection : undefined
-
-    return {
-      key: column.key,
-      title: column.title,
-      dataType: column.dataType,
-      progressIndicator: column.progressIndicator,
-      status: column.status,
-      avatar: column.avatar,
-      link: column.link,
-      sort: column.sort,
-      tooltip: column.tooltip,
-      showTooltipIcon: column.showTooltipIcon,
-      sortDirection: sortDirection,
-      minWidth: column.minWidth,
-      maxWidth: column.maxWidth,
-      explodeWidth: column.explodeWidth,
-      preventContentCollapse: column.preventContentCollapse,
-      isEditable: column.isEditable,
-      endAdornment: column.endAdornment,
-      startAdornment: column.startAdornment,
-      fill: column.fill,
+  // Optimization 2: Memoize selected fields count
+  const selectedFields = useMemo(() => {
+    if (!p.selectKeyField) {
+      return 0
     }
-  })
+    return p.data.filter(d => p.selectKeyField && d[p.selectKeyField]).length
+  }, [p.data, p.selectKeyField])
+
+  // Memoize total selectable fields count
+  const totalSelectableFields = useMemo(() => {
+    if (!p.selectKeyField) {
+      return 0
+    }
+    if (p.selectDisabledField === undefined) {
+      return p.data.length
+    }
+    return p.data.filter(d => p.selectDisabledField && !d[p.selectDisabledField]).length
+  }, [p.data, p.selectKeyField, p.selectDisabledField])
+
+  // Optimization 1: Memoize column processing
+  const nativeColumns = useMemo(() => {
+    const columns = p.columns.map(c => {
+      const column = c as Column
+
+      const sortDirection = p.mode !== "edit" && column.key === p.defaultSortColumn ? p.defaultSortDirection : undefined
+
+      return {
+        key: column.key,
+        title: column.title,
+        dataType: column.dataType,
+        progressIndicator: column.progressIndicator,
+        status: column.status,
+        avatar: column.avatar,
+        link: column.link,
+        sort: column.sort,
+        tooltip: column.tooltip,
+        showTooltipIcon: column.showTooltipIcon,
+        sortDirection: sortDirection,
+        minWidth: column.minWidth,
+        maxWidth: column.maxWidth,
+        explodeWidth: column.explodeWidth,
+        preventContentCollapse: column.preventContentCollapse,
+        isEditable: column.isEditable,
+        endAdornment: column.endAdornment,
+        startAdornment: column.startAdornment,
+        fill: column.fill,
+      }
+    })
+
+    // Add action columns if needed
+    if (p.mode === "edit" && p.editingMode !== EditingMode.Cell) {
+      columns.push({
+        key: KEY_ACTIONS_EDIT,
+        title: "",
+        dataType: DataType.Internal,
+        sortDirection: undefined,
+      } as any)
+    } else if (p.rowActions) {
+      columns.push({
+        key: KEY_ACTIONS,
+        title: "",
+        dataType: DataType.Internal,
+        sortDirection: undefined,
+      } as any)
+    }
+
+    return columns
+  }, [p.columns, p.mode, p.editingMode, p.rowActions, p.defaultSortColumn, p.defaultSortDirection])
 
   const getRowById = useCallback(
     (id: any) => {
@@ -126,69 +193,55 @@ export const DataTable = (p: DataTableProps) => {
     [p.data, p.rowKeyField],
   )
 
-  if (p.mode === "edit" && p.editingMode !== EditingMode.Cell) {
-    nativeColumns = [
-      ...nativeColumns,
-      {
-        key: KEY_ACTIONS_EDIT,
-        title: "",
-        dataType: DataType.Internal,
-      },
-    ]
-  } else if (p.rowActions) {
-    nativeColumns = [
-      ...nativeColumns,
-      {
-        key: KEY_ACTIONS,
-        title: "",
-        dataType: DataType.Internal,
-      },
-    ]
-  }
-
-  const updateSelectField = (key: any, value: boolean) => {
-    if (p.selectKeyField === undefined) {
-      return
-    }
-
-    const d = [...p.data]
-    const row = d.find(r => r[p.rowKeyField] === key)
-
-    if (!row) {
-      return
-    }
-    row[p.selectKeyField] = value
-
-    if (p.onChange) {
-      p.onChange(d)
-    }
-
-    if (p.onChangeRow) {
-      p.onChangeRow(row)
-    }
-
-    setSelectedFields(d.filter(d => p.selectKeyField && d[p.selectKeyField]).length)
-  }
-
-  const updateSelectFieldAll = (value: boolean) => {
-    if (p.selectKeyField === undefined) {
-      return
-    }
-
-    const d = [...p.data]
-
-    d.filter(d => p.selectDisabledField === undefined || !d[p.selectDisabledField]).forEach(row => {
-      if (p.selectKeyField) {
-        row[p.selectKeyField] = value
+  const updateSelectField = useCallback(
+    (key: any, value: boolean) => {
+      if (p.selectKeyField === undefined) {
+        return
       }
-    })
 
-    if (p.onChange) {
-      p.onChange(d)
-    }
+      const d = [...p.data]
+      const row = d.find(r => r[p.rowKeyField] === key)
 
-    setSelectedFields(d.filter(d => p.selectKeyField && d[p.selectKeyField]).length)
-  }
+      if (!row) {
+        return
+      }
+      row[p.selectKeyField] = value
+
+      if (p.onChange) {
+        p.onChange(d)
+      }
+
+      if (p.onChangeRow) {
+        p.onChangeRow(row)
+      }
+
+      // Selected fields will be recalculated automatically via useMemo
+    },
+    [p.data, p.selectKeyField, p.rowKeyField, p.onChange, p.onChangeRow],
+  )
+
+  const updateSelectFieldAll = useCallback(
+    (value: boolean) => {
+      if (p.selectKeyField === undefined) {
+        return
+      }
+
+      const d = [...p.data]
+
+      d.filter(d => p.selectDisabledField === undefined || !d[p.selectDisabledField]).forEach(row => {
+        if (p.selectKeyField) {
+          row[p.selectKeyField] = value
+        }
+      })
+
+      if (p.onChange) {
+        p.onChange(d)
+      }
+
+      // Selected fields will be recalculated automatically via useMemo
+    },
+    [p.data, p.selectKeyField, p.selectDisabledField, p.onChange],
+  )
 
   const table = useTable({
     onDispatch: d => {
@@ -270,6 +323,11 @@ export const DataTable = (p: DataTableProps) => {
   const print = useReactToPrint({ contentRef: referencePrint, documentTitle: p.exportName })
 
   const css = createDataTableStyles(cssScope, p.fill, p.stroke)
+
+  // Monitor performance of key operations
+  usePerformanceMonitoring("render", [p.data.length, p.columns.length])
+  usePerformanceMonitoring("column processing", [nativeColumns])
+  usePerformanceMonitoring("data selection", [selectedFields, totalSelectableFields])
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -444,12 +502,6 @@ export const DataTable = (p: DataTableProps) => {
                           const firstColumn = headCellContent.column.key === nativeColumns[0].key
 
                           const headCellContentAsColumn = headCellContent.column as Column
-                          const totalSelectableFields = p.data.filter(d =>
-                            p.selectDisabledField !== undefined && d[p.selectDisabledField]
-                              ? d[p.selectKeyField!]
-                              : true,
-                          ).length
-
                           const allowSort = p.mode !== "edit" && headCellContentAsColumn.dataType !== DataType.Status
 
                           return (
@@ -553,8 +605,6 @@ export const DataTable = (p: DataTableProps) => {
                           } else {
                             const column = cellTextContent.column as Column
 
-                            let output = <></>
-
                             const alignmentRight = column.dataType === DataType.Number
                             const firstColumn = column.key === nativeColumns[0].key
 
@@ -589,131 +639,22 @@ export const DataTable = (p: DataTableProps) => {
                               }
                             }
 
+                            let output = <></>
+
                             if (column.dataType === DataType.ProgressIndicator) {
                               output = <CellProgressIndicator {...cellTextContent} />
                             } else if (column.dataType === DataType.Status) {
                               output = <CellStatus {...cellTextContent} />
-                            } else if (column.dataType === DataType.List) {
-                              const selectedOption = cellTextContent.rowData?.selectableOptions?.find(
-                                o => o.value === cellTextContent.value,
-                              )
-                              if (!selectedOption) {
-                                output = <></>
-                              } else {
-                                output = (
-                                  <Align horizontal left>
-                                    <Text
-                                      fill={[Color.Neutral, 700]}
-                                      small
-                                      textOverflow={column.maxWidth !== undefined}
-                                    >
-                                      {selectedOption.label}
-                                    </Text>
-                                  </Align>
-                                )
-                              }
                             } else {
-                              const monospace =
-                                column.dataType === DataType.Date ||
-                                column.dataType === DataType.Number ||
-                                column.dataType === DataType.Boolean
-
-                              const avatar = column.avatar as Column["avatar"]
-                              const link = column.link as Column["link"]
-
-                              let avatarSrc
-                              let linkEffect
-
-                              if (typeof avatar === "function") {
-                                avatarSrc = avatar(cellTextContent.rowData)
-                              }
-
-                              if (typeof link === "function") {
-                                linkEffect = link(cellTextContent.rowData)
-                              }
-
-                              const avatarElement = avatarSrc ? (
-                                <>
-                                  <Avatar size="small" src={avatarSrc} title={text} />
-
-                                  <Spacer xsmall />
-                                </>
-                              ) : null
-
-                              let fillColor: Color | undefined
-                              if (typeof column.fill === "function") {
-                                fillColor = column.fill(cellTextContent.rowData)
-                              } else if (typeof column.fill !== "undefined") {
-                                fillColor = column.fill
-                              }
-
-                              const getColorWithLightness = (
-                                color: Color | undefined,
-                                lightness: Lightness = 700,
-                              ): [Color, Lightness] => {
-                                if (typeof color === "undefined") {
-                                  return [Color.Neutral, lightness]
-                                }
-                                return [color, lightness]
-                              }
-                              const startAdornment = column?.startAdornment?.(cellTextContent.rowData)
-                              const endAdornment = column?.endAdornment?.(cellTextContent.rowData)
-                              output =
-                                linkEffect && text !== TABLE_CELL_EMPTY_STRING ? (
-                                  <>
-                                    {avatarElement}
-
-                                    <Text
-                                      fill={[Color.Neutral, 700]}
-                                      small
-                                      monospace={monospace}
-                                      textOverflow={column.maxWidth !== undefined}
-                                    >
-                                      {typeof linkEffect === "string" ? (
-                                        <Link href={linkEffect}>{text}</Link>
-                                      ) : (
-                                        <a href="javascript: void(0);" onClick={linkEffect}>
-                                          {text}
-                                        </a>
-                                      )}
-                                    </Text>
-                                  </>
-                                ) : (
-                                  <Stack
-                                    horizontal
-                                    hug={typeof fillColor !== "undefined" ? "partly" : true}
-                                    fill={
-                                      typeof fillColor !== "undefined"
-                                        ? getColorWithLightness(fillColor, 100)
-                                        : undefined
-                                    }
-                                    cornerRadius="small"
-                                  >
-                                    <>
-                                      {avatarElement}
-                                      {startAdornment && (
-                                        <>
-                                          {startAdornment}
-                                          <Spacer xsmall />
-                                        </>
-                                      )}
-                                      <Text
-                                        fill={getColorWithLightness(fillColor, 700)}
-                                        small
-                                        monospace={monospace}
-                                        textOverflow={column.maxWidth !== undefined}
-                                      >
-                                        {text}
-                                      </Text>
-                                      {endAdornment && (
-                                        <>
-                                          <Spacer xsmall />
-                                          {endAdornment}
-                                        </>
-                                      )}
-                                    </>
-                                  </Stack>
-                                )
+                              // Use optimized cell component for regular cells
+                              output = (
+                                <OptimizedCell
+                                  {...cellTextContent}
+                                  column={column}
+                                  firstColumn={firstColumn}
+                                  tooltipElement={tooltipElement}
+                                />
+                              )
                             }
 
                             const DEPRICATED_customCellRendererElement =
