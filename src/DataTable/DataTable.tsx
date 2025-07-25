@@ -355,6 +355,8 @@ export const DataTable = (p: DataTableProps) => {
     }
   }, [editRowId, p.editingMode, table])
 
+  const hasFilters = p.mode === "filter" || Children.toArray(p.children).length > 0 || !p.exportDisable
+
   return (
     <>
       <style suppressHydrationWarning>{css}</style>
@@ -412,7 +414,7 @@ export const DataTable = (p: DataTableProps) => {
             </Stack>
           </Align>
 
-          <Spacer medium id="reference-spacer" />
+          {hasFilters ? <Spacer medium id="reference-spacer" /> : <></>}
 
           <Align left vertical>
             <div id="reference-target" ref={referencePrint}>
