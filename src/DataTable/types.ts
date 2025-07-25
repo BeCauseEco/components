@@ -64,6 +64,9 @@ export type Column = {
         }
       | undefined
   }
+  numberFormat?: {
+    configure: (value: number, rowData: ICellTextProps["rowData"]) => string
+  }
   fill?: ((rowData: ICellTextProps["rowData"]) => Color) | Color | undefined
 }
 
