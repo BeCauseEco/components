@@ -26,7 +26,14 @@ export const OptimizedCell = memo(
   (props: OptimizedCellProps) => {
     const { column, value, rowData } = props
     const alignmentRight = column.dataType === DataType.Number
-    const text = formatValue(value?.toString(), column.dataType || DataType.String)
+    
+    // Apply custom number formatting first if configured
+    let text: string
+    if (column.dataType === DataType.Number && column.numberFormat?.configure && typeof value === 'number') {
+      text = column.numberFormat.configure(value, rowData)
+    } else {
+      text = formatValue(value?.toString(), column.dataType || DataType.String)
+    }
 
     if (column.dataType === DataType.List) {
       const selectedOption = rowData?.selectableOptions?.find((o: any) => o.value === value)
