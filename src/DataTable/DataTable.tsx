@@ -163,6 +163,7 @@ export const DataTable = (p: DataTableProps) => {
         endAdornment: column.endAdornment,
         startAdornment: column.startAdornment,
         fill: column.fill,
+        placeholder: column.placeholder,
       }
     })
 
