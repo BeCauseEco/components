@@ -38,13 +38,14 @@ export type Column = {
   explodeWidth?: boolean
   preventContentCollapse?: boolean
   sort?: (sortDirection: SortDirection) => (a: any, b: any) => number
-  avatar?: (rowData: ICellTextProps["rowData"]) => string | undefined
+  avatar?: string | ((rowData: ICellTextProps["rowData"]) => string | ReactElement | undefined)
   link?: (rowData: ICellTextProps["rowData"]) => string | (() => void) | undefined
   tooltip?: ((rowData: ICellTextProps["rowData"]) => ReactElement<AlignProps> | string | undefined) | boolean
   showTooltipIcon?: boolean
   isEditable?: boolean
   endAdornment?: (rowData: ICellTextProps["rowData"]) => ReactElement<AlignProps> | string | undefined
   startAdornment?: (rowData: ICellTextProps["rowData"]) => ReactElement<AlignProps> | string | undefined
+  placeholder?: string
   progressIndicator?: {
     type: "bar" | "circle"
 
@@ -67,7 +68,7 @@ export type Column = {
   numberFormat?: {
     configure: (value: number, rowData: ICellTextProps["rowData"]) => string
   }
-  fill?: ((rowData: ICellTextProps["rowData"]) => Color) | Color | undefined
+  fill?: ((rowData: ICellTextProps["rowData"]) => Color | undefined) | Color | undefined
 }
 
 type Children =

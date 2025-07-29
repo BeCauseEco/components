@@ -611,13 +611,15 @@ export const DataTable = (p: DataTableProps) => {
                             const text = formatValue(
                               cellTextContent.value?.toString(),
                               column.dataType || DataType.String,
+                              column.placeholder,
                             )
 
                             const tooltip = column.tooltip as Column["tooltip"]
 
                             let tooltipElement
 
-                            if (typeof tooltip === "boolean" && text !== TABLE_CELL_EMPTY_STRING) {
+                            const emptyString = column.placeholder || TABLE_CELL_EMPTY_STRING
+                            if (typeof tooltip === "boolean" && text !== emptyString) {
                               tooltipElement = (
                                 <Align horizontal left>
                                   <Text small fill={[Color.Neutral, 700]} wrap>
