@@ -14,6 +14,7 @@ export type InputTextSingleProps = Pick<
   | "required"
   | "iconNameLeft"
   | "iconNameRight"
+  | "onIconClick"
   | "loading"
   | "disabled"
   | "value"
@@ -43,6 +44,7 @@ export const InputTextSingle = forwardRef<HTMLInputElement, InputTextSingleProps
       required={p.required}
       iconNameLeft={p.iconNameLeft}
       iconNameRight={p.iconNameRight}
+      onIconClick={p.onIconClick}
       rows={1}
       disabled={p.disabled ? true : undefined}
       value={p.value}
