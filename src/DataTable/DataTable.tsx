@@ -390,7 +390,7 @@ export const DataTable = (p: DataTableProps) => {
               </Align>
 
               <Align bottomRight horizontal hug>
-                {!p.exportDisable ? (
+                {!p.exportDisable && !p.loadingElement ? (
                   <>
                     <Spacer large />
                     <InputButtonIconTertiary
@@ -418,15 +418,18 @@ export const DataTable = (p: DataTableProps) => {
 
           <Align left vertical>
             <div id="reference-target" ref={referencePrint}>
-              <Stack
-                vertical
-                hug
-                stroke={p.stroke || [Color.Neutral, 100]}
-                fill={p.fill || [Color.Transparent]}
-                cornerRadius="large"
-              >
-                <Align topLeft vertical>
-                  <Table
+              {p.loadingElement ? (
+                p.loadingElement
+              ) : (
+                <Stack
+                  vertical
+                  hug
+                  stroke={p.stroke || [Color.Neutral, 100]}
+                  fill={p.fill || [Color.Transparent]}
+                  cornerRadius="large"
+                >
+                  <Align topLeft vertical>
+                    <Table
                     table={table}
                     columns={nativeColumns as any}
                     data={p.data}
@@ -881,32 +884,34 @@ export const DataTable = (p: DataTableProps) => {
                   />
                 </Align>
 
-                {p.mode === "edit" && p.editingMode !== EditingMode.Cell ? (
-                  <Align center vertical>
-                    <Divider fill={[Color.Neutral, 100]} />
+                    {p.mode === "edit" && p.editingMode !== EditingMode.Cell ? (
+                      <Align center vertical>
+                        <Divider fill={[Color.Neutral, 100]} />
 
-                    <Spacer xsmall />
+                        <Spacer xsmall />
 
-                    <InputButtonTertiary
-                      width="auto"
-                      size="small"
-                      iconNameLeft="add"
-                      label="Add row"
-                      disabled={editRowId !== null}
-                      onClick={() => {
-                        table.insertRow(createNewRow(p.data), {
-                          rowKeyValue: p.data[p.data.length - 1]?.key || 0,
-                          insertRowPosition: InsertRowPosition.after,
-                        })
-                      }}
-                    />
+                        <InputButtonTertiary
+                          width="auto"
+                          size="small"
+                          iconNameLeft="add"
+                          label="Add row"
+                          disabled={editRowId !== null}
+                          onClick={() => {
+                            table.insertRow(createNewRow(p.data), {
+                              rowKeyValue: p.data[p.data.length - 1]?.key || 0,
+                              insertRowPosition: InsertRowPosition.after,
+                            })
+                          }}
+                        />
 
-                    <Spacer xsmall />
-                  </Align>
-                ) : (
-                  <></>
-                )}
-              </Stack>
+                        <Spacer xsmall />
+                      </Align>
+                    ) : (
+                      <></>
+                    )}
+                  </Stack>
+                )
+              }
             </div>
           </Align>
         </Stack>

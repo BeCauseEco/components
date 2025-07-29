@@ -111,6 +111,7 @@ export type DataTableProps = {
   selectDisabledField?: string
   virtualScrolling?: boolean
   loading?: boolean
+  loadingElement?: ReactElement
   exportDisable?: boolean
   rowActions?: (rowData: ICellTextProps["rowData"]) => RowActionsElement[]
   onChange?: (value: DataTableProps["data"]) => void
