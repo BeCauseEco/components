@@ -853,6 +853,10 @@ export const DataTable = (p: DataTableProps) => {
                             classNames.push("override-ka-prevent-content-collapse")
                           }
 
+                          if (column.dataType === DataType.Icon) {
+                            classNames.push("ka-cell-icon")
+                          }
+
                           if (
                             p.mode === "edit" &&
                             p.editingMode === EditingMode.Cell &&
