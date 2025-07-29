@@ -27,6 +27,7 @@ export enum DataType {
   ProgressIndicator = "progressindicator",
   Status = "status",
   List = "list",
+  Icon = "icon",
 }
 
 export type Column = {
@@ -67,6 +68,14 @@ export type Column = {
   }
   numberFormat?: {
     configure: (value: number, rowData: ICellTextProps["rowData"]) => string
+  }
+  icon?: {
+    configure: (rowData: ICellTextProps["rowData"]) =>
+      | {
+          name: string
+          color: ColorWithLightness
+        }
+      | undefined
   }
   fill?: ((rowData: ICellTextProps["rowData"]) => Color | undefined) | Color | undefined
 }

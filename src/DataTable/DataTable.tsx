@@ -29,7 +29,7 @@ import { createNewRow, formatValue, csv } from "./utils"
 import { createDataTableStyles } from "./styles"
 import { ActionEdit, ActionSaveCancel } from "./internal/ActionComponents"
 import { CellInputTextSingle, CellInputTextDate, CellInputCheckbox, CellInputCombobox } from "./internal/CellEditors"
-import { CellProgressIndicator, CellStatus } from "./internal/CellRenderers"
+import { CellProgressIndicator, CellStatus, CellIcon } from "./internal/CellRenderers"
 import { KEY_DRAG, KEY_ACTIONS_EDIT, KEY_ACTIONS, TABLE_CELL_EMPTY_STRING } from "./internal/constants"
 import { OptimizedCell } from "./internal/OptimizedCellComponents"
 
@@ -149,6 +149,7 @@ export const DataTable = (p: DataTableProps) => {
         dataType: column.dataType,
         progressIndicator: column.progressIndicator,
         status: column.status,
+        icon: column.icon,
         avatar: column.avatar,
         link: column.link,
         sort: column.sort,
@@ -648,6 +649,8 @@ export const DataTable = (p: DataTableProps) => {
                               output = <CellProgressIndicator {...cellTextContent} />
                             } else if (column.dataType === DataType.Status) {
                               output = <CellStatus {...cellTextContent} />
+                            } else if (column.dataType === DataType.Icon) {
+                              output = <CellIcon {...cellTextContent} />
                             } else {
                               // Use optimized cell component for regular cells
                               output = (

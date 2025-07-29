@@ -4,6 +4,7 @@ import { ProgressIndicator } from "@new/ProgressIndicator/ProgressIndicator"
 import { ProgressIndicatorSegment } from "@new/ProgressIndicator/ProgressIndicatorSegment"
 import { Badge } from "@new/Badge/Badge"
 import { Text } from "@new/Text/Text"
+import { Icon } from "@new/Icon/Icon"
 import { Color } from "@new/Color"
 import { ICellTextProps, ICellEditorProps } from "ka-table/props"
 import { Column } from "../types"
@@ -51,6 +52,26 @@ export const CellStatus = (cellTextProps: ICellTextProps | ICellEditorProps) => 
       <Align horizontal left>
         {color && label ? (
           <Badge size="large" variant="transparent" color={color} iconName="circle" label={label} />
+        ) : (
+          <Text fill={[Color.Neutral, 700]} small monospace>
+            –
+          </Text>
+        )}
+      </Align>
+    </Stack>
+  )
+}
+
+export const CellIcon = (cellTextProps: ICellTextProps | ICellEditorProps) => {
+  const column = cellTextProps.column as Column
+  const icon = column.icon
+  const iconConfig = icon?.configure(cellTextProps.rowData)
+
+  return (
+    <Stack hug horizontal>
+      <Align horizontal center>
+        {iconConfig ? (
+          <Icon name={iconConfig.name} fill={iconConfig.color} medium />
         ) : (
           <Text fill={[Color.Neutral, 700]} small monospace>
             –
