@@ -37,7 +37,8 @@ export type InputTextProps = ComponentBaseProps & {
 
   iconNameLeft?: string
   iconNameRight?: string
-  onIconClick?: (iconSide: "left" | "right") => void
+  onLeftIconClick?: () => void
+  onRightIconClick?: () => void
 
   hug?: boolean
 
@@ -226,8 +227,8 @@ export const InputText = forwardRef<HTMLInputElement | HTMLTextAreaElement, Inpu
       <Align horizontal center hug="width">
         <Spacer xsmall={p.size === "small"} small={p.size === "large"} />
 
-        {p.onIconClick ? (
-          <InputButtonIconTertiary hug iconName={p.iconNameLeft} size={p.size} onClick={() => p.onIconClick!("left")} />
+        {p.onLeftIconClick ? (
+          <InputButtonIconTertiary hug iconName={p.iconNameLeft} size={p.size} onClick={p.onLeftIconClick} />
         ) : (
           <Icon
             name={p.iconNameLeft}
@@ -243,13 +244,8 @@ export const InputText = forwardRef<HTMLInputElement | HTMLTextAreaElement, Inpu
   if (p.iconNameRight && p.rows === 1) {
     iconEnd = (
       <Align horizontal center hug="width">
-        {p.onIconClick ? (
-          <InputButtonIconTertiary
-            hug
-            iconName={p.iconNameRight}
-            size={p.size}
-            onClick={() => p.onIconClick!("right")}
-          />
+        {p.onRightIconClick ? (
+          <InputButtonIconTertiary hug iconName={p.iconNameRight} size={p.size} onClick={p.onRightIconClick} />
         ) : (
           <Icon
             name={p.iconNameRight}
