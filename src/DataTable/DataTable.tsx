@@ -430,247 +430,317 @@ export const DataTable = (p: DataTableProps) => {
                 >
                   <Align topLeft vertical>
                     <Table
-                    table={table}
-                    columns={nativeColumns as any}
-                    data={p.data}
-                    rowKeyField={p.rowKeyField}
-                    sortingMode={SortingMode.Single}
-                    editingMode={p.editingMode}
-                    rowReordering={p.mode === "edit" && p.editingMode !== EditingMode.Cell}
-                    noData={{ text: "Nothing found" }}
-                    searchText={filter}
-                    virtualScrolling={p.mode !== "edit" && p.virtualScrolling ? { enabled: true } : undefined}
-                    search={({ searchText: searchTextValue, rowData, column }) => {
-                      if (column.dataType === DataType.Boolean) {
-                        const b = rowData[column.key]
-                        const s = searchTextValue.toLowerCase()
+                      table={table}
+                      columns={nativeColumns as any}
+                      data={p.data}
+                      rowKeyField={p.rowKeyField}
+                      sortingMode={SortingMode.Single}
+                      editingMode={p.editingMode}
+                      rowReordering={p.mode === "edit" && p.editingMode !== EditingMode.Cell}
+                      noData={{ text: "Nothing found" }}
+                      searchText={filter}
+                      virtualScrolling={p.mode !== "edit" && p.virtualScrolling ? { enabled: true } : undefined}
+                      search={({ searchText: searchTextValue, rowData, column }) => {
+                        if (column.dataType === DataType.Boolean) {
+                          const b = rowData[column.key]
+                          const s = searchTextValue.toLowerCase()
 
-                        return (s === "yes" && b === true) || (s === "no" && b === false)
-                      }
-                    }}
-                    sort={({ column }) => {
-                      if (column["sort"]) {
-                        return column["sort"](column.sortDirection)
-                      }
-                    }}
-                    childComponents={{
-                      tableWrapper: {
-                        elementAttributes: () => {
-                          if (p.mode !== "edit" && p.virtualScrolling) {
-                            return {
-                              className: "override-ka-virtual",
-                            }
-                          }
-
-                          if (p.mode === "edit" && p.editingMode !== EditingMode.Cell) {
-                            return {
-                              className: "override-ka-reorder",
-                            }
-                          }
-                        },
-                      },
-
-                      dataRow: {
-                        elementAttributes: dataRowElementAttributes => {
-                          if (
-                            dataRowElementAttributes.rowKeyValue === editRowId &&
-                            p.editingMode !== EditingMode.Cell
-                          ) {
-                            return {
-                              className: "override-ka-editing-row",
-                            }
-                          }
-                        },
-                      },
-
-                      headCell: {
-                        content: headCellContent => {
-                          if (
-                            headCellContent.column.key === KEY_DRAG ||
-                            headCellContent.column.key === KEY_ACTIONS_EDIT ||
-                            headCellContent.column.key === KEY_ACTIONS
-                          ) {
-                            return <></>
-                          }
-
-                          let iconName = ""
-
-                          if (headCellContent.column.sortDirection === SortDirection.Ascend) {
-                            iconName = "keyboard_arrow_up"
-                          } else if (headCellContent.column.sortDirection === SortDirection.Descend) {
-                            iconName = "keyboard_arrow_down"
-                          } else {
-                            iconName = "unfold_more"
-                          }
-
-                          const alignmentRight = headCellContent.column.dataType === DataType.Number
-                          const firstColumn = headCellContent.column.key === nativeColumns[0].key
-
-                          const headCellContentAsColumn = headCellContent.column as Column
-                          const allowSort = p.mode !== "edit" && headCellContentAsColumn.dataType !== DataType.Status
-
-                          return (
-                            <Stack hug horizontal>
-                              {(p.mode === "simple" || p.mode === "filter") && p.selectKeyField && firstColumn ? (
-                                <>
-                                  <Align left horizontal hug>
-                                    <InputCheckbox
-                                      size="small"
-                                      color={Color.Neutral}
-                                      value={
-                                        selectedFields === totalSelectableFields
-                                          ? true
-                                          : selectedFields === 0
-                                            ? false
-                                            : "indeterminate"
-                                      }
-                                      onChange={value => updateSelectFieldAll(value)}
-                                    />
-                                  </Align>
-
-                                  <Spacer xsmall />
-                                </>
-                              ) : (
-                                <></>
-                              )}
-
-                              <Align horizontal left={!alignmentRight} right={alignmentRight}>
-                                {allowSort || headCellContentAsColumn.sort ? (
-                                  <CellHeadLink onClick={() => table.updateSortDirection(headCellContent.column.key)}>
-                                    <Text fill={[Color.Neutral, 700]} xsmall>
-                                      <b>{headCellContent.column.title}</b>
-                                    </Text>
-
-                                    <Spacer tiny />
-
-                                    <Icon medium name={iconName} fill={[Color.Neutral, 700]} />
-                                  </CellHeadLink>
-                                ) : (
-                                  <Text fill={[Color.Neutral, 700]} xsmall>
-                                    <b>{headCellContent.column.title}</b>
-                                  </Text>
-                                )}
-                              </Align>
-                            </Stack>
-                          )
-                        },
-
-                        elementAttributes: headCellElementAttributes => {
-                          const column = headCellElementAttributes.column as Column
-
-                          if (p.fixedKeyField === column.key) {
-                            return { className: "override-ka-fixed-left" }
-                          }
-
-                          if (
-                            column.key === KEY_DRAG ||
-                            column.key === KEY_ACTIONS_EDIT ||
-                            column.key === KEY_ACTIONS
-                          ) {
-                            return { className: "override-ka-fixed-right" }
-                          }
-                        },
-                      },
-
-                      cellText: {
-                        content: cellTextContent => {
-                          if (cellTextContent.column.key === KEY_ACTIONS_EDIT && p.editingMode !== EditingMode.Cell) {
-                            return (
-                              <Stack horizontal hug>
-                                <Align horizontal right>
-                                  <InputButtonIconTertiary
-                                    size="small"
-                                    iconName="delete"
-                                    onClick={() => setDeleteId(cellTextContent.rowKeyValue)}
-                                    disabled={editRowId !== null}
-                                    destructive
-                                  />
-
-                                  <ActionEdit {...cellTextContent} disabled={editRowId !== null} />
-                                </Align>
-                              </Stack>
-                            )
-                          } else if (cellTextContent.column.key === KEY_ACTIONS && p.rowActions) {
-                            const actionElements: ReactNode[] = []
-
-                            Children.toArray(p.rowActions(cellTextContent.rowData)).forEach(r => {
-                              actionElements.push(r)
-                              actionElements.push(<Spacer xsmall />)
-                            })
-
-                            actionElements.pop()
-
-                            return (
-                              <Stack horizontal hug>
-                                <Align horizontal right>
-                                  {actionElements}
-                                </Align>
-                              </Stack>
-                            )
-                          } else {
-                            const column = cellTextContent.column as Column
-
-                            const alignmentRight = column.dataType === DataType.Number
-                            const firstColumn = column.key === nativeColumns[0].key
-
-                            const text = formatValue(
-                              cellTextContent.value?.toString(),
-                              column.dataType || DataType.String,
-                              column.placeholder,
-                            )
-
-                            const tooltip = column.tooltip as Column["tooltip"]
-
-                            let tooltipElement
-
-                            const emptyString = column.placeholder || TABLE_CELL_EMPTY_STRING
-                            if (typeof tooltip === "boolean" && text !== emptyString) {
-                              tooltipElement = (
-                                <Align horizontal left>
-                                  <Text small fill={[Color.Neutral, 700]} wrap>
-                                    {text}
-                                  </Text>
-                                </Align>
-                              )
-                            } else if (typeof tooltip === "function") {
-                              tooltipElement = tooltip(cellTextContent.rowData)
-
-                              if (typeof tooltipElement === "string") {
-                                tooltipElement = (
-                                  <Align horizontal left>
-                                    <Text small fill={[Color.Neutral, 700]} wrap>
-                                      {tooltipElement}
-                                    </Text>
-                                  </Align>
-                                )
+                          return (s === "yes" && b === true) || (s === "no" && b === false)
+                        }
+                      }}
+                      sort={({ column }) => {
+                        if (column["sort"]) {
+                          return column["sort"](column.sortDirection)
+                        }
+                      }}
+                      childComponents={{
+                        tableWrapper: {
+                          elementAttributes: () => {
+                            if (p.mode !== "edit" && p.virtualScrolling) {
+                              return {
+                                className: "override-ka-virtual",
                               }
                             }
 
-                            let output = <></>
+                            if (p.mode === "edit" && p.editingMode !== EditingMode.Cell) {
+                              return {
+                                className: "override-ka-reorder",
+                              }
+                            }
+                          },
+                        },
 
-                            if (column.dataType === DataType.ProgressIndicator) {
-                              output = <CellProgressIndicator {...cellTextContent} />
-                            } else if (column.dataType === DataType.Status) {
-                              output = <CellStatus {...cellTextContent} />
-                            } else if (column.dataType === DataType.Icon) {
-                              output = <CellIcon {...cellTextContent} />
-                            } else {
-                              // Use optimized cell component for regular cells
-                              output = (
-                                <OptimizedCell
-                                  {...cellTextContent}
-                                  column={column}
-                                  firstColumn={firstColumn}
-                                  tooltipElement={tooltipElement}
-                                />
-                              )
+                        dataRow: {
+                          elementAttributes: dataRowElementAttributes => {
+                            if (
+                              dataRowElementAttributes.rowKeyValue === editRowId &&
+                              p.editingMode !== EditingMode.Cell
+                            ) {
+                              return {
+                                className: "override-ka-editing-row",
+                              }
+                            }
+                          },
+                        },
+
+                        headCell: {
+                          content: headCellContent => {
+                            if (
+                              headCellContent.column.key === KEY_DRAG ||
+                              headCellContent.column.key === KEY_ACTIONS_EDIT ||
+                              headCellContent.column.key === KEY_ACTIONS
+                            ) {
+                              return <></>
                             }
 
-                            const DEPRICATED_customCellRendererElement =
-                              p.DEPRICATED_customCellRenderer && typeof p.DEPRICATED_customCellRenderer === "function"
-                                ? p.DEPRICATED_customCellRenderer(cellTextContent)
-                                : null
+                            let iconName = ""
 
+                            if (headCellContent.column.sortDirection === SortDirection.Ascend) {
+                              iconName = "keyboard_arrow_up"
+                            } else if (headCellContent.column.sortDirection === SortDirection.Descend) {
+                              iconName = "keyboard_arrow_down"
+                            } else {
+                              iconName = "unfold_more"
+                            }
+
+                            const alignmentRight = headCellContent.column.dataType === DataType.Number
+                            const firstColumn = headCellContent.column.key === nativeColumns[0].key
+
+                            const headCellContentAsColumn = headCellContent.column as Column
+                            const allowSort = p.mode !== "edit" && headCellContentAsColumn.dataType !== DataType.Status
+
+                            return (
+                              <Stack hug horizontal>
+                                {(p.mode === "simple" || p.mode === "filter") && p.selectKeyField && firstColumn ? (
+                                  <>
+                                    <Align left horizontal hug>
+                                      <InputCheckbox
+                                        size="small"
+                                        color={Color.Neutral}
+                                        value={
+                                          selectedFields === totalSelectableFields
+                                            ? true
+                                            : selectedFields === 0
+                                              ? false
+                                              : "indeterminate"
+                                        }
+                                        onChange={value => updateSelectFieldAll(value)}
+                                      />
+                                    </Align>
+
+                                    <Spacer xsmall />
+                                  </>
+                                ) : (
+                                  <></>
+                                )}
+
+                                <Align horizontal left={!alignmentRight} right={alignmentRight}>
+                                  {allowSort || headCellContentAsColumn.sort ? (
+                                    <CellHeadLink onClick={() => table.updateSortDirection(headCellContent.column.key)}>
+                                      <Text fill={[Color.Neutral, 700]} xsmall>
+                                        <b>{headCellContent.column.title}</b>
+                                      </Text>
+
+                                      <Spacer tiny />
+
+                                      <Icon medium name={iconName} fill={[Color.Neutral, 700]} />
+                                    </CellHeadLink>
+                                  ) : (
+                                    <Text fill={[Color.Neutral, 700]} xsmall>
+                                      <b>{headCellContent.column.title}</b>
+                                    </Text>
+                                  )}
+                                </Align>
+                              </Stack>
+                            )
+                          },
+
+                          elementAttributes: headCellElementAttributes => {
+                            const column = headCellElementAttributes.column as Column
+
+                            if (p.fixedKeyField === column.key) {
+                              return { className: "override-ka-fixed-left" }
+                            }
+
+                            if (
+                              column.key === KEY_DRAG ||
+                              column.key === KEY_ACTIONS_EDIT ||
+                              column.key === KEY_ACTIONS
+                            ) {
+                              return { className: "override-ka-fixed-right" }
+                            }
+                          },
+                        },
+
+                        cellText: {
+                          content: cellTextContent => {
+                            if (cellTextContent.column.key === KEY_ACTIONS_EDIT && p.editingMode !== EditingMode.Cell) {
+                              return (
+                                <Stack horizontal hug>
+                                  <Align horizontal right>
+                                    <InputButtonIconTertiary
+                                      size="small"
+                                      iconName="delete"
+                                      onClick={() => setDeleteId(cellTextContent.rowKeyValue)}
+                                      disabled={editRowId !== null}
+                                      destructive
+                                    />
+
+                                    <ActionEdit {...cellTextContent} disabled={editRowId !== null} />
+                                  </Align>
+                                </Stack>
+                              )
+                            } else if (cellTextContent.column.key === KEY_ACTIONS && p.rowActions) {
+                              const actionElements: ReactNode[] = []
+
+                              Children.toArray(p.rowActions(cellTextContent.rowData)).forEach(r => {
+                                actionElements.push(r)
+                                actionElements.push(<Spacer xsmall />)
+                              })
+
+                              actionElements.pop()
+
+                              return (
+                                <Stack horizontal hug>
+                                  <Align horizontal right>
+                                    {actionElements}
+                                  </Align>
+                                </Stack>
+                              )
+                            } else {
+                              const column = cellTextContent.column as Column
+
+                              const alignmentRight = column.dataType === DataType.Number
+                              const firstColumn = column.key === nativeColumns[0].key
+
+                              const text = formatValue(
+                                cellTextContent.value?.toString(),
+                                column.dataType || DataType.String,
+                                column.placeholder,
+                              )
+
+                              const tooltip = column.tooltip as Column["tooltip"]
+
+                              let tooltipElement
+
+                              const emptyString = column.placeholder || TABLE_CELL_EMPTY_STRING
+                              if (typeof tooltip === "boolean" && text !== emptyString) {
+                                tooltipElement = (
+                                  <Align horizontal left>
+                                    <Text small fill={[Color.Neutral, 700]} wrap>
+                                      {text}
+                                    </Text>
+                                  </Align>
+                                )
+                              } else if (typeof tooltip === "function") {
+                                tooltipElement = tooltip(cellTextContent.rowData)
+
+                                if (typeof tooltipElement === "string") {
+                                  tooltipElement = (
+                                    <Align horizontal left>
+                                      <Text small fill={[Color.Neutral, 700]} wrap>
+                                        {tooltipElement}
+                                      </Text>
+                                    </Align>
+                                  )
+                                }
+                              }
+
+                              let output = <></>
+
+                              if (column.dataType === DataType.ProgressIndicator) {
+                                output = <CellProgressIndicator {...cellTextContent} />
+                              } else if (column.dataType === DataType.Status) {
+                                output = <CellStatus {...cellTextContent} />
+                              } else if (column.dataType === DataType.Icon) {
+                                output = <CellIcon {...cellTextContent} />
+                              } else {
+                                // Use optimized cell component for regular cells
+                                output = (
+                                  <OptimizedCell
+                                    {...cellTextContent}
+                                    column={column}
+                                    firstColumn={firstColumn}
+                                    tooltipElement={tooltipElement}
+                                  />
+                                )
+                              }
+
+                              const DEPRICATED_customCellRendererElement =
+                                p.DEPRICATED_customCellRenderer && typeof p.DEPRICATED_customCellRenderer === "function"
+                                  ? p.DEPRICATED_customCellRenderer(cellTextContent)
+                                  : null
+
+                              return (
+                                <Stack hug horizontal>
+                                  {p.mode === "edit" && firstColumn && p.editingMode !== EditingMode.Cell ? (
+                                    <Align left horizontal hug>
+                                      <Icon name="drag_indicator" medium fill={[Color.Neutral, 700]} />
+
+                                      <Spacer xsmall />
+                                    </Align>
+                                  ) : (
+                                    <></>
+                                  )}
+
+                                  {(p.mode === "simple" || p.mode === "filter") && p.selectKeyField && firstColumn ? (
+                                    <>
+                                      <Align left horizontal hug>
+                                        <InputCheckbox
+                                          size="small"
+                                          color={Color.Neutral}
+                                          disabled={
+                                            p.selectDisabledField
+                                              ? getRowById(cellTextContent.rowKeyValue)?.[p.selectDisabledField]
+                                              : false
+                                          }
+                                          value={getRowById(cellTextContent.rowKeyValue)?.[p.selectKeyField] ?? false}
+                                          onChange={value => {
+                                            updateSelectField(cellTextContent.rowKeyValue, value)
+                                          }}
+                                        />
+                                      </Align>
+
+                                      <Spacer xsmall />
+                                    </>
+                                  ) : (
+                                    <></>
+                                  )}
+
+                                  <Align left={!alignmentRight} right={alignmentRight} horizontal>
+                                    {DEPRICATED_customCellRendererElement ? (
+                                      DEPRICATED_customCellRendererElement
+                                    ) : tooltipElement ? (
+                                      <Tooltip
+                                        trigger={
+                                          column.dataType !== DataType.Status &&
+                                          column.dataType !== DataType.ProgressIndicator &&
+                                          column.showTooltipIcon === true ? (
+                                            <Align horizontal center hug>
+                                              {output}
+                                              <Spacer xsmall />
+                                              <Icon name="info" small fill={[Color.Neutral, 200]} />
+                                            </Align>
+                                          ) : (
+                                            output
+                                          )
+                                        }
+                                      >
+                                        {tooltipElement}
+                                      </Tooltip>
+                                    ) : (
+                                      output
+                                    )}
+                                  </Align>
+                                </Stack>
+                              )
+                            }
+                          },
+                        },
+
+                        cellEditor: {
+                          content: cellEditorContent => {
+                            const firstColumn = cellEditorContent.column.key === nativeColumns[0].key
                             return (
                               <Stack hug horizontal>
                                 {p.mode === "edit" && firstColumn && p.editingMode !== EditingMode.Cell ? (
@@ -683,235 +753,164 @@ export const DataTable = (p: DataTableProps) => {
                                   <></>
                                 )}
 
-                                {(p.mode === "simple" || p.mode === "filter") && p.selectKeyField && firstColumn ? (
-                                  <>
-                                    <Align left horizontal hug>
-                                      <InputCheckbox
-                                        size="small"
-                                        color={Color.Neutral}
-                                        disabled={
-                                          p.selectDisabledField
-                                            ? getRowById(cellTextContent.rowKeyValue)?.[p.selectDisabledField]
-                                            : false
-                                        }
-                                        value={getRowById(cellTextContent.rowKeyValue)?.[p.selectKeyField] ?? false}
-                                        onChange={value => {
-                                          updateSelectField(cellTextContent.rowKeyValue, value)
-                                        }}
-                                      />
-                                    </Align>
-
-                                    <Spacer xsmall />
-                                  </>
+                                {(cellEditorContent.column as Column).dataType === DataType.ProgressIndicator ? (
+                                  <Align left horizontal>
+                                    <CellProgressIndicator {...cellEditorContent} />
+                                  </Align>
                                 ) : (
                                   <></>
                                 )}
 
-                                <Align left={!alignmentRight} right={alignmentRight} horizontal>
-                                  {DEPRICATED_customCellRendererElement ? (
-                                    DEPRICATED_customCellRendererElement
-                                  ) : tooltipElement ? (
-                                    <Tooltip
-                                      trigger={
-                                        column.dataType !== DataType.Status &&
-                                        column.dataType !== DataType.ProgressIndicator &&
-                                        column.showTooltipIcon === true ? (
-                                          <Align horizontal center hug>
-                                            {output}
-                                            <Spacer xsmall />
-                                            <Icon name="info" small fill={[Color.Neutral, 200]} />
-                                          </Align>
-                                        ) : (
-                                          output
-                                        )
-                                      }
-                                    >
-                                      {tooltipElement}
-                                    </Tooltip>
-                                  ) : (
-                                    output
-                                  )}
-                                </Align>
+                                {(cellEditorContent.column as Column).dataType === DataType.List ? (
+                                  <Stack vertical hug>
+                                    <CellInputCombobox {...cellEditorContent} />
+                                  </Stack>
+                                ) : (
+                                  <></>
+                                )}
+
+                                {(cellEditorContent.column as Column).dataType === DataType.Status ? (
+                                  <Align left horizontal>
+                                    <CellStatus {...cellEditorContent} />
+                                  </Align>
+                                ) : (
+                                  <></>
+                                )}
+
+                                {cellEditorContent.column.dataType === DataType.Boolean ? (
+                                  <Align left horizontal>
+                                    <CellInputCheckbox {...cellEditorContent} />
+                                  </Align>
+                                ) : (
+                                  <></>
+                                )}
+
+                                {cellEditorContent.column.dataType === DataType.Date ? (
+                                  <Align left horizontal>
+                                    <CellInputTextDate {...cellEditorContent} />
+                                  </Align>
+                                ) : (
+                                  <></>
+                                )}
+
+                                {cellEditorContent.column.dataType === DataType.Number ||
+                                cellEditorContent.column.dataType === DataType.String ? (
+                                  <Align left horizontal>
+                                    <CellInputTextSingle
+                                      {...cellEditorContent}
+                                      autoFocus={p.editingMode === EditingMode.Cell}
+                                    />
+                                  </Align>
+                                ) : (
+                                  <></>
+                                )}
+
+                                {cellEditorContent.column.key === KEY_ACTIONS_EDIT ? (
+                                  <Align left horizontal>
+                                    <ActionSaveCancel {...cellEditorContent} />
+                                  </Align>
+                                ) : (
+                                  <></>
+                                )}
                               </Stack>
                             )
-                          }
+                          },
                         },
-                      },
 
-                      cellEditor: {
-                        content: cellEditorContent => {
-                          const firstColumn = cellEditorContent.column.key === nativeColumns[0].key
-                          return (
-                            <Stack hug horizontal>
-                              {p.mode === "edit" && firstColumn && p.editingMode !== EditingMode.Cell ? (
-                                <Align left horizontal hug>
-                                  <Icon name="drag_indicator" medium fill={[Color.Neutral, 700]} />
+                        cell: {
+                          elementAttributes: cellElementAttributes => {
+                            const column = cellElementAttributes.column as Column
+                            const id = cellElementAttributes?.rowData?.id
+                              ? `cell-${column.key}-${cellElementAttributes?.rowData?.id}`
+                              : undefined
+                            const classNames: string[] = []
 
-                                  <Spacer xsmall />
-                                </Align>
-                              ) : (
-                                <></>
-                              )}
-
-                              {(cellEditorContent.column as Column).dataType === DataType.ProgressIndicator ? (
-                                <Align left horizontal>
-                                  <CellProgressIndicator {...cellEditorContent} />
-                                </Align>
-                              ) : (
-                                <></>
-                              )}
-
-                              {(cellEditorContent.column as Column).dataType === DataType.List ? (
-                                <Stack vertical hug>
-                                  <CellInputCombobox {...cellEditorContent} />
-                                </Stack>
-                              ) : (
-                                <></>
-                              )}
-
-                              {(cellEditorContent.column as Column).dataType === DataType.Status ? (
-                                <Align left horizontal>
-                                  <CellStatus {...cellEditorContent} />
-                                </Align>
-                              ) : (
-                                <></>
-                              )}
-
-                              {cellEditorContent.column.dataType === DataType.Boolean ? (
-                                <Align left horizontal>
-                                  <CellInputCheckbox {...cellEditorContent} />
-                                </Align>
-                              ) : (
-                                <></>
-                              )}
-
-                              {cellEditorContent.column.dataType === DataType.Date ? (
-                                <Align left horizontal>
-                                  <CellInputTextDate {...cellEditorContent} />
-                                </Align>
-                              ) : (
-                                <></>
-                              )}
-
-                              {cellEditorContent.column.dataType === DataType.Number ||
-                              cellEditorContent.column.dataType === DataType.String ? (
-                                <Align left horizontal>
-                                  <CellInputTextSingle
-                                    {...cellEditorContent}
-                                    autoFocus={p.editingMode === EditingMode.Cell}
-                                  />
-                                </Align>
-                              ) : (
-                                <></>
-                              )}
-
-                              {cellEditorContent.column.key === KEY_ACTIONS_EDIT ? (
-                                <Align left horizontal>
-                                  <ActionSaveCancel {...cellEditorContent} />
-                                </Align>
-                              ) : (
-                                <></>
-                              )}
-                            </Stack>
-                          )
-                        },
-                      },
-
-                      cell: {
-                        elementAttributes: cellElementAttributes => {
-                          const column = cellElementAttributes.column as Column
-                          const id = cellElementAttributes?.rowData?.id
-                            ? `cell-${column.key}-${cellElementAttributes?.rowData?.id}`
-                            : undefined
-                          const classNames: string[] = []
-
-                          if (p.fixedKeyField === column.key) {
-                            classNames.push("override-ka-fixed-left")
-                          }
-
-                          if (column.key === KEY_ACTIONS_EDIT || column.key === KEY_ACTIONS) {
-                            classNames.push("override-ka-fixed-right")
-                          }
-
-                          let minWidth: number | string = "auto"
-                          let maxWidth: number | string = "auto"
-
-                          if (column.minWidth) {
-                            if (typeof column.minWidth === "string" && column.minWidth.endsWith("%")) {
-                              minWidth = (containerWidth / 100) * parseFloat(column.minWidth)
-                            } else {
-                              minWidth = `${column.minWidth}px`
+                            if (p.fixedKeyField === column.key) {
+                              classNames.push("override-ka-fixed-left")
                             }
-                          }
 
-                          if (column.maxWidth) {
-                            if (typeof column.maxWidth === "string" && column.maxWidth.endsWith("%")) {
-                              maxWidth = (containerWidth / 100) * parseFloat(column.maxWidth)
-                            } else {
-                              maxWidth = `${column.maxWidth}px`
+                            if (column.key === KEY_ACTIONS_EDIT || column.key === KEY_ACTIONS) {
+                              classNames.push("override-ka-fixed-right")
                             }
-                          }
 
-                          if (column.preventContentCollapse) {
-                            classNames.push("override-ka-prevent-content-collapse")
-                          }
+                            let minWidth: number | string = "auto"
+                            let maxWidth: number | string = "auto"
 
-                          if (column.dataType === DataType.Icon) {
-                            classNames.push("ka-cell-icon")
-                          }
+                            if (column.minWidth) {
+                              if (typeof column.minWidth === "string" && column.minWidth.endsWith("%")) {
+                                minWidth = (containerWidth / 100) * parseFloat(column.minWidth)
+                              } else {
+                                minWidth = `${column.minWidth}px`
+                              }
+                            }
 
-                          if (
-                            p.mode === "edit" &&
-                            p.editingMode === EditingMode.Cell &&
-                            (column.isEditable || column.isEditable === undefined)
-                          ) {
-                            classNames.push("ka-cell-editable")
-                          }
+                            if (column.maxWidth) {
+                              if (typeof column.maxWidth === "string" && column.maxWidth.endsWith("%")) {
+                                maxWidth = (containerWidth / 100) * parseFloat(column.maxWidth)
+                              } else {
+                                maxWidth = `${column.maxWidth}px`
+                              }
+                            }
 
-                          return {
-                            id: id,
-                            className: classNames.join(" "),
+                            if (column.preventContentCollapse) {
+                              classNames.push("override-ka-prevent-content-collapse")
+                            }
 
-                            style: {
-                              width: column.explodeWidth ? "100%" : "auto",
-                              minWidth: minWidth,
-                              maxWidth: maxWidth,
-                            },
-                          }
+                            if (column.dataType === DataType.Icon) {
+                              classNames.push("ka-cell-icon")
+                            }
+
+                            if (
+                              p.mode === "edit" &&
+                              p.editingMode === EditingMode.Cell &&
+                              (column.isEditable || column.isEditable === undefined)
+                            ) {
+                              classNames.push("ka-cell-editable")
+                            }
+
+                            return {
+                              id: id,
+                              className: classNames.join(" "),
+
+                              style: {
+                                width: column.explodeWidth ? "100%" : "auto",
+                                minWidth: minWidth,
+                                maxWidth: maxWidth,
+                              },
+                            }
+                          },
                         },
-                      },
-                    }}
-                  />
-                </Align>
+                      }}
+                    />
+                  </Align>
 
-                    {p.mode === "edit" && p.editingMode !== EditingMode.Cell ? (
-                      <Align center vertical>
-                        <Divider fill={[Color.Neutral, 100]} />
+                  {p.mode === "edit" && p.editingMode !== EditingMode.Cell ? (
+                    <Align center vertical>
+                      <Divider fill={[Color.Neutral, 100]} />
 
-                        <Spacer xsmall />
+                      <Spacer xsmall />
 
-                        <InputButtonTertiary
-                          width="auto"
-                          size="small"
-                          iconNameLeft="add"
-                          label="Add row"
-                          disabled={editRowId !== null}
-                          onClick={() => {
-                            table.insertRow(createNewRow(p.data), {
-                              rowKeyValue: p.data[p.data.length - 1]?.key || 0,
-                              insertRowPosition: InsertRowPosition.after,
-                            })
-                          }}
-                        />
+                      <InputButtonTertiary
+                        width="auto"
+                        size="small"
+                        iconNameLeft="add"
+                        label="Add row"
+                        disabled={editRowId !== null}
+                        onClick={() => {
+                          table.insertRow(createNewRow(p.data), {
+                            rowKeyValue: p.data[p.data.length - 1]?.key || 0,
+                            insertRowPosition: InsertRowPosition.after,
+                          })
+                        }}
+                      />
 
-                        <Spacer xsmall />
-                      </Align>
-                    ) : (
-                      <></>
-                    )}
-                  </Stack>
-                )
-              }
+                      <Spacer xsmall />
+                    </Align>
+                  ) : (
+                    <></>
+                  )}
+                </Stack>
+              )}
             </div>
           </Align>
         </Stack>

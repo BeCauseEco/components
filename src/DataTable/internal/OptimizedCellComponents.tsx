@@ -103,7 +103,7 @@ export const OptimizedCell = memo(
           {avatarElement}
           {startAdornment && (
             <>
-              {startAdornment}
+              <div style={{ display: "flex", flexDirection: "column", justifyContent: "center" }}>{startAdornment}</div>
               <Spacer xsmall />
             </>
           )}
