@@ -8,6 +8,7 @@ import { Icon } from "@new/Icon/Icon"
 import { Color } from "@new/Color"
 import { ICellTextProps, ICellEditorProps } from "ka-table/props"
 import { Column } from "../types"
+import { TABLE_CELL_EMPTY_STRING } from "@new/DataTable/internal/constants"
 
 export const CellProgressIndicator = (cellTextProps: ICellTextProps | ICellEditorProps) => {
   const progressIndicator = cellTextProps.column["progressIndicator"] as Column["progressIndicator"]
@@ -70,13 +71,7 @@ export const CellIcon = (cellTextProps: ICellTextProps | ICellEditorProps) => {
   return (
     <Stack hug horizontal>
       <Align horizontal center>
-        {iconConfig ? (
-          <Icon name={iconConfig.name} fill={iconConfig.color} medium />
-        ) : (
-          <Text fill={[Color.Neutral, 700]} small monospace>
-            –
-          </Text>
-        )}
+        {iconConfig ? <Icon name={iconConfig.name} fill={iconConfig.color} medium /> : null}
       </Align>
     </Stack>
   )
