@@ -104,7 +104,7 @@ export const createDataTableStyles = (cssScope: string, fill?: ColorWithLightnes
   }
 
   .${cssScope} .ka-cell:first-child.ka-cell-icon {
-    padding-left: calc(var(--BU) * 4);
+    padding: 0;
   }
 
   .${cssScope} .ka-cell:last-child {
