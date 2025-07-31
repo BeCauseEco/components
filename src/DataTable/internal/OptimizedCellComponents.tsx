@@ -9,6 +9,13 @@ import Link from "next/link"
 import { Column, DataType } from "../types"
 import { formatValue } from "../utils"
 import { TABLE_CELL_EMPTY_STRING } from "./constants"
+import styled from "@emotion/styled"
+
+const AdornmentCenteringContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: "center";
+`
 
 interface OptimizedCellProps {
   column: Column
@@ -103,7 +110,7 @@ export const OptimizedCell = memo(
           {avatarElement}
           {startAdornment && (
             <>
-              <div style={{ display: "flex", flexDirection: "column", justifyContent: "center" }}>{startAdornment}</div>
+              <AdornmentCenteringContainer>{startAdornment}</AdornmentCenteringContainer>
               <Spacer xsmall />
             </>
           )}
