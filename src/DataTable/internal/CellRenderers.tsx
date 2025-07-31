@@ -55,7 +55,7 @@ export const CellStatus = (cellTextProps: ICellTextProps | ICellEditorProps) => 
           <Badge size="large" variant="transparent" color={color} iconName="circle" label={label} />
         ) : (
           <Text fill={[Color.Neutral, 700]} small monospace>
-            –
+            {TABLE_CELL_EMPTY_STRING}
           </Text>
         )}
       </Align>
