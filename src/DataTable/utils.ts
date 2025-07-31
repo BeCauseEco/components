@@ -5,7 +5,9 @@ export const createNewRow = (data: DataTableProps["data"]): object => {
   return { id: Math.max(...data.map(d => d.id)) + 1 }
 }
 
-export const formatValue = (value: string, dataType: DataType): string => {
+export const formatValue = (value: string, dataType: DataType, placeholder?: string): string => {
+  const emptyString = placeholder || TABLE_CELL_EMPTY_STRING
+
   switch (dataType) {
     case DataType.Number:
       return value
@@ -14,19 +16,19 @@ export const formatValue = (value: string, dataType: DataType): string => {
             minimumFractionDigits: 2,
             maximumFractionDigits: 2,
           }).format(Number(value))
-        : TABLE_CELL_EMPTY_STRING
+        : emptyString
 
     case DataType.Date:
-      return value ? new Date(value).toLocaleDateString() : TABLE_CELL_EMPTY_STRING
+      return value ? new Date(value).toLocaleDateString() : emptyString
 
     case DataType.Boolean:
-      return value ? (value === "true" ? "Yes" : "No") : TABLE_CELL_EMPTY_STRING
+      return value ? (value === "true" ? "Yes" : "No") : emptyString
 
     case DataType.String:
-      return value || TABLE_CELL_EMPTY_STRING
+      return value || emptyString
 
     default:
-      return TABLE_CELL_EMPTY_STRING
+      return emptyString
   }
 }
 
@@ -39,15 +41,17 @@ export const csv = (data: DataTableProps["data"], columns: Column[]) => {
     columns.forEach(c => {
       const column = c as Column
       const value = (row[column.key] || "").toString()
+      const emptyString = column.placeholder || TABLE_CELL_EMPTY_STRING
 
       if (column.dataType === DataType.Boolean) {
-        rowSanitized.push(value !== undefined ? (value ? "Yes" : "No") : "")
+        rowSanitized.push(value !== undefined ? (value ? "Yes" : "No") : emptyString)
       } else if (column.dataType === DataType.String) {
-        rowSanitized.push(value.lastIndexOf(";") !== -1 ? `"${value}"` : value)
+        const stringValue = value || emptyString
+        rowSanitized.push(stringValue.lastIndexOf(";") !== -1 ? `"${stringValue}"` : stringValue)
       } else if (column.dataType === DataType.ProgressIndicator) {
-        rowSanitized.push(row[column.key]?.["value"] || "")
+        rowSanitized.push(row[column.key]?.["value"] || emptyString)
       } else {
-        rowSanitized.push(value)
+        rowSanitized.push(value || emptyString)
       }
     })
 

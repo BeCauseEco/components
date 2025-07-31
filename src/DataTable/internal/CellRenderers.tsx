@@ -4,9 +4,11 @@ import { ProgressIndicator } from "@new/ProgressIndicator/ProgressIndicator"
 import { ProgressIndicatorSegment } from "@new/ProgressIndicator/ProgressIndicatorSegment"
 import { Badge } from "@new/Badge/Badge"
 import { Text } from "@new/Text/Text"
+import { Icon } from "@new/Icon/Icon"
 import { Color } from "@new/Color"
 import { ICellTextProps, ICellEditorProps } from "ka-table/props"
 import { Column } from "../types"
+import { TABLE_CELL_EMPTY_STRING } from "@new/DataTable/internal/constants"
 
 export const CellProgressIndicator = (cellTextProps: ICellTextProps | ICellEditorProps) => {
   const progressIndicator = cellTextProps.column["progressIndicator"] as Column["progressIndicator"]
@@ -53,9 +55,23 @@ export const CellStatus = (cellTextProps: ICellTextProps | ICellEditorProps) => 
           <Badge size="large" variant="transparent" color={color} iconName="circle" label={label} />
         ) : (
           <Text fill={[Color.Neutral, 700]} small monospace>
-            –
+            {TABLE_CELL_EMPTY_STRING}
           </Text>
         )}
+      </Align>
+    </Stack>
+  )
+}
+
+export const CellIcon = (cellTextProps: ICellTextProps | ICellEditorProps) => {
+  const column = cellTextProps.column as Column
+  const icon = column.icon
+  const iconConfig = icon?.configure(cellTextProps.rowData)
+
+  return (
+    <Stack hug horizontal>
+      <Align horizontal center>
+        {iconConfig ? <Icon name={iconConfig.name} fill={iconConfig.color} medium /> : null}
       </Align>
     </Stack>
   )

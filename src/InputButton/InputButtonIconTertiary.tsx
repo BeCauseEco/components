@@ -1,6 +1,6 @@
 import { forwardRef } from "react"
 import { InputButtonProps, InputButton } from "@new/InputButton/internal/InputButton"
-import { Color } from "@new/Color"
+import { Color, ColorWithLightness } from "@new/Color"
 
 export type InputButtonIconTertiaryProps = Pick<
   InputButtonProps,
@@ -16,6 +16,8 @@ export type InputButtonIconTertiaryProps = Pick<
   | "title"
 > & {
   iconName: string
+  customColor?: Color
+  customColorWithLightness?: ColorWithLightness
 }
 
 export const InputButtonIconTertiary = forwardRef<HTMLButtonElement, InputButtonIconTertiaryProps>((p, ref) => {
@@ -27,9 +29,9 @@ export const InputButtonIconTertiary = forwardRef<HTMLButtonElement, InputButton
       variant="transparent"
       size={p.size}
       width="auto"
-      colorForeground={[Color.Primary, 700]}
-      colorBackgroundHover={[Color.Primary, 100]}
-      colorLoading={[Color.Primary, 700]}
+      colorForeground={p.customColorWithLightness || [p.customColor || Color.Primary, 700]}
+      colorBackgroundHover={p.customColorWithLightness || [p.customColor || Color.Primary, 100]}
+      colorLoading={p.customColorWithLightness || [p.customColor || Color.Primary, 700]}
       hug={p.hug}
       loading={p.loading ? true : undefined}
       disabled={p.disabled ? true : undefined}
