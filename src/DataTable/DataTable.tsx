@@ -423,13 +423,7 @@ export const DataTable = (p: DataTableProps) => {
               {p.loadingElement ? (
                 p.loadingElement
               ) : (
-                <Stack
-                  vertical
-                  hug
-                  stroke={p.stroke || [Color.Neutral, 100]}
-                  fill={p.fill || [Color.Transparent]}
-                  cornerRadius="large"
-                >
+                <Stack vertical hug stroke={p.stroke || [Color.Neutral, 100]} fill={p.fill || [Color.Transparent]}>
                   <Align topLeft vertical>
                     <Table
                       table={table}
