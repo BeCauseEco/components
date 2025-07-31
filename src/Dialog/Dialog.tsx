@@ -58,6 +58,7 @@ const computeMinSize = (size: TDialog["size"], fixedWidth: TDialog["fixedWidth"]
     case Size.Huge:
       return {
         minWidth: "calc(100vw - calc(var(--BU) * 10))",
+        minHeight: `initial`,
       }
   }
 }
