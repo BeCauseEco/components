@@ -73,6 +73,7 @@ const computeColorDestructive = (
 const Output = styled.output<InputButtonProps & { _width: string; hug: boolean }>(p => ({
   display: "flex",
   border: 0,
+  padding: 0,
   background: "none",
   userSelect: "none",
   textDecorationColor: "inherit",
