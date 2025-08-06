@@ -27,6 +27,7 @@ export enum DataType {
   ProgressIndicator = "progressindicator",
   Status = "status",
   List = "list",
+  Icon = "icon",
 }
 
 export type Column = {
@@ -38,13 +39,14 @@ export type Column = {
   explodeWidth?: boolean
   preventContentCollapse?: boolean
   sort?: (sortDirection: SortDirection) => (a: any, b: any) => number
-  avatar?: (rowData: ICellTextProps["rowData"]) => string | undefined
+  avatar?: string | ((rowData: ICellTextProps["rowData"]) => string | ReactElement | undefined)
   link?: (rowData: ICellTextProps["rowData"]) => string | (() => void) | undefined
   tooltip?: ((rowData: ICellTextProps["rowData"]) => ReactElement<AlignProps> | string | undefined) | boolean
   showTooltipIcon?: boolean
   isEditable?: boolean
   endAdornment?: (rowData: ICellTextProps["rowData"]) => ReactElement<AlignProps> | string | undefined
   startAdornment?: (rowData: ICellTextProps["rowData"]) => ReactElement<AlignProps> | string | undefined
+  placeholder?: string
   progressIndicator?: {
     type: "bar" | "circle"
 
@@ -67,7 +69,15 @@ export type Column = {
   numberFormat?: {
     configure: (value: number, rowData: ICellTextProps["rowData"]) => string
   }
-  fill?: ((rowData: ICellTextProps["rowData"]) => Color) | Color | undefined
+  icon?: {
+    configure: (rowData: ICellTextProps["rowData"]) =>
+      | {
+          name: string
+          color: ColorWithLightness
+        }
+      | undefined
+  }
+  fill?: ((rowData: ICellTextProps["rowData"]) => Color | undefined) | Color | undefined
 }
 
 type Children =
@@ -101,6 +111,7 @@ export type DataTableProps = {
   selectDisabledField?: string
   virtualScrolling?: boolean
   loading?: boolean
+  loadingElement?: ReactElement
   exportDisable?: boolean
   rowActions?: (rowData: ICellTextProps["rowData"]) => RowActionsElement[]
   onChange?: (value: DataTableProps["data"]) => void

@@ -9,6 +9,7 @@ import { Icon } from "@new/Icon/Icon"
 import { Spacer } from "@new/Stack/Spacer"
 import { Divider } from "@new/Divider/Divider"
 import { InputButton } from "@new/InputButton/internal/InputButton"
+import { InputButtonIconTertiary } from "@new/InputButton/InputButtonIconTertiary"
 import { ComponentBaseProps } from "@new/ComponentBaseProps"
 
 export type InputTextProps = ComponentBaseProps & {
@@ -36,6 +37,8 @@ export type InputTextProps = ComponentBaseProps & {
 
   iconNameLeft?: string
   iconNameRight?: string
+  onLeftIconClick?: () => void
+  onRightIconClick?: () => void
 
   hug?: boolean
 
@@ -224,12 +227,16 @@ export const InputText = forwardRef<HTMLInputElement | HTMLTextAreaElement, Inpu
       <Align horizontal center hug="width">
         <Spacer xsmall={p.size === "small"} small={p.size === "large"} />
 
-        <Icon
-          name={p.iconNameLeft}
-          medium={p.size === "small"}
-          large={p.size === "large"}
-          fill={[p.error ? Color.Error : p.color, 700]}
-        />
+        {p.onLeftIconClick ? (
+          <InputButtonIconTertiary hug iconName={p.iconNameLeft} size={p.size} onClick={p.onLeftIconClick} />
+        ) : (
+          <Icon
+            name={p.iconNameLeft}
+            medium={p.size === "small"}
+            large={p.size === "large"}
+            fill={[p.error ? Color.Error : p.color, 700]}
+          />
+        )}
       </Align>
     )
   }
@@ -237,12 +244,16 @@ export const InputText = forwardRef<HTMLInputElement | HTMLTextAreaElement, Inpu
   if (p.iconNameRight && p.rows === 1) {
     iconEnd = (
       <Align horizontal center hug="width">
-        <Icon
-          name={p.iconNameRight}
-          medium={p.size === "small"}
-          large={p.size === "large"}
-          fill={[p.error ? Color.Error : p.color, 700]}
-        />
+        {p.onRightIconClick ? (
+          <InputButtonIconTertiary hug iconName={p.iconNameRight} size={p.size} onClick={p.onRightIconClick} />
+        ) : (
+          <Icon
+            name={p.iconNameRight}
+            medium={p.size === "small"}
+            large={p.size === "large"}
+            fill={[p.error ? Color.Error : p.color, 700]}
+          />
+        )}
 
         <Spacer xsmall={p.size === "small"} small={p.size === "large"} />
       </Align>

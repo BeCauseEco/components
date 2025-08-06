@@ -73,6 +73,7 @@ const computeColorDestructive = (
 const Output = styled.output<InputButtonProps & { _width: string; hug: boolean }>(p => ({
   display: "flex",
   border: 0,
+  padding: 0,
   background: "none",
   userSelect: "none",
   textDecorationColor: "inherit",
@@ -236,7 +237,7 @@ const Children = (p: Omit<InputButtonProps, "width">) => {
 }
 
 export const InputButton = forwardRef<HTMLButtonElement | HTMLAnchorElement, InputButtonProps>((p, ref) => {
-  const { id, variant, onClick, href, width, disabled, ...pp } = p
+  const { id, variant, onClick, href, width, disabled, content, ...pp } = p
   const router = useRouter()
 
   const click =
@@ -251,7 +252,7 @@ export const InputButton = forwardRef<HTMLButtonElement | HTMLAnchorElement, Inp
       // @ts-expect-error TypeScript can't infer the type of the `ref` prop when using as="..."
       ref={ref}
       id={id}
-      as={variant === "link" ? "span" : "div"} // TO-DO: @cllpse: should render a button, but React is retarded
+      as={variant === "link" ? "span" : "button"}
       variant={variant}
       onMouseDown={event => {
         if (p.preventDefault && !disabled) {
@@ -284,7 +285,7 @@ export const InputButton = forwardRef<HTMLButtonElement | HTMLAnchorElement, Inp
         colorOutline={computeColorDestructive(p.colorOutline, p.destructive)}
         colorOutlineHover={computeColorDestructive(p.colorOutlineHover, p.destructive)}
         colorLoading={p.colorLoading}
-        content={p.content}
+        content={content}
         hug={p.hug}
         href={p.href}
         target={p.target}

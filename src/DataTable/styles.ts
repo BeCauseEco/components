@@ -103,6 +103,10 @@ export const createDataTableStyles = (cssScope: string, fill?: ColorWithLightnes
     z-index: 3;
   }
 
+  .${cssScope} .ka-cell:first-child.ka-cell-icon {
+    padding: 0;
+  }
+
   .${cssScope} .ka-cell:last-child {
     padding-right: calc(var(--BU) * 2);
     z-index: 3;

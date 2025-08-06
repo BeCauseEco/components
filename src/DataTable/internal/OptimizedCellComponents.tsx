@@ -9,6 +9,13 @@ import Link from "next/link"
 import { Column, DataType } from "../types"
 import { formatValue } from "../utils"
 import { TABLE_CELL_EMPTY_STRING } from "./constants"
+import styled from "@emotion/styled"
+
+const AdornmentCenteringContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: "center";
+`
 
 interface OptimizedCellProps {
   column: Column
@@ -32,7 +39,7 @@ export const OptimizedCell = memo(
     if (column.dataType === DataType.Number && column.numberFormat?.configure && typeof value === "number") {
       text = column.numberFormat.configure(value, rowData)
     } else {
-      text = formatValue(value?.toString(), column.dataType || DataType.String)
+      text = formatValue(value?.toString(), column.dataType || DataType.String, column.placeholder)
     }
 
     if (column.dataType === DataType.List) {
@@ -54,15 +61,15 @@ export const OptimizedCell = memo(
       column.dataType === DataType.Date || column.dataType === DataType.Number || column.dataType === DataType.Boolean
 
     // Get dynamic values
-    const avatarSrc = typeof column.avatar === "function" ? column.avatar(rowData) : undefined
+    const avatarValue = typeof column.avatar === "function" ? column.avatar(rowData) : column.avatar
     const linkEffect = typeof column.link === "function" ? column.link(rowData) : undefined
     const fillColor = typeof column.fill === "function" ? column.fill(rowData) : column.fill
     const startAdornment = column?.startAdornment?.(rowData)
     const endAdornment = column?.endAdornment?.(rowData)
 
-    const avatarElement = avatarSrc ? (
+    const avatarElement = avatarValue ? (
       <>
-        <Avatar size="small" src={avatarSrc} title={text} />
+        {typeof avatarValue === "string" ? <Avatar size="small" src={avatarValue} title={text} /> : avatarValue}
         <Spacer xsmall />
       </>
     ) : null
@@ -74,7 +81,8 @@ export const OptimizedCell = memo(
       return [color, lightness]
     }
 
-    if (linkEffect && text !== TABLE_CELL_EMPTY_STRING) {
+    const emptyString = column.placeholder || TABLE_CELL_EMPTY_STRING
+    if (linkEffect && text !== emptyString) {
       return (
         <>
           {avatarElement}
@@ -102,7 +110,7 @@ export const OptimizedCell = memo(
           {avatarElement}
           {startAdornment && (
             <>
-              {startAdornment}
+              <AdornmentCenteringContainer>{startAdornment}</AdornmentCenteringContainer>
               <Spacer xsmall />
             </>
           )}
