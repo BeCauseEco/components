@@ -15,6 +15,7 @@ export type InputButtonIconSecondaryProps = Pick<
   | "data-playwright-testid"
   | "title"
   | "tabIndex"
+  | "type"
 > & {
   iconName: string
   customOutline?: ColorWithLightness
@@ -44,6 +45,7 @@ export const InputButtonIconSecondary = forwardRef<HTMLButtonElement, InputButto
       onClick={p.onClick}
       preventDefault={p.preventDefault}
       tabIndex={p.tabIndex}
+      type={p.type}
       data-playwright-testid={p["data-playwright-testid"]}
     />
   )
