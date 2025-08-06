@@ -31,13 +31,33 @@ export const CellInputTextSingle = ({ column, rowKeyValue, value, autoFocus }: I
       color={Color.Neutral}
       onChange={v => {
         if (column.dataType === DataType.Number) {
-          const normalized = v.replace(/,/g, ".").replace(/[^0-9.]/g, "")
-          if (normalized === "" || normalized === ".") {
-            table.updateCellValue(rowKeyValue, column.key, undefined)
-            return
-          }
-          if (/^\d*\.?\d*$/.test(normalized)) {
-            table.updateCellValue(rowKeyValue, column.key, normalized)
+          // Check if input contains tabs (Excel paste)
+          if (v.includes("\t")) {
+            const values = v.split("\t")
+
+            // Get all columns starting from current column
+            const allColumns = table.props.columns || []
+            const currentColumnIndex = allColumns.findIndex(col => col.key === column.key)
+            const columnsFromCurrent = allColumns.slice(currentColumnIndex)
+
+            // Update multiple cells in the row
+            values.forEach((value, index) => {
+              if (columnsFromCurrent[index]) {
+                const normalized = value.replace(/,/g, ".").replace(/[^0-9.-]/g, "")
+                const cellValue = normalized === "" || normalized === "." ? undefined : normalized
+                table.updateCellValue(rowKeyValue, columnsFromCurrent[index].key, cellValue)
+              }
+            })
+          } else {
+            // Single cell update (existing logic)
+            const normalized = v.replace(/,/g, ".").replace(/[^0-9.-]/g, "")
+            if (normalized === "" || normalized === ".") {
+              table.updateCellValue(rowKeyValue, column.key, undefined)
+              return
+            }
+            if (/^\d*\.?\d*$/.test(normalized)) {
+              table.updateCellValue(rowKeyValue, column.key, normalized)
+            }
           }
         } else {
           table.updateCellValue(rowKeyValue, column.key, v)
