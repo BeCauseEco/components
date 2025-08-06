@@ -228,7 +228,13 @@ export const InputText = forwardRef<HTMLInputElement | HTMLTextAreaElement, Inpu
         <Spacer xsmall={p.size === "small"} small={p.size === "large"} />
 
         {p.onLeftIconClick ? (
-          <InputButtonIconTertiary hug iconName={p.iconNameLeft} size={p.size} onClick={p.onLeftIconClick} />
+          <InputButtonIconTertiary
+            hug
+            iconName={p.iconNameLeft}
+            size={p.size}
+            onClick={p.onLeftIconClick}
+            tabIndex={-1}
+          />
         ) : (
           <Icon
             name={p.iconNameLeft}
@@ -245,7 +251,13 @@ export const InputText = forwardRef<HTMLInputElement | HTMLTextAreaElement, Inpu
     iconEnd = (
       <Align horizontal center hug="width">
         {p.onRightIconClick ? (
-          <InputButtonIconTertiary hug iconName={p.iconNameRight} size={p.size} onClick={p.onRightIconClick} />
+          <InputButtonIconTertiary
+            hug
+            iconName={p.iconNameRight}
+            size={p.size}
+            onClick={p.onRightIconClick}
+            tabIndex={-1}
+          />
         ) : (
           <Icon
             name={p.iconNameRight}
@@ -344,6 +356,7 @@ export const InputText = forwardRef<HTMLInputElement | HTMLTextAreaElement, Inpu
                 colorForeground={p.value ? [p.color, 700] : [Color.Transparent]}
                 iconName="clear"
                 iconPlacement="labelNotSpecified"
+                tabIndex={-1}
                 onClick={() => {
                   if (p.onChange) {
                     p.onChange("")

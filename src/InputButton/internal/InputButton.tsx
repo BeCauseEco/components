@@ -49,6 +49,8 @@ export type InputButtonProps = ComponentBaseProps &
     content?: ReactElement<StackProps> | null | undefined
 
     title?: string
+
+    tabIndex?: number
   }
 
 const computeHeight = (p: InputButtonProps): string => {
@@ -81,10 +83,10 @@ const Output = styled.output<InputButtonProps & { _width: string; hug: boolean }
   height: p.hug ? "fit-content" : computeHeight(p),
   lineHeight: 1,
   cursor: "pointer",
+  tabIndex: p.tabIndex !== undefined ? p.tabIndex : 0,
 
   "&:focus-visible, &:focus": {
-    outline: "none",
-    // boxShadow: "0 0 0 2px currentColor",
+    outlineOffset: "2px",
   },
 
   "& a p, & p": {

@@ -77,6 +77,7 @@ export const Badge = (p: BadgeProps) => {
           iconPlacement="labelNotSpecified"
           onClick={p.onClear}
           hug
+          tabIndex={-1}
         />
 
         <Spacer xsmall={p.size === "small"} small={p.size === "large"} />

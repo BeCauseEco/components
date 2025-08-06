@@ -584,6 +584,7 @@ export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<InputC
                         colorForeground={p.value ? [p.color, 700] : [Color.Transparent]}
                         iconName="clear"
                         iconPlacement="labelNotSpecified"
+                        tabIndex={-1}
                         onClick={() => {
                           if (p.onChange) {
                             p.onChange(p.multiple ? [] : "")
