@@ -16,6 +16,7 @@ export type InputButtonSecondaryProps = Pick<
   | "href"
   | "destructive"
   | "data-playwright-testid"
+  | "tabIndex"
 > & {
   label: string
   transparent?: boolean
@@ -65,6 +66,7 @@ export const InputButtonSecondary = forwardRef<HTMLButtonElement, InputButtonSec
       onClick={p.onClick}
       preventDefault={p.preventDefault}
       href={p.href}
+      tabIndex={p.tabIndex}
       data-playwright-testid={p["data-playwright-testid"]}
       title={p.title}
     />

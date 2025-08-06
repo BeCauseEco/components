@@ -14,6 +14,7 @@ export type InputButtonIconTertiaryProps = Pick<
   | "destructive"
   | "data-playwright-testid"
   | "title"
+  | "tabIndex"
 > & {
   iconName: string
   customColor?: Color
@@ -41,6 +42,7 @@ export const InputButtonIconTertiary = forwardRef<HTMLButtonElement, InputButton
       title={p.title}
       onClick={p.onClick}
       preventDefault={p.preventDefault}
+      tabIndex={p.tabIndex}
       data-playwright-testid={p["data-playwright-testid"]}
     />
   )

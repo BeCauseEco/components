@@ -15,6 +15,7 @@ export type InputButtonTertiaryProps = Pick<
   | "href"
   | "destructive"
   | "data-playwright-testid"
+  | "tabIndex"
 > & {
   label: string
   alignLabel?: "left" | "center" | "right"
@@ -56,6 +57,7 @@ export const InputButtonTertiary = forwardRef<HTMLButtonElement, InputButtonTert
       onClick={p.onClick}
       preventDefault={p.preventDefault}
       href={p.href}
+      tabIndex={p.tabIndex}
       data-playwright-testid={p["data-playwright-testid"]}
     />
   )

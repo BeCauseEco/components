@@ -14,6 +14,7 @@ export type InputButtonLinkProps = Pick<
   | "href"
   | "target"
   | "data-playwright-testid"
+  | "tabIndex"
 > & {
   label: string
   iconNameLeft?: string
@@ -51,6 +52,7 @@ export const InputButtonLink = forwardRef<HTMLAnchorElement, InputButtonLinkProp
       preventDefault={p.preventDefault}
       href={p.href}
       target={p.target}
+      tabIndex={p.tabIndex}
       data-playwright-testid={p["data-playwright-testid"]}
     />
   )
