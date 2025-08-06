@@ -17,6 +17,7 @@ export type InputButtonPrimaryProps = Pick<
   | "destructive"
   | "data-playwright-testid"
   | "tabIndex"
+  | "type"
 > & {
   label: string
   iconNameLeft?: string
@@ -58,6 +59,7 @@ export const InputButtonPrimary = forwardRef<HTMLButtonElement, InputButtonPrima
       preventDefault={p.preventDefault}
       href={p.href}
       tabIndex={p.tabIndex}
+      type={p.type}
       data-playwright-testid={p["data-playwright-testid"]}
       title={p.title}
     />

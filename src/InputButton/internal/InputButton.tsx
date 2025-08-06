@@ -51,6 +51,7 @@ export type InputButtonProps = ComponentBaseProps &
     title?: string
 
     tabIndex?: number
+    type?: "button" | "submit" | "reset"
   }
 
 const computeHeight = (p: InputButtonProps): string => {
@@ -239,7 +240,7 @@ const Children = (p: Omit<InputButtonProps, "width">) => {
 }
 
 export const InputButton = forwardRef<HTMLButtonElement | HTMLAnchorElement, InputButtonProps>((p, ref) => {
-  const { id, variant, onClick, href, width, disabled, content, ...pp } = p
+  const { id, variant, onClick, href, width, disabled, content, type, ...pp } = p
   const router = useRouter()
 
   const click =
@@ -255,6 +256,7 @@ export const InputButton = forwardRef<HTMLButtonElement | HTMLAnchorElement, Inp
       ref={ref}
       id={id}
       as={variant === "link" ? "span" : "button"}
+      type={variant === "link" ? undefined : (type ?? "button")}
       variant={variant}
       onMouseDown={event => {
         if (p.preventDefault && !disabled) {

@@ -15,6 +15,7 @@ export type InputButtonIconPrimaryProps = Pick<
   | "data-playwright-testid"
   | "title"
   | "tabIndex"
+  | "type"
 > & {
   iconName: string
 }
@@ -42,6 +43,7 @@ export const InputButtonIconPrimary = forwardRef<HTMLButtonElement, InputButtonI
       onClick={p.onClick}
       preventDefault={p.preventDefault}
       tabIndex={p.tabIndex}
+      type={p.type}
       data-playwright-testid={p["data-playwright-testid"]}
     />
   )
