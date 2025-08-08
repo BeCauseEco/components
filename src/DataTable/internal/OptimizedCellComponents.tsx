@@ -35,12 +35,22 @@ export const OptimizedCell = memo(
     const { column, value, rowData, textSize = "small" } = props
     const alignmentRight = column.dataType === DataType.Number
 
-    // Apply custom number formatting first if configured
+    // Apply number formatting with precedence hierarchy:
+    // 1. Custom configure() function takes absolute priority
+    // 2. defaultTrailingDecimals from column configuration
+    // 3. Global default (2 decimal places) handled in formatValue
     let text: string
     if (column.dataType === DataType.Number && column.numberFormat?.configure && typeof value === "number") {
+      // Priority 1: Custom configure() function overrides all other formatting
       text = column.numberFormat.configure(value, rowData)
     } else {
-      text = formatValue(value?.toString(), column.dataType || DataType.String, column.placeholder)
+      // Priority 2 & 3: Use defaultTrailingDecimals or global default
+      text = formatValue(
+        value?.toString(), 
+        column.dataType || DataType.String, 
+        column.placeholder,
+        column.numberFormat?.defaultTrailingDecimals  // Falls back to global default if undefined
+      )
     }
 
     if (column.dataType === DataType.List) {
