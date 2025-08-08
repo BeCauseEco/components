@@ -122,6 +122,7 @@ export type DataTableProps = {
   children?: Children | Children[]
   editingMode?: EditingMode
   cellPaddingSize?: "none" | "tiny" | "xsmall" | "small" | "medium"
+  textSize?: "tiny" | "xsmall" | "small" | "medium" | "large"
 
   /**
    * @deprecated

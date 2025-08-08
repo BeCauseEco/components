@@ -24,6 +24,7 @@ interface OptimizedCellProps {
   rowKeyValue: any
   firstColumn: boolean
   tooltipElement?: React.ReactNode
+  textSize?: "tiny" | "xsmall" | "small" | "medium" | "large"
   // Include all props from cellTextContent
   [key: string]: any
 }
@@ -31,7 +32,7 @@ interface OptimizedCellProps {
 // Memoized cell component for better performance
 export const OptimizedCell = memo(
   (props: OptimizedCellProps) => {
-    const { column, value, rowData } = props
+    const { column, value, rowData, textSize = "small" } = props
     const alignmentRight = column.dataType === DataType.Number
 
     // Apply custom number formatting first if configured
@@ -49,7 +50,7 @@ export const OptimizedCell = memo(
       }
       return (
         <Align horizontal left>
-          <Text fill={[Color.Neutral, 700]} small textOverflow={column.maxWidth !== undefined}>
+          <Text fill={[Color.Neutral, 700]} {...{[textSize]: true}} textOverflow={column.maxWidth !== undefined}>
             {selectedOption.label}
           </Text>
         </Align>
@@ -86,7 +87,7 @@ export const OptimizedCell = memo(
       return (
         <>
           {avatarElement}
-          <Text fill={[Color.Neutral, 700]} small monospace={monospace} textOverflow={column.maxWidth !== undefined}>
+          <Text fill={[Color.Neutral, 700]} {...{[textSize]: true}} monospace={monospace} textOverflow={column.maxWidth !== undefined}>
             {typeof linkEffect === "string" ? (
               <Link href={linkEffect}>{text}</Link>
             ) : (
@@ -117,7 +118,7 @@ export const OptimizedCell = memo(
           <Align horizontal right={alignmentRight} left={!alignmentRight}>
             <Text
               fill={getColorWithLightness(fillColor, 700)}
-              small
+              {...{[textSize]: true}}
               monospace={monospace}
               textOverflow={column.maxWidth !== undefined}
             >
@@ -141,7 +142,8 @@ export const OptimizedCell = memo(
       prevProps.column.key === nextProps.column.key &&
       prevProps.rowData === nextProps.rowData &&
       prevProps.firstColumn === nextProps.firstColumn &&
-      prevProps.tooltipElement === nextProps.tooltipElement
+      prevProps.tooltipElement === nextProps.tooltipElement &&
+      prevProps.textSize === nextProps.textSize
     )
   },
 )

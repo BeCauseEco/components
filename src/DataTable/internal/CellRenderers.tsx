@@ -10,7 +10,7 @@ import { ICellTextProps, ICellEditorProps } from "ka-table/props"
 import { Column } from "../types"
 import { TABLE_CELL_EMPTY_STRING } from "@new/DataTable/internal/constants"
 
-export const CellProgressIndicator = (cellTextProps: ICellTextProps | ICellEditorProps) => {
+export const CellProgressIndicator = (cellTextProps: (ICellTextProps | ICellEditorProps) & { textSize?: "tiny" | "xsmall" | "small" | "medium" | "large" }) => {
   const progressIndicator = cellTextProps.column["progressIndicator"] as Column["progressIndicator"]
   const type = progressIndicator?.type || "bar"
   const { value, color } = progressIndicator?.configure(cellTextProps.rowData) || { value: 0, color: Color.Neutral }
@@ -40,8 +40,9 @@ export const CellProgressIndicator = (cellTextProps: ICellTextProps | ICellEdito
   )
 }
 
-export const CellStatus = (cellTextProps: ICellTextProps | ICellEditorProps) => {
+export const CellStatus = (cellTextProps: (ICellTextProps | ICellEditorProps) & { textSize?: "tiny" | "xsmall" | "small" | "medium" | "large" }) => {
   const status = cellTextProps.column["status"] as Column["status"]
+  const textSize = (cellTextProps as any).textSize || "small"
 
   const { color, label } = status?.configure(cellTextProps.rowData) || {
     color: undefined,
@@ -54,7 +55,7 @@ export const CellStatus = (cellTextProps: ICellTextProps | ICellEditorProps) => 
         {color && label ? (
           <Badge size="large" variant="transparent" color={color} iconName="circle" label={label} />
         ) : (
-          <Text fill={[Color.Neutral, 700]} small monospace>
+          <Text fill={[Color.Neutral, 700]} {...{[textSize]: true}} monospace>
             {TABLE_CELL_EMPTY_STRING}
           </Text>
         )}
@@ -63,7 +64,7 @@ export const CellStatus = (cellTextProps: ICellTextProps | ICellEditorProps) => 
   )
 }
 
-export const CellIcon = (cellTextProps: ICellTextProps | ICellEditorProps) => {
+export const CellIcon = (cellTextProps: (ICellTextProps | ICellEditorProps) & { textSize?: "tiny" | "xsmall" | "small" | "medium" | "large" }) => {
   const column = cellTextProps.column as Column
   const icon = column.icon
   const iconConfig = icon?.configure(cellTextProps.rowData)
