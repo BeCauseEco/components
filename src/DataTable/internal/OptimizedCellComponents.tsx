@@ -24,7 +24,7 @@ interface OptimizedCellProps {
   rowKeyValue: any
   firstColumn: boolean
   tooltipElement?: React.ReactNode
-  textSize?: "tiny" | "xsmall" | "small" | "medium" | "large"
+  textSize?: "xxtiny" | "xtiny" | "tiny" | "xsmall" | "small" | "medium" | "large"
   // Include all props from cellTextContent
   [key: string]: any
 }

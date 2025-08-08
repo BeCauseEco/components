@@ -18,6 +18,16 @@ export const StyleFontFamily = {
   fontWeight: 400,
 }
 
+export const StyleBodyXXTiny = {
+  fontSize: "8px",
+  lineHeight: "12px",
+}
+
+export const StyleBodyXTiny = {
+  fontSize: "10px",
+  lineHeight: "14px",
+}
+
 export const StyleBodyTiny = {
   fontSize: "12px",
   lineHeight: "16px",
@@ -62,6 +72,8 @@ const Container = styled(
   "p",
   makePropsNonTransient([
     "wrap",
+    "xxtiny",
+    "xtiny",
     "tiny",
     "xsmall",
     "small",
@@ -130,6 +142,8 @@ const Container = styled(
     maxWidth: p.maxWidth || "auto",
   }),
 
+  ...(p.xxtiny && StyleBodyXXTiny),
+  ...(p.xtiny && StyleBodyXTiny),
   ...(p.tiny && StyleBodyTiny),
   ...(p.xsmall && StyleBodyXsmall),
   ...(p.small && StyleBodySmall),
@@ -140,6 +154,8 @@ const Container = styled(
   ...(p.xHuge && StyleBodyExtraHuge),
 
   // TODO: @cllpse: investigate why !important is needed here
+  ...(!p.wrap && p.xxtiny && { lineHeight: `${StyleBodyXXTiny.fontSize} !important` }),
+  ...(!p.wrap && p.xtiny && { lineHeight: `${StyleBodyXTiny.fontSize} !important` }),
   ...(!p.wrap && p.tiny && { lineHeight: `${StyleBodyTiny.fontSize} !important` }),
   ...(!p.wrap && p.xsmall && { lineHeight: `${StyleBodyXsmall.fontSize} !important` }),
   ...(!p.wrap && p.small && { lineHeight: `${StyleBodySmall.fontSize} !important` }),
@@ -151,6 +167,8 @@ const Container = styled(
 }))
 
 export type TextProps = PlaywrightProps & {
+  xxtiny?: boolean
+  xtiny?: boolean
   tiny?: boolean
   xsmall?: boolean
   small?: boolean

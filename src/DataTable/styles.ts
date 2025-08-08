@@ -22,7 +22,7 @@ const getFirstLastCellPadding = (size?: "none" | "tiny" | "xsmall" | "small" | "
     case "none":
       return "0"
     case "tiny":
-      return "calc(var(--BU) * 0.5)"
+      return "calc(var(--BU) * 1)" // Use full tiny padding instead of half
     case "xsmall":
       return "calc(var(--BU) * 1)"
     case "small":
