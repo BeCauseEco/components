@@ -113,6 +113,7 @@ export type DataTableProps = {
   loading?: boolean
   loadingElement?: ReactElement
   exportDisable?: boolean
+  disableSorting?: boolean
   rowActions?: (rowData: ICellTextProps["rowData"]) => RowActionsElement[]
   onChange?: (value: DataTableProps["data"]) => void
   onChangeRow?: (value: object) => void
@@ -120,6 +121,7 @@ export type DataTableProps = {
   stroke?: ColorWithLightness
   children?: Children | Children[]
   editingMode?: EditingMode
+  cellPaddingSize?: "none" | "tiny" | "xsmall" | "small" | "medium"
 
   /**
    * @deprecated

@@ -1,7 +1,44 @@
 import { Color, ColorWithLightness, adjustLightness, computeColor } from "@new/Color"
 import { StyleBodySmall, StyleFontFamily } from "@new/Text/Text"
 
-export const createDataTableStyles = (cssScope: string, fill?: ColorWithLightness, stroke?: ColorWithLightness) => `
+const getCellPadding = (size?: "none" | "tiny" | "xsmall" | "small" | "medium") => {
+  switch (size) {
+    case "none":
+      return "0"
+    case "tiny":
+      return "0 calc(var(--BU) * 1)"
+    case "xsmall":
+      return "0 calc(var(--BU) * 2)"
+    case "small":
+      return "0 calc(var(--BU) * 3)"
+    case "medium":
+    default:
+      return "0 calc(var(--BU) * 4)"
+  }
+}
+
+const getFirstLastCellPadding = (size?: "none" | "tiny" | "xsmall" | "small" | "medium") => {
+  switch (size) {
+    case "none":
+      return "0"
+    case "tiny":
+      return "calc(var(--BU) * 0.5)"
+    case "xsmall":
+      return "calc(var(--BU) * 1)"
+    case "small":
+      return "calc(var(--BU) * 1.5)"
+    case "medium":
+    default:
+      return "calc(var(--BU) * 2)"
+  }
+}
+
+export const createDataTableStyles = (
+  cssScope: string,
+  fill?: ColorWithLightness,
+  stroke?: ColorWithLightness,
+  cellPaddingSize?: "none" | "tiny" | "xsmall" | "small" | "medium"
+) => `
   .${cssScope} .ka {
     background-color: unset;
     font-size: unset;
@@ -54,7 +91,7 @@ export const createDataTableStyles = (cssScope: string, fill?: ColorWithLightnes
   }
 
   .${cssScope} .ka-thead-cell {
-    padding: 0 calc(var(--BU) * 4);
+    padding: ${getCellPadding(cellPaddingSize)};
     color: unset;
     z-index: 3;
   }
@@ -64,15 +101,15 @@ export const createDataTableStyles = (cssScope: string, fill?: ColorWithLightnes
   }
 
   .${cssScope} .ka-thead-row .ka-thead-cell:first-child {
-    padding-left: calc(var(--BU) * 2);
+    padding-left: ${getFirstLastCellPadding(cellPaddingSize)};
   }
 
   .${cssScope} .ka-thead-row .ka-thead-cell:last-child {
-    padding-left: calc(var(--BU) * 2);
+    padding-right: ${getFirstLastCellPadding(cellPaddingSize)};
   }
 
   .${cssScope} .ka-cell {
-    padding: 0 calc(var(--BU) * 4);
+    padding: ${getCellPadding(cellPaddingSize)};
     height: calc(var(--BU) * 10);
     line-height: unset;
     color: unset;
@@ -95,11 +132,11 @@ export const createDataTableStyles = (cssScope: string, fill?: ColorWithLightnes
   }
 
   .${cssScope} .ka-cell.override-ka-fixed-right {
-    padding-left: calc(var(--BU) * 2);
+    padding-left: ${getFirstLastCellPadding(cellPaddingSize)};
   }
 
   .${cssScope} .ka-cell:first-child {
-    padding-left: calc(var(--BU) * 2);
+    padding-left: ${getFirstLastCellPadding(cellPaddingSize)};
     z-index: 3;
   }
 
@@ -108,7 +145,7 @@ export const createDataTableStyles = (cssScope: string, fill?: ColorWithLightnes
   }
 
   .${cssScope} .ka-cell:last-child {
-    padding-right: calc(var(--BU) * 2);
+    padding-right: ${getFirstLastCellPadding(cellPaddingSize)};
     z-index: 3;
   }
 

@@ -324,7 +324,7 @@ export const DataTable = (p: DataTableProps) => {
   const referencePrint = useRef<HTMLDivElement>(null)
   const print = useReactToPrint({ contentRef: referencePrint, documentTitle: p.exportName })
 
-  const css = createDataTableStyles(cssScope, p.fill, p.stroke)
+  const css = createDataTableStyles(cssScope, p.fill, p.stroke, p.cellPaddingSize)
 
   // Monitor performance of key operations
   usePerformanceMonitoring("render", [p.data.length, p.columns.length])
@@ -430,7 +430,7 @@ export const DataTable = (p: DataTableProps) => {
                       columns={nativeColumns as any}
                       data={p.data}
                       rowKeyField={p.rowKeyField}
-                      sortingMode={SortingMode.Single}
+                      sortingMode={p.disableSorting ? SortingMode.None : SortingMode.Single}
                       editingMode={p.editingMode}
                       rowReordering={p.mode === "edit" && p.editingMode !== EditingMode.Cell}
                       noData={{ text: "Nothing found" }}
@@ -503,7 +503,10 @@ export const DataTable = (p: DataTableProps) => {
                             const firstColumn = headCellContent.column.key === nativeColumns[0].key
 
                             const headCellContentAsColumn = headCellContent.column as Column
-                            const allowSort = p.mode !== "edit" && headCellContentAsColumn.dataType !== DataType.Status
+                            const allowSort =
+                              !p.disableSorting &&
+                              p.mode !== "edit" &&
+                              headCellContentAsColumn.dataType !== DataType.Status
 
                             return (
                               <Stack hug horizontal>
