@@ -51,7 +51,9 @@ export const DataTable = (p: DataTableProps) => {
   const [containerWidth, setContainerWidth] = useState<number>(0)
 
   // Helper to get text size props for Text components
-  const getTextSizeProps = (defaultSize: "xxtiny" | "xtiny" | "tiny" | "xsmall" | "small" | "medium" | "large" = "small") => {
+  const getTextSizeProps = (
+    defaultSize: "xxtiny" | "xtiny" | "tiny" | "xsmall" | "small" | "medium" | "large" = "small",
+  ) => {
     const size = p.textSize || defaultSize
     return { [size]: true }
   }

@@ -7,18 +7,18 @@ export const createNewRow = (data: DataTableProps["data"]): object => {
 
 /**
  * Formats a value according to its data type and optional formatting parameters.
- * 
+ *
  * For DataType.Number columns, applies decimal formatting with the following precedence:
  * 1. Custom configure() function (if provided in column definition)
  * 2. decimalPlaces parameter (typically from defaultTrailingDecimals)
  * 3. Global default (2 decimal places)
- * 
+ *
  * @param value - The raw value to format (as string)
  * @param dataType - The column data type determining formatting rules
  * @param placeholder - Optional placeholder for empty/null values
  * @param decimalPlaces - Number of decimal places for numeric values (0-20)
  * @returns Formatted string ready for display
- * 
+ *
  * @example
  * ```typescript
  * formatValue("123.456", DataType.Number, "", 2)     // "123.46"
@@ -27,7 +27,12 @@ export const createNewRow = (data: DataTableProps["data"]): object => {
  * formatValue("2023-12-25", DataType.Date)           // "12/25/2023" (locale-dependent)
  * ```
  */
-export const formatValue = (value: string, dataType: DataType, placeholder?: string, decimalPlaces?: number): string => {
+export const formatValue = (
+  value: string,
+  dataType: DataType,
+  placeholder?: string,
+  decimalPlaces?: number,
+): string => {
   const emptyString = placeholder || TABLE_CELL_EMPTY_STRING
 
   switch (dataType) {

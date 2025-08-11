@@ -37,7 +37,7 @@ export const createDataTableStyles = (
   cssScope: string,
   fill?: ColorWithLightness,
   stroke?: ColorWithLightness,
-  cellPaddingSize?: "none" | "tiny" | "xsmall" | "small" | "medium"
+  cellPaddingSize?: "none" | "tiny" | "xsmall" | "small" | "medium",
 ) => `
   .${cssScope} .ka {
     background-color: unset;
