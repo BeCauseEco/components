@@ -70,16 +70,16 @@ export type Column = {
     configure: (value: number, rowData: ICellTextProps["rowData"]) => string
     /**
      * Default number of trailing decimal places for DataType.Number columns when no custom configure function is provided.
-     * 
+     *
      * **Formatting Precedence:**
      * 1. `configure()` function (highest priority)
      * 2. `defaultTrailingDecimals` (this property)
      * 3. Global default (2 decimal places)
-     * 
+     *
      * @minimum 0 - No decimal places (integer display)
      * @maximum 20 - Maximum precision allowed by Intl.NumberFormat
      * @default 2
-     * 
+     *
      * @example
      * ```typescript
      * // Column with custom default decimals
@@ -90,7 +90,7 @@ export type Column = {
      *     defaultTrailingDecimals: 4  // Shows 123.4567
      *   }
      * }
-     * 
+     *
      * // Column with configure() overrides defaultTrailingDecimals
      * {
      *   key: "percentage",
