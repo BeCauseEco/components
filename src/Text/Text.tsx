@@ -18,6 +18,16 @@ export const StyleFontFamily = {
   fontWeight: 400,
 }
 
+export const StyleBodyXXTiny = {
+  fontSize: "8px",
+  lineHeight: "12px",
+}
+
+export const StyleBodyXTiny = {
+  fontSize: "10px",
+  lineHeight: "14px",
+}
+
 export const StyleBodyTiny = {
   fontSize: "12px",
   lineHeight: "16px",
@@ -53,10 +63,17 @@ export const StyleBodyHuge = {
   lineHeight: "40px",
 }
 
+export const StyleBodyExtraHuge = {
+  fontSize: "44px",
+  lineHeight: "40px",
+}
+
 const Container = styled(
   "p",
   makePropsNonTransient([
     "wrap",
+    "xxtiny",
+    "xtiny",
     "tiny",
     "xsmall",
     "small",
@@ -125,6 +142,8 @@ const Container = styled(
     maxWidth: p.maxWidth || "auto",
   }),
 
+  ...(p.xxtiny && StyleBodyXXTiny),
+  ...(p.xtiny && StyleBodyXTiny),
   ...(p.tiny && StyleBodyTiny),
   ...(p.xsmall && StyleBodyXsmall),
   ...(p.small && StyleBodySmall),
@@ -132,8 +151,11 @@ const Container = styled(
   ...(p.large && StyleBodyLarge),
   ...(p.xLarge && StyleBodyXLarge),
   ...(p.huge && StyleBodyHuge),
+  ...(p.xHuge && StyleBodyExtraHuge),
 
   // TODO: @cllpse: investigate why !important is needed here
+  ...(!p.wrap && p.xxtiny && { lineHeight: `${StyleBodyXXTiny.fontSize} !important` }),
+  ...(!p.wrap && p.xtiny && { lineHeight: `${StyleBodyXTiny.fontSize} !important` }),
   ...(!p.wrap && p.tiny && { lineHeight: `${StyleBodyTiny.fontSize} !important` }),
   ...(!p.wrap && p.xsmall && { lineHeight: `${StyleBodyXsmall.fontSize} !important` }),
   ...(!p.wrap && p.small && { lineHeight: `${StyleBodySmall.fontSize} !important` }),
@@ -141,9 +163,12 @@ const Container = styled(
   ...(!p.wrap && p.large && { lineHeight: `${StyleBodyLarge.fontSize} !important` }),
   ...(!p.wrap && p.xLarge && { lineHeight: `${StyleBodyXLarge.fontSize} !important` }),
   ...(!p.wrap && p.huge && { lineHeight: `${StyleBodyHuge.fontSize} !important` }),
+  ...(!p.wrap && p.xHuge && { lineHeight: `${StyleBodyExtraHuge.fontSize} !important` }),
 }))
 
 export type TextProps = PlaywrightProps & {
+  xxtiny?: boolean
+  xtiny?: boolean
   tiny?: boolean
   xsmall?: boolean
   small?: boolean
@@ -152,6 +177,7 @@ export type TextProps = PlaywrightProps & {
   xLarge?: boolean
   xxLarge?: boolean
   huge?: boolean
+  xHuge?: boolean
 
   fill: ColorWithLightness
 

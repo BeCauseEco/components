@@ -24,6 +24,7 @@ interface OptimizedCellProps {
   rowKeyValue: any
   firstColumn: boolean
   tooltipElement?: React.ReactNode
+  textSize?: "xxtiny" | "xtiny" | "tiny" | "xsmall" | "small" | "medium" | "large"
   // Include all props from cellTextContent
   [key: string]: any
 }
@@ -31,15 +32,25 @@ interface OptimizedCellProps {
 // Memoized cell component for better performance
 export const OptimizedCell = memo(
   (props: OptimizedCellProps) => {
-    const { column, value, rowData } = props
+    const { column, value, rowData, textSize = "small" } = props
     const alignmentRight = column.dataType === DataType.Number
 
-    // Apply custom number formatting first if configured
+    // Apply number formatting with precedence hierarchy:
+    // 1. Custom configure() function takes absolute priority
+    // 2. defaultTrailingDecimals from column configuration
+    // 3. Global default (2 decimal places) handled in formatValue
     let text: string
     if (column.dataType === DataType.Number && column.numberFormat?.configure && typeof value === "number") {
+      // Priority 1: Custom configure() function overrides all other formatting
       text = column.numberFormat.configure(value, rowData)
     } else {
-      text = formatValue(value?.toString(), column.dataType || DataType.String, column.placeholder)
+      // Priority 2 & 3: Use defaultTrailingDecimals or global default
+      text = formatValue(
+        value?.toString(),
+        column.dataType || DataType.String,
+        column.placeholder,
+        column.numberFormat?.defaultTrailingDecimals, // Falls back to global default if undefined
+      )
     }
 
     if (column.dataType === DataType.List) {
@@ -49,7 +60,7 @@ export const OptimizedCell = memo(
       }
       return (
         <Align horizontal left>
-          <Text fill={[Color.Neutral, 700]} small textOverflow={column.maxWidth !== undefined}>
+          <Text fill={[Color.Neutral, 700]} {...{ [textSize]: true }} textOverflow={column.maxWidth !== undefined}>
             {selectedOption.label}
           </Text>
         </Align>
@@ -86,7 +97,12 @@ export const OptimizedCell = memo(
       return (
         <>
           {avatarElement}
-          <Text fill={[Color.Neutral, 700]} small monospace={monospace} textOverflow={column.maxWidth !== undefined}>
+          <Text
+            fill={[Color.Neutral, 700]}
+            {...{ [textSize]: true }}
+            monospace={monospace}
+            textOverflow={column.maxWidth !== undefined}
+          >
             {typeof linkEffect === "string" ? (
               <Link href={linkEffect}>{text}</Link>
             ) : (
@@ -117,7 +133,7 @@ export const OptimizedCell = memo(
           <Align horizontal right={alignmentRight} left={!alignmentRight}>
             <Text
               fill={getColorWithLightness(fillColor, 700)}
-              small
+              {...{ [textSize]: true }}
               monospace={monospace}
               textOverflow={column.maxWidth !== undefined}
             >
@@ -141,7 +157,8 @@ export const OptimizedCell = memo(
       prevProps.column.key === nextProps.column.key &&
       prevProps.rowData === nextProps.rowData &&
       prevProps.firstColumn === nextProps.firstColumn &&
-      prevProps.tooltipElement === nextProps.tooltipElement
+      prevProps.tooltipElement === nextProps.tooltipElement &&
+      prevProps.textSize === nextProps.textSize
     )
   },
 )

@@ -50,6 +50,14 @@ export const DataTable = (p: DataTableProps) => {
   const referenceContainer = useRef<HTMLDivElement>(null)
   const [containerWidth, setContainerWidth] = useState<number>(0)
 
+  // Helper to get text size props for Text components
+  const getTextSizeProps = (
+    defaultSize: "xxtiny" | "xtiny" | "tiny" | "xsmall" | "small" | "medium" | "large" = "small",
+  ) => {
+    const size = p.textSize || defaultSize
+    return { [size]: true }
+  }
+
   // Optimization 5: Performance monitoring hook for development
   const usePerformanceMonitoring = (label: string, deps: any[]) => {
     useEffect(() => {
@@ -324,7 +332,7 @@ export const DataTable = (p: DataTableProps) => {
   const referencePrint = useRef<HTMLDivElement>(null)
   const print = useReactToPrint({ contentRef: referencePrint, documentTitle: p.exportName })
 
-  const css = createDataTableStyles(cssScope, p.fill, p.stroke)
+  const css = createDataTableStyles(cssScope, p.fill, p.stroke, p.cellPaddingSize)
 
   // Monitor performance of key operations
   usePerformanceMonitoring("render", [p.data.length, p.columns.length])
@@ -430,7 +438,7 @@ export const DataTable = (p: DataTableProps) => {
                       columns={nativeColumns as any}
                       data={p.data}
                       rowKeyField={p.rowKeyField}
-                      sortingMode={SortingMode.Single}
+                      sortingMode={p.disableSorting ? SortingMode.None : SortingMode.Single}
                       editingMode={p.editingMode}
                       rowReordering={p.mode === "edit" && p.editingMode !== EditingMode.Cell}
                       noData={{ text: "Nothing found" }}
@@ -503,7 +511,10 @@ export const DataTable = (p: DataTableProps) => {
                             const firstColumn = headCellContent.column.key === nativeColumns[0].key
 
                             const headCellContentAsColumn = headCellContent.column as Column
-                            const allowSort = p.mode !== "edit" && headCellContentAsColumn.dataType !== DataType.Status
+                            const allowSort =
+                              !p.disableSorting &&
+                              p.mode !== "edit" &&
+                              headCellContentAsColumn.dataType !== DataType.Status
 
                             return (
                               <Stack hug horizontal>
@@ -533,7 +544,7 @@ export const DataTable = (p: DataTableProps) => {
                                 <Align horizontal left={!alignmentRight} right={alignmentRight}>
                                   {allowSort || headCellContentAsColumn.sort ? (
                                     <CellHeadLink onClick={() => table.updateSortDirection(headCellContent.column.key)}>
-                                      <Text fill={[Color.Neutral, 700]} xsmall>
+                                      <Text fill={[Color.Neutral, 700]} {...getTextSizeProps("xsmall")}>
                                         <b>{headCellContent.column.title}</b>
                                       </Text>
 
@@ -542,7 +553,7 @@ export const DataTable = (p: DataTableProps) => {
                                       <Icon medium name={iconName} fill={[Color.Neutral, 700]} />
                                     </CellHeadLink>
                                   ) : (
-                                    <Text fill={[Color.Neutral, 700]} xsmall>
+                                    <Text fill={[Color.Neutral, 700]} {...getTextSizeProps("xsmall")}>
                                       <b>{headCellContent.column.title}</b>
                                     </Text>
                                   )}
@@ -623,7 +634,7 @@ export const DataTable = (p: DataTableProps) => {
                               if (typeof tooltip === "boolean" && text !== emptyString) {
                                 tooltipElement = (
                                   <Align horizontal left>
-                                    <Text small fill={[Color.Neutral, 700]} wrap>
+                                    <Text {...getTextSizeProps()} fill={[Color.Neutral, 700]} wrap>
                                       {text}
                                     </Text>
                                   </Align>
@@ -634,7 +645,7 @@ export const DataTable = (p: DataTableProps) => {
                                 if (typeof tooltipElement === "string") {
                                   tooltipElement = (
                                     <Align horizontal left>
-                                      <Text small fill={[Color.Neutral, 700]} wrap>
+                                      <Text {...getTextSizeProps()} fill={[Color.Neutral, 700]} wrap>
                                         {tooltipElement}
                                       </Text>
                                     </Align>
@@ -645,11 +656,11 @@ export const DataTable = (p: DataTableProps) => {
                               let output = <></>
 
                               if (column.dataType === DataType.ProgressIndicator) {
-                                output = <CellProgressIndicator {...cellTextContent} />
+                                output = <CellProgressIndicator {...cellTextContent} textSize={p.textSize} />
                               } else if (column.dataType === DataType.Status) {
-                                output = <CellStatus {...cellTextContent} />
+                                output = <CellStatus {...cellTextContent} textSize={p.textSize} />
                               } else if (column.dataType === DataType.Icon) {
-                                output = <CellIcon {...cellTextContent} />
+                                output = <CellIcon {...cellTextContent} textSize={p.textSize} />
                               } else {
                                 // Use optimized cell component for regular cells
                                 output = (
@@ -658,6 +669,7 @@ export const DataTable = (p: DataTableProps) => {
                                     column={column}
                                     firstColumn={firstColumn}
                                     tooltipElement={tooltipElement}
+                                    textSize={p.textSize}
                                   />
                                 )
                               }
@@ -751,7 +763,7 @@ export const DataTable = (p: DataTableProps) => {
 
                                 {(cellEditorContent.column as Column).dataType === DataType.ProgressIndicator ? (
                                   <Align left horizontal>
-                                    <CellProgressIndicator {...cellEditorContent} />
+                                    <CellProgressIndicator {...cellEditorContent} textSize={p.textSize} />
                                   </Align>
                                 ) : (
                                   <></>
@@ -767,7 +779,7 @@ export const DataTable = (p: DataTableProps) => {
 
                                 {(cellEditorContent.column as Column).dataType === DataType.Status ? (
                                   <Align left horizontal>
-                                    <CellStatus {...cellEditorContent} />
+                                    <CellStatus {...cellEditorContent} textSize={p.textSize} />
                                   </Align>
                                 ) : (
                                   <></>
@@ -915,12 +927,12 @@ export const DataTable = (p: DataTableProps) => {
       <Alert
         open={deleteId !== null}
         title={
-          <Text fill={[Color.Error, 700]} small>
+          <Text fill={[Color.Error, 700]} {...getTextSizeProps()}>
             Delete row?
           </Text>
         }
         description={
-          <Text fill={[Color.Neutral, 700]} xsmall wrap>
+          <Text fill={[Color.Neutral, 700]} {...getTextSizeProps("xsmall")} wrap>
             Are you sure you want to delete this row?
           </Text>
         }
