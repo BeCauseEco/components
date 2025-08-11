@@ -68,6 +68,41 @@ export type Column = {
   }
   numberFormat?: {
     configure: (value: number, rowData: ICellTextProps["rowData"]) => string
+    /**
+     * Default number of trailing decimal places for DataType.Number columns when no custom configure function is provided.
+     *
+     * **Formatting Precedence:**
+     * 1. `configure()` function (highest priority)
+     * 2. `defaultTrailingDecimals` (this property)
+     * 3. Global default (2 decimal places)
+     *
+     * @minimum 0 - No decimal places (integer display)
+     * @maximum 20 - Maximum precision allowed by Intl.NumberFormat
+     * @default 2
+     *
+     * @example
+     * ```typescript
+     * // Column with custom default decimals
+     * {
+     *   key: "price",
+     *   dataType: DataType.Number,
+     *   numberFormat: {
+     *     defaultTrailingDecimals: 4  // Shows 123.4567
+     *   }
+     * }
+     *
+     * // Column with configure() overrides defaultTrailingDecimals
+     * {
+     *   key: "percentage",
+     *   dataType: DataType.Number,
+     *   numberFormat: {
+     *     defaultTrailingDecimals: 4,  // Ignored when configure() exists
+     *     configure: (value) => `${value.toFixed(1)}%`  // Always 1 decimal + %
+     *   }
+     * }
+     * ```
+     */
+    defaultTrailingDecimals?: number
   }
   icon?: {
     configure: (rowData: ICellTextProps["rowData"]) =>
@@ -113,6 +148,7 @@ export type DataTableProps = {
   loading?: boolean
   loadingElement?: ReactElement
   exportDisable?: boolean
+  disableSorting?: boolean
   rowActions?: (rowData: ICellTextProps["rowData"]) => RowActionsElement[]
   onChange?: (value: DataTableProps["data"]) => void
   onChangeRow?: (value: object) => void
@@ -120,6 +156,8 @@ export type DataTableProps = {
   stroke?: ColorWithLightness
   children?: Children | Children[]
   editingMode?: EditingMode
+  cellPaddingSize?: "none" | "tiny" | "xsmall" | "small" | "medium"
+  textSize?: "xxtiny" | "xtiny" | "tiny" | "xsmall" | "small" | "medium" | "large"
 
   /**
    * @deprecated

@@ -5,7 +5,7 @@ import styled from "@emotion/styled"
 import { css, Global } from "@emotion/react"
 import { PlaywrightProps } from "@new/Playwright"
 
-const calculateBorderRadius = (size?: Size): string => {
+export const calculateBorderRadius = (size?: Size): string => {
   switch (size) {
     case Size.Small:
       return "var(--BU)"

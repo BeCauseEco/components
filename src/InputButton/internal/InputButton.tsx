@@ -49,6 +49,9 @@ export type InputButtonProps = ComponentBaseProps &
     content?: ReactElement<StackProps> | null | undefined
 
     title?: string
+
+    tabIndex?: number
+    type?: "button" | "submit" | "reset"
   }
 
 const computeHeight = (p: InputButtonProps): string => {
@@ -81,10 +84,10 @@ const Output = styled.output<InputButtonProps & { _width: string; hug: boolean }
   height: p.hug ? "fit-content" : computeHeight(p),
   lineHeight: 1,
   cursor: "pointer",
+  tabIndex: p.tabIndex !== undefined ? p.tabIndex : 0,
 
   "&:focus-visible, &:focus": {
-    outline: "none",
-    // boxShadow: "0 0 0 2px currentColor",
+    outlineOffset: "2px",
   },
 
   "& a p, & p": {
@@ -237,7 +240,7 @@ const Children = (p: Omit<InputButtonProps, "width">) => {
 }
 
 export const InputButton = forwardRef<HTMLButtonElement | HTMLAnchorElement, InputButtonProps>((p, ref) => {
-  const { id, variant, onClick, href, width, disabled, content, ...pp } = p
+  const { id, variant, onClick, href, width, disabled, content, type, ...pp } = p
   const router = useRouter()
 
   const click =
@@ -253,6 +256,7 @@ export const InputButton = forwardRef<HTMLButtonElement | HTMLAnchorElement, Inp
       ref={ref}
       id={id}
       as={variant === "link" ? "span" : "button"}
+      type={variant === "link" ? undefined : (type ?? "button")}
       variant={variant}
       onMouseDown={event => {
         if (p.preventDefault && !disabled) {
