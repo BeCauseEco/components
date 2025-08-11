@@ -46,10 +46,10 @@ export const OptimizedCell = memo(
     } else {
       // Priority 2 & 3: Use defaultTrailingDecimals or global default
       text = formatValue(
-        value?.toString(), 
-        column.dataType || DataType.String, 
+        value?.toString(),
+        column.dataType || DataType.String,
         column.placeholder,
-        column.numberFormat?.defaultTrailingDecimals  // Falls back to global default if undefined
+        column.numberFormat?.defaultTrailingDecimals, // Falls back to global default if undefined
       )
     }
 
@@ -60,7 +60,7 @@ export const OptimizedCell = memo(
       }
       return (
         <Align horizontal left>
-          <Text fill={[Color.Neutral, 700]} {...{[textSize]: true}} textOverflow={column.maxWidth !== undefined}>
+          <Text fill={[Color.Neutral, 700]} {...{ [textSize]: true }} textOverflow={column.maxWidth !== undefined}>
             {selectedOption.label}
           </Text>
         </Align>
@@ -97,7 +97,12 @@ export const OptimizedCell = memo(
       return (
         <>
           {avatarElement}
-          <Text fill={[Color.Neutral, 700]} {...{[textSize]: true}} monospace={monospace} textOverflow={column.maxWidth !== undefined}>
+          <Text
+            fill={[Color.Neutral, 700]}
+            {...{ [textSize]: true }}
+            monospace={monospace}
+            textOverflow={column.maxWidth !== undefined}
+          >
             {typeof linkEffect === "string" ? (
               <Link href={linkEffect}>{text}</Link>
             ) : (
@@ -128,7 +133,7 @@ export const OptimizedCell = memo(
           <Align horizontal right={alignmentRight} left={!alignmentRight}>
             <Text
               fill={getColorWithLightness(fillColor, 700)}
-              {...{[textSize]: true}}
+              {...{ [textSize]: true }}
               monospace={monospace}
               textOverflow={column.maxWidth !== undefined}
             >
