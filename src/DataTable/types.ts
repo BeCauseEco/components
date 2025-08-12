@@ -169,25 +169,25 @@ type RowActionsElement =
   | ReactElement<InputButtonIconPrimaryProps>
   | ReactElement<PopoverProps>
 
-export type DataTableProps = {
+export type DataTableProps<TData = any> = {
   mode: "simple" | "filter" | "edit"
-  data: any[]
+  data: TData[]
   columns: Column[]
-  defaultSortColumn: string
+  defaultSortColumn: keyof TData & string
   defaultSortDirection?: SortDirection
-  rowKeyField: string
+  rowKeyField: keyof TData & string
   exportName: string
-  fixedKeyField?: string
-  selectKeyField?: string
-  selectDisabledField?: string
+  fixedKeyField?: keyof TData & string
+  selectKeyField?: keyof TData & string
+  selectDisabledField?: keyof TData & string
   virtualScrolling?: boolean
   loading?: boolean
   loadingElement?: ReactElement
   exportDisable?: boolean
   disableSorting?: boolean
-  rowActions?: (rowData: ICellTextProps["rowData"]) => RowActionsElement[]
-  onChange?: (value: DataTableProps["data"]) => void
-  onChangeRow?: (value: object) => void
+  rowActions?: (rowData: TData) => RowActionsElement[]
+  onChange?: (value: TData[]) => void
+  onChangeRow?: (value: TData) => void
   fill?: ColorWithLightness
   stroke?: ColorWithLightness
   children?: Children | Children[]

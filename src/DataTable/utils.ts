@@ -2,8 +2,8 @@ import { DataType, Column, DataTableProps } from "./types"
 import { TABLE_CELL_EMPTY_STRING } from "./internal/constants"
 import { format } from "date-fns"
 
-export const createNewRow = (data: DataTableProps["data"]): object => {
-  return { id: Math.max(...data.map(d => d.id)) + 1 }
+export const createNewRow = <TData = any>(data: TData[]): object => {
+  return { id: Math.max(...data.map((d: any) => d.id)) + 1 }
 }
 
 /**
@@ -78,8 +78,8 @@ export const formatValue = (
   }
 }
 
-export const csv = (data: DataTableProps["data"], columns: Column[]) => {
-  const dataSanitized: DataTableProps["data"] = [columns.map(c => c.title)]
+export const csv = <TData = any>(data: TData[], columns: Column[]) => {
+  const dataSanitized: any[][] = [columns.map(c => c.title)]
 
   data.forEach(row => {
     const rowSanitized: string[] = []

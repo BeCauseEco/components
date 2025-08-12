@@ -45,7 +45,7 @@ const CellHeadLink = styled.a({
   userSelect: "none",
 })
 
-export const DataTable = (p: DataTableProps) => {
+export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
   const cssScope = useId().replace(/:/g, "datatable")
   const referenceContainer = useRef<HTMLDivElement>(null)
   const [containerWidth, setContainerWidth] = useState<number>(0)
@@ -123,7 +123,7 @@ export const DataTable = (p: DataTableProps) => {
   const [editRowId, setEditRowId] = useState<number | null>(null)
   const [editColumnId, setEditColumnId] = useState<string>("")
   const [deleteId, setDeleteId] = useState<number | null>(null)
-  const [dataTemp, setDataTemp] = useState<DataTableProps["data"]>([])
+  const [dataTemp, setDataTemp] = useState<TData[]>([])
 
   // Optimization 2: Memoize selected fields count
   const selectedFields = useMemo(() => {
@@ -217,7 +217,7 @@ export const DataTable = (p: DataTableProps) => {
       if (!row) {
         return
       }
-      row[p.selectKeyField] = value
+      ;(row as any)[p.selectKeyField] = value
 
       if (p.onChange) {
         p.onChange(d)
@@ -242,7 +242,7 @@ export const DataTable = (p: DataTableProps) => {
 
       d.filter(d => p.selectDisabledField === undefined || !d[p.selectDisabledField]).forEach(row => {
         if (p.selectKeyField) {
-          row[p.selectKeyField] = value
+          ;(row as any)[p.selectKeyField] = value
         }
       })
 
@@ -261,7 +261,7 @@ export const DataTable = (p: DataTableProps) => {
       if (d.type === "ComponentDidMount") {
         if (p.data && p.data.length > 0 && !p.data.some(d => d[p.rowKeyField])) {
           throw new Error(
-            `DataTable: data must contain key defined by property: "rowKeyField" (current value: '${p.rowKeyField}').`,
+            `DataTable: data must contain key defined by property: "rowKeyField" (current value: '${String(p.rowKeyField)}').`,
           )
         }
       }
@@ -439,7 +439,7 @@ export const DataTable = (p: DataTableProps) => {
                       table={table}
                       columns={nativeColumns as any}
                       data={p.data}
-                      rowKeyField={p.rowKeyField}
+                      rowKeyField={String(p.rowKeyField)}
                       sortingMode={p.disableSorting ? SortingMode.None : SortingMode.Single}
                       editingMode={p.editingMode}
                       rowReordering={p.mode === "edit" && p.editingMode !== EditingMode.Cell}
@@ -448,7 +448,7 @@ export const DataTable = (p: DataTableProps) => {
                       virtualScrolling={p.mode !== "edit" && p.virtualScrolling ? { enabled: true } : undefined}
                       search={({ searchText: searchTextValue, rowData, column }) => {
                         if (column.dataType === DataType.Boolean) {
-                          const b = rowData[column.key]
+                          const b = (rowData as any)[column.key]
                           const s = searchTextValue.toLowerCase()
 
                           return (s === "yes" && b === true) || (s === "no" && b === false)
@@ -701,10 +701,10 @@ export const DataTable = (p: DataTableProps) => {
                                           color={Color.Neutral}
                                           disabled={
                                             p.selectDisabledField
-                                              ? getRowById(cellTextContent.rowKeyValue)?.[p.selectDisabledField]
+                                              ? Boolean((getRowById(cellTextContent.rowKeyValue) as any)?.[p.selectDisabledField])
                                               : false
                                           }
-                                          value={getRowById(cellTextContent.rowKeyValue)?.[p.selectKeyField] ?? false}
+                                          value={Boolean((getRowById(cellTextContent.rowKeyValue) as any)?.[p.selectKeyField] ?? false)}
                                           onChange={value => {
                                             updateSelectField(cellTextContent.rowKeyValue, value)
                                           }}
@@ -830,8 +830,8 @@ export const DataTable = (p: DataTableProps) => {
                         cell: {
                           elementAttributes: cellElementAttributes => {
                             const column = cellElementAttributes.column as Column
-                            const id = cellElementAttributes?.rowData?.id
-                              ? `cell-${column.key}-${cellElementAttributes?.rowData?.id}`
+                            const id = (cellElementAttributes?.rowData as any)?.id
+                              ? `cell-${column.key}-${(cellElementAttributes?.rowData as any)?.id}`
                               : undefined
                             const classNames: string[] = []
 
@@ -908,7 +908,7 @@ export const DataTable = (p: DataTableProps) => {
                         disabled={editRowId !== null}
                         onClick={() => {
                           table.insertRow(createNewRow(p.data), {
-                            rowKeyValue: p.data[p.data.length - 1]?.key || 0,
+                            rowKeyValue: (p.data[p.data.length - 1] as any)?.key || 0,
                             insertRowPosition: InsertRowPosition.after,
                           })
                         }}
