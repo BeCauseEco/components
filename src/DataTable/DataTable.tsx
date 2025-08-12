@@ -3,7 +3,17 @@
 import { Stack } from "@new/Stack/Stack"
 import { Align } from "@new/Stack/Align"
 import { EditingMode, InsertRowPosition, SortDirection, SortingMode, Table, useTable } from "ka-table"
-import { closeEditor, closeRowEditors, deleteRow } from "ka-table/actionCreators"
+import {
+  closeEditor,
+  closeRowEditors,
+  deleteRow,
+  openEditor,
+  setFocused,
+  moveFocusedRight,
+  moveFocusedLeft,
+} from "ka-table/actionCreators"
+import { Cell } from "ka-table/Models/Cell"
+import { Focused } from "ka-table/Models/Focused"
 import { InputButtonPrimary } from "@new/InputButton/InputButtonPrimary"
 import { Spacer } from "@new/Stack/Spacer"
 import { InputButtonTertiary } from "@new/InputButton/InputButtonTertiary"
@@ -364,6 +374,62 @@ export const DataTable = (p: DataTableProps) => {
       document.removeEventListener("mousedown", handleClickOutside)
     }
   }, [editRowId, p.editingMode, table])
+
+  // Add keyboard navigation support for edit mode
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (p.mode !== "edit") {
+        return
+      }
+
+      const tableContainer = referenceContainer.current
+      if (!tableContainer?.contains(event.target as HTMLElement)) {
+        return
+      }
+
+      const focusedElement = document.activeElement
+      if (!tableContainer.contains(focusedElement)) {
+        return
+      }
+
+      // Handle Tab from input elements (seamless editing)
+      if (
+        event.key === "Tab" &&
+        focusedElement &&
+        ["input"].includes(focusedElement.tagName.toLocaleLowerCase()) &&
+        p.editingMode === EditingMode.Cell &&
+        editRowId !== null &&
+        editColumnId
+      ) {
+        event.preventDefault()
+
+        table.dispatch(closeEditor(editRowId, editColumnId))
+
+        const currentCell = new Cell()
+        currentCell.columnKey = editColumnId
+        currentCell.rowKeyValue = editRowId
+        const focused = new Focused()
+        focused.cell = currentCell
+        table.dispatch(setFocused(focused))
+        table.dispatch(event.shiftKey ? moveFocusedLeft({ end: false }) : moveFocusedRight({ end: false }))
+
+        setTimeout(() => {
+          const newFocused = table.props.focused
+          if (newFocused?.cell) {
+            table.dispatch(openEditor(newFocused.cell.rowKeyValue, newFocused.cell.columnKey))
+          }
+        }, 0)
+
+        return
+      }
+    }
+
+    const tableContainer = referenceContainer.current
+    if (tableContainer) {
+      tableContainer.addEventListener("keydown", handleKeyDown, true)
+      return () => tableContainer.removeEventListener("keydown", handleKeyDown, true)
+    }
+  }, [p.mode, p.editingMode, editRowId, editColumnId, table])
 
   const hasFilters = p.mode === "filter" || Children.toArray(p.children).length > 0 || !p.exportDisable
 
@@ -879,6 +945,7 @@ export const DataTable = (p: DataTableProps) => {
                             return {
                               id: id,
                               className: classNames.join(" "),
+                              tabIndex: p.mode === "edit" && column.isEditable ? -1 : undefined,
 
                               style: {
                                 width: column.explodeWidth ? "100%" : "auto",
