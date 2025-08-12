@@ -13,7 +13,7 @@ export const StyleMonospace = {
 }
 
 export const StyleFontFamily = {
-  fontFamily: `"Inter", sans-serif`,
+  fontFamily: `-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;`,
   fontStyle: "normal",
   fontWeight: 400,
 }
