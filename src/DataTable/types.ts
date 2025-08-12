@@ -170,13 +170,13 @@ type RowActionsElement =
   | ReactElement<PopoverProps>
 
 export type DataTableProps<TData = any> = {
-  mode: "simple" | "filter" | "edit"
+  mode?: "simple" | "filter" | "edit"
   data: TData[]
   columns: Column[]
   defaultSortColumn: keyof TData & string
   defaultSortDirection?: SortDirection
   rowKeyField: keyof TData & string
-  exportName: string
+  exportName?: string
   fixedKeyField?: keyof TData & string
   selectKeyField?: keyof TData & string
   selectDisabledField?: keyof TData & string
@@ -196,8 +196,7 @@ export type DataTableProps<TData = any> = {
   textSize?: "xxtiny" | "xtiny" | "tiny" | "xsmall" | "small" | "medium" | "large"
 
   /**
-   * @deprecated
-   * See DataType enum and/or Column enum for available alternatives - tooltips, links, progress indicators, etc. are all possible using these.
+   * Before using this, see the DataType enum and/or Column enum for available alternatives - tooltips, links, progress indicators, etc. are all possible using these.
    */
-  DEPRICATED_customCellRenderer?: (cellProps: any) => ReactElement | null
+  customCellRenderer?: (cellProps: ICellTextProps<TData>) => ReactElement | null
 }

@@ -1,4 +1,4 @@
-import { DataType, Column, DataTableProps } from "./types"
+import { DataType, Column } from "./types"
 import { TABLE_CELL_EMPTY_STRING } from "./internal/constants"
 import { format } from "date-fns"
 
@@ -56,7 +56,9 @@ export const formatValue = (
         : emptyString
 
     case DataType.Date:
-      if (!value) return emptyString
+      if (!value) {
+        return emptyString
+      }
       try {
         const date = new Date(value)
         if (dateFormat) {

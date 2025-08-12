@@ -46,6 +46,9 @@ const CellHeadLink = styled.a({
 })
 
 export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
+  // Apply defaults for optional props
+  const mode = p.mode ?? "simple"
+  const exportName = p.exportName ?? "export"
   const cssScope = useId().replace(/:/g, "datatable")
   const referenceContainer = useRef<HTMLDivElement>(null)
   const [containerWidth, setContainerWidth] = useState<number>(0)
@@ -79,7 +82,7 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
   const debouncedResizeHandler = useMemo(
     () =>
       _debounce((size: { width?: number; height?: number }) => {
-        if (p.mode === "edit" && p.editingMode !== EditingMode.Cell) {
+        if (mode === "edit" && p.editingMode !== EditingMode.Cell) {
           return
         }
 
@@ -110,7 +113,7 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
           }
         }
       }, 100), // 100ms debounce
-    [p.mode, p.editingMode],
+    [mode, p.editingMode],
   )
 
   useResizeObserver({
@@ -149,7 +152,7 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
     const columns = p.columns.map(c => {
       const column = c as Column
 
-      const sortDirection = p.mode !== "edit" && column.key === p.defaultSortColumn ? p.defaultSortDirection : undefined
+      const sortDirection = mode !== "edit" && column.key === p.defaultSortColumn ? p.defaultSortDirection : undefined
 
       return {
         key: column.key,
@@ -179,7 +182,7 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
     })
 
     // Add action columns if needed
-    if (p.mode === "edit" && p.editingMode !== EditingMode.Cell) {
+    if (mode === "edit" && p.editingMode !== EditingMode.Cell) {
       columns.push({
         key: KEY_ACTIONS_EDIT,
         title: "",
@@ -196,7 +199,7 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
     }
 
     return columns
-  }, [p.columns, p.mode, p.editingMode, p.rowActions, p.defaultSortColumn, p.defaultSortDirection])
+  }, [p.columns, mode, p.editingMode, p.rowActions, p.defaultSortColumn, p.defaultSortDirection])
 
   const getRowById = useCallback(
     (id: any) => {
@@ -332,7 +335,7 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
   })
 
   const referencePrint = useRef<HTMLDivElement>(null)
-  const print = useReactToPrint({ contentRef: referencePrint, documentTitle: p.exportName })
+  const print = useReactToPrint({ contentRef: referencePrint, documentTitle: exportName })
 
   const css = createDataTableStyles(cssScope, p.fill, p.stroke, p.cellPaddingSize)
 
@@ -367,7 +370,7 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
     }
   }, [editRowId, p.editingMode, table])
 
-  const hasFilters = p.mode === "filter" || Children.toArray(p.children).length > 0 || !p.exportDisable
+  const hasFilters = mode === "filter" || Children.toArray(p.children).length > 0 || !p.exportDisable
 
   return (
     <>
@@ -375,7 +378,7 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
 
       <div
         className={cssScope}
-        data-mode={p.mode}
+        data-mode={mode}
         style={{ display: "flex", width: "100%", height: "100%" }}
         ref={referenceContainer}
       >
@@ -383,7 +386,7 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
           <Align left hug="height" horizontal id="reference-filters">
             <Stack hug horizontal>
               <Align left horizontal wrap>
-                {p.mode === "filter" ? (
+                {mode === "filter" ? (
                   <InputTextSingle
                     iconNameLeft="search"
                     value={filter}
@@ -442,10 +445,10 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
                       rowKeyField={String(p.rowKeyField)}
                       sortingMode={p.disableSorting ? SortingMode.None : SortingMode.Single}
                       editingMode={p.editingMode}
-                      rowReordering={p.mode === "edit" && p.editingMode !== EditingMode.Cell}
+                      rowReordering={mode === "edit" && p.editingMode !== EditingMode.Cell}
                       noData={{ text: "Nothing found" }}
                       searchText={filter}
-                      virtualScrolling={p.mode !== "edit" && p.virtualScrolling ? { enabled: true } : undefined}
+                      virtualScrolling={mode !== "edit" && p.virtualScrolling ? { enabled: true } : undefined}
                       search={({ searchText: searchTextValue, rowData, column }) => {
                         if (column.dataType === DataType.Boolean) {
                           const b = (rowData as any)[column.key]
@@ -462,13 +465,13 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
                       childComponents={{
                         tableWrapper: {
                           elementAttributes: () => {
-                            if (p.mode !== "edit" && p.virtualScrolling) {
+                            if (mode !== "edit" && p.virtualScrolling) {
                               return {
                                 className: "override-ka-virtual",
                               }
                             }
 
-                            if (p.mode === "edit" && p.editingMode !== EditingMode.Cell) {
+                            if (mode === "edit" && p.editingMode !== EditingMode.Cell) {
                               return {
                                 className: "override-ka-reorder",
                               }
@@ -515,12 +518,12 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
                             const headCellContentAsColumn = headCellContent.column as Column
                             const allowSort =
                               !p.disableSorting &&
-                              p.mode !== "edit" &&
+                              mode !== "edit" &&
                               headCellContentAsColumn.dataType !== DataType.Status
 
                             return (
                               <Stack hug horizontal>
-                                {(p.mode === "simple" || p.mode === "filter") && p.selectKeyField && firstColumn ? (
+                                {(mode === "simple" || mode === "filter") && p.selectKeyField && firstColumn ? (
                                   <>
                                     <Align left horizontal hug>
                                       <InputCheckbox
@@ -677,13 +680,13 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
                               }
 
                               const DEPRICATED_customCellRendererElement =
-                                p.DEPRICATED_customCellRenderer && typeof p.DEPRICATED_customCellRenderer === "function"
-                                  ? p.DEPRICATED_customCellRenderer(cellTextContent)
+                                p.customCellRenderer && typeof p.customCellRenderer === "function"
+                                  ? p.customCellRenderer(cellTextContent)
                                   : null
 
                               return (
                                 <Stack hug horizontal>
-                                  {p.mode === "edit" && firstColumn && p.editingMode !== EditingMode.Cell ? (
+                                  {mode === "edit" && firstColumn && p.editingMode !== EditingMode.Cell ? (
                                     <Align left horizontal hug>
                                       <Icon name="drag_indicator" medium fill={[Color.Neutral, 700]} />
 
@@ -693,7 +696,7 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
                                     <></>
                                   )}
 
-                                  {(p.mode === "simple" || p.mode === "filter") && p.selectKeyField && firstColumn ? (
+                                  {(mode === "simple" || mode === "filter") && p.selectKeyField && firstColumn ? (
                                     <>
                                       <Align left horizontal hug>
                                         <InputCheckbox
@@ -701,10 +704,17 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
                                           color={Color.Neutral}
                                           disabled={
                                             p.selectDisabledField
-                                              ? Boolean((getRowById(cellTextContent.rowKeyValue) as any)?.[p.selectDisabledField])
+                                              ? Boolean(
+                                                  (getRowById(cellTextContent.rowKeyValue) as any)?.[
+                                                    p.selectDisabledField
+                                                  ],
+                                                )
                                               : false
                                           }
-                                          value={Boolean((getRowById(cellTextContent.rowKeyValue) as any)?.[p.selectKeyField] ?? false)}
+                                          value={Boolean(
+                                            (getRowById(cellTextContent.rowKeyValue) as any)?.[p.selectKeyField] ??
+                                              false,
+                                          )}
                                           onChange={value => {
                                             updateSelectField(cellTextContent.rowKeyValue, value)
                                           }}
@@ -753,7 +763,7 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
                             const firstColumn = cellEditorContent.column.key === nativeColumns[0].key
                             return (
                               <Stack hug horizontal>
-                                {p.mode === "edit" && firstColumn && p.editingMode !== EditingMode.Cell ? (
+                                {mode === "edit" && firstColumn && p.editingMode !== EditingMode.Cell ? (
                                   <Align left horizontal hug>
                                     <Icon name="drag_indicator" medium fill={[Color.Neutral, 700]} />
 
@@ -871,7 +881,7 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
                             }
 
                             if (
-                              p.mode === "edit" &&
+                              mode === "edit" &&
                               p.editingMode === EditingMode.Cell &&
                               (column.isEditable || column.isEditable === undefined)
                             ) {
@@ -894,7 +904,7 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
                     />
                   </Align>
 
-                  {p.mode === "edit" && p.editingMode !== EditingMode.Cell ? (
+                  {mode === "edit" && p.editingMode !== EditingMode.Cell ? (
                     <Align center vertical>
                       <Divider fill={[Color.Neutral, 100]} />
 
