@@ -378,13 +378,19 @@ export const DataTable = (p: DataTableProps) => {
   // Add keyboard navigation support for edit mode
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (p.mode !== "edit") return
+      if (p.mode !== "edit") {
+        return
+      }
 
       const tableContainer = referenceContainer.current
-      if (!tableContainer?.contains(event.target as HTMLElement)) return
+      if (!tableContainer?.contains(event.target as HTMLElement)) {
+        return
+      }
 
       const focusedElement = document.activeElement
-      if (!tableContainer.contains(focusedElement)) return
+      if (!tableContainer.contains(focusedElement)) {
+        return
+      }
 
       // Handle Tab from input elements (seamless editing)
       if (
