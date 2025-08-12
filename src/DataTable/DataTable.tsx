@@ -173,6 +173,8 @@ export const DataTable = (p: DataTableProps) => {
         startAdornment: column.startAdornment,
         fill: column.fill,
         placeholder: column.placeholder,
+        numberFormat: column.numberFormat,
+        dateFormat: column.dateFormat,
       }
     })
 

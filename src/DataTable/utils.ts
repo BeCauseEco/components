@@ -1,5 +1,6 @@
 import { DataType, Column, DataTableProps } from "./types"
 import { TABLE_CELL_EMPTY_STRING } from "./internal/constants"
+import { format } from "date-fns"
 
 export const createNewRow = (data: DataTableProps["data"]): object => {
   return { id: Math.max(...data.map(d => d.id)) + 1 }
@@ -13,18 +14,25 @@ export const createNewRow = (data: DataTableProps["data"]): object => {
  * 2. decimalPlaces parameter (typically from defaultTrailingDecimals)
  * 3. Global default (2 decimal places)
  *
+ * For DataType.Date columns, applies date formatting with the following precedence:
+ * 1. Custom configure() function (if provided in column definition)
+ * 2. dateFormat parameter (typically from defaultFormat)
+ * 3. Global default (browser's locale date format)
+ *
  * @param value - The raw value to format (as string)
  * @param dataType - The column data type determining formatting rules
  * @param placeholder - Optional placeholder for empty/null values
  * @param decimalPlaces - Number of decimal places for numeric values (0-20)
+ * @param dateFormat - Custom date format string for DataType.Date columns (uses date-fns format)
  * @returns Formatted string ready for display
  *
  * @example
  * ```typescript
- * formatValue("123.456", DataType.Number, "", 2)     // "123.46"
- * formatValue("123.456", DataType.Number, "", 0)     // "123"
- * formatValue("", DataType.Number, "N/A", 2)         // "N/A"
- * formatValue("2023-12-25", DataType.Date)           // "12/25/2023" (locale-dependent)
+ * formatValue("123.456", DataType.Number, "", 2)                    // "123.46"
+ * formatValue("123.456", DataType.Number, "", 0)                    // "123"
+ * formatValue("", DataType.Number, "N/A", 2)                       // "N/A"
+ * formatValue("2023-12-25", DataType.Date)                          // "12/25/2023" (locale-dependent)
+ * formatValue("2023-12-25T14:30:00Z", DataType.Date, "", undefined, "yyyy-MM-dd HH:mm")  // "2023-12-25 14:30"
  * ```
  */
 export const formatValue = (
@@ -32,6 +40,7 @@ export const formatValue = (
   dataType: DataType,
   placeholder?: string,
   decimalPlaces?: number,
+  dateFormat?: string,
 ): string => {
   const emptyString = placeholder || TABLE_CELL_EMPTY_STRING
 
@@ -47,7 +56,16 @@ export const formatValue = (
         : emptyString
 
     case DataType.Date:
-      return value ? new Date(value).toLocaleDateString() : emptyString
+      if (!value) return emptyString
+      try {
+        const date = new Date(value)
+        if (dateFormat) {
+          return format(date, dateFormat)
+        }
+        return date.toLocaleDateString()
+      } catch {
+        return value // Return original value if date parsing fails
+      }
 
     case DataType.Boolean:
       return value ? (value === "true" ? "Yes" : "No") : emptyString

@@ -104,6 +104,42 @@ export type Column = {
      */
     defaultTrailingDecimals?: number
   }
+  dateFormat?: {
+    configure: (value: string | Date, rowData: ICellTextProps["rowData"]) => string
+    /**
+     * Default date format for DataType.Date columns when no custom configure function is provided.
+     *
+     * **Formatting Precedence:**
+     * 1. `configure()` function (highest priority)
+     * 2. `defaultFormat` (this property)
+     * 3. Global default (browser locale date format)
+     *
+     * @default undefined - Uses browser's default locale date format
+     *
+     * @example
+     * ```typescript
+     * // Column with custom default format
+     * {
+     *   key: "createdAt",
+     *   dataType: DataType.Date,
+     *   dateFormat: {
+     *     defaultFormat: "yyyy-MM-dd HH:mm"  // Shows 2023-12-25 14:30
+     *   }
+     * }
+     *
+     * // Column with configure() overrides defaultFormat
+     * {
+     *   key: "deadline",
+     *   dataType: DataType.Date,
+     *   dateFormat: {
+     *     defaultFormat: "yyyy-MM-dd",  // Ignored when configure() exists
+     *     configure: (value) => new Date(value).toLocaleDateString()  // Custom format
+     *   }
+     * }
+     * ```
+     */
+    defaultFormat?: string
+  }
   icon?: {
     configure: (rowData: ICellTextProps["rowData"]) =>
       | {
