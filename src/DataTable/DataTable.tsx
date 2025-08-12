@@ -679,7 +679,7 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
                                 )
                               }
 
-                              const DEPRICATED_customCellRendererElement =
+                              const customCellRendererElement =
                                 p.customCellRenderer && typeof p.customCellRenderer === "function"
                                   ? p.customCellRenderer(cellTextContent)
                                   : null
@@ -728,8 +728,8 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
                                   )}
 
                                   <Align left={!alignmentRight} right={alignmentRight} horizontal>
-                                    {DEPRICATED_customCellRendererElement ? (
-                                      DEPRICATED_customCellRendererElement
+                                    {customCellRendererElement ? (
+                                      customCellRendererElement
                                     ) : tooltipElement ? (
                                       <Tooltip
                                         trigger={
