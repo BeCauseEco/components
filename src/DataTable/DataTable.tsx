@@ -45,6 +45,36 @@ const CellHeadLink = styled.a({
   userSelect: "none",
 })
 
+// Separate search input component to prevent expensive table re-renders whenever the inputValue state changes
+const SearchInput = ({ onDebouncedChange }: { onDebouncedChange: (value: string) => void }) => {
+  const [inputValue, setInputValue] = useState("")
+
+  const handleOnDebouncedChange = useMemo(
+    () =>
+      _debounce((newValue: string) => {
+        onDebouncedChange(newValue)
+      }, 500),
+    [onDebouncedChange],
+  )
+
+  const onInputValueChanged = (newValue: string) => {
+    setInputValue(newValue)
+    handleOnDebouncedChange(newValue)
+  }
+
+  return (
+    <InputTextSingle
+      iconNameLeft="search"
+      value={inputValue}
+      width="fixed"
+      size="large"
+      placeholder="Search"
+      onChange={onInputValueChanged}
+      color={Color.Neutral}
+    />
+  )
+}
+
 export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
   // Apply defaults for optional props
   const mode = p.mode ?? "simple"
@@ -123,6 +153,11 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
   })
 
   const [filter, setFilter] = useState("")
+
+  // Memoize setFilter to prevent SearchInput from re-creating debounced handler
+  const handleSearchChange = useCallback((value: string) => {
+    setFilter(value)
+  }, [])
   const [editRowId, setEditRowId] = useState<number | null>(null)
   const [editColumnId, setEditColumnId] = useState<string>("")
   const [deleteId, setDeleteId] = useState<number | null>(null)
@@ -386,19 +421,7 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
           <Align left hug="height" horizontal id="reference-filters">
             <Stack hug horizontal>
               <Align left horizontal wrap>
-                {mode === "filter" ? (
-                  <InputTextSingle
-                    iconNameLeft="search"
-                    value={filter}
-                    width="fixed"
-                    size="large"
-                    placeholder="Search"
-                    onChange={v => setFilter(v)}
-                    color={Color.Neutral}
-                  />
-                ) : (
-                  <></>
-                )}
+                {mode === "filter" ? <SearchInput onDebouncedChange={handleSearchChange} /> : <></>}
                 {Children.toArray(p.children)
                   .filter(child => !!child)
                   .map(child => child)}
