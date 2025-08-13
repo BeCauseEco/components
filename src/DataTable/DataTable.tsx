@@ -55,7 +55,40 @@ const CellHeadLink = styled.a({
   userSelect: "none",
 })
 
-export const DataTable = (p: DataTableProps) => {
+// Separate search input component to prevent expensive table re-renders whenever the inputValue state changes
+const SearchInput = ({ onDebouncedChange }: { onDebouncedChange: (value: string) => void }) => {
+  const [inputValue, setInputValue] = useState("")
+
+  const handleOnDebouncedChange = useMemo(
+    () =>
+      _debounce((newValue: string) => {
+        onDebouncedChange(newValue)
+      }, 500),
+    [onDebouncedChange],
+  )
+
+  const onInputValueChanged = (newValue: string) => {
+    setInputValue(newValue)
+    handleOnDebouncedChange(newValue)
+  }
+
+  return (
+    <InputTextSingle
+      iconNameLeft="search"
+      value={inputValue}
+      width="fixed"
+      size="large"
+      placeholder="Search"
+      onChange={onInputValueChanged}
+      color={Color.Neutral}
+    />
+  )
+}
+
+export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
+  // Apply defaults for optional props
+  const mode = p.mode ?? "simple"
+  const exportName = p.exportName ?? "export"
   const cssScope = useId().replace(/:/g, "datatable")
   const referenceContainer = useRef<HTMLDivElement>(null)
   const [containerWidth, setContainerWidth] = useState<number>(0)
@@ -89,7 +122,7 @@ export const DataTable = (p: DataTableProps) => {
   const debouncedResizeHandler = useMemo(
     () =>
       _debounce((size: { width?: number; height?: number }) => {
-        if (p.mode === "edit" && p.editingMode !== EditingMode.Cell) {
+        if (mode === "edit" && p.editingMode !== EditingMode.Cell) {
           return
         }
 
@@ -120,7 +153,7 @@ export const DataTable = (p: DataTableProps) => {
           }
         }
       }, 100), // 100ms debounce
-    [p.mode, p.editingMode],
+    [mode, p.editingMode],
   )
 
   useResizeObserver({
@@ -130,10 +163,15 @@ export const DataTable = (p: DataTableProps) => {
   })
 
   const [filter, setFilter] = useState("")
+
+  // Memoize setFilter to prevent SearchInput from re-creating debounced handler
+  const handleSearchChange = useCallback((value: string) => {
+    setFilter(value)
+  }, [])
   const [editRowId, setEditRowId] = useState<number | null>(null)
   const [editColumnId, setEditColumnId] = useState<string>("")
   const [deleteId, setDeleteId] = useState<number | null>(null)
-  const [dataTemp, setDataTemp] = useState<DataTableProps["data"]>([])
+  const [dataTemp, setDataTemp] = useState<TData[]>([])
 
   // Optimization 2: Memoize selected fields count
   const selectedFields = useMemo(() => {
@@ -159,7 +197,7 @@ export const DataTable = (p: DataTableProps) => {
     const columns = p.columns.map(c => {
       const column = c as Column
 
-      const sortDirection = p.mode !== "edit" && column.key === p.defaultSortColumn ? p.defaultSortDirection : undefined
+      const sortDirection = mode !== "edit" && column.key === p.defaultSortColumn ? p.defaultSortDirection : undefined
 
       return {
         key: column.key,
@@ -183,11 +221,13 @@ export const DataTable = (p: DataTableProps) => {
         startAdornment: column.startAdornment,
         fill: column.fill,
         placeholder: column.placeholder,
+        numberFormat: column.numberFormat,
+        dateFormat: column.dateFormat,
       }
     })
 
     // Add action columns if needed
-    if (p.mode === "edit" && p.editingMode !== EditingMode.Cell) {
+    if (mode === "edit" && p.editingMode !== EditingMode.Cell) {
       columns.push({
         key: KEY_ACTIONS_EDIT,
         title: "",
@@ -204,7 +244,7 @@ export const DataTable = (p: DataTableProps) => {
     }
 
     return columns
-  }, [p.columns, p.mode, p.editingMode, p.rowActions, p.defaultSortColumn, p.defaultSortDirection])
+  }, [p.columns, mode, p.editingMode, p.rowActions, p.defaultSortColumn, p.defaultSortDirection])
 
   const getRowById = useCallback(
     (id: any) => {
@@ -225,7 +265,7 @@ export const DataTable = (p: DataTableProps) => {
       if (!row) {
         return
       }
-      row[p.selectKeyField] = value
+      ;(row as any)[p.selectKeyField] = value
 
       if (p.onChange) {
         p.onChange(d)
@@ -250,7 +290,7 @@ export const DataTable = (p: DataTableProps) => {
 
       d.filter(d => p.selectDisabledField === undefined || !d[p.selectDisabledField]).forEach(row => {
         if (p.selectKeyField) {
-          row[p.selectKeyField] = value
+          ;(row as any)[p.selectKeyField] = value
         }
       })
 
@@ -269,7 +309,7 @@ export const DataTable = (p: DataTableProps) => {
       if (d.type === "ComponentDidMount") {
         if (p.data && p.data.length > 0 && !p.data.some(d => d[p.rowKeyField])) {
           throw new Error(
-            `DataTable: data must contain key defined by property: "rowKeyField" (current value: '${p.rowKeyField}').`,
+            `DataTable: data must contain key defined by property: "rowKeyField" (current value: '${String(p.rowKeyField)}').`,
           )
         }
       }
@@ -340,7 +380,7 @@ export const DataTable = (p: DataTableProps) => {
   })
 
   const referencePrint = useRef<HTMLDivElement>(null)
-  const print = useReactToPrint({ contentRef: referencePrint, documentTitle: p.exportName })
+  const print = useReactToPrint({ contentRef: referencePrint, documentTitle: exportName })
 
   const css = createDataTableStyles(cssScope, p.fill, p.stroke, p.cellPaddingSize)
 
@@ -374,6 +414,8 @@ export const DataTable = (p: DataTableProps) => {
       document.removeEventListener("mousedown", handleClickOutside)
     }
   }, [editRowId, p.editingMode, table])
+
+  const hasFilters = mode === "filter" || Children.toArray(p.children).length > 0 || !p.exportDisable
 
   // Add keyboard navigation support for edit mode
   useEffect(() => {
@@ -431,15 +473,13 @@ export const DataTable = (p: DataTableProps) => {
     }
   }, [p.mode, p.editingMode, editRowId, editColumnId, table])
 
-  const hasFilters = p.mode === "filter" || Children.toArray(p.children).length > 0 || !p.exportDisable
-
   return (
     <>
       <style suppressHydrationWarning>{css}</style>
 
       <div
         className={cssScope}
-        data-mode={p.mode}
+        data-mode={mode}
         style={{ display: "flex", width: "100%", height: "100%" }}
         ref={referenceContainer}
       >
@@ -447,19 +487,7 @@ export const DataTable = (p: DataTableProps) => {
           <Align left hug="height" horizontal id="reference-filters">
             <Stack hug horizontal>
               <Align left horizontal wrap>
-                {p.mode === "filter" ? (
-                  <InputTextSingle
-                    iconNameLeft="search"
-                    value={filter}
-                    width="fixed"
-                    size="large"
-                    placeholder="Search"
-                    onChange={v => setFilter(v)}
-                    color={Color.Neutral}
-                  />
-                ) : (
-                  <></>
-                )}
+                {mode === "filter" ? <SearchInput onDebouncedChange={handleSearchChange} /> : <></>}
                 {Children.toArray(p.children)
                   .filter(child => !!child)
                   .map(child => child)}
@@ -503,16 +531,16 @@ export const DataTable = (p: DataTableProps) => {
                       table={table}
                       columns={nativeColumns as any}
                       data={p.data}
-                      rowKeyField={p.rowKeyField}
+                      rowKeyField={String(p.rowKeyField)}
                       sortingMode={p.disableSorting ? SortingMode.None : SortingMode.Single}
                       editingMode={p.editingMode}
-                      rowReordering={p.mode === "edit" && p.editingMode !== EditingMode.Cell}
+                      rowReordering={mode === "edit" && p.editingMode !== EditingMode.Cell}
                       noData={{ text: "Nothing found" }}
                       searchText={filter}
-                      virtualScrolling={p.mode !== "edit" && p.virtualScrolling ? { enabled: true } : undefined}
+                      virtualScrolling={mode !== "edit" && p.virtualScrolling ? { enabled: true } : undefined}
                       search={({ searchText: searchTextValue, rowData, column }) => {
                         if (column.dataType === DataType.Boolean) {
-                          const b = rowData[column.key]
+                          const b = (rowData as any)[column.key]
                           const s = searchTextValue.toLowerCase()
 
                           return (s === "yes" && b === true) || (s === "no" && b === false)
@@ -526,13 +554,13 @@ export const DataTable = (p: DataTableProps) => {
                       childComponents={{
                         tableWrapper: {
                           elementAttributes: () => {
-                            if (p.mode !== "edit" && p.virtualScrolling) {
+                            if (mode !== "edit" && p.virtualScrolling) {
                               return {
                                 className: "override-ka-virtual",
                               }
                             }
 
-                            if (p.mode === "edit" && p.editingMode !== EditingMode.Cell) {
+                            if (mode === "edit" && p.editingMode !== EditingMode.Cell) {
                               return {
                                 className: "override-ka-reorder",
                               }
@@ -579,12 +607,12 @@ export const DataTable = (p: DataTableProps) => {
                             const headCellContentAsColumn = headCellContent.column as Column
                             const allowSort =
                               !p.disableSorting &&
-                              p.mode !== "edit" &&
+                              mode !== "edit" &&
                               headCellContentAsColumn.dataType !== DataType.Status
 
                             return (
                               <Stack hug horizontal>
-                                {(p.mode === "simple" || p.mode === "filter") && p.selectKeyField && firstColumn ? (
+                                {(mode === "simple" || mode === "filter") && p.selectKeyField && firstColumn ? (
                                   <>
                                     <Align left horizontal hug>
                                       <InputCheckbox
@@ -740,14 +768,14 @@ export const DataTable = (p: DataTableProps) => {
                                 )
                               }
 
-                              const DEPRICATED_customCellRendererElement =
-                                p.DEPRICATED_customCellRenderer && typeof p.DEPRICATED_customCellRenderer === "function"
-                                  ? p.DEPRICATED_customCellRenderer(cellTextContent)
+                              const customCellRendererElement =
+                                p.customCellRenderer && typeof p.customCellRenderer === "function"
+                                  ? p.customCellRenderer(cellTextContent)
                                   : null
 
                               return (
                                 <Stack hug horizontal>
-                                  {p.mode === "edit" && firstColumn && p.editingMode !== EditingMode.Cell ? (
+                                  {mode === "edit" && firstColumn && p.editingMode !== EditingMode.Cell ? (
                                     <Align left horizontal hug>
                                       <Icon name="drag_indicator" medium fill={[Color.Neutral, 700]} />
 
@@ -757,7 +785,7 @@ export const DataTable = (p: DataTableProps) => {
                                     <></>
                                   )}
 
-                                  {(p.mode === "simple" || p.mode === "filter") && p.selectKeyField && firstColumn ? (
+                                  {(mode === "simple" || mode === "filter") && p.selectKeyField && firstColumn ? (
                                     <>
                                       <Align left horizontal hug>
                                         <InputCheckbox
@@ -765,10 +793,17 @@ export const DataTable = (p: DataTableProps) => {
                                           color={Color.Neutral}
                                           disabled={
                                             p.selectDisabledField
-                                              ? getRowById(cellTextContent.rowKeyValue)?.[p.selectDisabledField]
+                                              ? Boolean(
+                                                  (getRowById(cellTextContent.rowKeyValue) as any)?.[
+                                                    p.selectDisabledField
+                                                  ],
+                                                )
                                               : false
                                           }
-                                          value={getRowById(cellTextContent.rowKeyValue)?.[p.selectKeyField] ?? false}
+                                          value={Boolean(
+                                            (getRowById(cellTextContent.rowKeyValue) as any)?.[p.selectKeyField] ??
+                                              false,
+                                          )}
                                           onChange={value => {
                                             updateSelectField(cellTextContent.rowKeyValue, value)
                                           }}
@@ -782,8 +817,8 @@ export const DataTable = (p: DataTableProps) => {
                                   )}
 
                                   <Align left={!alignmentRight} right={alignmentRight} horizontal>
-                                    {DEPRICATED_customCellRendererElement ? (
-                                      DEPRICATED_customCellRendererElement
+                                    {customCellRendererElement ? (
+                                      customCellRendererElement
                                     ) : tooltipElement ? (
                                       <Tooltip
                                         trigger={
@@ -817,7 +852,7 @@ export const DataTable = (p: DataTableProps) => {
                             const firstColumn = cellEditorContent.column.key === nativeColumns[0].key
                             return (
                               <Stack hug horizontal>
-                                {p.mode === "edit" && firstColumn && p.editingMode !== EditingMode.Cell ? (
+                                {mode === "edit" && firstColumn && p.editingMode !== EditingMode.Cell ? (
                                   <Align left horizontal hug>
                                     <Icon name="drag_indicator" medium fill={[Color.Neutral, 700]} />
 
@@ -894,8 +929,8 @@ export const DataTable = (p: DataTableProps) => {
                         cell: {
                           elementAttributes: cellElementAttributes => {
                             const column = cellElementAttributes.column as Column
-                            const id = cellElementAttributes?.rowData?.id
-                              ? `cell-${column.key}-${cellElementAttributes?.rowData?.id}`
+                            const id = (cellElementAttributes?.rowData as any)?.id
+                              ? `cell-${column.key}-${(cellElementAttributes?.rowData as any)?.id}`
                               : undefined
                             const classNames: string[] = []
 
@@ -935,7 +970,7 @@ export const DataTable = (p: DataTableProps) => {
                             }
 
                             if (
-                              p.mode === "edit" &&
+                              mode === "edit" &&
                               p.editingMode === EditingMode.Cell &&
                               (column.isEditable || column.isEditable === undefined)
                             ) {
@@ -959,7 +994,7 @@ export const DataTable = (p: DataTableProps) => {
                     />
                   </Align>
 
-                  {p.mode === "edit" && p.editingMode !== EditingMode.Cell ? (
+                  {mode === "edit" && p.editingMode !== EditingMode.Cell ? (
                     <Align center vertical>
                       <Divider fill={[Color.Neutral, 100]} />
 
@@ -973,7 +1008,7 @@ export const DataTable = (p: DataTableProps) => {
                         disabled={editRowId !== null}
                         onClick={() => {
                           table.insertRow(createNewRow(p.data), {
-                            rowKeyValue: p.data[p.data.length - 1]?.key || 0,
+                            rowKeyValue: (p.data[p.data.length - 1] as any)?.key || 0,
                             insertRowPosition: InsertRowPosition.after,
                           })
                         }}
