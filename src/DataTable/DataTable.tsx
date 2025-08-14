@@ -175,22 +175,22 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
 
   // Optimization 2: Memoize selected fields count
   const selectedFields = useMemo(() => {
-    if (!p.selectKeyField) {
+    if (!p.selectedRows) {
       return 0
     }
-    return p.data.filter(d => p.selectKeyField && d[p.selectKeyField]).length
-  }, [p.data, p.selectKeyField])
+    return p.selectedRows.length
+  }, [p.selectedRows])
 
   // Memoize total selectable fields count
   const totalSelectableFields = useMemo(() => {
-    if (!p.selectKeyField) {
+    if (!p.selectedRows && !p.onSelectionChange) {
       return 0
     }
-    if (p.selectDisabledField === undefined) {
+    if (!p.disabledRows) {
       return p.data.length
     }
-    return p.data.filter(d => p.selectDisabledField && !d[p.selectDisabledField]).length
-  }, [p.data, p.selectKeyField, p.selectDisabledField])
+    return p.data.filter(d => !p.disabledRows?.includes(d[p.rowKeyField] as string | number)).length
+  }, [p.data, p.disabledRows, p.rowKeyField, p.selectedRows, p.onSelectionChange])
 
   // Optimization 1: Memoize column processing
   const nativeColumns = useMemo(() => {
@@ -255,52 +255,48 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
 
   const updateSelectField = useCallback(
     (key: any, value: boolean) => {
-      if (p.selectKeyField === undefined) {
+      if (!p.onSelectionChange) {
         return
       }
 
-      const d = [...p.data]
-      const row = d.find(r => r[p.rowKeyField] === key)
+      const currentSelected = p.selectedRows || []
+      let newSelectedRows: (string | number)[]
 
-      if (!row) {
-        return
+      if (value) {
+        // Add to selection if not already selected
+        if (!currentSelected.includes(key)) {
+          newSelectedRows = [...currentSelected, key]
+        } else {
+          newSelectedRows = currentSelected
+        }
+      } else {
+        // Remove from selection
+        newSelectedRows = currentSelected.filter(id => id !== key)
       }
-      ;(row as any)[p.selectKeyField] = value
 
-      if (p.onChange) {
-        p.onChange(d)
-      }
-
-      if (p.onChangeRow) {
-        p.onChangeRow(row)
-      }
-
-      // Selected fields will be recalculated automatically via useMemo
+      p.onSelectionChange(newSelectedRows)
     },
-    [p.data, p.selectKeyField, p.rowKeyField, p.onChange, p.onChangeRow],
+    [p.selectedRows, p.onSelectionChange],
   )
 
   const updateSelectFieldAll = useCallback(
     (value: boolean) => {
-      if (p.selectKeyField === undefined) {
+      if (!p.onSelectionChange) {
         return
       }
 
-      const d = [...p.data]
-
-      d.filter(d => p.selectDisabledField === undefined || !d[p.selectDisabledField]).forEach(row => {
-        if (p.selectKeyField) {
-          ;(row as any)[p.selectKeyField] = value
-        }
-      })
-
-      if (p.onChange) {
-        p.onChange(d)
+      if (value) {
+        // Select all non-disabled rows
+        const selectableRowIds = p.data
+          .filter(d => !p.disabledRows?.includes(d[p.rowKeyField] as string | number))
+          .map(d => d[p.rowKeyField] as string | number)
+        p.onSelectionChange(selectableRowIds)
+      } else {
+        // Deselect all
+        p.onSelectionChange([])
       }
-
-      // Selected fields will be recalculated automatically via useMemo
     },
-    [p.data, p.selectKeyField, p.selectDisabledField, p.onChange],
+    [p.data, p.disabledRows, p.rowKeyField, p.onSelectionChange],
   )
 
   const table = useTable({
@@ -532,6 +528,7 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
                       columns={nativeColumns as any}
                       data={p.data}
                       rowKeyField={String(p.rowKeyField)}
+                      selectedRows={p.selectedRows || []}
                       sortingMode={p.disableSorting ? SortingMode.None : SortingMode.Single}
                       editingMode={p.editingMode}
                       rowReordering={mode === "edit" && p.editingMode !== EditingMode.Cell}
@@ -612,14 +609,14 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
 
                             return (
                               <Stack hug horizontal>
-                                {(mode === "simple" || mode === "filter") && p.selectKeyField && firstColumn ? (
+                                {(mode === "simple" || mode === "filter") && p.onSelectionChange && firstColumn ? (
                                   <>
                                     <Align left horizontal hug>
                                       <InputCheckbox
                                         size="small"
                                         color={Color.Neutral}
                                         value={
-                                          selectedFields === totalSelectableFields
+                                          selectedFields === totalSelectableFields && totalSelectableFields > 0
                                             ? true
                                             : selectedFields === 0
                                               ? false
@@ -785,25 +782,14 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
                                     <></>
                                   )}
 
-                                  {(mode === "simple" || mode === "filter") && p.selectKeyField && firstColumn ? (
+                                  {(mode === "simple" || mode === "filter") && p.onSelectionChange && firstColumn ? (
                                     <>
                                       <Align left horizontal hug>
                                         <InputCheckbox
                                           size="small"
                                           color={Color.Neutral}
-                                          disabled={
-                                            p.selectDisabledField
-                                              ? Boolean(
-                                                  (getRowById(cellTextContent.rowKeyValue) as any)?.[
-                                                    p.selectDisabledField
-                                                  ],
-                                                )
-                                              : false
-                                          }
-                                          value={Boolean(
-                                            (getRowById(cellTextContent.rowKeyValue) as any)?.[p.selectKeyField] ??
-                                              false,
-                                          )}
+                                          disabled={p.disabledRows?.includes(cellTextContent.rowKeyValue) ?? false}
+                                          value={p.selectedRows?.includes(cellTextContent.rowKeyValue) ?? false}
                                           onChange={value => {
                                             updateSelectField(cellTextContent.rowKeyValue, value)
                                           }}
