@@ -43,13 +43,21 @@ export const OptimizedCell = memo(
     if (column.dataType === DataType.Number && column.numberFormat?.configure && typeof value === "number") {
       // Priority 1: Custom configure() function overrides all other formatting
       text = column.numberFormat.configure(value, rowData)
+    } else if (
+      column.dataType === DataType.Date &&
+      column.dateFormat?.configure &&
+      (typeof value === "string" || value instanceof Date)
+    ) {
+      // Priority 1: Custom date configure() function overrides all other formatting
+      text = column.dateFormat.configure(value, rowData)
     } else {
-      // Priority 2 & 3: Use defaultTrailingDecimals or global default
+      // Priority 2 & 3: Use defaultTrailingDecimals/defaultFormat or global default
       text = formatValue(
         value?.toString(),
         column.dataType || DataType.String,
         column.placeholder,
         column.numberFormat?.defaultTrailingDecimals, // Falls back to global default if undefined
+        column.dateFormat?.defaultFormat, // Falls back to global default if undefined
       )
     }
 

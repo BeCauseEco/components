@@ -104,6 +104,42 @@ export type Column = {
      */
     defaultTrailingDecimals?: number
   }
+  dateFormat?: {
+    configure: (value: string | Date, rowData: ICellTextProps["rowData"]) => string
+    /**
+     * Default date format for DataType.Date columns when no custom configure function is provided.
+     *
+     * **Formatting Precedence:**
+     * 1. `configure()` function (highest priority)
+     * 2. `defaultFormat` (this property)
+     * 3. Global default (browser locale date format)
+     *
+     * @default undefined - Uses browser's default locale date format
+     *
+     * @example
+     * ```typescript
+     * // Column with custom default format
+     * {
+     *   key: "createdAt",
+     *   dataType: DataType.Date,
+     *   dateFormat: {
+     *     defaultFormat: "yyyy-MM-dd HH:mm"  // Shows 2023-12-25 14:30
+     *   }
+     * }
+     *
+     * // Column with configure() overrides defaultFormat
+     * {
+     *   key: "deadline",
+     *   dataType: DataType.Date,
+     *   dateFormat: {
+     *     defaultFormat: "yyyy-MM-dd",  // Ignored when configure() exists
+     *     configure: (value) => new Date(value).toLocaleDateString()  // Custom format
+     *   }
+     * }
+     * ```
+     */
+    defaultFormat?: string
+  }
   icon?: {
     configure: (rowData: ICellTextProps["rowData"]) =>
       | {
@@ -133,25 +169,25 @@ type RowActionsElement =
   | ReactElement<InputButtonIconPrimaryProps>
   | ReactElement<PopoverProps>
 
-export type DataTableProps = {
-  mode: "simple" | "filter" | "edit"
-  data: any[]
+export type DataTableProps<TData = any> = {
+  mode?: "simple" | "filter" | "edit"
+  data: TData[]
   columns: Column[]
-  defaultSortColumn: string
+  defaultSortColumn: keyof TData & string
   defaultSortDirection?: SortDirection
-  rowKeyField: string
-  exportName: string
-  fixedKeyField?: string
-  selectKeyField?: string
-  selectDisabledField?: string
+  rowKeyField: keyof TData & string
+  exportName?: string
+  fixedKeyField?: keyof TData & string
+  selectKeyField?: keyof TData & string
+  selectDisabledField?: keyof TData & string
   virtualScrolling?: boolean
   loading?: boolean
   loadingElement?: ReactElement
   exportDisable?: boolean
   disableSorting?: boolean
-  rowActions?: (rowData: ICellTextProps["rowData"]) => RowActionsElement[]
-  onChange?: (value: DataTableProps["data"]) => void
-  onChangeRow?: (value: object) => void
+  rowActions?: (rowData: TData) => RowActionsElement[]
+  onChange?: (value: TData[]) => void
+  onChangeRow?: (value: TData) => void
   fill?: ColorWithLightness
   stroke?: ColorWithLightness
   children?: Children | Children[]
@@ -160,8 +196,7 @@ export type DataTableProps = {
   textSize?: "xxtiny" | "xtiny" | "tiny" | "xsmall" | "small" | "medium" | "large"
 
   /**
-   * @deprecated
-   * See DataType enum and/or Column enum for available alternatives - tooltips, links, progress indicators, etc. are all possible using these.
+   * Before using this, see the DataType enum and/or Column enum for available alternatives - tooltips, links, progress indicators, etc. are all possible using these.
    */
-  DEPRICATED_customCellRenderer?: (cellProps: any) => ReactElement | null
+  customCellRenderer?: (cellProps: ICellTextProps<TData>) => ReactElement | null
 }
