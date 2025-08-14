@@ -5,6 +5,10 @@ import { twMerge } from "tailwind-merge"
 import { css, Global } from "@emotion/react"
 import { StyleBodyXLarge, StyleBodyXsmall, StyleFontFamily, StyleMonospace } from "@new/Text/Text"
 import { Color, computeColor } from "@new/Color"
+import { Size } from "@new/Size"
+
+// Constants
+const CHART_FONT_SIZE = Size.Small
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -82,7 +86,9 @@ const ChartContainer = React.forwardRef<
               color: ${computeColor([Color.Neutral, 700])};
             }
 
-            .component-chart .recharts-legend-item-text {
+            /* !important needed to override Recharts inline styles */
+            .component-chart .recharts-legend-wrapper .recharts-legend-item-text,
+            .component-chart .recharts-legend-item-text.recharts-legend-item-text {
               color: ${computeColor([Color.Neutral, 700])} !important;
               fill: ${computeColor([Color.Neutral, 700])} !important;
             }
@@ -142,7 +148,7 @@ const ChartContainer = React.forwardRef<
             "flex aspect-square justify-center [&_.recharts-cartesian-grid_line[stroke='#ccc']]:stroke-border/50 [&_.recharts-curve.recharts-tooltip-cursor]:stroke-border [&_.recharts-dot[stroke='#fff']]:stroke-transparent [&_.recharts-layer]:outline-none [&_.recharts-polar-grid_[stroke='#ccc']]:stroke-border [&_.recharts-radial-bar-background-sector]:fill-muted [&_.recharts-rectangle.recharts-tooltip-cursor]:fill-muted [&_.recharts-reference-line_[stroke='#ccc']]:stroke-border [&_.recharts-sector[stroke='#fff']]:stroke-transparent [&_.recharts-sector]:outline-none [&_.recharts-surface]:outline-none",
             "component-chart",
           )}
-          style={{ color: `${computeColor([Color.Neutral, 700])}`, fontSize: "12px" }}
+          style={{ color: `${computeColor([Color.Neutral, 700])}`, fontSize: CHART_FONT_SIZE }}
           {...props}
         >
           <ChartStyle id={chartId} config={config} />
@@ -236,7 +242,7 @@ const ChartTooltipContent = React.forwardRef<
         return (
           <div
             className={cn("font-medium", labelClassName)}
-            style={{ color: `${computeColor([Color.Neutral, 700])}`, fontSize: "12px" }}
+            style={{ color: `${computeColor([Color.Neutral, 700])}`, fontSize: CHART_FONT_SIZE }}
           >
             {labelFormatter(value, payload)}
           </div>
@@ -250,7 +256,7 @@ const ChartTooltipContent = React.forwardRef<
       return (
         <div
           className={cn("font-medium", labelClassName)}
-          style={{ color: `${computeColor([Color.Neutral, 700])}`, fontSize: "12px" }}
+          style={{ color: `${computeColor([Color.Neutral, 700])}`, fontSize: CHART_FONT_SIZE }}
         >
           {value}
         </div>
@@ -270,7 +276,7 @@ const ChartTooltipContent = React.forwardRef<
           "grid min-w-[8rem] items-start gap-1.5 rounded-lg border border-border/50 bg-background px-2.5 py-1.5 shadow-xl",
           className,
         )}
-        style={{ color: `${computeColor([Color.Neutral, 700])}`, fontSize: "12px" }}
+        style={{ color: `${computeColor([Color.Neutral, 700])}`, fontSize: CHART_FONT_SIZE }}
       >
         {!nestLabel ? tooltipLabel : null}
         <div className="grid gap-1.5">
@@ -319,14 +325,14 @@ const ChartTooltipContent = React.forwardRef<
                     >
                       <div className="grid gap-1.5">
                         {nestLabel ? tooltipLabel : null}
-                        <span style={{ color: `${computeColor([Color.Neutral, 700])}`, fontSize: "12px" }}>
+                        <span style={{ color: `${computeColor([Color.Neutral, 700])}`, fontSize: CHART_FONT_SIZE }}>
                           {itemConfig?.label || item.name}
                         </span>
                       </div>
                       {!hideValue && item.value && (
                         <span
                           className="font-mono font-medium tabular-nums"
-                          style={{ color: `${computeColor([Color.Neutral, 700])}`, fontSize: "12px" }}
+                          style={{ color: `${computeColor([Color.Neutral, 700])}`, fontSize: CHART_FONT_SIZE }}
                         >
                           {item.value.toLocaleString()}
                         </span>
@@ -385,7 +391,7 @@ const ChartLegendContent = React.forwardRef<
                 }}
               />
             )}
-            <span style={{ color: `${computeColor([Color.Neutral, 700])}`, fontSize: "12px" }}>
+            <span style={{ color: `${computeColor([Color.Neutral, 700])}`, fontSize: CHART_FONT_SIZE }}>
               {itemConfig?.label}
             </span>
           </div>
