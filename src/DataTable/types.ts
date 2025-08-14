@@ -178,8 +178,9 @@ export type DataTableProps<TData = any> = {
   rowKeyField: keyof TData & string
   exportName?: string
   fixedKeyField?: keyof TData & string
-  selectKeyField?: keyof TData & string
-  selectDisabledField?: keyof TData & string
+  selectedRows?: (string | number)[]
+  onSelectionChange?: (selectedRows: (string | number)[]) => void
+  disabledRows?: (string | number)[]
   virtualScrolling?: boolean
   loading?: boolean
   loadingElement?: ReactElement
