@@ -246,13 +246,6 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
     return columns
   }, [p.columns, mode, p.editingMode, p.rowActions, p.defaultSortColumn, p.defaultSortDirection])
 
-  const getRowById = useCallback(
-    (id: any) => {
-      return p.data.find(r => r[p.rowKeyField] === id)
-    },
-    [p.data, p.rowKeyField],
-  )
-
   const updateSelectField = useCallback(
     (key: any, value: boolean) => {
       if (!p.onSelectionChange) {
