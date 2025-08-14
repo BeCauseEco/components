@@ -87,12 +87,6 @@ const ChartContainer = React.forwardRef<
               fill: ${computeColor([Color.Neutral, 700])} !important;
             }
 
-            /* Make legend icons circular */
-            .component-chart .recharts-legend-item svg rect {
-              rx: 4 !important;
-              ry: 4 !important;
-            }
-
             .component-chart .font-mono {
               font-family: ${StyleMonospace.fontFamily};
               font-optical-sizing: ${StyleMonospace.fontOpticalSizing};
