@@ -516,7 +516,14 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
               ) : (
                 <Stack vertical hug stroke={p.stroke || [Color.Neutral, 100]} fill={p.fill || [Color.Transparent]}>
                   <Align topLeft vertical>
+                    {/* 
+                      Force ka-table to remount when switching between cell-editing and readonly modes.
+                      This is necessary because ka-table maintains internal state and event handlers that don't 
+                      get properly reset when editingMode prop changes dynamically after initial render.
+                      Without this key, cells remain editable even after switching from EditingMode.Cell to None.
+                    */}
                     <Table
+                      key={`table-${mode === "edit" && p.editingMode === EditingMode.Cell ? "cell-edit" : "readonly"}`}
                       table={table}
                       columns={nativeColumns as any}
                       data={p.data}

@@ -5,6 +5,10 @@ import { twMerge } from "tailwind-merge"
 import { css, Global } from "@emotion/react"
 import { StyleBodyXLarge, StyleBodyXsmall, StyleFontFamily, StyleMonospace } from "@new/Text/Text"
 import { Color, computeColor } from "@new/Color"
+import { Size } from "@new/Size"
+
+// Constants
+const CHART_FONT_SIZE = Size.Small
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -69,7 +73,9 @@ const ChartContainer = React.forwardRef<
 
             .component-chart .font-medium,
             .component-chart .text-muted-foreground,
-            .component-chart .recharts-legend-wrapper div {
+            .component-chart .recharts-legend-wrapper div,
+            .component-chart .recharts-legend-wrapper,
+            .component-chart .recharts-default-legend .recharts-legend-item {
               font-family: ${StyleFontFamily.fontFamily};
               font-style: ${StyleFontFamily.fontStyle};
               font-weight: ${StyleFontFamily.fontWeight};
@@ -78,6 +84,13 @@ const ChartContainer = React.forwardRef<
               line-height: ${StyleBodyXsmall.lineHeight};
 
               color: ${computeColor([Color.Neutral, 700])};
+            }
+
+            /* !important needed to override Recharts inline styles */
+            .component-chart .recharts-legend-wrapper .recharts-legend-item-text,
+            .component-chart .recharts-legend-item-text.recharts-legend-item-text {
+              color: ${computeColor([Color.Neutral, 700])} !important;
+              fill: ${computeColor([Color.Neutral, 700])} !important;
             }
 
             .component-chart .font-mono {
@@ -108,8 +121,15 @@ const ChartContainer = React.forwardRef<
             }
 
             .component-chart svg text,
-            .component-chart svg text .fill-muted-foreground {
+            .component-chart svg text .fill-muted-foreground,
+            .component-chart .recharts-cartesian-axis-tick,
+            .component-chart .recharts-cartesian-axis-tick text,
+            .component-chart .recharts-tooltip-wrapper,
+            .component-chart .recharts-tooltip-wrapper *,
+            .component-chart [role="tooltip"],
+            .component-chart [role="tooltip"] * {
               fill: ${computeColor([Color.Neutral, 700])};
+              color: ${computeColor([Color.Neutral, 700])};
 
               font-family: ${StyleFontFamily.fontFamily};
               font-style: ${StyleFontFamily.fontStyle};
@@ -125,9 +145,10 @@ const ChartContainer = React.forwardRef<
           data-chart={chartId}
           ref={ref}
           className={cn(
-            "flex aspect-square justify-center text-xs [&_.recharts-cartesian-axis-tick_text]:fill-muted-foreground [&_.recharts-cartesian-grid_line[stroke='#ccc']]:stroke-border/50 [&_.recharts-curve.recharts-tooltip-cursor]:stroke-border [&_.recharts-dot[stroke='#fff']]:stroke-transparent [&_.recharts-layer]:outline-none [&_.recharts-polar-grid_[stroke='#ccc']]:stroke-border [&_.recharts-radial-bar-background-sector]:fill-muted [&_.recharts-rectangle.recharts-tooltip-cursor]:fill-muted [&_.recharts-reference-line_[stroke='#ccc']]:stroke-border [&_.recharts-sector[stroke='#fff']]:stroke-transparent [&_.recharts-sector]:outline-none [&_.recharts-surface]:outline-none",
+            "flex aspect-square justify-center [&_.recharts-cartesian-grid_line[stroke='#ccc']]:stroke-border/50 [&_.recharts-curve.recharts-tooltip-cursor]:stroke-border [&_.recharts-dot[stroke='#fff']]:stroke-transparent [&_.recharts-layer]:outline-none [&_.recharts-polar-grid_[stroke='#ccc']]:stroke-border [&_.recharts-radial-bar-background-sector]:fill-muted [&_.recharts-rectangle.recharts-tooltip-cursor]:fill-muted [&_.recharts-reference-line_[stroke='#ccc']]:stroke-border [&_.recharts-sector[stroke='#fff']]:stroke-transparent [&_.recharts-sector]:outline-none [&_.recharts-surface]:outline-none",
             "component-chart",
           )}
+          style={{ color: `${computeColor([Color.Neutral, 700])}`, fontSize: CHART_FONT_SIZE }}
           {...props}
         >
           <ChartStyle id={chartId} config={config} />
@@ -218,14 +239,28 @@ const ChartTooltipContent = React.forwardRef<
           : itemConfig?.label
 
       if (labelFormatter) {
-        return <div className={cn("font-medium", labelClassName)}>{labelFormatter(value, payload)}</div>
+        return (
+          <div
+            className={cn("font-medium", labelClassName)}
+            style={{ color: `${computeColor([Color.Neutral, 700])}`, fontSize: CHART_FONT_SIZE }}
+          >
+            {labelFormatter(value, payload)}
+          </div>
+        )
       }
 
       if (!value) {
         return null
       }
 
-      return <div className={cn("font-medium", labelClassName)}>{value}</div>
+      return (
+        <div
+          className={cn("font-medium", labelClassName)}
+          style={{ color: `${computeColor([Color.Neutral, 700])}`, fontSize: CHART_FONT_SIZE }}
+        >
+          {value}
+        </div>
+      )
     }, [label, labelFormatter, payload, hideLabel, labelClassName, config, labelKey])
 
     if (!active || !payload?.length) {
@@ -238,9 +273,10 @@ const ChartTooltipContent = React.forwardRef<
       <div
         ref={ref}
         className={cn(
-          "grid min-w-[8rem] items-start gap-1.5 rounded-lg border border-border/50 bg-background px-2.5 py-1.5 text-xs shadow-xl",
+          "grid min-w-[8rem] items-start gap-1.5 rounded-lg border border-border/50 bg-background px-2.5 py-1.5 shadow-xl",
           className,
         )}
+        style={{ color: `${computeColor([Color.Neutral, 700])}`, fontSize: CHART_FONT_SIZE }}
       >
         {!nestLabel ? tooltipLabel : null}
         <div className="grid gap-1.5">
@@ -289,10 +325,15 @@ const ChartTooltipContent = React.forwardRef<
                     >
                       <div className="grid gap-1.5">
                         {nestLabel ? tooltipLabel : null}
-                        <span className="text-muted-foreground">{itemConfig?.label || item.name}</span>
+                        <span style={{ color: `${computeColor([Color.Neutral, 700])}`, fontSize: CHART_FONT_SIZE }}>
+                          {itemConfig?.label || item.name}
+                        </span>
                       </div>
                       {!hideValue && item.value && (
-                        <span className="font-mono font-medium tabular-nums text-foreground">
+                        <span
+                          className="font-mono font-medium tabular-nums"
+                          style={{ color: `${computeColor([Color.Neutral, 700])}`, fontSize: CHART_FONT_SIZE }}
+                        >
                           {item.value.toLocaleString()}
                         </span>
                       )}
@@ -344,13 +385,15 @@ const ChartLegendContent = React.forwardRef<
               <itemConfig.icon />
             ) : (
               <div
-                className="h-2 w-2 shrink-0 rounded-[2px]"
+                className="h-2 w-2 shrink-0 rounded-full"
                 style={{
                   backgroundColor: item.color,
                 }}
               />
             )}
-            {itemConfig?.label}
+            <span style={{ color: `${computeColor([Color.Neutral, 700])}`, fontSize: CHART_FONT_SIZE }}>
+              {itemConfig?.label}
+            </span>
           </div>
         )
       })}
