@@ -23,15 +23,23 @@ export type InputTextSingleProps = Pick<
   | "data-playwright-testid"
 > & {
   color: Color
-  hideValue?: boolean
+  hideValue?: boolean // DEPRECATED. Use type="password" instead.
+  type?: "text" | "email" | "password"
+  autoComplete?: string
+  name?: string
 }
 
 export const InputTextSingle = forwardRef<HTMLInputElement, InputTextSingleProps>((p, ref) => {
+  // Deprecation warning for hideValue
+  if (p.hideValue && !p.type && process.env.NODE_ENV !== "production") {
+    // eslint-disable-next-line no-console
+    console.warn("InputTextSingle: 'hideValue' prop is deprecated. Use 'type=\"password\"' instead.")
+  }
+
   return (
     <InputText
       className="<InputTextSingle /> -"
-      type="text"
-      hideValue={p.hideValue}
+      type={p.type ?? (p.hideValue ? "password" : "text")}
       ref={ref}
       size={p.size}
       width={p.width}
@@ -52,6 +60,8 @@ export const InputTextSingle = forwardRef<HTMLInputElement, InputTextSingleProps
       value={p.value}
       data-playwright-testid={p["data-playwright-testid"]}
       id={p.id}
+      autoComplete={p.autoComplete}
+      name={p.name}
     />
   )
 })

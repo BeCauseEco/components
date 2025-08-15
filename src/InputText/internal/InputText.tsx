@@ -13,7 +13,7 @@ import { InputButtonIconTertiary } from "@new/InputButton/InputButtonIconTertiar
 import { ComponentBaseProps } from "@new/ComponentBaseProps"
 
 export type InputTextProps = ComponentBaseProps & {
-  type: "text" | "date"
+  type: "text" | "date" | "email" | "password"
 
   size: "small" | "large"
   width: "auto" | "fixed"
@@ -24,7 +24,6 @@ export type InputTextProps = ComponentBaseProps & {
 
   value: string
   onChange: (value: string) => void
-  hideValue?: boolean
 
   loading?: boolean
   disabled?: boolean
@@ -46,6 +45,9 @@ export type InputTextProps = ComponentBaseProps & {
 
   dateMin?: string
   dateMax?: string
+
+  autoComplete?: string
+  name?: string
 }
 
 const calculateWidth = (rows: InputTextProps["rows"], width: InputTextProps["width"], size: InputTextProps["size"]) => {
@@ -325,8 +327,9 @@ export const InputText = forwardRef<HTMLInputElement | HTMLTextAreaElement, Inpu
               // @ts-expect-error TypeScript can't infer the type of the `ref` prop when using as="...".
               ref={ref}
               as={p.rows === 1 ? "input" : "textarea"}
-              type={p.hideValue ? "password" : p.type}
+              type={p.type}
               id={id}
+              name={p.name}
               value={p.value}
               rows={p.rows || 1}
               color={p.error ? Color.Error : p.color}
@@ -338,7 +341,7 @@ export const InputText = forwardRef<HTMLInputElement | HTMLTextAreaElement, Inpu
               width={p.width}
               min={p.type === "date" ? p.dateMin : undefined}
               max={p.type === "date" ? p.dateMax : undefined}
-              autoComplete="one-time-code"
+              autoComplete={p.autoComplete ?? "one-time-code"}
               onChange={event => {
                 if (p.onChange) {
                   p.onChange(event?.target?.["value"])
