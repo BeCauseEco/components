@@ -471,6 +471,7 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
         data-mode={mode}
         style={{ display: "flex", width: "100%", height: "100%" }}
         ref={referenceContainer}
+        data-playwright-testid={p["data-playwright-testid"]}
       >
         <Stack vertical hug loading={p.loading}>
           <Align left hug="height" horizontal id="reference-filters">

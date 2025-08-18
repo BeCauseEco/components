@@ -129,6 +129,7 @@ const DialogContentInner = (p: TDialog) => {
       <BackgroundCard colorBackground={[Color.White]} borderRadius={Size.Tiny} shadow={EShadow.Large} />
 
       <LayoutDialog
+        data-playwright-testid={p["data-playwright-testid"]}
         contentStart={
           <TitleAndDescription>
             {p.title}
