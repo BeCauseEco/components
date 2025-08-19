@@ -60,9 +60,16 @@ export type TLayoutDialog = TLayoutBase & {
   omitPadding?: boolean
 }
 
-export const LayoutDialog = ({ contentStart, contentMiddle, contentEnd, buttonClose, buttonsText }: TLayoutDialog) => {
+export const LayoutDialog = ({
+  contentStart,
+  contentMiddle,
+  contentEnd,
+  buttonClose,
+  buttonsText,
+  ...p
+}: TLayoutDialog) => {
   return (
-    <Container className="layout-container">
+    <Container className="layout-container" data-playwright-testid={p["data-playwright-testid"]}>
       <ContentStart>
         <ContentStartContent>{contentStart}</ContentStartContent>
 

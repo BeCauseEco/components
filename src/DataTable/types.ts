@@ -14,6 +14,7 @@ import { InputTextSingleProps } from "@new/InputText/InputTextSingle"
 import { InputTextDateProps } from "@new/InputText/InputTextDate"
 import { PopoverProps } from "@new/Popover/Popover"
 import { EditingMode } from "ka-table"
+import { PlaywrightProps } from "@new/Playwright"
 
 export { SortDirection } from "ka-table"
 
@@ -169,7 +170,7 @@ type RowActionsElement =
   | ReactElement<InputButtonIconPrimaryProps>
   | ReactElement<PopoverProps>
 
-export type DataTableProps<TData = any> = {
+export type DataTableProps<TData = any> = PlaywrightProps & {
   mode?: "simple" | "filter" | "edit"
   data: TData[]
   columns: Column[]
