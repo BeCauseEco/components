@@ -68,7 +68,7 @@ export type Column = {
       | undefined
   }
   numberFormat?: {
-    configure: (value: number, rowData: ICellTextProps["rowData"]) => string
+    configure?: (value: number, rowData: ICellTextProps["rowData"]) => string
     /**
      * Default number of trailing decimal places for DataType.Number columns when no custom configure function is provided.
      *
