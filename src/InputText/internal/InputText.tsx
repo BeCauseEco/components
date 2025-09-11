@@ -13,7 +13,7 @@ import { InputButtonIconTertiary } from "@new/InputButton/InputButtonIconTertiar
 import { ComponentBaseProps } from "@new/ComponentBaseProps"
 
 export type InputTextProps = ComponentBaseProps & {
-  type: "text" | "date" | "email" | "password"
+  type: "text" | "date" | "email" | "password" | "number"
 
   size: "small" | "large"
   width: "auto" | "fixed"
