@@ -1,4 +1,4 @@
-import { forwardRef, useRef, useEffect } from "react"
+import { forwardRef } from "react"
 import { InputTextProps, InputText } from "@new/InputText/internal/InputText"
 import { Color, ColorWithLightness } from "@new/Color"
 
