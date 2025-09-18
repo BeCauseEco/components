@@ -27,13 +27,14 @@ export type InputComboboxProps = ComponentBaseProps & {
   /** Enables filtering, if supplied. */
   filterOptions?: { textFilterNoResults: string; textFilterPlaceholder: string }
 
-  label?: ["outside" | "inside", string]
+  label?: ["outside" | "outside-small" | "inside", string]
   hint?: string
   error?: string
 
   multiple?: boolean
 
   color: Color
+  outlineColor?: ColorWithLightness
 
   /**
    * When InputCombobox.multiple is set to true; "value" parameter is of type string[].
@@ -71,6 +72,8 @@ export type InputComboboxProps = ComponentBaseProps & {
     label: string
     icon?: string
   }
+
+  tooltip?: string
 }
 
 const Container = styled.div<Pick<InputComboboxProps, "size" | "width">>(p => ({
@@ -464,6 +467,15 @@ export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<InputC
     alignItems: "center",
   })
 
+  let strokeColor: ColorWithLightness = [p.color, 300]
+  if (p.disabled) {
+    strokeColor = [p.color, 100]
+  } else if (p.error) {
+    strokeColor = [Color.Error, 300]
+  } else if (p.outlineColor) {
+    strokeColor = p.outlineColor
+  }
+
   return (
     <Container
       ref={ref}
@@ -494,9 +506,82 @@ export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<InputC
                     />
                   </>
                 )}
+
+                {p.tooltip && (
+                  <>
+                    <Spacer tiny />
+
+                    <Icon
+                      name="info"
+                      small={p.size === "small"}
+                      medium={p.size === "large"}
+                      fill={[p.color, 500]}
+                      style="outlined"
+                      tooltip={p.tooltip}
+                    />
+                  </>
+                )}
               </Label>
 
               <Spacer xsmall={p.size === "small"} small={p.size === "large"} />
+            </Align>
+
+            {p.hint ? (
+              <Align vertical left hug>
+                <Text tiny={p.size === "small"} xsmall={p.size !== "small"} fill={[p.color, 700]}>
+                  {p.hint}
+                </Text>
+
+                <Spacer xsmall={p.size === "small"} small={p.size === "large"} />
+              </Align>
+            ) : (
+              <></>
+            )}
+          </>
+        </Stack>
+      ) : (
+        <></>
+      )}
+
+      {p.label && p.label[0] === "outside-small" ? (
+        <Stack vertical hug>
+          <>
+            <Align vertical left hug="width">
+              <Label>
+                <Text xsmall fill={[Color.Neutral, 700]}>
+                  <b>{p?.label?.[1]}</b>
+                </Text>
+
+                {p.required && (
+                  <>
+                    <Spacer tiny={p.size === "small"} xsmall={p.size === "large"} />
+
+                    <Icon
+                      name="asterisk"
+                      small={p.size === "small"}
+                      medium={p.size === "large"}
+                      fill={[Color.Error, 700]}
+                    />
+                  </>
+                )}
+
+                {p.tooltip && (
+                  <>
+                    <Spacer tiny />
+
+                    <Icon
+                      name="info"
+                      small={p.size === "small"}
+                      medium={p.size === "large"}
+                      fill={[Color.Neutral, 500]}
+                      style="outlined"
+                      tooltip={p.tooltip}
+                    />
+                  </>
+                )}
+              </Label>
+
+              <Spacer xsmall />
             </Align>
 
             {p.hint ? (
@@ -526,7 +611,7 @@ export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<InputC
             width="full"
             variant="outlined"
             colorForeground={[p.color, 700]}
-            colorOutline={p.disabled ? [p.color, 100] : [p.color, 300]}
+            colorOutline={strokeColor}
             colorOutlineHover={p.disabled ? [p.color, 100] : [p.color, 700]}
             colorBackground={p.disabled ? [p.color, 50] : [Color.White]}
             colorBackgroundHover={[p.color, 50]}
@@ -563,6 +648,34 @@ export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<InputC
                         <Text xsmall={p.size === "small"} small={p.size === "large"} fill={[p.color, 500]}>
                           {p.label[1]}
                         </Text>
+
+                        {p.required && (
+                          <>
+                            <Spacer tiny={p.size === "small"} xsmall={p.size === "large"} />
+
+                            <Icon
+                              name="asterisk"
+                              small={p.size === "small"}
+                              medium={p.size === "large"}
+                              fill={[Color.Error, 700]}
+                            />
+                          </>
+                        )}
+
+                        {p.tooltip && (
+                          <>
+                            <Spacer tiny />
+
+                            <Icon
+                              name="info"
+                              small={p.size === "small"}
+                              medium={p.size === "large"}
+                              fill={[p.color, 500]}
+                              style="outlined"
+                              tooltip={p.tooltip}
+                            />
+                          </>
+                        )}
 
                         <Spacer xsmall={p.size === "small"} small={p.size === "large"} />
                       </>

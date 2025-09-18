@@ -7,6 +7,8 @@ import { KeyValuePair } from "@new/KeyValuePair/KeyValuePair"
 import { EDirection } from "@new/EDirection"
 import { Size } from "@new/Size"
 import { PlaywrightProps } from "@new/Playwright"
+import { Icon } from "@new/Icon/Icon"
+import { Spacer } from "@new/Stack/Spacer"
 
 const Container = styled.div({
   display: "flex",
@@ -63,6 +65,7 @@ export type TSwitch = PlaywrightProps & {
   colorForeground: Color
   colorValueTrue: Color
   label?: ReactElement<TextProps>
+  tooltip?: string
 }
 
 export const Switch = (p: TSwitch) => {
@@ -81,7 +84,17 @@ export const Switch = (p: TSwitch) => {
           <SwitchThumb colorForeground={p.colorForeground} />
         </SwitchRoot>
 
-        <Label htmlFor={key}>{p.label}</Label>
+        <Label htmlFor={key}>
+          {p.label}
+
+          {p.tooltip && (
+            <>
+              <Spacer tiny />
+
+              <Icon name="info" small fill={[p.colorBackground, 500]} style="outlined" tooltip={p.tooltip} />
+            </>
+          )}
+        </Label>
       </KeyValuePair>
     </Container>
   )
