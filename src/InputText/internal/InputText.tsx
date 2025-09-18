@@ -1,6 +1,6 @@
 import styled from "@emotion/styled"
 import { forwardRef, ReactElement, useId, useState } from "react"
-import { Color, computeColor } from "@new/Color"
+import { Color, ColorWithLightness, computeColor } from "@new/Color"
 import { StyleFontFamily, StyleBodySmall, Text, StyleBodyXsmall } from "@new/Text/Text"
 import { Size } from "@new/Size"
 import { Stack } from "@new/Stack/Stack"
@@ -29,7 +29,7 @@ export type InputTextProps = ComponentBaseProps & {
   disabled?: boolean
 
   placeholder?: string
-  label?: ["outside" | "inside", string]
+  label?: ["outside" | "outside-small" | "inside", string]
   hint?: string
   error?: string
   required?: boolean
@@ -48,6 +48,9 @@ export type InputTextProps = ComponentBaseProps & {
 
   autoComplete?: string
   name?: string
+
+  outlineColor?: ColorWithLightness
+  tooltip?: string
 }
 
 const calculateWidth = (rows: InputTextProps["rows"], width: InputTextProps["width"], size: InputTextProps["size"]) => {
@@ -173,6 +176,21 @@ export const InputText = forwardRef<HTMLInputElement | HTMLTextAreaElement, Inpu
               <Icon name="asterisk" small={p.size === "small"} medium={p.size === "large"} fill={[Color.Error, 700]} />
             </>
           )}
+
+          {p.tooltip && (
+            <>
+              <Spacer tiny />
+
+              <Icon
+                name="info"
+                small={p.size === "small"}
+                medium={p.size === "large"}
+                fill={[p.color, 500]}
+                style="outlined"
+                tooltip={p.tooltip}
+              />
+            </>
+          )}
         </Label>
       </Align>
     )
@@ -205,9 +223,73 @@ export const InputText = forwardRef<HTMLInputElement | HTMLTextAreaElement, Inpu
               <Icon name="asterisk" small={p.size === "small"} medium={p.size === "large"} fill={[Color.Error, 700]} />
             </>
           )}
+
+          {p.tooltip && (
+            <>
+              <Spacer tiny />
+
+              <Icon
+                name="info"
+                small={p.size === "small"}
+                medium={p.size === "large"}
+                fill={[p.color, 500]}
+                style="outlined"
+                tooltip={p.tooltip}
+              />
+            </>
+          )}
         </Label>
 
         <Spacer xsmall={p.size === "small"} small={p.size === "large"} />
+      </Align>
+    )
+
+    if (p.hint) {
+      hintOutside = (
+        <Align vertical left hug>
+          <Text tiny={p.size === "small"} xsmall={p.size !== "small"} fill={[p.color, 700]}>
+            {p.hint}
+          </Text>
+
+          <Spacer xsmall={p.size === "small"} small={p.size === "large"} />
+        </Align>
+      )
+    }
+  }
+
+  if (p.label && p.label[0] === "outside-small") {
+    labelOutside = (
+      <Align vertical left hug="width">
+        <Label htmlFor={id}>
+          <Text xsmall fill={[Color.Neutral, 700]}>
+            <b>{p.label[1]}</b>
+          </Text>
+
+          {p.required && (
+            <>
+              <Spacer tiny={p.size === "small"} xsmall={p.size === "large"} />
+
+              <Icon name="asterisk" small={p.size === "small"} medium={p.size === "large"} fill={[Color.Error, 700]} />
+            </>
+          )}
+
+          {p.tooltip && (
+            <>
+              <Spacer tiny />
+
+              <Icon
+                name="info"
+                small={p.size === "small"}
+                medium={p.size === "large"}
+                fill={[Color.Neutral, 500]}
+                style="outlined"
+                tooltip={p.tooltip}
+              />
+            </>
+          )}
+        </Label>
+
+        <Spacer xsmall />
       </Align>
     )
 
@@ -286,6 +368,15 @@ export const InputText = forwardRef<HTMLInputElement | HTMLTextAreaElement, Inpu
     )
   }
 
+  let strokeColor: ColorWithLightness = [p.color, 300]
+  if (p.disabled) {
+    strokeColor = [p.color, 100]
+  } else if (p.error) {
+    strokeColor = [Color.Error, 300]
+  } else if (p.outlineColor) {
+    strokeColor = p.outlineColor
+  }
+
   return (
     <StackWidthOverride
       className={p.className}
@@ -303,7 +394,7 @@ export const InputText = forwardRef<HTMLInputElement | HTMLTextAreaElement, Inpu
       <Align horizontal left>
         <Stack
           horizontal
-          stroke={p.disabled ? [p.color, 100] : [p.error ? Color.Error : p.color, 300]}
+          stroke={strokeColor}
           strokeHover={
             p.disabled
               ? [p.color, 100]

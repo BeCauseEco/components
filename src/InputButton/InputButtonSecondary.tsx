@@ -19,6 +19,7 @@ export type InputButtonSecondaryProps = Pick<
   | "tabIndex"
   | "type"
 > & {
+  className?: string
   label: string
   transparent?: boolean
   iconNameLeft?: string
@@ -46,7 +47,7 @@ export const InputButtonSecondary = forwardRef<HTMLButtonElement, InputButtonSec
 
   return (
     <InputButton
-      className="<InputButtonSecondary /> -"
+      className={`<InputButtonSecondary /> - ${p.className}`}
       id={p.id}
       ref={ref}
       variant="outlined"

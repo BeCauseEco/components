@@ -275,6 +275,7 @@ export const InputButton = forwardRef<HTMLButtonElement | HTMLAnchorElement, Inp
       {...pp}
     >
       <Children
+        className={p.className}
         variant={variant}
         size={p.size}
         loading={p.loading}
