@@ -47,6 +47,12 @@ export type Column = {
   isEditable?: boolean
   endAdornment?: (rowData: ICellTextProps["rowData"]) => ReactElement<AlignProps> | string | undefined
   startAdornment?: (rowData: ICellTextProps["rowData"]) => ReactElement<AlignProps> | string | undefined
+  /**
+   * Function to generate footer content for each cell
+   * @param rowData - The data object for the current row
+   * @returns Footer content as ReactElement, or undefined to show no footer
+   */
+  footer?: (rowData: ICellTextProps["rowData"]) => ReactElement | undefined
   placeholder?: string
   progressIndicator?: {
     type: "bar" | "circle"
@@ -149,6 +155,14 @@ export type Column = {
         }
       | undefined
   }
+
+  comboboxOptions?: {
+    /** Placeholder text for the search input. Providing this will automatically enable filtering */
+    filterPlaceholder?: string
+    /** Text shown when no results match the search. Providing this will automatically enable filtering */
+    filterNoResults?: string
+  }
+
   fill?: ((rowData: ICellTextProps["rowData"]) => Color | undefined) | Color | undefined
 }
 

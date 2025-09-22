@@ -161,7 +161,7 @@ export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<InputC
           <Badge
             size={p.size}
             variant={p.disabled ? "opaque" : "solid"}
-            label={selectedItem.label}
+            label={selectedItem.shortLabel || selectedItem.label}
             title={selectedItem.label}
             color={p.disabled ? p.color : Color.Primary}
             onClear={() => {
@@ -184,7 +184,7 @@ export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<InputC
             ) : null}
 
             <Text fill={[p.color, 700]} xsmall={p.size === "small"} small={p.size === "large"} textOverflow>
-              {selectedItem?.label || p.textNoSelection}
+              {selectedItem?.shortLabel || selectedItem?.label || p.textNoSelection}
             </Text>
           </Align>
         </Stack>
