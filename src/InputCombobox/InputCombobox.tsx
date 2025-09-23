@@ -123,12 +123,14 @@ export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<InputC
   const [search, setSearch] = useState("")
   const [filteredValues, setFilteredValues] = useState<string[]>([])
 
-  const items: { [value: string]: InputComboboxItemProps } = useMemo(() => {
-    const output: { [value: string]: InputComboboxItemProps } = {}
+  const items: { [key: string]: InputComboboxItemProps } = useMemo(() => {
+    const output: { [key: string]: InputComboboxItemProps } = {}
 
     React.Children.forEach(p.children, child => {
       if (React.isValidElement<InputComboboxItemProps>(child)) {
-        output[child.props.value] = child.props
+        // Create unique key combining value and grouping to allow duplicates in different groups
+        const uniqueKey = `${child.props.value}__${child.props.groupingLabel || "ungrouped"}`
+        output[uniqueKey] = child.props
       }
     })
 
@@ -136,7 +138,7 @@ export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<InputC
   }, [p.children])
 
   useEffect(() => {
-    const newItems = Object.values(items).map(item => item.value)
+    const newItems = Object.keys(items)
 
     setFilteredValues(newItems)
   }, [items])
@@ -343,22 +345,28 @@ export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<InputC
   //Grouping logic created with claude code
   const groupedItems = useMemo(() => {
     const groups: { [groupName: string]: InputComboboxItemProps[] } = {}
+    const dividerItems: InputComboboxItemProps[] = []
     let hasAnyGroupingLabel = false
 
     filteredItems.forEach(item => {
-      const groupName = item.groupingLabel || ""
-      if (item.groupingLabel) {
-        hasAnyGroupingLabel = true
-      }
+      if (item.groupingLabel === "-") {
+        // Items with dash groupingLabel should be rendered with dividers
+        dividerItems.push(item)
+      } else {
+        const groupName = item.groupingLabel || ""
+        if (item.groupingLabel) {
+          hasAnyGroupingLabel = true
+        }
 
-      if (!groups[groupName]) {
-        groups[groupName] = []
+        if (!groups[groupName]) {
+          groups[groupName] = []
+        }
+        groups[groupName].push(item)
       }
-      groups[groupName].push(item)
     })
 
     // If no grouping labels exist, return null to use flat rendering
-    if (!hasAnyGroupingLabel) {
+    if (!hasAnyGroupingLabel && dividerItems.length === 0) {
       return null
     }
 
@@ -373,9 +381,11 @@ export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<InputC
       Object.keys(groups).forEach(groupName => {
         groups[groupName].sort((a, b) => a.label.localeCompare(b.label))
       })
+
+      dividerItems.sort((a, b) => a.label.localeCompare(b.label))
     }
 
-    return groups
+    return { groups, dividerItems }
   }, [filteredItems, p.sortAlphabetically])
 
   let commandListItems: ReactElement | null = null
@@ -400,7 +410,8 @@ export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<InputC
   } else {
     if (groupedItems) {
       // Render grouped items
-      const groupEntries = Object.entries(groupedItems)
+      const { groups, dividerItems } = groupedItems
+      const groupEntries = Object.entries(groups)
 
       // Sort group names alphabetically if sortAlphabetically is true
       if (p.sortAlphabetically) {
@@ -423,6 +434,21 @@ export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<InputC
               {groupItems.map((item, index) => getCommandItem(index, item))}
             </CommandGroupStyled>
           ))}
+          {dividerItems.length > 0 && (
+            <>
+              {/* Only show divider if there are other groups */}
+              {groupEntries.length > 0 && (
+                <Align vertical>
+                  <Divider fill={[Color.Neutral, 100]} />
+                  <Spacer small />
+                </Align>
+              )}
+              {/* All dash items rendered without individual dividers */}
+              {dividerItems.map((item, index) => (
+                <React.Fragment key={`divider-${index}`}>{getCommandItem(index, item)}</React.Fragment>
+              ))}
+            </>
+          )}
         </>
       )
     } else {
@@ -446,14 +472,16 @@ export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<InputC
   const filterResults = useCallback(
     (value: string) => {
       if (value === "") {
-        setFilteredValues(Object.values(items).map(item => item.value))
+        setFilteredValues(Object.keys(items))
 
         return
       }
 
-      const itemsFiltered = Object.values(items).filter(item => item.label.toLowerCase().includes(value.toLowerCase()))
+      const itemsFiltered = Object.entries(items).filter(([, item]) =>
+        item.label.toLowerCase().includes(value.toLowerCase()),
+      )
 
-      setFilteredValues(itemsFiltered.map(item => item.value))
+      setFilteredValues(itemsFiltered.map(([key]) => key))
     },
     [items],
   )

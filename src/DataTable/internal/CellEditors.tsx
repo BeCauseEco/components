@@ -90,7 +90,6 @@ export const CellInputCheckbox = ({ column, rowKeyValue, value }: ICellEditorPro
     <InputCheckbox
       value={value || false}
       size="small"
-      disabled
       onChange={v => {
         table.updateCellValue(rowKeyValue, column.key, v)
       }}
