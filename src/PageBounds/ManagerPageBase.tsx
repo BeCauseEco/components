@@ -37,10 +37,12 @@ const ManagerPageBase = ({
   actionArea,
   children,
   rightPane,
+  titleActionArea,
 }: {
   isLoading?: boolean
   title: string
   subtitle: string
+  titleActionArea?: ReactNode
   actionArea?: ReactNode
   children?: ReactNode
   rightPane?: ReactNode
@@ -60,6 +62,7 @@ const ManagerPageBase = ({
               <Text fill={[Color.Neutral, 400]} small wrap>
                 {subtitle}
               </Text>
+              {titleActionArea}
             </Align>
 
             <>
