@@ -220,9 +220,11 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
         endAdornment: column.endAdornment,
         startAdornment: column.startAdornment,
         fill: column.fill,
+        footer: column.footer,
         placeholder: column.placeholder,
         numberFormat: column.numberFormat,
         dateFormat: column.dateFormat,
+        comboboxOptions: column.comboboxOptions,
       }
     })
 
@@ -745,6 +747,12 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
                                 }
                               }
 
+                              // Process footer similar to tooltip
+                              let footerElement
+                              if (typeof column.footer === "function") {
+                                footerElement = column.footer(cellTextContent.rowData)
+                              }
+
                               let output = <></>
 
                               if (column.dataType === DataType.ProgressIndicator) {
@@ -772,7 +780,7 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
                                   : null
 
                               return (
-                                <Stack hug horizontal>
+                                <Stack hug={footerElement ? "partly" : true} horizontal>
                                   {mode === "edit" && firstColumn && p.editingMode !== EditingMode.Cell ? (
                                     <Align left horizontal hug>
                                       <Icon name="drag_indicator" medium fill={[Color.Neutral, 700]} />
@@ -806,26 +814,42 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
                                   <Align left={!alignmentRight} right={alignmentRight} horizontal>
                                     {customCellRendererElement ? (
                                       customCellRendererElement
-                                    ) : tooltipElement ? (
-                                      <Tooltip
-                                        trigger={
-                                          column.dataType !== DataType.Status &&
-                                          column.dataType !== DataType.ProgressIndicator &&
-                                          column.showTooltipIcon === true ? (
-                                            <Align horizontal center hug>
-                                              {output}
-                                              <Spacer xsmall />
-                                              <Icon name="info" small fill={[Color.Neutral, 200]} />
-                                            </Align>
+                                    ) : (
+                                      <Stack vertical hug>
+                                        <Align horizontal left={!alignmentRight} right={alignmentRight}>
+                                          {tooltipElement ? (
+                                            <Tooltip
+                                              trigger={
+                                                column.dataType !== DataType.Status &&
+                                                column.dataType !== DataType.ProgressIndicator &&
+                                                column.showTooltipIcon === true ? (
+                                                  <Align horizontal center hug>
+                                                    {output}
+                                                    <Spacer xsmall />
+                                                    <Icon name="info" small fill={[Color.Neutral, 200]} />
+                                                  </Align>
+                                                ) : (
+                                                  output
+                                                )
+                                              }
+                                            >
+                                              {tooltipElement}
+                                            </Tooltip>
                                           ) : (
                                             output
-                                          )
-                                        }
-                                      >
-                                        {tooltipElement}
-                                      </Tooltip>
-                                    ) : (
-                                      output
+                                          )}
+                                        </Align>
+
+                                        {footerElement && (
+                                          <>
+                                            <Spacer tiny />
+
+                                            <Align horizontal left={!alignmentRight} right={alignmentRight}>
+                                              {footerElement}
+                                            </Align>
+                                          </>
+                                        )}
+                                      </Stack>
                                     )}
                                   </Align>
                                 </Stack>

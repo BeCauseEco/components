@@ -7,7 +7,7 @@ import { InputCheckbox } from "@new/InputCheckbox/InputCheckbox"
 import { InputCombobox } from "@new/InputCombobox/InputCombobox"
 import { InputComboboxItem } from "@new/InputCombobox/InputComboboxItem"
 import { Color } from "@new/Color"
-import { DataType } from "../types"
+import { DataType, Column } from "../types"
 
 export const CellInputTextSingle = ({ column, rowKeyValue, value, autoFocus }: ICellEditorProps) => {
   const table = useTableInstance()
@@ -104,6 +104,15 @@ export const CellInputCombobox = ({ column, rowKeyValue, value, rowData }: ICell
   if (!rowData.selectableOptions || rowData.selectableOptions.length === 0) {
     return null
   }
+
+  // Get combobox options from column configuration
+  const columnConfig = column as Column
+  const comboboxOptions = columnConfig.comboboxOptions
+
+  // Determine if filtering should be enabled - enable when any filter text options are provided
+  const enableFilter =
+    comboboxOptions?.filterPlaceholder !== undefined || comboboxOptions?.filterNoResults !== undefined
+
   return (
     <InputCombobox
       textNoSelection=""
@@ -114,9 +123,23 @@ export const CellInputCombobox = ({ column, rowKeyValue, value, rowData }: ICell
       size="small"
       width="auto"
       color={Color.Neutral}
+      filterOptions={
+        enableFilter
+          ? {
+              textFilterPlaceholder: comboboxOptions?.filterPlaceholder || "Search...",
+              textFilterNoResults: comboboxOptions?.filterNoResults || "No results found",
+            }
+          : undefined
+      }
     >
       {rowData.selectableOptions.map(option => (
-        <InputComboboxItem key={option.value} label={option.label} value={option.value} />
+        <InputComboboxItem
+          key={option.value}
+          label={option.label}
+          value={option.value}
+          shortLabel={option.shortLabel}
+          groupingLabel={option.groupingLabel}
+        />
       ))}
     </InputCombobox>
   )

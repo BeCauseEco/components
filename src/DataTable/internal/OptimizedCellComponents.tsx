@@ -69,7 +69,7 @@ export const OptimizedCell = memo(
       return (
         <Align horizontal left>
           <Text fill={[Color.Neutral, 700]} {...{ [textSize]: true }} textOverflow={column.maxWidth !== undefined}>
-            {selectedOption.label}
+            {selectedOption.shortLabel || selectedOption.label}
           </Text>
         </Align>
       )
