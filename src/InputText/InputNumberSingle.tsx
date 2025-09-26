@@ -1,4 +1,4 @@
-import { forwardRef } from "react"
+import { forwardRef, ReactNode } from "react"
 import { InputTextProps, InputText } from "@new/InputText/internal/InputText"
 import { Color, ColorWithLightness } from "@new/Color"
 
@@ -31,6 +31,8 @@ export type InputNumberSingleProps = Pick<
   allowNegative?: boolean
   allowDecimals?: boolean
   allowEmpty?: boolean
+  startAdornment?: ReactNode
+  endAdornment?: ReactNode
 }
 
 export const InputNumberSingle = forwardRef<HTMLInputElement, InputNumberSingleProps>((p, ref) => {
@@ -119,6 +121,8 @@ export const InputNumberSingle = forwardRef<HTMLInputElement, InputNumberSingleP
       iconNameRight={p.iconNameRight}
       onLeftIconClick={p.onLeftIconClick}
       onRightIconClick={p.onRightIconClick}
+      startAdornment={p.startAdornment}
+      endAdornment={p.endAdornment}
       rows={1}
       disabled={p.disabled ? true : undefined}
       value={p.value}

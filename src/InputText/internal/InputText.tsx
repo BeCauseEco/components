@@ -1,5 +1,5 @@
 import styled from "@emotion/styled"
-import { forwardRef, ReactElement, useId, useState } from "react"
+import { forwardRef, ReactElement, ReactNode, useId, useState } from "react"
 import { Color, ColorWithLightness, computeColor } from "@new/Color"
 import { StyleFontFamily, StyleBodySmall, Text, StyleBodyXsmall } from "@new/Text/Text"
 import { Size } from "@new/Size"
@@ -38,6 +38,9 @@ export type InputTextProps = ComponentBaseProps & {
   iconNameRight?: string
   onLeftIconClick?: () => void
   onRightIconClick?: () => void
+
+  startAdornment?: ReactNode
+  endAdornment?: ReactNode
 
   hug?: boolean
 
@@ -306,12 +309,12 @@ export const InputText = forwardRef<HTMLInputElement | HTMLTextAreaElement, Inpu
     }
   }
 
-  if (p.iconNameLeft && p.rows === 1) {
+  if ((p.iconNameLeft || p.startAdornment) && p.rows === 1) {
     iconStart = (
       <Align horizontal center hug="width">
         <Spacer xsmall={p.size === "small"} small={p.size === "large"} />
 
-        {p.onLeftIconClick ? (
+        {p.iconNameLeft && p.onLeftIconClick ? (
           <InputButtonIconTertiary
             hug
             iconName={p.iconNameLeft}
@@ -319,22 +322,26 @@ export const InputText = forwardRef<HTMLInputElement | HTMLTextAreaElement, Inpu
             onClick={p.onLeftIconClick}
             tabIndex={-1}
           />
-        ) : (
+        ) : p.iconNameLeft ? (
           <Icon
             name={p.iconNameLeft}
             medium={p.size === "small"}
             large={p.size === "large"}
             fill={[p.error ? Color.Error : p.color, 700]}
           />
-        )}
+        ) : null}
+
+        {p.startAdornment && p.startAdornment}
       </Align>
     )
   }
 
-  if (p.iconNameRight && p.rows === 1) {
+  if ((p.iconNameRight || p.endAdornment) && p.rows === 1) {
     iconEnd = (
       <Align horizontal center hug="width">
-        {p.onRightIconClick ? (
+        {p.endAdornment && p.endAdornment}
+
+        {p.iconNameRight && p.onRightIconClick ? (
           <InputButtonIconTertiary
             hug
             iconName={p.iconNameRight}
@@ -342,14 +349,14 @@ export const InputText = forwardRef<HTMLInputElement | HTMLTextAreaElement, Inpu
             onClick={p.onRightIconClick}
             tabIndex={-1}
           />
-        ) : (
+        ) : p.iconNameRight ? (
           <Icon
             name={p.iconNameRight}
             medium={p.size === "small"}
             large={p.size === "large"}
             fill={[p.error ? Color.Error : p.color, 700]}
           />
-        )}
+        ) : null}
 
         <Spacer xsmall={p.size === "small"} small={p.size === "large"} />
       </Align>
@@ -462,7 +469,7 @@ export const InputText = forwardRef<HTMLInputElement | HTMLTextAreaElement, Inpu
             <></>
           )}
 
-          {p.iconNameRight ? (
+          {p.iconNameRight || p.endAdornment ? (
             <>
               <Align vertical center hug="width">
                 <Divider vertical fill={p.value ? [p.color, 300] : [Color.Transparent]} overrideHeight="50%" />
