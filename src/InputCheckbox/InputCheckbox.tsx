@@ -52,6 +52,8 @@ export type InputCheckboxProps = ComponentBaseProps &
     disabled?: boolean
 
     alternateAppearance?: boolean
+
+    tooltip?: string
   }
 
 export const InputCheckbox = (p: InputCheckboxProps) => {
@@ -99,6 +101,14 @@ export const InputCheckbox = (p: InputCheckboxProps) => {
                 >
                   {p.label}
                 </Text>
+
+                {p.tooltip && (
+                  <>
+                    <Spacer tiny />
+
+                    <Icon name="info" small fill={[p.color, 500]} style="outlined" tooltip={p.tooltip} />
+                  </>
+                )}
               </Label>
             </>
           )}
