@@ -52,7 +52,7 @@ export type Column = {
    * @param rowData - The data object for the current row
    * @returns Footer content as ReactElement, or undefined to show no footer
    */
-  footer?: (rowData: ICellTextProps["rowData"]) => ReactElement | undefined
+  footer?: (rowData: ICellTextProps["rowData"]) => ReactElement | undefined | null
   placeholder?: string
   progressIndicator?: {
     type: "bar" | "circle"

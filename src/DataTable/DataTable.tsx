@@ -780,7 +780,7 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
                                   : null
 
                               return (
-                                <Stack hug="partly" horizontal>
+                                <Stack hug={footerElement ? "partly" : true} horizontal>
                                   {mode === "edit" && firstColumn && p.editingMode !== EditingMode.Cell ? (
                                     <Align left horizontal hug>
                                       <Icon name="drag_indicator" medium fill={[Color.Neutral, 700]} />
@@ -842,6 +842,8 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
 
                                         {footerElement && (
                                           <>
+                                            <Spacer tiny />
+
                                             <Align horizontal left={!alignmentRight} right={alignmentRight}>
                                               {footerElement}
                                             </Align>
