@@ -780,7 +780,7 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
                                   : null
 
                               return (
-                                <Stack hug={footerElement ? "partly" : true} horizontal>
+                                <Stack hug horizontal>
                                   {mode === "edit" && firstColumn && p.editingMode !== EditingMode.Cell ? (
                                     <Align left horizontal hug>
                                       <Icon name="drag_indicator" medium fill={[Color.Neutral, 700]} />
@@ -816,6 +816,9 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
                                       customCellRendererElement
                                     ) : (
                                       <Stack vertical hug>
+                                        {/* If there is a footer element, the content gets pushed closer to the borders of the cell. Add a tiny spacer for the cell to become larger */}
+                                        {footerElement && <Spacer tiny />}
+
                                         <Align horizontal left={!alignmentRight} right={alignmentRight}>
                                           {tooltipElement ? (
                                             <Tooltip
@@ -847,6 +850,8 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
                                             <Align horizontal left={!alignmentRight} right={alignmentRight}>
                                               {footerElement}
                                             </Align>
+
+                                            <Spacer tiny />
                                           </>
                                         )}
                                       </Stack>
