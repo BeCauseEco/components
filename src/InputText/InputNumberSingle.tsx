@@ -91,6 +91,15 @@ export const InputNumberSingle = forwardRef<HTMLInputElement, InputNumberSingleP
       filtered = filtered.replace(/\./g, "")
     }
 
+    // Remove leading zeroes, but preserve "0", "0.", "-0", and "-0."
+    const isNegative = filtered.startsWith("-")
+    const numberPart = isNegative ? filtered.slice(1) : filtered
+
+    if (numberPart.length > 1 && numberPart[0] === "0" && numberPart[1] !== ".") {
+      const withoutLeadingZeroes = numberPart.replace(/^0+/, "")
+      filtered = (isNegative ? "-" : "") + (withoutLeadingZeroes || "0")
+    }
+
     return filtered
   }
 
