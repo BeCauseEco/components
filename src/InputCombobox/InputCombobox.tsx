@@ -252,7 +252,7 @@ export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<InputC
     const onSelectSingle = (value: string) => {
       setOpen(false)
 
-      const item = Object.values(items).findLast(item => item.label === value.trim())
+      const item = Object.values(items).findLast(item => item.label?.trim() === value?.trim())
 
       if (item) {
         p.onChange(item.value)
