@@ -196,8 +196,8 @@ export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<InputC
     const selectedValuesSet = new Set(p.value)
 
     const selectedItems = Object.entries(items)
-      .filter(([id]) => selectedValuesSet.has(id))
-      .flatMap(([, value]) => value.label)
+      .filter(([, item]) => selectedValuesSet.has(item.value))
+      .flatMap(([, item]) => item.label)
 
     if (selectedItems.length === 0) {
       return (
