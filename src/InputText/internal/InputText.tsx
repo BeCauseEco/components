@@ -11,6 +11,7 @@ import { Divider } from "@new/Divider/Divider"
 import { InputButton } from "@new/InputButton/internal/InputButton"
 import { InputButtonIconTertiary } from "@new/InputButton/InputButtonIconTertiary"
 import { ComponentBaseProps } from "@new/ComponentBaseProps"
+import _debounce from "lodash/debounce"
 
 export type InputTextProps = ComponentBaseProps & {
   type: "text" | "date" | "email" | "password" | "number"
@@ -22,6 +23,7 @@ export type InputTextProps = ComponentBaseProps & {
 
   color: Color
 
+  debounceChanges?: boolean
   value: string
   onChange: (value: string) => void
 
@@ -148,7 +150,13 @@ const Label = styled.label({
   alignItems: "center",
 })
 
+const debouncedOnChange = _debounce((newValue: string, onChange: (newValue: string) => void) => {
+  onChange(newValue)
+}, 500)
+
 export const InputText = forwardRef<HTMLInputElement | HTMLTextAreaElement, InputTextProps>((p, ref) => {
+  const [internalValue, setInternalValue] = useState(p.value || "")
+
   const generatedId = useId()
   const id = p.id ?? generatedId
 
@@ -161,6 +169,17 @@ export const InputText = forwardRef<HTMLInputElement | HTMLTextAreaElement, Inpu
   let errorEitherSide: ReactElement<AlignProps> = <></>
   let iconStart: ReactElement<AlignProps> = <></>
   let iconEnd: ReactElement<AlignProps> = <></>
+
+  const onChange = (newValue: string) => {
+    if (p.onChange) {
+      setInternalValue(newValue)
+      if (p.debounceChanges) {
+        debouncedOnChange(newValue, p.onChange)
+      } else {
+        p.onChange(newValue)
+      }
+    }
+  }
 
   if (p.label && p.label[0] === "inside") {
     labelInside = (
@@ -428,7 +447,7 @@ export const InputText = forwardRef<HTMLInputElement | HTMLTextAreaElement, Inpu
               type={p.type}
               id={id}
               name={p.name}
-              value={p.value}
+              value={internalValue}
               rows={p.rows || 1}
               color={p.error ? Color.Error : p.color}
               size={p.size}
@@ -441,9 +460,7 @@ export const InputText = forwardRef<HTMLInputElement | HTMLTextAreaElement, Inpu
               max={p.type === "date" ? p.dateMax : undefined}
               autoComplete={p.autoComplete ?? "one-time-code"}
               onChange={event => {
-                if (p.onChange) {
-                  p.onChange(event?.target?.["value"])
-                }
+                onChange(event?.target?.["value"])
               }}
             />
           </Align>
@@ -454,14 +471,12 @@ export const InputText = forwardRef<HTMLInputElement | HTMLTextAreaElement, Inpu
                 variant="blank"
                 width="auto"
                 size={p.size}
-                colorForeground={p.value ? [p.color, 700] : [Color.Transparent]}
+                colorForeground={internalValue ? [p.color, 700] : [Color.Transparent]}
                 iconName="clear"
                 iconPlacement="labelNotSpecified"
                 tabIndex={-1}
                 onClick={() => {
-                  if (p.onChange) {
-                    p.onChange("")
-                  }
+                  onChange("")
                 }}
               />
             </Align>
@@ -472,7 +487,7 @@ export const InputText = forwardRef<HTMLInputElement | HTMLTextAreaElement, Inpu
           {p.iconNameRight || p.endAdornment ? (
             <>
               <Align vertical center hug="width">
-                <Divider vertical fill={p.value ? [p.color, 300] : [Color.Transparent]} overrideHeight="50%" />
+                <Divider vertical fill={internalValue ? [p.color, 300] : [Color.Transparent]} overrideHeight="50%" />
               </Align>
 
               <Spacer xsmall={p.size === "small"} small={p.size === "large"} />
