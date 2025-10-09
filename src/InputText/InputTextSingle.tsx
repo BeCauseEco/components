@@ -29,6 +29,7 @@ export type InputTextSingleProps = Pick<
   type?: "text" | "email" | "password"
   autoComplete?: string
   name?: string
+  debounceChanges?: boolean
 }
 
 export const InputTextSingle = forwardRef<HTMLInputElement, InputTextSingleProps>((p, ref) => {
@@ -38,6 +39,7 @@ export const InputTextSingle = forwardRef<HTMLInputElement, InputTextSingleProps
 
   return (
     <InputText
+      debounceChanges={p.debounceChanges}
       outlineColor={p.outlineColor}
       className={p.className || `<InputTextSingle />`}
       type={p.type ?? "text"}

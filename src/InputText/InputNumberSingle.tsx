@@ -33,6 +33,7 @@ export type InputNumberSingleProps = Pick<
   allowEmpty?: boolean
   startAdornment?: ReactNode
   endAdornment?: ReactNode
+  debounceChanges?: boolean
 }
 
 export const InputNumberSingle = forwardRef<HTMLInputElement, InputNumberSingleProps>((p, ref) => {
@@ -112,6 +113,7 @@ export const InputNumberSingle = forwardRef<HTMLInputElement, InputNumberSingleP
 
   return (
     <InputText
+      debounceChanges={p.debounceChanges}
       outlineColor={p.outlineColor}
       className={p.className || `<InputNumberSingle />`}
       type="text"
