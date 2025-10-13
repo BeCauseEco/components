@@ -12,6 +12,7 @@ import { InputButton } from "@new/InputButton/internal/InputButton"
 import { InputButtonIconTertiary } from "@new/InputButton/InputButtonIconTertiary"
 import { ComponentBaseProps } from "@new/ComponentBaseProps"
 import _debounce from "lodash/debounce"
+import { validateAndFormatNumber } from "@new/InputText/internal/numberUtils"
 
 export type InputTextProps = ComponentBaseProps & {
   type: "text" | "date" | "email" | "password" | "number"
@@ -56,6 +57,14 @@ export type InputTextProps = ComponentBaseProps & {
 
   borderColor?: ColorWithLightness
   tooltip?: string
+
+  numberSettings?: NumberInputSettings
+}
+
+export type NumberInputSettings = {
+  allowNegativeNumbers: boolean
+  allowDecimals: boolean
+  allowEmpty: boolean
 }
 
 const calculateWidth = (rows: InputTextProps["rows"], width: InputTextProps["width"], size: InputTextProps["size"]) => {
@@ -171,12 +180,18 @@ export const InputText = forwardRef<HTMLInputElement | HTMLTextAreaElement, Inpu
   let iconEnd: ReactElement<AlignProps> = <></>
 
   const onChange = (newValue: string) => {
+    let newValueFormatted = newValue
+    if (p.numberSettings) {
+      //If number settings are provided, we consider this a number input
+      newValueFormatted = validateAndFormatNumber(newValue, internalValue, p.numberSettings)
+    }
+
     if (p.onChange) {
-      setInternalValue(newValue)
+      setInternalValue(newValueFormatted)
       if (p.debounceChanges) {
-        debouncedOnChange(newValue, p.onChange)
+        debouncedOnChange(newValueFormatted, p.onChange)
       } else {
-        p.onChange(newValue)
+        p.onChange(newValueFormatted)
       }
     }
   }
