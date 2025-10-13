@@ -24,8 +24,8 @@ export type InputButtonProps = ComponentBaseProps &
     colorForeground: ColorWithLightness
     colorBackground?: ColorWithLightness
     colorBackgroundHover?: ColorWithLightness
-    colorOutline?: ColorWithLightness
-    colorOutlineHover?: ColorWithLightness
+    borderColor?: ColorWithLightness
+    borderColorHover?: ColorWithLightness
     colorLoading?: ColorWithLightness
 
     loading?: boolean
@@ -174,8 +174,8 @@ const Children = (p: Omit<InputButtonProps, "width">) => {
       horizontal
       fill={p.colorBackground}
       fillHover={p.colorBackgroundHover}
-      stroke={p.disabled && p.colorOutline?.[0] ? [p.colorOutline[0], 200] : p.colorOutline}
-      strokeHover={p.colorOutlineHover}
+      stroke={p.disabled && p.borderColor?.[0] ? [p.borderColor[0], 200] : p.borderColor}
+      strokeHover={p.borderColorHover}
       fillLoading={p.colorLoading}
       cornerRadius="medium"
       loading={p.loading ? true : undefined}
@@ -287,8 +287,8 @@ export const InputButton = forwardRef<HTMLButtonElement | HTMLAnchorElement, Inp
         colorForeground={computeColorDestructive(p.colorForeground, p.destructive) || p.colorForeground}
         colorBackground={computeColorDestructive(p.colorBackground, p.destructive)}
         colorBackgroundHover={computeColorDestructive(p.colorBackgroundHover, p.destructive)}
-        colorOutline={computeColorDestructive(p.colorOutline, p.destructive)}
-        colorOutlineHover={computeColorDestructive(p.colorOutlineHover, p.destructive)}
+        borderColor={computeColorDestructive(p.borderColor, p.destructive)}
+        borderColorHover={computeColorDestructive(p.borderColorHover, p.destructive)}
         colorLoading={p.colorLoading}
         content={content}
         hug={p.hug}

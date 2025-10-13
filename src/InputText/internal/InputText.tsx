@@ -54,7 +54,7 @@ export type InputTextProps = ComponentBaseProps & {
   autoComplete?: string
   name?: string
 
-  outlineColor?: ColorWithLightness
+  borderColor?: ColorWithLightness
   tooltip?: string
 }
 
@@ -399,8 +399,8 @@ export const InputText = forwardRef<HTMLInputElement | HTMLTextAreaElement, Inpu
     strokeColor = [p.color, 100]
   } else if (p.error) {
     strokeColor = [Color.Error, 300]
-  } else if (p.outlineColor) {
-    strokeColor = p.outlineColor
+  } else if (p.borderColor) {
+    strokeColor = p.borderColor
   }
 
   return (

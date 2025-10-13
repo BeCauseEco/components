@@ -10,8 +10,7 @@ type TContainerProperties = Omit<TTable, "head" | "body">
 const Container = styled.table<TContainerProperties>(p => ({
   display: "table",
   borderCollapse: "collapse",
-  outline: `solid 1px ${computeColor(p.colorBorder)}`,
-  outlineOffset: -1,
+  border: `solid 1px ${computeColor(p.colorBorder)}`,
   border: "solid 1px transparent",
   borderRadius: Size.Tiny,
   width: p.hug ? "0" : "100%",

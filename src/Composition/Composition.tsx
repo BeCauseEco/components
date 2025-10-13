@@ -11,7 +11,6 @@ import { TLayoutStack } from "@new/Composition/LayoutStack"
 import { TLayoutBase } from "./TLayoutBase"
 import { PlaywrightProps } from "@new/Playwright"
 import { computeColor, Color, ColorWithLightness } from "@new/Color"
-import { TBackground } from "./Background"
 import { makePropsNonTransient } from "@new/_internal/emotionUtilities"
 
 const Container = styled(
@@ -140,8 +139,6 @@ const Layout = styled(
     : {}),
 }))
 
-type AllowedBackgrounds = TBackgroundCard | TBackground
-
 type TAllowedLayouts =
   | TLayoutSingle
   | TLayoutSplit
@@ -152,7 +149,7 @@ type TAllowedLayouts =
   | TLayoutBase
 
 export type TComposition = PlaywrightProps & {
-  children: ReactElement<TAllowedLayouts> | [ReactElement<AllowedBackgrounds>, ReactElement<TAllowedLayouts>]
+  children: ReactElement<TAllowedLayouts> | [ReactElement<TBackgroundCard>, ReactElement<TAllowedLayouts>]
   loading?: boolean
   disabled?: boolean
   explodeHeight?: boolean
