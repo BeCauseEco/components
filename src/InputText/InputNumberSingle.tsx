@@ -23,6 +23,7 @@ export type InputNumberSingleProps = Pick<
   | "onChange"
   | "data-playwright-testid"
   | "tooltip"
+  | "debounceChanges"
 > & {
   borderColor?: ColorWithLightness
   color: Color
@@ -33,7 +34,6 @@ export type InputNumberSingleProps = Pick<
   allowEmpty?: boolean
   startAdornment?: ReactNode
   endAdornment?: ReactNode
-  debounceChanges?: boolean
 }
 
 export const InputNumberSingle = forwardRef<HTMLInputElement, InputNumberSingleProps>((p, ref) => {

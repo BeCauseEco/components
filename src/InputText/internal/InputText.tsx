@@ -164,7 +164,8 @@ const debouncedOnChange = _debounce((newValue: string, onChange: (newValue: stri
 }, 500)
 
 export const InputText = forwardRef<HTMLInputElement | HTMLTextAreaElement, InputTextProps>((p, ref) => {
-  const [internalValue, setInternalValue] = useState(p.value || "")
+  const [debouncedValue, setDebouncedValue] = useState<string | null>(null)
+  const internalValue = debouncedValue ?? p.value
 
   const generatedId = useId()
   const id = p.id ?? generatedId
@@ -187,9 +188,12 @@ export const InputText = forwardRef<HTMLInputElement | HTMLTextAreaElement, Inpu
     }
 
     if (p.onChange) {
-      setInternalValue(newValueFormatted)
       if (p.debounceChanges) {
-        debouncedOnChange(newValueFormatted, p.onChange)
+        setDebouncedValue(newValueFormatted)
+        debouncedOnChange(newValueFormatted, value => {
+          p.onChange(value)
+          setDebouncedValue(null)
+        })
       } else {
         p.onChange(newValueFormatted)
       }
