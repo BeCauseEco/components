@@ -24,7 +24,7 @@ export type InputTextSingleProps = Pick<
   | "data-playwright-testid"
   | "tooltip"
 > & {
-  outlineColor?: ColorWithLightness
+  borderColor?: ColorWithLightness
   color: Color
   type?: "text" | "email" | "password"
   autoComplete?: string
@@ -40,7 +40,7 @@ export const InputTextSingle = forwardRef<HTMLInputElement, InputTextSingleProps
   return (
     <InputText
       debounceChanges={p.debounceChanges}
-      outlineColor={p.outlineColor}
+      borderColor={p.borderColor}
       className={p.className || `<InputTextSingle />`}
       type={p.type ?? "text"}
       ref={ref}

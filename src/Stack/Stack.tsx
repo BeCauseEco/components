@@ -113,15 +113,15 @@ const Container = styled(
   boxShadow: computeShadow(p.dropShadow),
 
   ...(p.stroke && {
-    outline: `solid 1px ${computeColor(p.stroke || [Color.Transparent])}`,
-    outlineOffset: "-1px",
+    border: `solid 1px ${computeColor(p.stroke || [Color.Transparent])}`,
+    boxSizing: "border-box",
   }),
 
   "&:hover": {
     ...(p.fillHover && { backgroundColor: computeColor(p.fillHover || [Color.Transparent]) }),
 
     ...(p.strokeHover && {
-      outlineColor: computeColor(p.strokeHover || [Color.Transparent]),
+      borderColor: computeColor(p.strokeHover || [Color.Transparent]),
     }),
   },
 

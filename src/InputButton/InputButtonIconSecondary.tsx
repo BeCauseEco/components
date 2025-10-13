@@ -18,7 +18,7 @@ export type InputButtonIconSecondaryProps = Pick<
   | "type"
 > & {
   iconName: string
-  customOutline?: ColorWithLightness
+  bordercolor?: ColorWithLightness
   customColor?: Color
 }
 
@@ -32,7 +32,7 @@ export const InputButtonIconSecondary = forwardRef<HTMLButtonElement, InputButto
       size={p.size}
       width="auto"
       colorForeground={[p.customColor || Color.Primary, 700]}
-      colorOutline={p.customOutline || [p.customColor || Color.Primary, 700]}
+      borderColor={p.bordercolor || [p.customColor || Color.Primary, 700]}
       colorBackgroundHover={[p.customColor || Color.Primary, 100]}
       colorLoading={[p.customColor || Color.Primary, 700]}
       hug={p.hug}

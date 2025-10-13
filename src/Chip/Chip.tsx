@@ -20,7 +20,7 @@ const Container = styled.div({
 
 export type TChip = PlaywrightProps & {
   colorBackground?: ColorWithLightness
-  colorOutline?: ColorWithLightness
+  colorBorder?: ColorWithLightness
   children:
     | ReactElement<TKeyValuePair>
     | ReactElement<TextProps>
@@ -39,7 +39,7 @@ export const Chip = (p: PropsWithChildren<TChip>) => {
   return (
     <Container data-playwright-testid={p["data-playwright-testid"]}>
       <Composition>
-        <BackgroundCard colorBackground={p.colorBackground} colorOutline={p.colorOutline} borderRadius={Size.Tiny} />
+        <BackgroundCard colorBackground={p.colorBackground} colorBorder={p.colorBorder} borderRadius={Size.Tiny} />
 
         <LayoutChip content={p.children} />
       </Composition>

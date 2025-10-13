@@ -14,37 +14,13 @@ const Container = styled.div<TBackgroundCard>(p => ({
   borderRadius: p.borderRadius ? p.borderRadius : 0,
   transition: "background-color 0.025s ease-in",
   cursor: "inherit",
-
-  // ...(p.stacked && {
-  //   "&:before, &:after": {
-  //     content: `""`,
-  //     position: "absolute",
-  //     bottom: "-2rem",
-  //     left: "2rem",
-  //     right: "2rem",
-  //     width: "calc(100% - 4rem)",
-  //     height: "2rem",
-  //     backgroundColor: "inherit",
-  //     filter: "brightness(0.8)",
-  //     borderBottomLeftRadius: p.borderRadius ? p.borderRadius : 0,
-  //     borderBottomRightRadius: p.borderRadius ? p.borderRadius : 0,
-  //   },
-
-  //   "&:after": {
-  //     bottom: "-4rem",
-  //     left: "4rem",
-  //     right: "4rem",
-  //     width: "calc(100% - 8rem)",
-  //     filter: "brightness(0.75)",
-  //   },
-  // }),
 }))
 
 export type TBackgroundCard = PlaywrightProps & {
   colorBackground?: ColorWithLightness
   colorBackgroundHover?: ColorWithLightness
-  colorOutline?: ColorWithLightness
-  colorOutlineHover?: ColorWithLightness
+  colorBorder?: ColorWithLightness
+  colorBorderHover?: ColorWithLightness
   borderRadius?: Size.Tiny | Size.Small | Size.Medium
   shadow?: EShadow
   stacked?: boolean
@@ -57,12 +33,12 @@ export const BackgroundCard = (p: TBackgroundCard) => {
   const c = css`
     .component-composition > .component-composition-background > .component-backgroundcard-${id} {
       background-color: ${computeColor(p.colorBackground || [Color.Transparent])};
-      outline: solid 1px ${computeColor(p.colorOutline || [Color.Transparent])};
+      border: solid 1px ${computeColor(p.colorBorder || [Color.Transparent])};
     }
 
     .component-composition:hover > .component-composition-background > .component-backgroundcard-${id} {
       background-color: ${computeColor(p.colorBackgroundHover || p.colorBackground || [Color.Transparent])} !important;
-      outlinecolor: ${computeColor(p.colorOutlineHover || p.colorOutline || [Color.Transparent])} !important;
+      border-color: ${computeColor(p.colorBorderHover || p.colorBorder || [Color.Transparent])} !important;
     }
   `
 
@@ -74,8 +50,8 @@ export const BackgroundCard = (p: TBackgroundCard) => {
         className={`component-backgroundcard-${id}`}
         colorBackground={p.colorBackground}
         colorBackgroundHover={p.colorBackgroundHover}
-        colorOutline={p.colorOutline}
-        colorOutlineHover={p.colorOutlineHover}
+        colorBorder={p.colorBorder}
+        colorBorderHover={p.colorBorderHover}
         borderRadius={p.borderRadius}
         shadow={p.shadow}
         stacked={p.stacked}

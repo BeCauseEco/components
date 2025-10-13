@@ -34,7 +34,7 @@ export type InputComboboxProps = ComponentBaseProps & {
   multiple?: boolean
 
   color: Color
-  outlineColor?: ColorWithLightness
+  borderColor?: ColorWithLightness
 
   /**
    * When InputCombobox.multiple is set to true; "value" parameter is of type string[].
@@ -500,8 +500,8 @@ export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<InputC
     strokeColor = [p.color, 100]
   } else if (p.error) {
     strokeColor = [Color.Error, 300]
-  } else if (p.outlineColor) {
-    strokeColor = p.outlineColor
+  } else if (p.borderColor) {
+    strokeColor = p.borderColor
   }
 
   return (
@@ -639,8 +639,8 @@ export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<InputC
             width="full"
             variant="outlined"
             colorForeground={[p.color, 700]}
-            colorOutline={strokeColor}
-            colorOutlineHover={p.disabled ? [p.color, 100] : [p.color, 700]}
+            borderColor={strokeColor}
+            borderColorHover={p.disabled ? [p.color, 100] : [p.color, 700]}
             colorBackground={p.disabled ? [p.color, 50] : [Color.White]}
             colorBackgroundHover={[p.color, 50]}
             colorLoading={[p.color, 700]}

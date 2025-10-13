@@ -286,8 +286,7 @@ export const createDataTableStyles = (
   }
 
   .${cssScope} .override-ka-editing-row {
-    outline: solid 1px ${computeColor([Color.Quarternary, 100])};
-    outline-offset: -1px;
+    border: solid 1px ${computeColor([Color.Quarternary, 100])};
   }
 
   .${cssScope} .ka-no-data-row {
