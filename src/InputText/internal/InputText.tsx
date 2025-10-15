@@ -59,6 +59,10 @@ export type InputTextProps = ComponentBaseProps & {
   tooltip?: string
 
   numberSettings?: NumberInputSettings
+
+  onBlur?: (event: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>) => void
+  onFocus?: (event: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>) => void
+  onKeyDown?: (event: React.KeyboardEvent<HTMLInputElement | HTMLTextAreaElement>) => void
 }
 
 export type NumberInputSettings = {
@@ -473,7 +477,16 @@ export const InputText = forwardRef<HTMLInputElement | HTMLTextAreaElement, Inpu
               focus={focusCapture}
               placeholder={p.placeholder}
               onFocusCapture={() => setFocusCapture(true)}
-              onBlur={() => setFocusCapture(false)}
+              onBlur={event => {
+                setFocusCapture(false)
+                p.onBlur?.(event)
+              }}
+              onFocus={event => {
+                p.onFocus?.(event)
+              }}
+              onKeyDown={event => {
+                p.onKeyDown?.(event)
+              }}
               width={p.width}
               min={p.type === "date" ? p.dateMin : undefined}
               max={p.type === "date" ? p.dateMax : undefined}

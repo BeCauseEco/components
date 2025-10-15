@@ -1,4 +1,13 @@
-import React, { forwardRef, PropsWithChildren, ReactElement, useCallback, useEffect, useMemo, useState } from "react"
+import React, {
+  forwardRef,
+  PropsWithChildren,
+  ReactElement,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react"
 import { InputComboboxItemProps } from "./InputComboboxItem"
 import { Text } from "@new/Text/Text"
 import { Color, ColorWithLightness } from "@new/Color"
@@ -77,6 +86,31 @@ export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<InputC
   const [open, setOpen] = useState(false)
   const [search, setSearch] = useState("")
   const [filteredValues, setFilteredValues] = useState<string[]>([])
+  const [containerWidth, setContainerWidth] = useState<number | undefined>(undefined)
+
+  const containerRef = useRef<HTMLDivElement>(null)
+
+  // Measure container width when component mounts or size/width props change
+  useEffect(() => {
+    if (containerRef.current) {
+      const width = containerRef.current.offsetWidth
+      setContainerWidth(width)
+    }
+  }, [p.size, p.width])
+
+  // Merge the forwarded ref with our internal ref
+  const mergedRef = useCallback(
+    (node: HTMLDivElement | null) => {
+      containerRef.current = node
+
+      if (typeof ref === "function") {
+        ref(node)
+      } else if (ref) {
+        ref.current = node
+      }
+    },
+    [ref],
+  )
 
   const items: { [key: string]: InputComboboxItemProps } = useMemo(() => {
     const output: { [key: string]: InputComboboxItemProps } = {}
@@ -224,6 +258,9 @@ export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<InputC
       groupedItems={groupedItems}
       enableVirtuoso={p.enableVirtuoso}
       sortAlphabetically={p.sortAlphabetically}
+      size={p.size}
+      width={p.width}
+      containerWidthPx={containerWidth}
       renderItem={(index, item) => (
         <ComboboxItem
           key={index}
@@ -245,7 +282,7 @@ export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<InputC
 
   return (
     <Container
-      ref={ref}
+      ref={mergedRef}
       id={p.id}
       data-playwright-testid={p["data-playwright-testid"]}
       className="<InputCombobox /> - "

@@ -24,6 +24,9 @@ export type InputTextSingleProps = Pick<
   | "data-playwright-testid"
   | "tooltip"
   | "debounceChanges"
+  | "onBlur"
+  | "onFocus"
+  | "onKeyDown"
 > & {
   borderColor?: ColorWithLightness
   color: Color
@@ -66,6 +69,9 @@ export const InputTextSingle = forwardRef<HTMLInputElement, InputTextSingleProps
       autoComplete={p.autoComplete}
       name={p.name}
       tooltip={p.tooltip}
+      onBlur={p.onBlur}
+      onFocus={p.onFocus}
+      onKeyDown={p.onKeyDown}
     />
   )
 })

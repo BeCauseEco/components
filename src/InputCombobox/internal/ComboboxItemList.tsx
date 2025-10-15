@@ -1,4 +1,4 @@
-import React, { ReactElement } from "react"
+import React from "react"
 import { Virtuoso } from "react-virtuoso"
 import { InputComboboxItemProps } from "../InputComboboxItem"
 import { CommandGroupStyled } from "./InputCombobox.styles"
@@ -6,6 +6,7 @@ import { Align } from "@new/Stack/Align"
 import { Divider } from "@new/Divider/Divider"
 import { Spacer } from "@new/Stack/Spacer"
 import { Color } from "@new/Color"
+import { calculateContainerWidth } from "./utils"
 
 export interface GroupedItemsResult {
   groups: { [groupName: string]: InputComboboxItemProps[] }
@@ -17,6 +18,9 @@ export interface ComboboxItemListProps {
   groupedItems: GroupedItemsResult | null
   enableVirtuoso?: boolean
   sortAlphabetically?: boolean
+  size: "small" | "large"
+  width: "fixed" | "auto"
+  containerWidthPx?: number
   renderItem: (index: number, item: InputComboboxItemProps) => React.ReactNode
 }
 
@@ -28,16 +32,21 @@ export const ComboboxItemList: React.FC<ComboboxItemListProps> = ({
   groupedItems,
   enableVirtuoso,
   sortAlphabetically,
+  size,
+  width,
+  containerWidthPx,
   renderItem,
 }) => {
   if (enableVirtuoso) {
     // For virtuoso, we need to use flat rendering even with groups
     // TODO: Future enhancement could add virtuoso support for groups
+    const minWidth = containerWidthPx ? `${containerWidthPx}px` : calculateContainerWidth(size, width)
+
     return (
       <Virtuoso
         style={{
           height: "calc(var(--radix-popover-content-available-height) / 2)",
-          minWidth: "100%",
+          minWidth,
           maxWidth: "calc(var(--radix-popover-content-available-width) - var(--BU) * 4)",
 
           overflowX: "hidden",

@@ -14,3 +14,17 @@ export const debounce = <F extends (...args: Parameters<F>) => ReturnType<F>>(fu
 
   return debounced
 }
+
+/**
+ * Calculates the container width based on size and width props.
+ * This matches the Container styled component's width calculation.
+ * @param size The size variant ("small" | "large")
+ * @param width The width variant ("fixed" | "auto")
+ * @returns The calculated width as a CSS string
+ */
+export const calculateContainerWidth = (size: "small" | "large", width: "fixed" | "auto"): string => {
+  if (width === "fixed") {
+    return size === "small" ? "calc(var(--BU) * 70)" : "calc(var(--BU) * 80)"
+  }
+  return "auto"
+}
