@@ -53,12 +53,12 @@ export const MapAutocompleteInput = ({ onPlaceSelect }: PlaceAutocompleteProps) 
 
   return (
     <div className="relative">
-      <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground z-1000" />
+      <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
       <Input
         ref={inputRef}
         type="text"
         placeholder="Search for an address..."
-        className="pl-10 z-1000000000"
+        className="pl-10"
         value={inputValue}
         onChange={e => setInputValue(e.target.value)}
       />

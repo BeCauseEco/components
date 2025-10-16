@@ -16,6 +16,8 @@ export interface GenericGoogleMapProps {
   onClick?: ((event: MapMouseEvent) => void) | undefined
   onPlaceSelect?: (place: google.maps.places.PlaceResult) => void
   streetViewControl?: boolean
+  cameraControl?: boolean
+  mapTypeControl?: boolean //Controls whether user can toggle between e.g. satellite and map view
 }
 
 export interface MapMarkerTooltipProperties {
@@ -38,6 +40,8 @@ export const GoogleMap = ({
   onClick,
   onPlaceSelect,
   streetViewControl = true,
+  cameraControl = true,
+  mapTypeControl = true,
 }: GenericGoogleMapProps) => {
   const [infowindowData, setInfowindowData] = useState<{
     anchor: google.maps.marker.AdvancedMarkerElement
@@ -72,11 +76,13 @@ export const GoogleMap = ({
         </div>
       )}
       <Map
+        mapTypeControl={mapTypeControl}
         streetViewControl={streetViewControl}
         mapId={"992ebfe9-cf01-4f45-b884-2c4eba19f61e"} //Randomly generated. Required for advanced markers. Purpose can be seen here: https://developers.google.com/maps/documentation/javascript/map-ids/mapid-over
         defaultCenter={defaultCenter || { lat: 45.4046987, lng: 12.2472504 }}
         defaultZoom={defaultZoomLevel ?? 3}
         gestureHandling={"greedy"}
+        cameraControl={cameraControl}
         onClick={e => {
           if (onClick) {
             onClick(e)

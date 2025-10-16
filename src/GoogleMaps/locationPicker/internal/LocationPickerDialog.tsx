@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react"
-import { SelectedLocation } from "@new/GoogleMaps/locationPicker/LocationPickerButtonTrigger"
+import { SelectedLocation } from "src/components/pages/certificationArea/application/overview/components/LocationPickerButtonTrigger"
 import { Dialog } from "@new/Dialog/Dialog"
 import { InputButtonPrimary } from "@new/InputButton/InputButtonPrimary"
 import { InputButtonSecondary } from "@new/InputButton/InputButtonSecondary"
@@ -213,6 +213,8 @@ export const LocationPickerDialog = ({
                 onClick={handleMapClick}
                 onPlaceSelect={handlePlaceSelect}
                 streetViewControl={false}
+                cameraControl={false}
+                mapTypeControl={false}
               >
                 <Marker position={markerPosition} draggable onDragEnd={handleMarkerDragEnd} />
               </GoogleMap>
