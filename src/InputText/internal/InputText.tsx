@@ -83,7 +83,7 @@ const calculateWidth = (rows: InputTextProps["rows"], width: InputTextProps["wid
   return width === "auto" ? "100%" : size === "small" ? "calc(var(--BU) * 70)" : "calc(var(--BU) * 80)"
 }
 
-const Output = styled.output<Pick<InputTextProps, "color" | "size" | "rows"> & { focus: boolean }>(p => ({
+const Output = styled.div<Pick<InputTextProps, "color" | "size" | "rows"> & { focus: boolean }>(p => ({
   display: "flex",
   position: "relative",
   width: "100%",
@@ -479,13 +479,13 @@ export const InputText = forwardRef<HTMLInputElement | HTMLTextAreaElement, Inpu
               onFocusCapture={() => setFocusCapture(true)}
               onBlur={event => {
                 setFocusCapture(false)
-                p.onBlur?.(event)
+                p.onBlur?.(event as React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>)
               }}
               onFocus={event => {
-                p.onFocus?.(event)
+                p.onFocus?.(event as React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>)
               }}
               onKeyDown={event => {
-                p.onKeyDown?.(event)
+                p.onKeyDown?.(event as React.KeyboardEvent<HTMLInputElement | HTMLTextAreaElement>)
               }}
               width={p.width}
               min={p.type === "date" ? p.dateMin : undefined}

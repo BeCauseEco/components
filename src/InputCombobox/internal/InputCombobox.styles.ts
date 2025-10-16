@@ -1,5 +1,5 @@
 import styled from "@emotion/styled"
-import { Command, CommandEmpty, CommandGroup, CommandItem } from "cmdk"
+import { CommandEmpty, CommandGroup, CommandItem } from "cmdk"
 import { Color, ColorWithLightness, computeColor } from "@new/Color"
 import { InputComboboxProps } from "../InputCombobox"
 

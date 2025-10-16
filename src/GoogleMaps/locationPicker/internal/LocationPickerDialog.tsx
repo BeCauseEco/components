@@ -1,5 +1,4 @@
 import React, { useCallback, useEffect, useState } from "react"
-import { SelectedLocation } from "src/components/pages/certificationArea/application/overview/components/LocationPickerButtonTrigger"
 import { Dialog } from "@new/Dialog/Dialog"
 import { InputButtonPrimary } from "@new/InputButton/InputButtonPrimary"
 import { InputButtonSecondary } from "@new/InputButton/InputButtonSecondary"
@@ -10,20 +9,20 @@ import { GoogleMap } from "@new/GoogleMaps/Internal/GoogleMap"
 import { MapMouseEvent, Marker, useMap } from "@vis.gl/react-google-maps"
 
 export interface LocationData {
-  latitude: number
-  longitude: number
+  latitude?: number
+  longitude?: number
   street?: string
   city?: string
   zipCode?: string
   region?: string
-  country?: string
+  countryAlpha2?: string
 }
 
 interface LocationPickerDialogProps {
   open: boolean
   onOpenChange: (open: boolean) => void
   initialLocation: { lat: number; lng: number } | null
-  onLocationSelect: (data: SelectedLocation) => void
+  onLocationSelect: (data: LocationData) => void
   googleMapsApiKey: string
 }
 
@@ -125,7 +124,6 @@ export const LocationPickerDialog = ({
 
   const handlePlaceSelect = useCallback(
     (place: google.maps.places.PlaceResult) => {
-      console.log(1112, place)
       if (place?.geometry?.location) {
         const newPosition = {
           lat: place.geometry.location.lat(),
@@ -143,9 +141,13 @@ export const LocationPickerDialog = ({
   const handleConfirm = useCallback(async () => {
     if (window.google && window.google.maps) {
       const geocoder = new google.maps.Geocoder()
-      const latlng = { lat: markerPosition.lat, lng: markerPosition.lng }
 
-      geocoder.geocode({ location: latlng }, (results, status) => {
+      if (!markerPosition?.lat || !markerPosition?.lng) {
+        onOpenChange(false)
+        return
+      }
+      const latlng = { lat: markerPosition.lat, lng: markerPosition.lng }
+      await geocoder.geocode({ location: latlng }, (results, status) => {
         if (status === "OK" && results && results[0]) {
           const addressComponents = results[0].address_components
           const getComponent = (type: string) => {
@@ -153,36 +155,33 @@ export const LocationPickerDialog = ({
             return component?.long_name || ""
           }
 
-          console.log(444, addressComponents)
+          const getCountryCodeAlpha2 = () => {
+            const component = addressComponents.find(c => c.types.includes("country"))
+            return component?.short_name || ""
+          }
+
           const locationData: LocationData = {
-            latitude: markerPosition.lat,
-            longitude: markerPosition.lng,
+            latitude: markerPosition?.lat,
+            longitude: markerPosition?.lng,
             street: `${getComponent("route")} ${getComponent("street_number")}`.trim(),
             city: getComponent("locality") || getComponent("postal_town") || "",
             zipCode: getComponent("postal_code") || "",
             region: getComponent("administrative_area_level_1") || getComponent("administrative_area_level_2") || "",
-            country: getComponent("country") || "",
+            countryAlpha2: getCountryCodeAlpha2() || "",
           }
 
           onLocationSelect(locationData)
           onOpenChange(false)
-          // toast.success("Location confirmed!")
         } else {
           onLocationSelect({
-            latitude: markerPosition.lat,
-            longitude: markerPosition.lng,
+            latitude: markerPosition?.lat,
+            longitude: markerPosition?.lng,
           })
           onOpenChange(false)
-          // toast.success("Location confirmed!")
         }
       })
     } else {
-      onLocationSelect({
-        latitude: markerPosition.lat,
-        longitude: markerPosition.lng,
-      })
       onOpenChange(false)
-      // toast.success("Location confirmed!")
     }
   }, [markerPosition, onLocationSelect, onOpenChange])
 

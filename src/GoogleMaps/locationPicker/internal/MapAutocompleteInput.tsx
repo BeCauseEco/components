@@ -120,11 +120,7 @@ export const MapAutocompleteInput = ({ onPlaceSelect }: PlaceAutocompleteProps) 
   const autocompleteServiceRef = useRef<google.maps.places.AutocompleteService | null>(null)
   const placesServiceRef = useRef<google.maps.places.PlacesService | null>(null)
 
-  /**
-   * Initialize Google Places API services when the library is loaded.
-   * Creates AutocompleteService for predictions and PlacesService for place details.
-   * PlacesService requires a DOM element, so we create a detached div element.
-   */
+  // Initialize Google Places API services
   useEffect(() => {
     if (!places) {
       return
@@ -141,10 +137,7 @@ export const MapAutocompleteInput = ({ onPlaceSelect }: PlaceAutocompleteProps) 
     }
   }, [places])
 
-  /**
-   * Cleanup effect for debounce timer and mounted state tracking.
-   * Prevents memory leaks and state updates on unmounted components.
-   */
+  // Cleanup debounce timer and prevent updates after unmount
   useEffect(() => {
     return () => {
       // Clear pending debounce timer
@@ -156,11 +149,7 @@ export const MapAutocompleteInput = ({ onPlaceSelect }: PlaceAutocompleteProps) 
     }
   }, [])
 
-  /**
-   * Close dropdown when clicking outside the component.
-   * Listens for mousedown events and checks if the click target is outside
-   * both the input field and the dropdown menu.
-   */
+  // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
@@ -177,18 +166,8 @@ export const MapAutocompleteInput = ({ onPlaceSelect }: PlaceAutocompleteProps) 
   }, [])
 
   /**
-   * Fetches autocomplete predictions from Google Places API.
-   * Requests all types of places (cities, addresses, establishments) for maximum flexibility.
-   *
-   * Implements race condition prevention by tracking request IDs - only the most recent
-   * request's response will update the component state.
-   *
-   * Handles three status cases:
-   * - OK: Displays predictions in dropdown
-   * - ZERO_RESULTS: Clears predictions and closes dropdown
-   * - Other errors: Silently fails by closing dropdown (network errors, quota exceeded, etc.)
-   *
-   * @param input - Search query string from user input
+   * Fetches autocomplete predictions with race condition prevention.
+   * @param input - Search query string
    */
   const fetchPredictions = useCallback((input: string) => {
     if (!autocompleteServiceRef.current || !input.trim()) {
@@ -230,19 +209,7 @@ export const MapAutocompleteInput = ({ onPlaceSelect }: PlaceAutocompleteProps) 
   }, [])
 
   /**
-   * Handles input change with debouncing to minimize API requests.
-   * Waits 300ms after user stops typing before fetching predictions.
-   *
-   * Rationale for 300ms delay:
-   * - Balances responsiveness with API efficiency
-   * - Reduces API costs by avoiding requests for every keystroke
-   * - Allows users to type naturally without lag
-   *
-   * Edge cases handled:
-   * - Empty/whitespace-only input: Clears predictions immediately
-   * - Rapid typing: Cancels previous timers to avoid redundant requests
-   * - Selected index reset: Prevents stale keyboard selection state
-   *
+   * Handles input change with 300ms debouncing.
    * @param e - Input change event
    */
   const handleInputChange = useCallback(
@@ -273,24 +240,9 @@ export const MapAutocompleteInput = ({ onPlaceSelect }: PlaceAutocompleteProps) 
   )
 
   /**
-   * Fetches full place details from Google Places API and invokes the onPlaceSelect callback.
-   * Requests specific fields to optimize API usage and costs:
-   * - geometry: Latitude/longitude coordinates
-   * - name: Place name
-   * - formatted_address: Human-readable address string
-   * - address_components: Structured address data (street, city, postal code, country, etc.)
-   *
-   * On success:
-   * - Calls onPlaceSelect with complete place details
-   * - Updates input with selected place description
-   * - Closes dropdown and clears predictions
-   *
-   * On failure:
-   * - Logs error to console for debugging
-   * - Silently fails without updating state (maintains current input value)
-   *
-   * @param placeId - Unique identifier for the place from Google Places API
-   * @param description - Display text for the selected place (used to update input)
+   * Fetches full place details and invokes onPlaceSelect callback.
+   * @param placeId - Place ID from Google Places API
+   * @param description - Display text for the selected place
    */
   const selectPlace = useCallback(
     (placeId: string, description: string) => {
@@ -327,9 +279,7 @@ export const MapAutocompleteInput = ({ onPlaceSelect }: PlaceAutocompleteProps) 
 
   /**
    * Handles prediction selection via mouse click.
-   * Extracts place_id and description from the prediction and fetches full place details.
-   *
-   * @param prediction - The autocomplete prediction that was clicked
+   * @param prediction - Selected prediction
    */
   const handlePredictionClick = useCallback(
     (prediction: google.maps.places.AutocompletePrediction) => {
@@ -339,19 +289,8 @@ export const MapAutocompleteInput = ({ onPlaceSelect }: PlaceAutocompleteProps) 
   )
 
   /**
-   * Handles keyboard navigation for accessibility.
-   * Implements WCAG-compliant combobox pattern with arrow key navigation.
-   *
-   * Supported keys:
-   * - ArrowDown: Move selection down (wraps to top at end)
-   * - ArrowUp: Move selection up (wraps to bottom at start)
-   * - Enter: Select currently highlighted prediction (or first if none highlighted)
-   * - Escape: Close dropdown and clear selection
-   *
-   * All keyboard events are prevented from default behavior to ensure
-   * proper autocomplete UX without form submission or page scrolling.
-   *
-   * @param e - Keyboard event from input field
+   * Handles keyboard navigation (arrows, Enter, Escape).
+   * @param e - Keyboard event
    */
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent<HTMLInputElement>) => {
