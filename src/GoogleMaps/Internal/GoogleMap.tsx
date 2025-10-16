@@ -70,6 +70,7 @@ export const GoogleMap = ({
         <div className={"mb-4"}>
           <MapAutocompleteInput
             onPlaceSelect={pr => {
+              console.log(5666)
               onPlaceSelect(pr)
             }}
           />

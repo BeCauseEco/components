@@ -22,7 +22,7 @@ export interface LocationData {
 interface LocationPickerDialogProps {
   open: boolean
   onOpenChange: (open: boolean) => void
-  initialLocation: { lat: number; lng: number }
+  initialLocation: { lat: number; lng: number } | null
   onLocationSelect: (data: SelectedLocation) => void
   googleMapsApiKey: string
 }
@@ -103,9 +103,18 @@ export const LocationPickerDialog = ({
   const handleMarkerDragEnd = useCallback(
     (e: google.maps.MapMouseEvent) => {
       if (e.latLng) {
+        let lat = 0
+        let lng = 0
+        if (typeof e.latLng.lat === "function") {
+          lat = e.latLng.lat() as number
+        }
+        if (typeof e.latLng.lng === "function") {
+          lng = e.latLng.lng() as number
+        }
+
         const newPosition = {
-          lat: typeof e.latLng.lat === "function" ? (e.latLng.lat() as number) : (e.latLng.lat as number),
-          lng: typeof e.latLng.lng === "function" ? (e.latLng.lng() as number) : (e.latLng.lng as number),
+          lat: lat,
+          lng: lng,
         }
         setMarkerPosition(newPosition)
         updateLocationInfo(newPosition)
@@ -116,6 +125,7 @@ export const LocationPickerDialog = ({
 
   const handlePlaceSelect = useCallback(
     (place: google.maps.places.PlaceResult) => {
+      console.log(1112, place)
       if (place?.geometry?.location) {
         const newPosition = {
           lat: place.geometry.location.lat(),
@@ -143,14 +153,15 @@ export const LocationPickerDialog = ({
             return component?.long_name || ""
           }
 
+          console.log(444, addressComponents)
           const locationData: LocationData = {
             latitude: markerPosition.lat,
             longitude: markerPosition.lng,
             street: `${getComponent("route")} ${getComponent("street_number")}`.trim(),
-            city: getComponent("locality") || getComponent("postal_town"),
-            zipCode: getComponent("postal_code"),
-            region: getComponent("administrative_area_level_1"),
-            country: getComponent("country"),
+            city: getComponent("locality") || getComponent("postal_town") || "",
+            zipCode: getComponent("postal_code") || "",
+            region: getComponent("administrative_area_level_1") || getComponent("administrative_area_level_2") || "",
+            country: getComponent("country") || "",
           }
 
           onLocationSelect(locationData)
@@ -193,7 +204,7 @@ export const LocationPickerDialog = ({
       }
       title={
         <Text fill={[Color.Neutral, 700]} medium wrap>
-          <b>Set Location</b>
+          <b>Auto-fill address from map</b>
         </Text>
       }
       content={
@@ -206,17 +217,21 @@ export const LocationPickerDialog = ({
                   features: [],
                 }}
                 googlePlacesApiKey={googleMapsApiKey}
-                defaultCenter={{
-                  lat: initialLocation.lat,
-                  lng: initialLocation.lng,
-                }}
+                defaultCenter={
+                  initialLocation
+                    ? {
+                        lat: initialLocation?.lat,
+                        lng: initialLocation?.lng,
+                      }
+                    : undefined
+                }
                 onClick={handleMapClick}
                 onPlaceSelect={handlePlaceSelect}
                 streetViewControl={false}
                 cameraControl={false}
                 mapTypeControl={false}
               >
-                <Marker position={markerPosition} draggable onDragEnd={handleMarkerDragEnd} />
+                {markerPosition && <Marker position={markerPosition} draggable onDragEnd={handleMarkerDragEnd} />}
               </GoogleMap>
             </div>
             {locationInfo && (
