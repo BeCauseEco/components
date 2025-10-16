@@ -1,11 +1,11 @@
 import React, { memo } from "react"
 import { Feature, Point } from "geojson"
-import { MapMarkerTooltipProperties } from "../GoogleMap"
 import { Stack } from "@new/Stack/Stack"
 import { Text } from "@new/Text/Text"
 import { Color } from "@new/Color"
 import { Spacer } from "@new/Stack/Spacer"
 import { InputButtonLink } from "@new/InputButton/InputButtonLink"
+import { MapMarkerTooltipProperties } from "@new/GoogleMaps/Internal/GoogleMap"
 
 type InfoWindowContentProps = {
   features: Feature<Point>[]

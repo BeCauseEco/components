@@ -1,5 +1,6 @@
 import React, { ReactNode, useState } from "react"
-import { LocationPickerDialog } from "@new/GoogleMaps/Internal/LocationPickerDialog"
+import { LocationPickerDialog } from "@new/GoogleMaps/locationPicker/internal/LocationPickerDialog"
+import { InputButtonPrimary } from "@new/InputButton/InputButtonPrimary"
 
 export type InitialLocation = {
   latitude: number
@@ -16,14 +17,14 @@ export type SelectedLocation = {
   country: string
 }
 
-const GenericGoogleMapsButton = ({
-  children,
+const LocationPickerButtonTrigger = ({
   initialLocation,
   onLocationSelected,
+  googleMapsApiKey,
 }: {
-  children: ReactNode
   initialLocation: InitialLocation
   onLocationSelected: (location: SelectedLocation) => void
+  googleMapsApiKey: string
 }) => {
   const [showLocationPicker, setShowLocationPicker] = useState(false)
 
@@ -34,10 +35,13 @@ const GenericGoogleMapsButton = ({
   }
 
   return (
-    <>
-      <div className={"tw"} onClick={() => setShowLocationPicker(true)}>
-        {children}
-      </div>
+    <div>
+      <InputButtonPrimary
+        label={"Pick location"}
+        onClick={() => setShowLocationPicker(true)}
+        size={"large"}
+        width={"auto"}
+      />
       <LocationPickerDialog
         open={showLocationPicker}
         onOpenChange={setShowLocationPicker}
@@ -46,9 +50,10 @@ const GenericGoogleMapsButton = ({
           lng: initialLocation.longitude,
         }}
         onLocationSelect={handleLocationSelect}
+        googleMapsApiKey={googleMapsApiKey}
       />
-    </>
+    </div>
   )
 }
 
-export default GenericGoogleMapsButton
+export default LocationPickerButtonTrigger

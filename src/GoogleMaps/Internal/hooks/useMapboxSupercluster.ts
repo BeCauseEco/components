@@ -1,7 +1,7 @@
 import { FeatureCollection, GeoJsonProperties, Point } from "geojson"
 import Supercluster, { ClusterProperties } from "supercluster"
 import { useCallback, useEffect, useMemo, useReducer } from "react"
-import { useMapViewport } from "./useMapViewport"
+import { useMapViewport } from "@new/GoogleMaps/Internal/hooks/useMapViewport"
 
 export function useSupercluster<T extends GeoJsonProperties>(
   geojson: FeatureCollection<Point, T>,

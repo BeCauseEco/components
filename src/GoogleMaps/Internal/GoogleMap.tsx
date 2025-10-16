@@ -1,16 +1,17 @@
 import { useCallback, useState } from "react"
-import config from "../../../config"
 import { APIProvider, Map, InfoWindow } from "@vis.gl/react-google-maps"
-import { ClusteredMarkers } from "./components/ClusteredMarkers"
 import { Feature, FeatureCollection, Point } from "geojson"
-import { InfoWindowContent } from "./components/InfoWindowContent"
 import { ColorWithLightness } from "@new/Color"
+import { ClusteredMarkers } from "@new/GoogleMaps/Internal/components/ClusteredMarkers"
+import { InfoWindowContent } from "@new/GoogleMaps/Internal/components/InfoWindowContent"
 
 export interface GenericGoogleMapProps {
   entries: FeatureCollection<Point>
   disallowClustering?: boolean
   defaultCenter?: google.maps.LatLngLiteral
   defaultZoomLevel?: number
+  googlePlacesApiKey: string
+  children?: React.ReactNode
 }
 
 export interface MapMarkerTooltipProperties {
@@ -23,7 +24,14 @@ export interface MapMarkerTooltipProperties {
 
 //Everything in this file is heavily inspired from
 //https://github.com/visgl/react-google-maps/blob/main/examples/custom-marker-clustering/src/app.tsx
-export const GoogleMap = ({ defaultZoomLevel, defaultCenter, entries, disallowClustering }: GenericGoogleMapProps) => {
+export const GoogleMap = ({
+  googlePlacesApiKey,
+  defaultZoomLevel,
+  defaultCenter,
+  entries,
+  disallowClustering,
+  children,
+}: GenericGoogleMapProps) => {
   const [infowindowData, setInfowindowData] = useState<{
     anchor: google.maps.marker.AdvancedMarkerElement
     features: Feature<Point>[]
@@ -31,9 +39,12 @@ export const GoogleMap = ({ defaultZoomLevel, defaultCenter, entries, disallowCl
 
   const handleInfoWindowClose = useCallback(() => setInfowindowData(null), [setInfowindowData])
 
-  if (!config.googlePlacesApiKey) {
+  console.log(999)
+  if (!googlePlacesApiKey) {
     return
   }
+
+  console.log(555, googlePlacesApiKey)
 
   return (
     // The "places" library is required for Google Maps Places API features such as autocomplete, place search, and place details.
@@ -46,7 +57,7 @@ export const GoogleMap = ({ defaultZoomLevel, defaultCenter, entries, disallowCl
     //
     // Do NOT include extra libraries unless you actually use their features,
     // as each one increases bundle size and can affect performance.
-    <APIProvider apiKey={config.googlePlacesApiKey} libraries={["places"]}>
+    <APIProvider apiKey={googlePlacesApiKey} libraries={["places"]}>
       <Map
         mapId={"992ebfe9-cf01-4f45-b884-2c4eba19f61e"} //Randomly generated. Required for advanced markers. Purpose can be seen here: https://developers.google.com/maps/documentation/javascript/map-ids/mapid-over
         defaultCenter={defaultCenter || { lat: 45.4046987, lng: 12.2472504 }}
@@ -64,6 +75,7 @@ export const GoogleMap = ({ defaultZoomLevel, defaultCenter, entries, disallowCl
             <InfoWindowContent features={infowindowData.features} />
           </InfoWindow>
         )}
+        {children}
       </Map>
     </APIProvider>
   )

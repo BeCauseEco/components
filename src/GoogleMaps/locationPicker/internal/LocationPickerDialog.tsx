@@ -1,26 +1,26 @@
-import React, { useRef, useState } from "react"
+import React from "react"
 // import { useLoadScript, Marker, Autocomplete } from "@react-google-maps/api"
 import { MapPin } from "lucide-react"
 // import { toast } from "sonner"
-import { SelectedLocation } from "@new/GoogleMaps/GenericGoogleMapsButton"
+import { SelectedLocation } from "@new/GoogleMaps/locationPicker/LocationPickerButtonTrigger"
 import { Dialog } from "@new/Dialog/Dialog"
 import { InputButtonPrimary } from "@new/InputButton/InputButtonPrimary"
 import { InputButtonSecondary } from "@new/InputButton/InputButtonSecondary"
 import { Text } from "@new/Text/Text"
 import { Color } from "@new/Color"
-import config from "src/config"
-import { GoogleMap } from "src/components/GoogleMap/base/GoogleMap"
-import { InputTextSingle } from "@new/InputText/InputTextSingle"
 import { Size } from "@new/Size"
+import { GoogleMap } from "@new/GoogleMaps/Internal/GoogleMap"
+import { ControlPosition } from "@vis.gl/react-google-maps/dist/components/map-control"
+import { MapAutocompleteInput } from "@new/GoogleMaps/locationPicker/internal/MapAutocompleteInput"
+import { MapControl } from "@vis.gl/react-google-maps"
 
 interface LocationPickerDialogProps {
   open: boolean
   onOpenChange: (open: boolean) => void
   initialLocation: { lat: number; lng: number }
   onLocationSelect: (data: SelectedLocation) => void
+  googleMapsApiKey: string
 }
-
-const libraries: "places"[] = ["places"]
 
 const mapContainerStyle = {
   width: "100%",
@@ -32,11 +32,11 @@ export const LocationPickerDialog = ({
   onOpenChange,
   initialLocation,
   onLocationSelect,
+  googleMapsApiKey,
 }: LocationPickerDialogProps) => {
-  const apiKey = config.googlePlacesApiKey
-  const [markerPosition, setMarkerPosition] = useState(initialLocation)
-  const [mapCenter, setMapCenter] = useState(initialLocation)
-  const autocompleteRef = useRef<google.maps.places.Autocomplete | null>(null)
+  // const [markerPosition, setMarkerPosition] = useState(initialLocation)
+  // const [mapCenter, setMapCenter] = useState(initialLocation)
+  // const autocompleteRef = useRef<google.maps.places.Autocomplete | null>(null)
 
   // const { isLoaded, loadError } = useLoadScript({
   //   googleMapsApiKey: apiKey,
@@ -162,6 +162,11 @@ export const LocationPickerDialog = ({
   //   )
   // }
 
+  if (!googleMapsApiKey) {
+    console.error("Google Maps API key is required to display the map.")
+    return null
+  }
+
   return (
     <Dialog
       size={Size.Medium}
@@ -189,21 +194,20 @@ export const LocationPickerDialog = ({
             {/*  <InputTextSingle type="text" placeholder="Search for an address..." className="pl-10" />*/}
             {/*</Autocomplete>*/}
           </div>
-          <div className="rounded-lg overflow-hidden border border-border">
-            <GoogleMap />
-            {/*<GoogleMap*/}
-            {/*  mapContainerStyle={mapContainerStyle}*/}
-            {/*  center={mapCenter}*/}
-            {/*  zoom={15}*/}
-            {/*  onClick={handleMapClick}*/}
-            {/*  options={{*/}
-            {/*    streetViewControl: false,*/}
-            {/*    mapTypeControl: false,*/}
-            {/*    fullscreenControl: false,*/}
-            {/*  }}*/}
-            {/*>*/}
-            {/*  <Marker position={markerPosition} draggable onDragEnd={handleMarkerDragEnd} />*/}
-            {/*</GoogleMap>*/}
+          <div className="rounded-lg overflow-hidden border border-border h-[500px]">
+            <GoogleMap
+              entries={{
+                type: "FeatureCollection",
+                features: [],
+              }}
+              googlePlacesApiKey={googleMapsApiKey}
+              defaultCenter={{
+                lat: initialLocation.lat,
+                lng: initialLocation.lng,
+              }}
+            >
+                <MapAutocompleteInput onPlaceSelect={() => {}} />
+            </GoogleMap>
           </div>
           <p className="text-sm text-muted-foreground">
             Search for an address, click on the map, or drag the marker to set your location.

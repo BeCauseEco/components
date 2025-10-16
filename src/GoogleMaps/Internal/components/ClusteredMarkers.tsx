@@ -1,10 +1,10 @@
 import React, { useCallback } from "react"
 import Supercluster, { ClusterProperties } from "supercluster"
-import { FeaturesClusterMarker } from "./FeaturesClusterMarker"
-import { FeatureMarker } from "./FeatureMarker"
-import { useSupercluster } from "../hooks/useMapboxSupercluster"
 import { Feature, FeatureCollection, GeoJsonProperties, Point } from "geojson"
-import { MapMarkerTooltipProperties } from "../GoogleMap"
+import { useSupercluster } from "@new/GoogleMaps/Internal/hooks/useMapboxSupercluster"
+import { MapMarkerTooltipProperties } from "@new/GoogleMaps/Internal/GoogleMap"
+import { FeaturesClusterMarker } from "@new/GoogleMaps/Internal/components/FeaturesClusterMarker"
+import { FeatureMarker } from "@new/GoogleMaps/Internal/components/FeatureMarker"
 
 type ClusteredMarkersProps = {
   disallowClustering: boolean

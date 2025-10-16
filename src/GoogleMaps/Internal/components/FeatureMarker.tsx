@@ -4,8 +4,8 @@ import styled from "@emotion/styled"
 import { Icon } from "@new/Icon/Icon"
 import { Color, computeColor } from "@new/Color"
 import { keyframes } from "@emotion/react"
-import { MapMarkerTooltipProperties } from "../GoogleMap"
 import { Text } from "@new/Text/Text"
+import { MapMarkerTooltipProperties } from "@new/GoogleMaps/Internal/GoogleMap"
 
 const appearAnimation = keyframes`
     from {

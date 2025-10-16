@@ -1,7 +1,7 @@
 import { Stack } from "@new/Stack/Stack"
 import styled from "@emotion/styled"
 import { Feature, FeatureCollection, GeoJsonProperties, Point } from "geojson"
-import { GoogleMap, MapMarkerTooltipProperties } from "../base/GoogleMap"
+import { GoogleMap, MapMarkerTooltipProperties } from "@new/GoogleMaps/Internal/GoogleMap"
 
 const MapsContainer = styled.div<{ minHeight?: string }>`
   min-height: ${({ minHeight }) => minHeight || "30vh"};
@@ -42,6 +42,7 @@ export interface GenericGoogleMapProps {
   disallowClustering?: boolean
   defaultCenter?: google.maps.LatLngLiteral
   defaultZoomLevel?: number
+  apiKey: string
 }
 
 export const GenericMap = ({
@@ -50,6 +51,7 @@ export const GenericMap = ({
   entries,
   minHeight,
   disallowClustering,
+  apiKey,
 }: GenericGoogleMapProps) => {
   const entriesAsPoints: FeatureCollection<Point> = {
     type: "FeatureCollection",
@@ -64,6 +66,7 @@ export const GenericMap = ({
           disallowClustering={disallowClustering}
           defaultZoomLevel={defaultZoomLevel}
           defaultCenter={defaultCenter}
+          googlePlacesApiKey={apiKey}
         />
       </MapsContainer>
     </Stack>
