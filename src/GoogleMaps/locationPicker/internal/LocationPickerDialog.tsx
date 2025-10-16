@@ -1,7 +1,4 @@
-import React from "react"
-// import { useLoadScript, Marker, Autocomplete } from "@react-google-maps/api"
-import { MapPin } from "lucide-react"
-// import { toast } from "sonner"
+import React, { useCallback, useEffect, useState } from "react"
 import { SelectedLocation } from "@new/GoogleMaps/locationPicker/LocationPickerButtonTrigger"
 import { Dialog } from "@new/Dialog/Dialog"
 import { InputButtonPrimary } from "@new/InputButton/InputButtonPrimary"
@@ -10,9 +7,17 @@ import { Text } from "@new/Text/Text"
 import { Color } from "@new/Color"
 import { Size } from "@new/Size"
 import { GoogleMap } from "@new/GoogleMaps/Internal/GoogleMap"
-import { ControlPosition } from "@vis.gl/react-google-maps/dist/components/map-control"
-import { MapAutocompleteInput } from "@new/GoogleMaps/locationPicker/internal/MapAutocompleteInput"
-import { MapControl } from "@vis.gl/react-google-maps"
+import { MapMouseEvent, Marker, useMap } from "@vis.gl/react-google-maps"
+
+export interface LocationData {
+  latitude: number
+  longitude: number
+  street?: string
+  city?: string
+  zipCode?: string
+  region?: string
+  country?: string
+}
 
 interface LocationPickerDialogProps {
   open: boolean
@@ -22,11 +27,6 @@ interface LocationPickerDialogProps {
   googleMapsApiKey: string
 }
 
-const mapContainerStyle = {
-  width: "100%",
-  height: "500px",
-}
-
 export const LocationPickerDialog = ({
   open,
   onOpenChange,
@@ -34,133 +34,146 @@ export const LocationPickerDialog = ({
   onLocationSelect,
   googleMapsApiKey,
 }: LocationPickerDialogProps) => {
-  // const [markerPosition, setMarkerPosition] = useState(initialLocation)
-  // const [mapCenter, setMapCenter] = useState(initialLocation)
-  // const autocompleteRef = useRef<google.maps.places.Autocomplete | null>(null)
+  const map = useMap()
+  const [markerPosition, setMarkerPosition] = useState(initialLocation)
+  const [locationInfo, setLocationInfo] = useState<{
+    name?: string
+    street?: string
+    city?: string
+    coordinates: string
+  } | null>(null)
 
-  // const { isLoaded, loadError } = useLoadScript({
-  //   googleMapsApiKey: apiKey,
-  //   libraries,
-  // })
-  //
-  // useEffect(() => {
-  //   setMarkerPosition(initialLocation)
-  //   setMapCenter(initialLocation)
-  // }, [initialLocation])
-  //
-  // const handleMapClick = useCallback((e: google.maps.MapMouseEvent) => {
-  //   if (e.latLng) {
-  //     const newPosition = {
-  //       lat: e.latLng.lat(),
-  //       lng: e.latLng.lng(),
-  //     }
-  //     setMarkerPosition(newPosition)
-  //   }
-  // }, [])
-  //
-  // const handleMarkerDragEnd = useCallback((e: google.maps.MapMouseEvent) => {
-  //   if (e.latLng) {
-  //     const newPosition = {
-  //       lat: e.latLng.lat(),
-  //       lng: e.latLng.lng(),
-  //     }
-  //     setMarkerPosition(newPosition)
-  //   }
-  // }, [])
+  useEffect(() => {
+    setMarkerPosition(initialLocation)
+  }, [initialLocation])
 
-  // const handlePlaceSelect = useCallback(() => {
-  //   const place = autocompleteRef.current?.getPlace()
-  //   if (place?.geometry?.location) {
-  //     const newPosition = {
-  //       lat: place.geometry.location.lat(),
-  //       lng: place.geometry.location.lng(),
-  //     }
-  //     setMarkerPosition(newPosition)
-  //     setMapCenter(newPosition)
-  //
-  //     // Extract address components
-  //     const addressComponents = place.address_components || []
-  //     const getComponent = (type: string) => {
-  //       const component = addressComponents.find(c => c.types.includes(type))
-  //       return component?.long_name || ""
-  //     }
-  //
-  //     toast.success("Location set from address search")
-  //   }
-  // }, [])
-  //
-  // const handleConfirm = async () => {
-  //   // Reverse geocode to get address details
-  //   if (window.google && window.google.maps) {
-  //     const geocoder = new google.maps.Geocoder()
-  //     const latlng = { lat: markerPosition.lat, lng: markerPosition.lng }
-  //
-  //     geocoder.geocode({ location: latlng }, (results, status) => {
-  //       if (status === "OK" && results && results[0]) {
-  //         const addressComponents = results[0].address_components
-  //         const getComponent = (type: string) => {
-  //           const component = addressComponents.find(c => c.types.includes(type))
-  //           return component?.long_name || ""
-  //         }
-  //
-  //         const locationData: SelectedLocation = {
-  //           latitude: markerPosition.lat,
-  //           longitude: markerPosition.lng,
-  //           street: `${getComponent("route")} ${getComponent("street_number")}`.trim(),
-  //           city: getComponent("locality") || getComponent("postal_town"),
-  //           zipCode: getComponent("postal_code"),
-  //           region: getComponent("administrative_area_level_1"),
-  //           country: getComponent("country"),
-  //         }
-  //
-  //         onLocationSelect(locationData)
-  //         onOpenChange(false)
-  //         toast.success("Location confirmed!")
-  //       } else {
-  //         // If geocoding fails, just send coordinates
-  //         onLocationSelect({
-  //           latitude: markerPosition.lat,
-  //           longitude: markerPosition.lng,
-  //         })
-  //         onOpenChange(false)
-  //         toast.success("Location confirmed!")
-  //       }
-  //     })
-  //   } else {
-  //     // Fallback if Google Maps is not loaded
-  //     onLocationSelect({
-  //       latitude: markerPosition.lat,
-  //       longitude: markerPosition.lng,
-  //     })
-  //     onOpenChange(false)
-  //     toast.success("Location confirmed!")
-  //   }
-  // }
+  const updateLocationInfo = useCallback(
+    (position: { lat: number; lng: number }, placeResult?: google.maps.places.PlaceResult) => {
+      if (placeResult) {
+        const addressComponents = placeResult.address_components || []
+        const getComponent = (type: string) => {
+          const component = addressComponents.find(c => c.types.includes(type))
+          return component?.long_name || ""
+        }
 
-  // if (loadError) {
-  //   return (
-  //     <Dialog open={open} onOpenChange={onOpenChange}>
-  //       <DialogContent>
-  //         <DialogHeader>
-  //           <DialogTitle>Error Loading Map</DialogTitle>
-  //         </DialogHeader>
-  //         <p className="text-sm text-destructive">Failed to load Google Maps. Please try again.</p>
-  //       </DialogContent>
-  //     </Dialog>
-  //   )
-  // }
-  //
-  // if (!isLoaded) {
-  //   return (
-  //     <Dialog open={open} onOpenChange={onOpenChange}>
-  //       <DialogContent>
-  //         <div className="flex items-center justify-center py-12">
-  //           <Loader2 className="h-8 w-8 animate-spin text-primary" />
-  //         </div>
-  //       </DialogContent>
-  //     </Dialog>
-  //   )
-  // }
+        setLocationInfo({
+          name: placeResult.name || placeResult.formatted_address,
+          street: `${getComponent("route")} ${getComponent("street_number")}`.trim(),
+          city: getComponent("locality") || getComponent("postal_town"),
+          coordinates: `${position.lat.toFixed(6)}, ${position.lng.toFixed(6)}`,
+        })
+      } else {
+        // Reverse geocode
+        const geocoder = new google.maps.Geocoder()
+        geocoder.geocode({ location: position }, (results, status) => {
+          if (status === "OK" && results && results[0]) {
+            const addressComponents = results[0].address_components
+            const getComponent = (type: string) => {
+              const component = addressComponents.find(c => c.types.includes(type))
+              return component?.long_name || ""
+            }
+
+            setLocationInfo({
+              name: results[0].formatted_address,
+              street: `${getComponent("route")} ${getComponent("street_number")}`.trim(),
+              city: getComponent("locality") || getComponent("postal_town"),
+              coordinates: `${position.lat.toFixed(6)}, ${position.lng.toFixed(6)}`,
+            })
+          }
+        })
+      }
+    },
+    [],
+  )
+
+  const handleMapClick = useCallback(
+    (e: MapMouseEvent) => {
+      if (e.detail?.latLng) {
+        const newPosition = {
+          lat: e.detail.latLng.lat,
+          lng: e.detail.latLng.lng,
+        }
+        setMarkerPosition(newPosition)
+        updateLocationInfo(newPosition)
+      }
+    },
+    [updateLocationInfo],
+  )
+
+  const handleMarkerDragEnd = useCallback(
+    (e: google.maps.MapMouseEvent) => {
+      if (e.latLng) {
+        const newPosition = {
+          lat: typeof e.latLng.lat === "function" ? (e.latLng.lat() as number) : (e.latLng.lat as number),
+          lng: typeof e.latLng.lng === "function" ? (e.latLng.lng() as number) : (e.latLng.lng as number),
+        }
+        setMarkerPosition(newPosition)
+        updateLocationInfo(newPosition)
+      }
+    },
+    [updateLocationInfo],
+  )
+
+  const handlePlaceSelect = useCallback(
+    (place: google.maps.places.PlaceResult) => {
+      if (place?.geometry?.location) {
+        const newPosition = {
+          lat: place.geometry.location.lat(),
+          lng: place.geometry.location.lng(),
+        }
+        setMarkerPosition(newPosition)
+        map?.setCenter(newPosition)
+        updateLocationInfo(newPosition, place)
+        // toast.success("Location set from address search")
+      }
+    },
+    [map, updateLocationInfo],
+  )
+
+  const handleConfirm = useCallback(async () => {
+    if (window.google && window.google.maps) {
+      const geocoder = new google.maps.Geocoder()
+      const latlng = { lat: markerPosition.lat, lng: markerPosition.lng }
+
+      geocoder.geocode({ location: latlng }, (results, status) => {
+        if (status === "OK" && results && results[0]) {
+          const addressComponents = results[0].address_components
+          const getComponent = (type: string) => {
+            const component = addressComponents.find(c => c.types.includes(type))
+            return component?.long_name || ""
+          }
+
+          const locationData: LocationData = {
+            latitude: markerPosition.lat,
+            longitude: markerPosition.lng,
+            street: `${getComponent("route")} ${getComponent("street_number")}`.trim(),
+            city: getComponent("locality") || getComponent("postal_town"),
+            zipCode: getComponent("postal_code"),
+            region: getComponent("administrative_area_level_1"),
+            country: getComponent("country"),
+          }
+
+          onLocationSelect(locationData)
+          onOpenChange(false)
+          // toast.success("Location confirmed!")
+        } else {
+          onLocationSelect({
+            latitude: markerPosition.lat,
+            longitude: markerPosition.lng,
+          })
+          onOpenChange(false)
+          // toast.success("Location confirmed!")
+        }
+      })
+    } else {
+      onLocationSelect({
+        latitude: markerPosition.lat,
+        longitude: markerPosition.lng,
+      })
+      onOpenChange(false)
+      // toast.success("Location confirmed!")
+    }
+  }, [markerPosition, onLocationSelect, onOpenChange])
 
   if (!googleMapsApiKey) {
     console.error("Google Maps API key is required to display the map.")
@@ -172,7 +185,9 @@ export const LocationPickerDialog = ({
       size={Size.Medium}
       open={open}
       onOpenChange={onOpenChange}
-      buttonPrimary={<InputButtonPrimary width={"auto"} label={"Confirm Location"} size={"large"} />}
+      buttonPrimary={
+        <InputButtonPrimary width={"auto"} label={"Confirm Location"} size={"large"} onClick={handleConfirm} />
+      }
       buttonSecondary={
         <InputButtonSecondary width={"auto"} label={"Cancel"} size={"large"} onClick={() => onOpenChange(false)} />
       }
@@ -182,37 +197,46 @@ export const LocationPickerDialog = ({
         </Text>
       }
       content={
-        <div className="space-y-4">
-          <div className="relative">
-            <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground z-10" />
-            {/*<Autocomplete*/}
-            {/*  onLoad={autocomplete => {*/}
-            {/*    autocompleteRef.current = autocomplete*/}
-            {/*  }}*/}
-            {/*  onPlaceChanged={handlePlaceSelect}*/}
-            {/*>*/}
-            {/*  <InputTextSingle type="text" placeholder="Search for an address..." className="pl-10" />*/}
-            {/*</Autocomplete>*/}
+        <>
+          <div className="space-y-4">
+            <div className="rounded-lg overflow-hidden border border-border  h-[500px]">
+              <GoogleMap
+                entries={{
+                  type: "FeatureCollection",
+                  features: [],
+                }}
+                googlePlacesApiKey={googleMapsApiKey}
+                defaultCenter={{
+                  lat: initialLocation.lat,
+                  lng: initialLocation.lng,
+                }}
+                onClick={handleMapClick}
+                onPlaceSelect={handlePlaceSelect}
+              >
+                <Marker position={markerPosition} draggable onDragEnd={handleMarkerDragEnd} />
+              </GoogleMap>
+            </div>
+            {locationInfo && (
+              <div className="p-4 rounded-lg border bg-card space-y-2">
+                <div className="flex items-start justify-between">
+                  <div className="space-y-1 flex-1">
+                    {locationInfo.name && <p className="font-medium text-sm">{locationInfo.name}</p>}
+                    {locationInfo.street && (
+                      <p className="text-sm text-muted-foreground">
+                        {locationInfo.street}
+                        {locationInfo.city && `, ${locationInfo.city}`}
+                      </p>
+                    )}
+                    <p className="text-xs text-muted-foreground font-mono">{locationInfo.coordinates}</p>
+                  </div>
+                </div>
+              </div>
+            )}
+            <p className="text-sm text-muted-foreground">
+              Search for an address, click on the map, or drag the marker to set your location.
+            </p>
           </div>
-          <div className="rounded-lg overflow-hidden border border-border h-[500px]">
-            <GoogleMap
-              entries={{
-                type: "FeatureCollection",
-                features: [],
-              }}
-              googlePlacesApiKey={googleMapsApiKey}
-              defaultCenter={{
-                lat: initialLocation.lat,
-                lng: initialLocation.lng,
-              }}
-            >
-                <MapAutocompleteInput onPlaceSelect={() => {}} />
-            </GoogleMap>
-          </div>
-          <p className="text-sm text-muted-foreground">
-            Search for an address, click on the map, or drag the marker to set your location.
-          </p>
-        </div>
+        </>
       }
     />
   )

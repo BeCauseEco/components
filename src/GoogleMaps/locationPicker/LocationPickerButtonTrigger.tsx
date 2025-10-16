@@ -8,13 +8,11 @@ export type InitialLocation = {
 }
 
 export type SelectedLocation = {
-  latitude: number | null
-  longitude: number | null
-  street: string
-  city: string
-  zipCode: string
-  region: string
-  country: string
+  name?: string
+  street?: string
+  city?: string
+  latitude?: number | null
+  longitude?: number | null
 }
 
 const LocationPickerButtonTrigger = ({

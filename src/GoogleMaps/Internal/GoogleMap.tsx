@@ -1,9 +1,10 @@
-import { useCallback, useState } from "react"
-import { APIProvider, Map, InfoWindow } from "@vis.gl/react-google-maps"
+import React, { useCallback, useState } from "react"
+import { APIProvider, Map, InfoWindow, MapMouseEvent } from "@vis.gl/react-google-maps"
 import { Feature, FeatureCollection, Point } from "geojson"
 import { ColorWithLightness } from "@new/Color"
 import { ClusteredMarkers } from "@new/GoogleMaps/Internal/components/ClusteredMarkers"
 import { InfoWindowContent } from "@new/GoogleMaps/Internal/components/InfoWindowContent"
+import { MapAutocompleteInput } from "@new/GoogleMaps/locationPicker/internal/MapAutocompleteInput"
 
 export interface GenericGoogleMapProps {
   entries: FeatureCollection<Point>
@@ -12,6 +13,8 @@ export interface GenericGoogleMapProps {
   defaultZoomLevel?: number
   googlePlacesApiKey: string
   children?: React.ReactNode
+  onClick?: ((event: MapMouseEvent) => void) | undefined
+  onPlaceSelect?: (place: google.maps.places.PlaceResult) => void
 }
 
 export interface MapMarkerTooltipProperties {
@@ -31,6 +34,8 @@ export const GoogleMap = ({
   entries,
   disallowClustering,
   children,
+  onClick,
+  onPlaceSelect,
 }: GenericGoogleMapProps) => {
   const [infowindowData, setInfowindowData] = useState<{
     anchor: google.maps.marker.AdvancedMarkerElement
@@ -39,12 +44,9 @@ export const GoogleMap = ({
 
   const handleInfoWindowClose = useCallback(() => setInfowindowData(null), [setInfowindowData])
 
-  console.log(999)
   if (!googlePlacesApiKey) {
     return
   }
-
-  console.log(555, googlePlacesApiKey)
 
   return (
     // The "places" library is required for Google Maps Places API features such as autocomplete, place search, and place details.
@@ -58,12 +60,25 @@ export const GoogleMap = ({
     // Do NOT include extra libraries unless you actually use their features,
     // as each one increases bundle size and can affect performance.
     <APIProvider apiKey={googlePlacesApiKey} libraries={["places"]}>
+      <MapAutocompleteInput
+        onPlaceSelect={pr => {
+          if (onPlaceSelect) {
+            onPlaceSelect(pr)
+          }
+        }}
+      />
       <Map
         mapId={"992ebfe9-cf01-4f45-b884-2c4eba19f61e"} //Randomly generated. Required for advanced markers. Purpose can be seen here: https://developers.google.com/maps/documentation/javascript/map-ids/mapid-over
         defaultCenter={defaultCenter || { lat: 45.4046987, lng: 12.2472504 }}
         defaultZoom={defaultZoomLevel ?? 3}
         gestureHandling={"greedy"}
-        onClick={() => setInfowindowData(null)}
+        onClick={e => {
+          if (onClick) {
+            onClick(e)
+          } else {
+            setInfowindowData(null)
+          }
+        }}
       >
         <ClusteredMarkers
           geojson={entries}

@@ -1,72 +1,67 @@
-import React, { useCallback, useMemo, useState } from "react"
-import { ControlPosition, MapControl } from "@vis.gl/react-google-maps"
-import { InputCombobox } from "@new/InputCombobox/InputCombobox"
-import { useAutocompleteSuggestions } from "@new/GoogleMaps/locationPicker/internal/useAutocompleteSuggestions"
-import { InputComboboxItem } from "@new/InputCombobox/InputComboboxItem"
-import { Color } from "@new/Color"
-import { InputButton } from "@new/InputButton/internal/InputButton"
-import { Stack } from "@new/Stack/Stack"
-import { Align } from "@new/Stack/Align"
-import { Spacer } from "@new/Stack/Spacer"
-import { Badge } from "@new/Badge/Badge"
-import { Text } from "@new/Text/Text"
-import { InputTextSingle } from "@new/InputText/InputTextSingle"
-import { Autocomplete } from "@new/Autocomplete/Autocomplete"
+import { useState, useRef, useEffect, forwardRef } from "react"
 import { MapPin } from "lucide-react"
+import { useMapsLibrary } from "@vis.gl/react-google-maps"
+import { clsx, type ClassValue } from "clsx"
+import { twMerge } from "tailwind-merge"
 
-const autocompleteRef = useRef<google.maps.places.Autocomplete | null>(null)
-
-interface MapAutocompleteInputProps {
-  onPlaceSelect: (place: google.maps.places.Place | null) => void
+function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs))
 }
 
-//Most of the code below is sourced from:
-//https://github.com/visgl/react-google-maps/blob/main/examples/autocomplete/src/components/autocomplete-custom-hybrid.tsx
+const Input = forwardRef<HTMLInputElement, React.ComponentProps<"input">>(({ className, type, ...props }, ref) => {
+  return (
+    <input
+      type={type}
+      className={cn(
+        "flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-base ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm",
+        className,
+      )}
+      ref={ref}
+      {...props}
+    />
+  )
+})
+Input.displayName = "Input"
 
-export const MapAutocompleteInput = ({ onPlaceSelect }: MapAutocompleteInputProps) => {
-  const [inputValue, setInputValue] = useState<string>("")
+interface PlaceAutocompleteProps {
+  onPlaceSelect: (place: google.maps.places.PlaceResult) => void
+}
 
-  const { suggestions, resetSession, isLoading } = useAutocompleteSuggestions(inputValue)
+export const MapAutocompleteInput = ({ onPlaceSelect }: PlaceAutocompleteProps) => {
+  const [inputValue, setInputValue] = useState("")
+  const inputRef = useRef<HTMLInputElement>(null)
+  const places = useMapsLibrary("places")
 
-  const handleInputChange = useCallback((value: google.maps.places.PlacePrediction | string) => {
-    if (typeof value === "string") {
-      setInputValue(value)
+  useEffect(() => {
+    if (!places || !inputRef.current) {
+      return
     }
-  }, [])
 
-  const handleSelect = useCallback(
-    (prediction: google.maps.places.PlacePrediction | string) => {
-      if (typeof prediction === "string") return
+    const options = {
+      fields: ["geometry", "name", "formatted_address", "address_components"],
+    }
 
-      const place = prediction.toPlace()
-      place
-        .fetchFields({
-          fields: ["viewport", "location", "svgIconMaskURI", "iconBackgroundColor"],
-        })
-        .then(() => {
-          resetSession()
-          onPlaceSelect(place)
-          setInputValue("")
-        })
-    },
-    [onPlaceSelect],
-  )
+    const autocomplete = new places.Autocomplete(inputRef.current, options)
 
-  const predictions = useMemo(
-    () => suggestions.filter(suggestion => suggestion.placePrediction).map(({ placePrediction }) => placePrediction!),
-    [suggestions],
-  )
+    autocomplete.addListener("place_changed", () => {
+      const place = autocomplete.getPlace()
+      if (place) {
+        onPlaceSelect(place)
+      }
+    })
+  }, [places, onPlaceSelect])
+
   return (
     <div className="relative">
-      <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground z-10" />
-      <Autocomplete
-        onLoad={autocomplete => {
-          autocompleteRef.current = autocomplete
-        }}
-        onPlaceChanged={handlePlaceSelect}
-      >
-        <Input type="text" placeholder="Search for an address..." className="pl-10" />
-      </Autocomplete>
+      <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground z-10000000000" />
+      <Input
+        ref={inputRef}
+        type="text"
+        placeholder="Search for an address..."
+        className="pl-10 z-1000000000"
+        value={inputValue}
+        onChange={e => setInputValue(e.target.value)}
+      />
     </div>
   )
 }
