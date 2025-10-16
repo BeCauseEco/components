@@ -15,6 +15,7 @@ export interface GenericGoogleMapProps {
   children?: React.ReactNode
   onClick?: ((event: MapMouseEvent) => void) | undefined
   onPlaceSelect?: (place: google.maps.places.PlaceResult) => void
+  streetViewControl?: boolean
 }
 
 export interface MapMarkerTooltipProperties {
@@ -36,6 +37,7 @@ export const GoogleMap = ({
   children,
   onClick,
   onPlaceSelect,
+  streetViewControl = true,
 }: GenericGoogleMapProps) => {
   const [infowindowData, setInfowindowData] = useState<{
     anchor: google.maps.marker.AdvancedMarkerElement
@@ -60,14 +62,17 @@ export const GoogleMap = ({
     // Do NOT include extra libraries unless you actually use their features,
     // as each one increases bundle size and can affect performance.
     <APIProvider apiKey={googlePlacesApiKey} libraries={["places"]}>
-      <MapAutocompleteInput
-        onPlaceSelect={pr => {
-          if (onPlaceSelect) {
-            onPlaceSelect(pr)
-          }
-        }}
-      />
+      {onPlaceSelect && (
+        <div className={"mb-4"}>
+          <MapAutocompleteInput
+            onPlaceSelect={pr => {
+              onPlaceSelect(pr)
+            }}
+          />
+        </div>
+      )}
       <Map
+        streetViewControl={streetViewControl}
         mapId={"992ebfe9-cf01-4f45-b884-2c4eba19f61e"} //Randomly generated. Required for advanced markers. Purpose can be seen here: https://developers.google.com/maps/documentation/javascript/map-ids/mapid-over
         defaultCenter={defaultCenter || { lat: 45.4046987, lng: 12.2472504 }}
         defaultZoom={defaultZoomLevel ?? 3}

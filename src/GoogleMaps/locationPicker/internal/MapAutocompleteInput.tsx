@@ -53,7 +53,7 @@ export const MapAutocompleteInput = ({ onPlaceSelect }: PlaceAutocompleteProps) 
 
   return (
     <div className="relative">
-      <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground z-10000000000" />
+      <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground z-1000" />
       <Input
         ref={inputRef}
         type="text"

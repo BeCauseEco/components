@@ -198,8 +198,8 @@ export const LocationPickerDialog = ({
       }
       content={
         <>
-          <div className="space-y-4">
-            <div className="rounded-lg overflow-hidden border border-border  h-[500px]">
+          <div className="space-y-4 p-4 gap-2">
+            <div className="rounded-lg overflow-hidden h-[500px]">
               <GoogleMap
                 entries={{
                   type: "FeatureCollection",
@@ -212,12 +212,13 @@ export const LocationPickerDialog = ({
                 }}
                 onClick={handleMapClick}
                 onPlaceSelect={handlePlaceSelect}
+                streetViewControl={false}
               >
                 <Marker position={markerPosition} draggable onDragEnd={handleMarkerDragEnd} />
               </GoogleMap>
             </div>
             {locationInfo && (
-              <div className="p-4 rounded-lg border bg-card space-y-2">
+              <div className="p-4 rounded border border-neutral-100 bg-card space-y-2">
                 <div className="flex items-start justify-between">
                   <div className="space-y-1 flex-1">
                     {locationInfo.name && <p className="font-medium text-sm">{locationInfo.name}</p>}
