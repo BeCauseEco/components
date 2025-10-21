@@ -48,6 +48,13 @@ const computeMinSize = (size: TDialog["size"], fixedWidth: TDialog["fixedWidth"]
         minHeight: "auto",
       }
 
+    case Size.MediumLarge:
+      return {
+        minWidth: "calc(var(--BU) * 240)",
+        ...(fixedWidth ? { maxWidth: "calc(var(--BU) * 240)" } : {}),
+        minHeight: "auto",
+      }
+
     case Size.Large:
       return {
         minWidth: "calc(var(--BU) * 320)",
@@ -107,7 +114,7 @@ const TitleAndDescription = styled.div({
 })
 
 export type TDialog = PlaywrightProps & {
-  size: Size.Medium | Size.Large | Size.Huge
+  size: Size.Medium | Size.MediumLarge | Size.Large | Size.Huge
   content: ReactElement<TComposition>
   open: boolean
   onOpenChange: (open: boolean) => void
