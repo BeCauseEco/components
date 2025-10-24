@@ -537,7 +537,7 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
                       rowReordering={mode === "edit" && p.editingMode !== EditingMode.Cell}
                       noData={{ text: "Nothing found" }}
                       searchText={filter}
-                      virtualScrolling={mode !== "edit" && p.virtualScrolling ? { enabled: true } : undefined}
+                      virtualScrolling={p.virtualScrollingMaxHeight ? { enabled: true } : undefined}
                       search={({ searchText: searchTextValue, rowData, column }) => {
                         if (column.dataType === DataType.Boolean) {
                           const b = (rowData as any)[column.key]
@@ -554,9 +554,9 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
                       childComponents={{
                         tableWrapper: {
                           elementAttributes: () => {
-                            if (mode !== "edit" && p.virtualScrolling) {
+                            if (p.virtualScrollingMaxHeight) {
                               return {
-                                className: "override-ka-virtual",
+                                style: { maxHeight: p.virtualScrollingMaxHeight },
                               }
                             }
 
