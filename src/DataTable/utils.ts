@@ -110,3 +110,26 @@ export const csv = <TData = any>(data: TData[], columns: Column[]) => {
     window.open("data:text/csv;charset=utf-8," + dataSanitized.map(ds => ds.join(";")).join("\n"))
   }
 }
+
+export const calculateColumnWidth = (
+  column: Column,
+): { minWidth: string | number; maxWidth: string | number; width: string | number } => {
+  let minWidth: number | string = "auto"
+  if (column.minWidth && typeof column.minWidth === "string") {
+    minWidth = column.minWidth
+  }
+
+  let maxWidth: number | string = "auto"
+  if (column.maxWidth && typeof column.maxWidth === "string") {
+    maxWidth = column.maxWidth
+  }
+
+  let width: string | number = "auto"
+  if (minWidth && maxWidth && minWidth === maxWidth) {
+    width = minWidth //It is pretty obvious in this case, we want to fix the width of the column.
+  } else if (column.explodeWidth) {
+    width = "100%"
+  }
+
+  return { minWidth, maxWidth, width }
+}
