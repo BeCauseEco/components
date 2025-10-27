@@ -33,7 +33,7 @@ import { Tooltip } from "@new/Tooltip/Tooltip"
 
 // Import from our new modular structure
 import { DataTableProps, DataType, Column } from "./types"
-import { createNewRow, formatValue, csv } from "./utils"
+import { createNewRow, formatValue, csv, calculateColumnWidth } from "./utils"
 import { createDataTableStyles } from "./styles"
 import { ActionEdit, ActionSaveCancel } from "./internal/ActionComponents"
 import { CellInputTextSingle, CellInputTextDate, CellInputCheckbox, CellInputCombobox } from "./internal/CellEditors"
@@ -89,7 +89,6 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
   const exportName = p.exportName ?? "export"
   const cssScope = useId().replace(/:/g, "datatable")
   const referenceContainer = useRef<HTMLDivElement>(null)
-  const [containerWidth, setContainerWidth] = useState<number>(0)
 
   // Helper to get text size props for Text components
   const getTextSizeProps = (
@@ -912,25 +911,6 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
                               classNames.push("override-ka-fixed-right")
                             }
 
-                            let minWidth: number | string = "auto"
-                            let maxWidth: number | string = "auto"
-
-                            if (column.minWidth) {
-                              if (typeof column.minWidth === "string" && column.minWidth.endsWith("%")) {
-                                minWidth = (containerWidth / 100) * parseFloat(column.minWidth)
-                              } else {
-                                minWidth = `${column.minWidth}px`
-                              }
-                            }
-
-                            if (column.maxWidth) {
-                              if (typeof column.maxWidth === "string" && column.maxWidth.endsWith("%")) {
-                                maxWidth = (containerWidth / 100) * parseFloat(column.maxWidth)
-                              } else {
-                                maxWidth = `${column.maxWidth}px`
-                              }
-                            }
-
                             if (column.preventContentCollapse) {
                               classNames.push("override-ka-prevent-content-collapse")
                             }
@@ -947,13 +927,15 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
                               classNames.push("ka-cell-editable")
                             }
 
+                            const { width, minWidth, maxWidth } = calculateColumnWidth(column)
+
                             return {
                               id: id,
                               className: classNames.join(" "),
                               tabIndex: p.mode === "edit" && column.isEditable ? -1 : undefined,
 
                               style: {
-                                width: column.explodeWidth ? "100%" : "auto",
+                                width: width,
                                 minWidth: minWidth,
                                 maxWidth: maxWidth,
                               },
