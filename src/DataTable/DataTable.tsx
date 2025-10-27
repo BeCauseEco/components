@@ -1,5 +1,4 @@
 "use client"
-
 import { Stack } from "@new/Stack/Stack"
 import { Align } from "@new/Stack/Align"
 import { EditingMode, InsertRowPosition, SortDirection, SortingMode, Table, useTable } from "ka-table"
@@ -30,7 +29,6 @@ import { InputCheckbox } from "@new/InputCheckbox/InputCheckbox"
 import { Divider } from "@new/Divider/Divider"
 import { kaPropsUtils } from "ka-table/utils"
 import { Alert } from "@new/Alert/Alert"
-import { useResizeObserver } from "usehooks-ts"
 import { Tooltip } from "@new/Tooltip/Tooltip"
 
 // Import from our new modular structure
@@ -117,50 +115,6 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
       }
     }, deps)
   }
-
-  // Optimization 4: Debounced resize handler to reduce performance impact
-  const debouncedResizeHandler = useMemo(
-    () =>
-      _debounce((size: { width?: number; height?: number }) => {
-        if (mode === "edit" && p.editingMode !== EditingMode.Cell) {
-          return
-        }
-
-        const containerWidth = size.width || 0
-        const containerHeight = size.height || 0
-
-        if (referenceContainer.current && containerWidth > 0) {
-          setContainerWidth(Math.floor(containerWidth - 16 - 2))
-        }
-
-        if (referenceContainer.current && containerHeight > 0) {
-          // Cache DOM queries
-          const filtersElement = referenceContainer.current.querySelector(`#reference-filters`)
-          const spacerElement = referenceContainer.current.querySelector(`#reference-spacer`)
-          const targetElements = referenceContainer.current.querySelectorAll(`#reference-target`)
-
-          if (filtersElement && spacerElement && targetElements.length > 0) {
-            const filtersHeight = filtersElement.clientHeight || 0
-            const spacerHeight = spacerElement.clientHeight || 0
-            const newHeight = `${Math.ceil(containerHeight - filtersHeight - spacerHeight)}px`
-
-            targetElements.forEach(target => {
-              const t = target as HTMLElement
-              if (t) {
-                t.style.height = newHeight
-              }
-            })
-          }
-        }
-      }, 100), // 100ms debounce
-    [mode, p.editingMode],
-  )
-
-  useResizeObserver({
-    ref: referenceContainer as React.RefObject<HTMLElement>,
-    box: "border-box",
-    onResize: debouncedResizeHandler,
-  })
 
   const [filter, setFilter] = useState("")
 
