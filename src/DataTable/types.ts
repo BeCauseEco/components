@@ -35,8 +35,8 @@ export type Column = {
   key: string
   title: string
   dataType: DataType
-  maxWidth?: number | `${number}${"%"}`
-  minWidth?: number | `${number}${"%"}`
+  maxWidth?: `${number}${"px"}` | `${number}${"%"}`
+  minWidth?: `${number}${"px"}` | `${number}${"%"}`
   explodeWidth?: boolean
   preventContentCollapse?: boolean
   sort?: (sortDirection: SortDirection) => (a: any, b: any) => number
@@ -196,7 +196,7 @@ export type DataTableProps<TData = any> = PlaywrightProps & {
   selectedRows?: (string | number)[]
   onSelectionChange?: (selectedRows: (string | number)[]) => void
   disabledRows?: (string | number)[]
-  virtualScrolling?: boolean
+  virtualScrollingMaxHeight?: `${number}${"px"}` | `${number}${"vh"}`
   loading?: boolean
   loadingElement?: ReactElement
   exportDisable?: boolean

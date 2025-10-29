@@ -1,4 +1,4 @@
-import { forwardRef } from "react"
+import { forwardRef, ReactNode } from "react"
 import { InputTextProps, InputText } from "@new/InputText/internal/InputText"
 import { Color, ColorWithLightness } from "@new/Color"
 
@@ -33,6 +33,8 @@ export type InputTextSingleProps = Pick<
   type?: "text" | "email" | "password"
   autoComplete?: string
   name?: string
+  startAdornment?: ReactNode
+  endAdornment?: ReactNode
 }
 
 export const InputTextSingle = forwardRef<HTMLInputElement, InputTextSingleProps>((p, ref) => {
@@ -69,6 +71,8 @@ export const InputTextSingle = forwardRef<HTMLInputElement, InputTextSingleProps
       autoComplete={p.autoComplete}
       name={p.name}
       tooltip={p.tooltip}
+      startAdornment={p.startAdornment}
+      endAdornment={p.endAdornment}
       onBlur={p.onBlur}
       onFocus={p.onFocus}
       onKeyDown={p.onKeyDown}
