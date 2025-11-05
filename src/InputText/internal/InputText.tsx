@@ -158,7 +158,6 @@ const StackWidthOverride = styled(Stack)<Pick<InputTextProps, "size" | "rows" | 
 
 const Label = styled.label({
   display: "flex",
-  userSelect: "none",
   cursor: "pointer",
   alignItems: "center",
 })

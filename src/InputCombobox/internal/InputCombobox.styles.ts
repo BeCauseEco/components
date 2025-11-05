@@ -58,7 +58,6 @@ export const LabelContainer = styled.div({
 
 export const Label = styled.label({
   display: "flex",
-  userSelect: "none",
   cursor: "pointer",
   alignItems: "center",
 })
