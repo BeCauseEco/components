@@ -1,22 +1,28 @@
-import styled from "@emotion/styled"
-import { Command, CommandEmpty, CommandGroup, CommandItem, CommandList } from "cmdk"
-import React, { forwardRef, PropsWithChildren, ReactElement, useCallback, useEffect, useMemo, useState } from "react"
+import React, {
+  forwardRef,
+  PropsWithChildren,
+  ReactElement,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react"
 import { InputComboboxItemProps } from "./InputComboboxItem"
 import { Text } from "@new/Text/Text"
-import { Color, ColorWithLightness, computeColor } from "@new/Color"
+import { Color, ColorWithLightness } from "@new/Color"
 import { Popover } from "@new/Popover/Popover"
 import { InputButton } from "@new/InputButton/internal/InputButton"
-import { InputTextSingle } from "@new/InputText/InputTextSingle"
 import { Spacer } from "@new/Stack/Spacer"
-import { InputCheckbox } from "@new/InputCheckbox/InputCheckbox"
-import { Virtuoso } from "react-virtuoso"
-import { Badge } from "@new/Badge/Badge"
-import { Stack } from "@new/Stack/Stack"
-import { Align } from "@new/Stack/Align"
 import { ComponentBaseProps } from "@new/ComponentBaseProps"
-import { OverflowContainer } from "@new/OverflowContainer/OverflowContainer"
-import { Divider } from "@new/Divider/Divider"
-import { Icon } from "@new/Icon/Icon"
+import { Align } from "@new/Stack/Align"
+import { Container } from "./internal/InputCombobox.styles"
+import { debounce } from "./internal/utils"
+import { ComboboxLabel } from "./internal/ComboboxLabel"
+import { ComboboxTriggerContent } from "./internal/ComboboxTriggerContent"
+import { ComboboxItem } from "./internal/ComboboxItem"
+import { ComboboxItemList } from "./internal/ComboboxItemList"
+import { ComboboxPopoverContent } from "./internal/ComboboxPopoverContent"
 
 export type InputComboboxProps = ComponentBaseProps & {
   size: "small" | "large"
@@ -76,52 +82,35 @@ export type InputComboboxProps = ComponentBaseProps & {
   tooltip?: string
 }
 
-const Container = styled.div<Pick<InputComboboxProps, "size" | "width">>(p => ({
-  display: "flex",
-  flexDirection: "column",
-  width: p.width === "fixed" ? (p.size === "small" ? "calc(var(--BU) * 70)" : "calc(var(--BU) * 80)") : "auto",
-}))
-
-const CommandGroupStyled = styled(CommandGroup)({
-  margin: "0 0 10px 0",
-
-  "[cmdk-group-heading]": {
-    color: computeColor([Color.Neutral, 400]),
-    fontSize: "14px",
-    marginBottom: "5px",
-  },
-})
-
-const CommandItemStyled = styled(CommandItem)<{
-  multiple?: boolean
-  selected: boolean
-  colorSelected: ColorWithLightness
-  colorBackgroundHover: ColorWithLightness
-  colorForeground: ColorWithLightness
-}>(p => ({
-  position: "relative",
-  padding: p.multiple ? "calc(var(--BU) * 1)" : "calc(var(--BU) * 1.5) ",
-  borderRadius: "var(--BU)",
-  cursor: "pointer",
-  userSelect: "none",
-  backgroundColor: "transparent",
-
-  "&[data-selected='true']": {
-    backgroundColor: computeColor(p.colorBackgroundHover),
-  },
-}))
-
-const CommandEmptyStyled = styled(CommandEmpty)({
-  padding: "calc(var(--BU) * 1.5) 0",
-  userSelect: "none",
-  maxWidth: "100%",
-  overflow: "hidden",
-})
-
 export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<InputComboboxProps>>((p, ref) => {
   const [open, setOpen] = useState(false)
   const [search, setSearch] = useState("")
   const [filteredValues, setFilteredValues] = useState<string[]>([])
+  const [containerWidth, setContainerWidth] = useState<number | undefined>(undefined)
+
+  const containerRef = useRef<HTMLDivElement>(null)
+
+  // Measure container width when component mounts or size/width props change
+  useEffect(() => {
+    if (containerRef.current) {
+      const width = containerRef.current.offsetWidth
+      setContainerWidth(width)
+    }
+  }, [p.size, p.width])
+
+  // Merge the forwarded ref with our internal ref
+  const mergedRef = useCallback(
+    (node: HTMLDivElement | null) => {
+      containerRef.current = node
+
+      if (typeof ref === "function") {
+        ref(node)
+      } else if (ref) {
+        ref.current = node
+      }
+    },
+    [ref],
+  )
 
   const items: { [key: string]: InputComboboxItemProps } = useMemo(() => {
     const output: { [key: string]: InputComboboxItemProps } = {}
@@ -142,190 +131,6 @@ export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<InputC
 
     setFilteredValues(newItems)
   }, [items])
-
-  const LabelContainer = styled.div({
-    display: "flex",
-    overflow: "hidden",
-    width: "100%",
-    maxWidth: "100%",
-
-    "& [class^='<Badge']:not(:nth-child(n+4))": {
-      minWidth: "25%",
-    },
-  })
-
-  const generateCurrentValueLabel = (multiple?: boolean) => {
-    if (!multiple) {
-      const selectedItem = Object.values(items).findLast(item => p.value === item.value)
-
-      if (p.clearable && selectedItem) {
-        return (
-          <Badge
-            size={p.size}
-            variant={p.disabled ? "opaque" : "solid"}
-            label={selectedItem.shortLabel || selectedItem.label}
-            title={selectedItem.label}
-            color={p.disabled ? p.color : Color.Primary}
-            onClear={() => {
-              p.onChange("")
-            }}
-            textOverflow
-          />
-        )
-      }
-
-      return (
-        <Stack horizontal hug overflowHidden>
-          <Align horizontal left hug>
-            {selectedItem?.icon ? (
-              <>
-                {selectedItem.icon}
-
-                <Spacer xsmall />
-              </>
-            ) : null}
-
-            <Text fill={[p.color, 700]} xsmall={p.size === "small"} small={p.size === "large"} textOverflow>
-              {selectedItem?.shortLabel || selectedItem?.label || p.textNoSelection}{" "}
-            </Text>
-          </Align>
-        </Stack>
-      )
-    }
-
-    const selectedValuesSet = new Set(p.value)
-
-    const selectedItems = Object.entries(items)
-      .filter(([, item]) => selectedValuesSet.has(item.value))
-      .flatMap(([, item]) => item.label)
-
-    if (selectedItems.length === 0) {
-      return (
-        <Text xsmall={p.size === "small"} small={p.size === "large"} fill={[Color.Neutral, 700]} wrap>
-          {p.textNoSelection}
-        </Text>
-      )
-    }
-
-    const visibleItems = selectedItems.slice(0, 2)
-    const remainingCount = selectedItems.length - 2
-
-    return (
-      <>
-        {visibleItems?.map((item, index) => (
-          <>
-            <Badge
-              key={index}
-              label={item}
-              title={item}
-              size={p.size}
-              variant={p.disabled ? "opaque" : "solid"}
-              color={p.disabled ? p.color : Color.Primary}
-              onClear={
-                p.clearable
-                  ? () => {
-                      handleRemoveItem(item)
-                    }
-                  : undefined
-              }
-              textOverflow
-            />
-
-            <Spacer tiny={p.size === "small"} xsmall={p.size === "large"} />
-          </>
-        ))}
-
-        {remainingCount > 0 && (
-          <Badge
-            key={remainingCount}
-            label={`+${remainingCount}`}
-            size={p.size}
-            variant={p.disabled ? "opaque" : "solid"}
-            color={p.disabled ? p.color : Color.Primary}
-          />
-        )}
-      </>
-    )
-  }
-
-  const getCommandItem = (index: number, item: InputComboboxItemProps): React.ReactNode => {
-    const onSelectSingle = (value: string) => {
-      setOpen(false)
-
-      const item = Object.values(items).findLast(item => item.label?.trim() === value?.trim())
-
-      if (item) {
-        p.onChange(item.value)
-      }
-    }
-
-    const onSelectMultiple = (selectedItemId: string, newValue: boolean) => {
-      const currentValue = p.value as string[]
-      const selectedItemsIds = newValue
-        ? [...currentValue, selectedItemId]
-        : currentValue.filter(item => item !== selectedItemId)
-
-      p.onChange(selectedItemsIds)
-    }
-
-    return (
-      <CommandItemStyled
-        key={index}
-        multiple={p.multiple}
-        value={item.label}
-        onSelect={value => (p.multiple ? () => {} : onSelectSingle(value))}
-        selected={p.multiple ? (p.value as string[]).includes(item.value) : p.value === item.value}
-        colorSelected={[p.color, 400]}
-        colorBackgroundHover={[p.color, 50]}
-        colorForeground={[p.color, 700]}
-        data-playwright-testid={item["data-playwright-testid"]}
-      >
-        {p.multiple ? (
-          <Stack horizontal hug overflowHidden>
-            <Align horizontal left hug>
-              {item.icon ? (
-                <>
-                  {item.icon}
-
-                  <Spacer xsmall />
-                </>
-              ) : null}
-
-              <InputCheckbox
-                size={p.size}
-                value={p.multiple ? (p.value as string[]).includes(item.value) : p.value === item.value}
-                onChange={value => onSelectMultiple(item.value, value)}
-                color={Color.Primary}
-                label={item.label}
-              />
-            </Align>
-          </Stack>
-        ) : (
-          <Stack horizontal hug overflowHidden>
-            <Align horizontal left hug>
-              {item.icon ? (
-                <>
-                  {item.icon}
-
-                  <Spacer xsmall />
-                </>
-              ) : null}
-
-              <Text
-                xsmall={p.size === "small"}
-                small={p.size === "large"}
-                fill={[p.color, 700]}
-                textOverflow
-                title={item.label}
-              >
-                {item.label}
-              </Text>
-            </Align>
-          </Stack>
-        )}
-      </CommandItemStyled>
-    )
-  }
 
   const filteredItems = useMemo(() => {
     const filteredItemIdsSet = new Set(filteredValues)
@@ -388,73 +193,23 @@ export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<InputC
     return { groups, dividerItems }
   }, [filteredItems, p.sortAlphabetically])
 
-  let commandListItems: ReactElement | null = null
+  const onSelectSingle = (label: string) => {
+    setOpen(false)
 
-  if (p.enableVirtuoso) {
-    // For virtuoso, we need to use flat rendering even with groups
-    // TODO: Future enhancement could add virtuoso support for groups
-    commandListItems = (
-      <Virtuoso
-        style={{
-          height: "calc(var(--radix-popover-content-available-height) / 2)",
-          minWidth: "100%",
-          maxWidth: "calc(var(--radix-popover-content-available-width) - var(--BU) * 4)",
+    const item = Object.values(items).findLast(item => item.label?.trim() === label?.trim())
 
-          overflowX: "hidden",
-        }}
-        increaseViewportBy={100}
-        data={filteredItems}
-        itemContent={(index, item) => getCommandItem(index, item)}
-      />
-    )
-  } else {
-    if (groupedItems) {
-      // Render grouped items
-      const { groups, dividerItems } = groupedItems
-      const groupEntries = Object.entries(groups)
-
-      // Sort group names alphabetically if sortAlphabetically is true
-      if (p.sortAlphabetically) {
-        groupEntries.sort(([a], [b]) => {
-          // Ensure "Other" group always appears last
-          if (a === "Other") {
-            return 1
-          }
-          if (b === "Other") {
-            return -1
-          }
-          return a.localeCompare(b)
-        })
-      }
-
-      commandListItems = (
-        <>
-          {groupEntries.map(([groupName, groupItems]) => (
-            <CommandGroupStyled key={groupName} heading={groupName}>
-              {groupItems.map((item, index) => getCommandItem(index, item))}
-            </CommandGroupStyled>
-          ))}
-          {dividerItems.length > 0 && (
-            <>
-              {/* Only show divider if there are other groups */}
-              {groupEntries.length > 0 && (
-                <Align vertical>
-                  <Divider fill={[Color.Neutral, 100]} />
-                  <Spacer small />
-                </Align>
-              )}
-              {/* All dash items rendered without individual dividers */}
-              {dividerItems.map((item, index) => (
-                <React.Fragment key={`divider-${index}`}>{getCommandItem(index, item)}</React.Fragment>
-              ))}
-            </>
-          )}
-        </>
-      )
-    } else {
-      // Render flat items
-      commandListItems = <>{filteredItems.map((item, index) => getCommandItem(index, item))}</>
+    if (item) {
+      p.onChange(item.value)
     }
+  }
+
+  const onSelectMultiple = (selectedItemId: string, newValue: boolean) => {
+    const currentValue = p.value as string[]
+    const selectedItemsIds = newValue
+      ? [...currentValue, selectedItemId]
+      : currentValue.filter(item => item !== selectedItemId)
+
+    p.onChange(selectedItemsIds)
   }
 
   const handleRemoveItem = (label: string) => {
@@ -488,13 +243,6 @@ export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<InputC
 
   const filterWithDebounce = useMemo(() => debounce(filterResults, 300), [filterResults])
 
-  const Label = styled.label({
-    display: "flex",
-    userSelect: "none",
-    cursor: "pointer",
-    alignItems: "center",
-  })
-
   let strokeColor: ColorWithLightness = [p.color, 300]
   if (p.disabled) {
     strokeColor = [p.color, 100]
@@ -504,130 +252,51 @@ export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<InputC
     strokeColor = p.borderColor
   }
 
+  const commandListItems = (
+    <ComboboxItemList
+      filteredItems={filteredItems}
+      groupedItems={groupedItems}
+      enableVirtuoso={p.enableVirtuoso}
+      sortAlphabetically={p.sortAlphabetically}
+      size={p.size}
+      width={p.width}
+      containerWidthPx={containerWidth}
+      renderItem={(index, item) => (
+        <ComboboxItem
+          key={index}
+          item={item}
+          index={index}
+          multiple={p.multiple}
+          value={p.value}
+          size={p.size}
+          color={p.color}
+          colorSelected={[p.color, 400]}
+          colorBackgroundHover={[p.color, 50]}
+          colorForeground={[p.color, 700]}
+          onSelectSingle={onSelectSingle}
+          onSelectMultiple={onSelectMultiple}
+        />
+      )}
+    />
+  )
+
   return (
     <Container
-      ref={ref}
+      ref={mergedRef}
       id={p.id}
       data-playwright-testid={p["data-playwright-testid"]}
       className="<InputCombobox /> - "
       size={p.size}
       width={p.width}
     >
-      {p.label && p.label[0] === "outside" ? (
-        <Stack vertical hug>
-          <>
-            <Align vertical left hug="width">
-              <Label>
-                <Text xsmall={p.size === "small"} small={p.size !== "small"} fill={[p.color, 700]}>
-                  <b>{p?.label?.[1]}</b>
-                </Text>
-
-                {p.required && (
-                  <>
-                    <Spacer tiny={p.size === "small"} xsmall={p.size === "large"} />
-
-                    <Icon
-                      name="asterisk"
-                      small={p.size === "small"}
-                      medium={p.size === "large"}
-                      fill={[Color.Error, 700]}
-                    />
-                  </>
-                )}
-
-                {p.tooltip && (
-                  <>
-                    <Spacer tiny />
-
-                    <Icon
-                      name="info"
-                      small={p.size === "small"}
-                      medium={p.size === "large"}
-                      fill={[p.color, 500]}
-                      style="outlined"
-                      tooltip={p.tooltip}
-                    />
-                  </>
-                )}
-              </Label>
-
-              <Spacer xsmall={p.size === "small"} small={p.size === "large"} />
-            </Align>
-
-            {p.hint ? (
-              <Align vertical left hug>
-                <Text tiny={p.size === "small"} xsmall={p.size !== "small"} fill={[p.color, 700]}>
-                  {p.hint}
-                </Text>
-
-                <Spacer xsmall={p.size === "small"} small={p.size === "large"} />
-              </Align>
-            ) : (
-              <></>
-            )}
-          </>
-        </Stack>
-      ) : (
-        <></>
-      )}
-
-      {p.label && p.label[0] === "outside-small" ? (
-        <Stack vertical hug>
-          <>
-            <Align vertical left hug="width">
-              <Label>
-                <Text xsmall fill={[Color.Neutral, 700]}>
-                  <b>{p?.label?.[1]}</b>
-                </Text>
-
-                {p.required && (
-                  <>
-                    <Spacer tiny={p.size === "small"} xsmall={p.size === "large"} />
-
-                    <Icon
-                      name="asterisk"
-                      small={p.size === "small"}
-                      medium={p.size === "large"}
-                      fill={[Color.Error, 700]}
-                    />
-                  </>
-                )}
-
-                {p.tooltip && (
-                  <>
-                    <Spacer tiny />
-
-                    <Icon
-                      name="info"
-                      small={p.size === "small"}
-                      medium={p.size === "large"}
-                      fill={[Color.Neutral, 500]}
-                      style="outlined"
-                      tooltip={p.tooltip}
-                    />
-                  </>
-                )}
-              </Label>
-
-              <Spacer xsmall />
-            </Align>
-
-            {p.hint ? (
-              <Align vertical left hug>
-                <Text tiny={p.size === "small"} xsmall={p.size !== "small"} fill={[p.color, 700]}>
-                  {p.hint}
-                </Text>
-
-                <Spacer xsmall={p.size === "small"} small={p.size === "large"} />
-              </Align>
-            ) : (
-              <></>
-            )}
-          </>
-        </Stack>
-      ) : (
-        <></>
-      )}
+      <ComboboxLabel
+        label={p.label}
+        hint={p.hint}
+        required={p.required}
+        tooltip={p.tooltip}
+        size={p.size}
+        color={p.color}
+      />
 
       <Popover
         alignment="start"
@@ -641,7 +310,7 @@ export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<InputC
             colorForeground={[p.color, 700]}
             borderColor={strokeColor}
             borderColorHover={p.disabled ? [p.color, 100] : [p.color, 700]}
-            colorBackground={p.disabled ? [p.color, 50] : [Color.White]}
+            colorBackground={p.disabled ? [p.color, 50] : [Color.White, 700]}
             colorBackgroundHover={[p.color, 50]}
             colorLoading={[p.color, 700]}
             iconName={p.button ? undefined : open ? "keyboard_arrow_up" : "keyboard_arrow_down"}
@@ -649,154 +318,40 @@ export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<InputC
             disabled={p.disabled ? true : undefined}
             loading={p.loading ? true : undefined}
             content={
-              p.button ? (
-                <Stack horizontal hug>
-                  <Align horizontal left>
-                    {p.button.icon && (
-                      <>
-                        <Icon
-                          name={p.button.icon}
-                          small={p.size === "small"}
-                          medium={p.size === "large"}
-                          fill={[p.color, 700]}
-                        />
-                        <Spacer xsmall />
-                      </>
-                    )}
-                    <Text xsmall={p.size === "small"} small={p.size === "large"} fill={[p.color, 700]}>
-                      {p.button.label}
-                    </Text>
-                  </Align>
-                </Stack>
-              ) : (
-                <Stack horizontal hug>
-                  <Align horizontal left>
-                    {p.label && p.label[0] === "inside" ? (
-                      <>
-                        <Text xsmall={p.size === "small"} small={p.size === "large"} fill={[p.color, 500]}>
-                          {p.label[1]}
-                        </Text>
-
-                        {p.required && (
-                          <>
-                            <Spacer tiny={p.size === "small"} xsmall={p.size === "large"} />
-
-                            <Icon
-                              name="asterisk"
-                              small={p.size === "small"}
-                              medium={p.size === "large"}
-                              fill={[Color.Error, 700]}
-                            />
-                          </>
-                        )}
-
-                        {p.tooltip && (
-                          <>
-                            <Spacer tiny />
-
-                            <Icon
-                              name="info"
-                              small={p.size === "small"}
-                              medium={p.size === "large"}
-                              fill={[p.color, 500]}
-                              style="outlined"
-                              tooltip={p.tooltip}
-                            />
-                          </>
-                        )}
-
-                        <Spacer xsmall={p.size === "small"} small={p.size === "large"} />
-                      </>
-                    ) : (
-                      <></>
-                    )}
-
-                    <LabelContainer>{generateCurrentValueLabel(p.multiple)}</LabelContainer>
-                  </Align>
-
-                  {p.resettable && ((!p.multiple && !p.clearable) || (p.multiple && p.value.length > 1)) ? (
-                    <Align horizontal right hug="width">
-                      <Spacer xsmall={p.size === "small"} small={p.size === "large"} />
-
-                      <InputButton
-                        variant="blank"
-                        width="auto"
-                        size={p.size}
-                        colorForeground={p.value ? [p.color, 700] : [Color.Transparent]}
-                        iconName="clear"
-                        iconPlacement="labelNotSpecified"
-                        tabIndex={-1}
-                        onClick={() => {
-                          if (p.onChange) {
-                            p.onChange(p.multiple ? [] : "")
-                          }
-                        }}
-                      />
-
-                      <Divider vertical fill={p.value ? [p.color, 300] : [Color.Transparent]} overrideHeight="50%" />
-                    </Align>
-                  ) : (
-                    <></>
-                  )}
-                </Stack>
-              )
+              <ComboboxTriggerContent
+                button={p.button}
+                label={p.label}
+                multiple={p.multiple}
+                value={p.value}
+                items={items}
+                size={p.size}
+                color={p.color}
+                disabled={p.disabled}
+                clearable={p.clearable}
+                resettable={p.resettable}
+                required={p.required}
+                tooltip={p.tooltip}
+                textNoSelection={p.textNoSelection}
+                onChange={p.onChange}
+                onRemoveItem={handleRemoveItem}
+              />
             }
           />
         }
       >
-        <Align vertical topLeft>
-          {p.filterOptions && Object.keys(items).length > 9 && (
-            <InputTextSingle
-              size="small"
-              width="auto"
-              color={p.color}
-              value={search}
-              placeholder={p.filterOptions.textFilterPlaceholder}
-              onChange={value => {
-                setSearch(value)
-                filterWithDebounce(value)
-              }}
-            />
-          )}
-
-          <Spacer tiny={p.size === "small"} xsmall={p.size === "large"} />
-
-          {p.enableVirtuoso ? (
-            <Command style={{ width: "100%" }} loop>
-              {p.filterOptions && (
-                <CommandEmptyStyled>
-                  <Text fill={[p.color, 700]} xsmall={p.size === "small"} small={p.size !== "small"} textOverflow>
-                    {p.filterOptions.textFilterNoResults}
-                  </Text>
-                </CommandEmptyStyled>
-              )}
-
-              <CommandList>{commandListItems}</CommandList>
-            </Command>
-          ) : (
-            <OverflowContainer
-              axes="vertical"
-              colorBackground={[Color.White]}
-              colorForeground={Color.Neutral}
-              maxHeight="radix-popover-content-available-height-SAFE-AREA-INPUTTEXT"
-              minWidth="radix-popover-trigger-width"
-              maxWidth="radix-popover-content-available-width"
-              hug
-            >
-              <Command loop>
-                {p.filterOptions && (
-                  <CommandEmptyStyled>
-                    <Text fill={[p.color, 700]} xsmall={p.size === "small"} small={p.size !== "small"} textOverflow>
-                      {p.filterOptions.textFilterNoResults}
-                    </Text>
-                  </CommandEmptyStyled>
-                )}
-
-                <CommandList>{commandListItems}</CommandList>
-              </Command>
-            </OverflowContainer>
-          )}
-        </Align>
+        <ComboboxPopoverContent
+          filterOptions={p.filterOptions}
+          itemsCount={Object.keys(items).length}
+          search={search}
+          onSearchChange={value => {
+            setSearch(value)
+            filterWithDebounce(value)
+          }}
+          size={p.size}
+          color={p.color}
+          enableVirtuoso={p.enableVirtuoso}
+          commandListItems={commandListItems}
+        />
       </Popover>
 
       {p.error ? (
@@ -813,14 +368,3 @@ export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<InputC
     </Container>
   )
 })
-
-const debounce = <F extends (...args: Parameters<F>) => ReturnType<F>>(func: F, waitFor: number) => {
-  let timeout: NodeJS.Timeout
-
-  const debounced = (...args: Parameters<F>) => {
-    clearTimeout(timeout)
-    timeout = setTimeout(() => func(...args), waitFor)
-  }
-
-  return debounced
-}

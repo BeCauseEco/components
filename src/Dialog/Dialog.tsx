@@ -72,14 +72,17 @@ const computeMinSize = (size: TDialog["size"], fixedWidth: TDialog["fixedWidth"]
 
 const offsetTop = "128px"
 
-const Overlay = styled(RadixDialog.Overlay)({
+const Overlay = styled(
+  RadixDialog.Overlay,
+  makePropsNonTransient(["zIndex"]),
+)<{ zIndex?: number }>(p => ({
   display: "flex",
   position: "fixed",
   inset: 0,
   backgroundColor: Color.Neutral,
   opacity: EOpacity.Light,
-  zIndex: 99999,
-})
+  zIndex: p.zIndex ?? 99999,
+}))
 
 const RadixDialogClose = styled(RadixDialog.Close)({
   display: "flex",
@@ -87,11 +90,11 @@ const RadixDialogClose = styled(RadixDialog.Close)({
   height: "fit-content",
 })
 
-type TDialogContentProperties = Pick<TDialog, "size" | "collapseHeight" | "fixedWidth">
+type TDialogContentProperties = Pick<TDialog, "size" | "collapseHeight" | "fixedWidth" | "zIndex">
 
 const Content = styled(
   RadixDialog.Content,
-  makePropsNonTransient(["collapseHeight", "fixedWidth"]),
+  makePropsNonTransient(["collapseHeight", "fixedWidth", "zIndex"]),
 )<TDialogContentProperties>(p => ({
   display: "flex",
   position: "fixed",
@@ -101,7 +104,7 @@ const Content = styled(
   minWidth: computeMinSize(p.size, p.fixedWidth).minWidth,
   maxWidth: computeMinSize(p.size, p.fixedWidth).minWidth,
   minHeight: computeMinSize(p.size, p.fixedWidth).minHeight,
-  zIndex: 99999,
+  zIndex: p.zIndex ?? 99999,
   // TO-DO: @cllpe
   // maxHeight: `calc(100vh - ${offsetTop} - calc(var(--BU) * 10))`,
   outline: "none",
@@ -120,6 +123,7 @@ export type TDialog = PlaywrightProps & {
   onOpenChange: (open: boolean) => void
   collapseHeight?: boolean
   fixedWidth?: boolean
+  zIndex?: number
   title?: ReactElement<TextProps>
   description?: ReactElement<TextProps> | ReactElement<TextProps | SpacerProps>[]
   message?: ["notice" | "warning" | "error" | "hidden", string]
@@ -214,15 +218,15 @@ const DialogContentInner = (p: TDialog) => {
 }
 
 export const Dialog = (p: TDialog) => {
-  const { size, collapseHeight, fixedWidth } = p
-  const contentProps: TDialogContentProperties = { size, collapseHeight, fixedWidth }
+  const { size, collapseHeight, fixedWidth, zIndex } = p
+  const contentProps: TDialogContentProperties = { size, collapseHeight, fixedWidth, zIndex }
 
   return (
     <RadixDialog.Root open={p.open} onOpenChange={p.onOpenChange}>
       <RadixDialog.Portal>
-        <Overlay />
+        <Overlay zIndex={zIndex} />
 
-        {/* Conditionally add p.id because if not provided, Radix will auto-generate one. 
+        {/* Conditionally add p.id because if not provided, Radix will auto-generate one.
         If id={undefined}, Radix omits the id entirely, which may impact accessibility. */}
         <Content {...contentProps} {...(p.id ? { id: p.id } : {})}>
           <DialogContentInner {...p} />

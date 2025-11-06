@@ -31,7 +31,6 @@ const Root = styled(RadixCheckbox.Root)({
 
 const Label = styled.label({
   display: "flex",
-  userSelect: "none",
   cursor: "pointer",
   maxWidth: "inherit",
   overflow: "inherit",

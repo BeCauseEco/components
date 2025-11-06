@@ -33,7 +33,6 @@ const Item = styled(RadixRadioGroup.Item)({
 const Label = styled.label({
   display: "flex",
   cursor: "pointer",
-  userSelect: "none",
 })
 
 export type InputRadioGroupProps = PlaywrightProps & {

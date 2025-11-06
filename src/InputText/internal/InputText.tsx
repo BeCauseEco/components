@@ -59,6 +59,10 @@ export type InputTextProps = ComponentBaseProps & {
   tooltip?: string
 
   numberSettings?: NumberInputSettings
+
+  onBlur?: (event: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>) => void
+  onFocus?: (event: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>) => void
+  onKeyDown?: (event: React.KeyboardEvent<HTMLInputElement | HTMLTextAreaElement>) => void
 }
 
 export type NumberInputSettings = {
@@ -79,7 +83,7 @@ const calculateWidth = (rows: InputTextProps["rows"], width: InputTextProps["wid
   return width === "auto" ? "100%" : size === "small" ? "calc(var(--BU) * 70)" : "calc(var(--BU) * 80)"
 }
 
-const Output = styled.output<Pick<InputTextProps, "color" | "size" | "rows"> & { focus: boolean }>(p => ({
+const Output = styled.div<Pick<InputTextProps, "color" | "size" | "rows"> & { focus: boolean }>(p => ({
   display: "flex",
   position: "relative",
   width: "100%",
@@ -154,7 +158,6 @@ const StackWidthOverride = styled(Stack)<Pick<InputTextProps, "size" | "rows" | 
 
 const Label = styled.label({
   display: "flex",
-  userSelect: "none",
   cursor: "pointer",
   alignItems: "center",
 })
@@ -473,7 +476,16 @@ export const InputText = forwardRef<HTMLInputElement | HTMLTextAreaElement, Inpu
               focus={focusCapture}
               placeholder={p.placeholder}
               onFocusCapture={() => setFocusCapture(true)}
-              onBlur={() => setFocusCapture(false)}
+              onBlur={event => {
+                setFocusCapture(false)
+                p.onBlur?.(event as React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>)
+              }}
+              onFocus={event => {
+                p.onFocus?.(event as React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>)
+              }}
+              onKeyDown={event => {
+                p.onKeyDown?.(event as React.KeyboardEvent<HTMLInputElement | HTMLTextAreaElement>)
+              }}
               width={p.width}
               min={p.type === "date" ? p.dateMin : undefined}
               max={p.type === "date" ? p.dateMax : undefined}
