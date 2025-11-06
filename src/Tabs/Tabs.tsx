@@ -24,6 +24,7 @@ export type TTabs = PlaywrightProps & {
   defaultContentTargetId: string
   navigationItems: ReactElement<TTabsNavigationItem> | ReactElement<TTabsNavigationItem>[]
   contentItems: ReactElement<TTabsContentItem> | ReactElement<TTabsContentItem>[]
+  onValueChange?: (value: string) => void
 }
 
 export const Tabs = (p: TTabs) => {
@@ -31,6 +32,7 @@ export const Tabs = (p: TTabs) => {
     <Root
       value={p.contentTargetId}
       defaultValue={p.defaultContentTargetId}
+      onValueChange={p.onValueChange}
       data-playwright-testid={p["data-playwright-testid"]}
     >
       <List>{p.navigationItems}</List>

@@ -1,5 +1,4 @@
 "use client"
-
 import { Stack } from "@new/Stack/Stack"
 import { Align } from "@new/Stack/Align"
 import { EditingMode, InsertRowPosition, SortDirection, SortingMode, Table, useTable } from "ka-table"
@@ -30,12 +29,11 @@ import { InputCheckbox } from "@new/InputCheckbox/InputCheckbox"
 import { Divider } from "@new/Divider/Divider"
 import { kaPropsUtils } from "ka-table/utils"
 import { Alert } from "@new/Alert/Alert"
-import { useResizeObserver } from "usehooks-ts"
 import { Tooltip } from "@new/Tooltip/Tooltip"
 
 // Import from our new modular structure
 import { DataTableProps, DataType, Column } from "./types"
-import { createNewRow, formatValue, csv } from "./utils"
+import { createNewRow, formatValue, csv, calculateColumnWidth } from "./utils"
 import { createDataTableStyles } from "./styles"
 import { ActionEdit, ActionSaveCancel } from "./internal/ActionComponents"
 import { CellInputTextSingle, CellInputTextDate, CellInputCheckbox, CellInputCombobox } from "./internal/CellEditors"
@@ -91,7 +89,6 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
   const exportName = p.exportName ?? "export"
   const cssScope = useId().replace(/:/g, "datatable")
   const referenceContainer = useRef<HTMLDivElement>(null)
-  const [containerWidth, setContainerWidth] = useState<number>(0)
 
   // Helper to get text size props for Text components
   const getTextSizeProps = (
@@ -117,50 +114,6 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
       }
     }, deps)
   }
-
-  // Optimization 4: Debounced resize handler to reduce performance impact
-  const debouncedResizeHandler = useMemo(
-    () =>
-      _debounce((size: { width?: number; height?: number }) => {
-        if (mode === "edit" && p.editingMode !== EditingMode.Cell) {
-          return
-        }
-
-        const containerWidth = size.width || 0
-        const containerHeight = size.height || 0
-
-        if (referenceContainer.current && containerWidth > 0) {
-          setContainerWidth(Math.floor(containerWidth - 16 - 2))
-        }
-
-        if (referenceContainer.current && containerHeight > 0) {
-          // Cache DOM queries
-          const filtersElement = referenceContainer.current.querySelector(`#reference-filters`)
-          const spacerElement = referenceContainer.current.querySelector(`#reference-spacer`)
-          const targetElements = referenceContainer.current.querySelectorAll(`#reference-target`)
-
-          if (filtersElement && spacerElement && targetElements.length > 0) {
-            const filtersHeight = filtersElement.clientHeight || 0
-            const spacerHeight = spacerElement.clientHeight || 0
-            const newHeight = `${Math.ceil(containerHeight - filtersHeight - spacerHeight)}px`
-
-            targetElements.forEach(target => {
-              const t = target as HTMLElement
-              if (t) {
-                t.style.height = newHeight
-              }
-            })
-          }
-        }
-      }, 100), // 100ms debounce
-    [mode, p.editingMode],
-  )
-
-  useResizeObserver({
-    ref: referenceContainer as React.RefObject<HTMLElement>,
-    box: "border-box",
-    onResize: debouncedResizeHandler,
-  })
 
   const [filter, setFilter] = useState("")
 
@@ -537,7 +490,7 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
                       rowReordering={mode === "edit" && p.editingMode !== EditingMode.Cell}
                       noData={{ text: "Nothing found" }}
                       searchText={filter}
-                      virtualScrolling={mode !== "edit" && p.virtualScrolling ? { enabled: true } : undefined}
+                      virtualScrolling={p.virtualScrollingMaxHeight ? { enabled: true } : undefined}
                       search={({ searchText: searchTextValue, rowData, column }) => {
                         if (column.dataType === DataType.Boolean) {
                           const b = (rowData as any)[column.key]
@@ -554,9 +507,9 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
                       childComponents={{
                         tableWrapper: {
                           elementAttributes: () => {
-                            if (mode !== "edit" && p.virtualScrolling) {
+                            if (p.virtualScrollingMaxHeight) {
                               return {
-                                className: "override-ka-virtual",
+                                style: { maxHeight: p.virtualScrollingMaxHeight },
                               }
                             }
 
@@ -958,25 +911,6 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
                               classNames.push("override-ka-fixed-right")
                             }
 
-                            let minWidth: number | string = "auto"
-                            let maxWidth: number | string = "auto"
-
-                            if (column.minWidth) {
-                              if (typeof column.minWidth === "string" && column.minWidth.endsWith("%")) {
-                                minWidth = (containerWidth / 100) * parseFloat(column.minWidth)
-                              } else {
-                                minWidth = `${column.minWidth}px`
-                              }
-                            }
-
-                            if (column.maxWidth) {
-                              if (typeof column.maxWidth === "string" && column.maxWidth.endsWith("%")) {
-                                maxWidth = (containerWidth / 100) * parseFloat(column.maxWidth)
-                              } else {
-                                maxWidth = `${column.maxWidth}px`
-                              }
-                            }
-
                             if (column.preventContentCollapse) {
                               classNames.push("override-ka-prevent-content-collapse")
                             }
@@ -993,13 +927,15 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
                               classNames.push("ka-cell-editable")
                             }
 
+                            const { width, minWidth, maxWidth } = calculateColumnWidth(column)
+
                             return {
                               id: id,
                               className: classNames.join(" "),
                               tabIndex: p.mode === "edit" && column.isEditable ? -1 : undefined,
 
                               style: {
-                                width: column.explodeWidth ? "100%" : "auto",
+                                width: width,
                                 minWidth: minWidth,
                                 maxWidth: maxWidth,
                               },

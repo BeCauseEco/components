@@ -3,6 +3,7 @@ export enum Size {
   Xsmall = "8px",
   Small = "12px",
   Medium = "16px",
+  MediumLarge = "20px",
   Large = "24px",
   XLarge = "32px",
   XXLarge = "40px",
