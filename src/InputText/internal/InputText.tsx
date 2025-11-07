@@ -159,11 +159,14 @@ const StackWidthOverride = styled(Stack)<Pick<InputTextProps, "size" | "rows" | 
   flexShrink: 0,
 }))
 
-const OuterContainer = styled.div({
+const OuterContainer = styled.div<Pick<InputTextProps, "size" | "rows" | "width">>(p => ({
   position: "relative",
   display: "flex",
   flexDirection: "column",
-})
+  width: calculateWidth(p["rows"], p["width"], p["size"]),
+  minWidth: calculateWidth(p["rows"], p["width"], p["size"]),
+  flexShrink: 0,
+}))
 
 const DropdownContainer = styled.div<Pick<InputTextProps, "size" | "width">>({
   position: "absolute",
@@ -469,7 +472,7 @@ export const InputText = forwardRef<HTMLInputElement | HTMLTextAreaElement, Inpu
   }
 
   return (
-    <OuterContainer ref={containerRef}>
+    <OuterContainer ref={containerRef} rows={p.rows} width={p.width} size={p.size}>
       <StackWidthOverride
         className={p.className}
         rows={p.rows}
