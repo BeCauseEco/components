@@ -24,6 +24,8 @@ export type InputNumberSingleProps = Pick<
   | "data-playwright-testid"
   | "tooltip"
   | "debounceChanges"
+  | "dropdown"
+  | "onDropdownOpenChange"
 > & {
   borderColor?: ColorWithLightness
   color: Color
@@ -74,6 +76,8 @@ export const InputNumberSingle = forwardRef<HTMLInputElement, InputNumberSingleP
       autoComplete={p.autoComplete}
       name={p.name}
       tooltip={p.tooltip}
+      dropdown={p.dropdown}
+      onDropdownOpenChange={p.onDropdownOpenChange}
     />
   )
 })

@@ -361,7 +361,7 @@ export const MapAutocompleteInput = ({ onPlaceSelect }: PlaceAutocompleteProps) 
           ref={dropdownRef}
           id="predictions-list"
           role="listbox"
-          className="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-md shadow-lg max-h-60 overflow-auto"
+          className="absolute z-50 w-full mt-1 bg-white border border-neutral-200 rounded-md shadow-lg max-h-60 overflow-auto"
         >
           {predictions.map((prediction, index) => (
             <div
@@ -371,13 +371,13 @@ export const MapAutocompleteInput = ({ onPlaceSelect }: PlaceAutocompleteProps) 
               aria-selected={index === selectedIndex}
               className={cn(
                 "px-4 py-2 cursor-pointer transition-colors",
-                index === selectedIndex ? "bg-gray-100" : "hover:bg-gray-50",
+                index === selectedIndex ? "bg-neutral-100" : "hover:bg-neutral-50",
               )}
               onClick={() => handlePredictionClick(prediction)}
               onMouseEnter={() => setSelectedIndex(index)}
             >
-              <div className="text-sm font-medium text-gray-900">{prediction.structured_formatting.main_text}</div>
-              <div className="text-xs text-gray-500">{prediction.structured_formatting.secondary_text}</div>
+              <div className="text-sm font-medium text-neutral-900">{prediction.structured_formatting.main_text}</div>
+              <div className="text-xs text-neutral-500">{prediction.structured_formatting.secondary_text}</div>
             </div>
           ))}
         </div>
