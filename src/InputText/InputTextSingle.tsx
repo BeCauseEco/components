@@ -27,6 +27,8 @@ export type InputTextSingleProps = Pick<
   | "onBlur"
   | "onFocus"
   | "onKeyDown"
+  | "dropdown"
+  | "onDropdownOpenChange"
 > & {
   borderColor?: ColorWithLightness
   color: Color
@@ -76,6 +78,8 @@ export const InputTextSingle = forwardRef<HTMLInputElement, InputTextSingleProps
       onKeyDown={p.onKeyDown}
       startAdornment={p.startAdornment}
       endAdornment={p.endAdornment}
+      dropdown={p.dropdown}
+      onDropdownOpenChange={p.onDropdownOpenChange}
     />
   )
 })

@@ -1,5 +1,5 @@
 import styled from "@emotion/styled"
-import { forwardRef, ReactElement, ReactNode, useId, useState } from "react"
+import React, { forwardRef, ReactElement, ReactNode, useId, useState, useRef, useEffect } from "react"
 import { Color, ColorWithLightness, computeColor } from "@new/Color"
 import { StyleFontFamily, StyleBodySmall, Text, StyleBodyXsmall } from "@new/Text/Text"
 import { Size } from "@new/Size"
@@ -13,6 +13,7 @@ import { InputButtonIconTertiary } from "@new/InputButton/InputButtonIconTertiar
 import { ComponentBaseProps } from "@new/ComponentBaseProps"
 import _debounce from "lodash/debounce"
 import { validateAndFormatNumber } from "@new/InputText/internal/numberUtils"
+import { Popover } from "@new/Popover/Popover"
 
 export type InputTextProps = ComponentBaseProps & {
   type: "text" | "date" | "email" | "password" | "number"
@@ -63,6 +64,9 @@ export type InputTextProps = ComponentBaseProps & {
   onBlur?: (event: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>) => void
   onFocus?: (event: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>) => void
   onKeyDown?: (event: React.KeyboardEvent<HTMLInputElement | HTMLTextAreaElement>) => void
+
+  dropdown?: ReactNode
+  onDropdownOpenChange?: (open: boolean) => void
 }
 
 export type NumberInputSettings = {
@@ -156,6 +160,21 @@ const StackWidthOverride = styled(Stack)<Pick<InputTextProps, "size" | "rows" | 
   flexShrink: 0,
 }))
 
+const OuterContainer = styled.div({
+  position: "relative",
+  display: "flex",
+  flexDirection: "column",
+})
+
+const DropdownContainer = styled.div<Pick<InputTextProps, "size" | "width">>(p => ({
+  position: "absolute",
+  top: "100%",
+  left: 0,
+  marginTop: "calc(var(--BU) * 1)",
+  zIndex: 1000,
+  width: "100%",
+}))
+
 const Label = styled.label({
   display: "flex",
   cursor: "pointer",
@@ -173,7 +192,30 @@ export const InputText = forwardRef<HTMLInputElement | HTMLTextAreaElement, Inpu
   const generatedId = useId()
   const id = p.id ?? generatedId
 
-  const [focusCapture, setFocusCapture] = useState(false)
+  const [hasFocus, setHasFocus] = useState<boolean>(false)
+  const [dropdownOpen, setDropdownOpen] = useState<boolean>(false)
+  const dropdownRef = useRef<HTMLDivElement>(null)
+  const containerRef = useRef<HTMLDivElement>(null)
+
+  // Handle click outside to close dropdown
+  useEffect(() => {
+    if (!p.dropdown || !dropdownOpen) return
+
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node) &&
+        containerRef.current &&
+        !containerRef.current.contains(event.target as Node)
+      ) {
+        setDropdownOpen(false)
+        p.onDropdownOpenChange?.(false)
+      }
+    }
+
+    document.addEventListener("mousedown", handleClickOutside)
+    return () => document.removeEventListener("mousedown", handleClickOutside)
+  }, [p.dropdown, dropdownOpen, p.onDropdownOpenChange])
 
   let labelInside: ReactElement<AlignProps> = <></>
   let labelOutside: ReactElement<AlignProps> = <></>
@@ -426,114 +468,133 @@ export const InputText = forwardRef<HTMLInputElement | HTMLTextAreaElement, Inpu
   }
 
   return (
-    <StackWidthOverride
-      className={p.className}
-      rows={p.rows}
-      width={p.width}
-      size={p.size}
-      vertical
-      hug
-      data-playwright-testid={p["data-playwright-testid"]}
-    >
-      {labelOutside}
+    <OuterContainer ref={containerRef}>
+      <StackWidthOverride
+        className={p.className}
+        rows={p.rows}
+        width={p.width}
+        size={p.size}
+        vertical
+        hug
+        data-playwright-testid={p["data-playwright-testid"]}
+      >
+        {labelOutside}
 
-      {hintOutside}
+        {hintOutside}
 
-      <Align horizontal left>
-        <Stack
-          horizontal
-          stroke={strokeColor}
-          strokeHover={
-            p.disabled
-              ? [p.color, 100]
-              : focusCapture
-                ? [p.error ? Color.Error : p.color, 700]
-                : [p.error ? Color.Error : p.color, 700]
-          }
-          fill={p.disabled ? [p.color, 50] : [focusCapture ? (p.error ? Color.Error : p.color) : Color.White, 50]}
-          cornerRadius="medium"
-          disabled={p.disabled ? true : undefined}
-          loading={p.loading ? true : undefined}
-          fillLoading={[p.color, 700]}
-          hug
-        >
-          {labelInside}
+        <Align horizontal left>
+          <Stack
+            horizontal
+            stroke={strokeColor}
+            strokeHover={
+              p.disabled
+                ? [p.color, 100]
+                : hasFocus
+                  ? [p.error ? Color.Error : p.color, 700]
+                  : [p.error ? Color.Error : p.color, 700]
+            }
+            fill={p.disabled ? [p.color, 50] : [hasFocus ? (p.error ? Color.Error : p.color) : Color.White, 50]}
+            cornerRadius="medium"
+            disabled={p.disabled ? true : undefined}
+            loading={p.loading ? true : undefined}
+            fillLoading={[p.color, 700]}
+            hug
+          >
+            {labelInside}
 
-          {iconStart}
+            {iconStart}
 
-          <Align horizontal left>
-            <Output
-              // @ts-expect-error TypeScript can't infer the type of the `ref` prop when using as="...".
-              ref={ref}
-              as={p.rows === 1 ? "input" : "textarea"}
-              type={p.type}
-              id={id}
-              name={p.name}
-              value={internalValue}
-              rows={p.rows || 1}
-              color={p.error ? Color.Error : p.color}
-              size={p.size}
-              focus={focusCapture}
-              placeholder={p.placeholder}
-              onFocusCapture={() => setFocusCapture(true)}
-              onBlur={event => {
-                setFocusCapture(false)
-                p.onBlur?.(event as React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>)
-              }}
-              onFocus={event => {
-                p.onFocus?.(event as React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>)
-              }}
-              onKeyDown={event => {
-                p.onKeyDown?.(event as React.KeyboardEvent<HTMLInputElement | HTMLTextAreaElement>)
-              }}
-              width={p.width}
-              min={p.type === "date" ? p.dateMin : undefined}
-              max={p.type === "date" ? p.dateMax : undefined}
-              autoComplete={p.autoComplete ?? "one-time-code"}
-              onChange={event => {
-                onChange(event?.target?.["value"])
-              }}
-            />
-          </Align>
-
-          {p.rows === 1 && p.type !== "date" ? (
-            <Align horizontal center hug="width">
-              <InputButton
-                variant="blank"
-                width="auto"
+            <Align horizontal left>
+              <Output
+                // @ts-expect-error TypeScript can't infer the type of the `ref` prop when using as="...".
+                ref={ref}
+                as={p.rows === 1 ? "input" : "textarea"}
+                type={p.type}
+                id={id}
+                name={p.name}
+                value={internalValue}
+                rows={p.rows || 1}
+                color={p.error ? Color.Error : p.color}
                 size={p.size}
-                colorForeground={internalValue ? [p.color, 700] : [Color.Transparent]}
-                iconName="clear"
-                iconPlacement="labelNotSpecified"
-                tabIndex={-1}
-                onClick={() => {
-                  onChange("")
+                focus={hasFocus}
+                placeholder={p.placeholder}
+                onFocusCapture={() => {
+                  setHasFocus(true)
+                  if (p.dropdown && !p.disabled) {
+                    setDropdownOpen(true)
+                    p.onDropdownOpenChange?.(true)
+                  }
+                }}
+                onBlur={event => {
+                  setHasFocus(false)
+                  p.onBlur?.(event as React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>)
+                }}
+                onFocus={event => {
+                  p.onFocus?.(event as React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>)
+                }}
+                onKeyDown={event => {
+                  if (event.key === "Escape" && p.dropdown && dropdownOpen) {
+                    event.preventDefault()
+                    setDropdownOpen(false)
+                    p.onDropdownOpenChange?.(false)
+                  }
+                  p.onKeyDown?.(event as React.KeyboardEvent<HTMLInputElement | HTMLTextAreaElement>)
+                }}
+                width={p.width}
+                min={p.type === "date" ? p.dateMin : undefined}
+                max={p.type === "date" ? p.dateMax : undefined}
+                autoComplete={p.autoComplete ?? "one-time-code"}
+                onChange={event => {
+                  onChange(event?.target?.["value"])
                 }}
               />
             </Align>
-          ) : (
-            <></>
-          )}
 
-          {p.iconNameRight || p.endAdornment ? (
-            <>
-              <Align vertical center hug="width">
-                <Divider vertical fill={internalValue ? [p.color, 300] : [Color.Transparent]} overrideHeight="50%" />
+            {p.rows === 1 && p.type !== "date" ? (
+              <Align horizontal center hug="width">
+                <InputButton
+                  variant="blank"
+                  width="auto"
+                  size={p.size}
+                  colorForeground={internalValue ? [p.color, 700] : [Color.Transparent]}
+                  iconName="clear"
+                  iconPlacement="labelNotSpecified"
+                  tabIndex={-1}
+                  onClick={() => {
+                    onChange("")
+                  }}
+                />
               </Align>
+            ) : (
+              <></>
+            )}
 
-              <Spacer xsmall={p.size === "small"} small={p.size === "large"} />
-            </>
-          ) : (
-            <></>
-          )}
+            {p.iconNameRight || p.endAdornment ? (
+              <>
+                <Align vertical center hug="width">
+                  <Divider vertical fill={internalValue ? [p.color, 300] : [Color.Transparent]} overrideHeight="50%" />
+                </Align>
 
-          {iconEnd}
-        </Stack>
-      </Align>
+                <Spacer xsmall={p.size === "small"} small={p.size === "large"} />
+              </>
+            ) : (
+              <></>
+            )}
 
-      {errorEitherSide}
+            {iconEnd}
+          </Stack>
+        </Align>
 
-      {hintInside}
-    </StackWidthOverride>
+        {errorEitherSide}
+
+        {hintInside}
+      </StackWidthOverride>
+
+      {p.dropdown && dropdownOpen && (
+        <DropdownContainer ref={dropdownRef} size={p.size} width={p.width}>
+          {p.dropdown}
+        </DropdownContainer>
+      )}
+    </OuterContainer>
   )
 })

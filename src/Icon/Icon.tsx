@@ -20,6 +20,10 @@ const computeSize = (p: IconProps) => {
     size = "24px"
   }
 
+  if (p.xLarge) {
+    size = "36px"
+  }
+
   if (p.huge) {
     size = "48px"
   }
@@ -74,6 +78,7 @@ export type IconProps = PlaywrightProps & {
   small?: boolean
   medium?: boolean
   large?: boolean
+  xLarge?: boolean
 
   huge?: boolean
 
