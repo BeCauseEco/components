@@ -13,7 +13,6 @@ import { InputButtonIconTertiary } from "@new/InputButton/InputButtonIconTertiar
 import { ComponentBaseProps } from "@new/ComponentBaseProps"
 import _debounce from "lodash/debounce"
 import { validateAndFormatNumber } from "@new/InputText/internal/numberUtils"
-import { Popover } from "@new/Popover/Popover"
 
 export type InputTextProps = ComponentBaseProps & {
   type: "text" | "date" | "email" | "password" | "number"
@@ -166,14 +165,14 @@ const OuterContainer = styled.div({
   flexDirection: "column",
 })
 
-const DropdownContainer = styled.div<Pick<InputTextProps, "size" | "width">>(p => ({
+const DropdownContainer = styled.div<Pick<InputTextProps, "size" | "width">>({
   position: "absolute",
   top: "100%",
   left: 0,
   marginTop: "calc(var(--BU) * 1)",
   zIndex: 1000,
   width: "100%",
-}))
+})
 
 const Label = styled.label({
   display: "flex",
@@ -199,7 +198,9 @@ export const InputText = forwardRef<HTMLInputElement | HTMLTextAreaElement, Inpu
 
   // Handle click outside to close dropdown
   useEffect(() => {
-    if (!p.dropdown || !dropdownOpen) return
+    if (!p.dropdown || !dropdownOpen) {
+      return
+    }
 
     const handleClickOutside = (event: MouseEvent) => {
       if (
