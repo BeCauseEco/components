@@ -14,12 +14,21 @@ const ContentStart = styled.div({
   flexDirection: "row",
   justifyContent: "space-between",
   padding: "calc(var(--BU) * 4)",
+  width: "100%",
 })
 
 const ContentStartContent = styled.div({
   display: "flex",
   flexDirection: "row",
   alignItems: "center",
+  width: "100%",
+})
+
+const CloseIconContainer = styled.div({
+  display: "flex",
+  flexDirection: "row",
+  alignItems: "center",
+  width: "100%",
 })
 
 const ContentMiddle = styled.div({
@@ -70,10 +79,9 @@ export const LayoutDialog = ({
 }: TLayoutDialog) => {
   return (
     <Container className="layout-container" data-playwright-testid={p["data-playwright-testid"]}>
+      {buttonClose && <CloseIconContainer>{buttonClose}</CloseIconContainer>}
       <ContentStart>
         <ContentStartContent>{contentStart}</ContentStartContent>
-
-        <ContentStartContent>{buttonClose}</ContentStartContent>
       </ContentStart>
 
       <ContentMiddle>{contentMiddle}</ContentMiddle>

@@ -114,6 +114,7 @@ const TitleAndDescription = styled.div({
   display: "flex",
   flexDirection: "column",
   justifyContent: "center",
+  width: "100%",
 })
 
 export type TDialog = PlaywrightProps & {
