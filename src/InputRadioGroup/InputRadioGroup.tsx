@@ -80,7 +80,7 @@ export const InputRadioGroup = (p: InputRadioGroupProps) => {
             <Spacer tiny={p.size === "small"} xsmall={p.size === "large"} />
 
             <Label htmlFor={child.props.value}>
-              <Text xsmall={p.size === "small"} small={p.size !== "small"} fill={[p.color, 700]}>
+              <Text xsmall={p.size === "small"} small={p.size !== "small"} fill={[Color.Neutral, 700]}>
                 {child.props.label}
               </Text>
             </Label>
@@ -97,7 +97,7 @@ export const InputRadioGroup = (p: InputRadioGroupProps) => {
       vertical
       data-playwright-testid={p["data-playwright-testid"]}
       hug
-      className="<InputRadioGroup /> -"
+      className="tw <InputRadioGroup /> -"
       disabled={p.disabled ? true : undefined}
     >
       {p.label ? (
@@ -132,11 +132,7 @@ export const InputRadioGroup = (p: InputRadioGroupProps) => {
           onValueChange={p.onChange}
           data-playwright-test-id={p["data-playwright-testid"]}
         >
-          <Stack vertical hug>
-            <Align vertical left hug>
-              {items}
-            </Align>
-          </Stack>
+          <div className={"flex flex-col gap-2"}>{items}</div>
         </Root>
       </Align>
     </Stack>

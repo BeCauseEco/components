@@ -32,24 +32,10 @@ const computeSize = (p: IconProps) => {
 }
 
 const computeStyle = (p: IconProps) => {
-  return p.style === "outlined" ? "0" : "1"
+  return p.style === "filled" ? "1" : "0"
 }
 
 const computeFontVariantSettings = (p: IconProps) => {
-  // let w = [Size.Large, Size.Huge].includes(p.size) ? "700" : "600"
-
-  // const g = [Size.Large, Size.Huge].includes(p.size) ? "0" : "-25"
-
-  // switch (p.weight) {
-  //   case EWeight.Light:
-  //     w = "200"
-  //     break
-
-  //   case EWeight.Heavy:
-  //     w = "900"
-  //     break
-  // }
-
   const w = "600"
   const g = "0"
 
@@ -82,7 +68,7 @@ export type IconProps = PlaywrightProps & {
 
   huge?: boolean
 
-  style?: "filled" | "outlined" | "rounded" | "twotone" | "sharp"
+  style?: "filled" | "outlined"
 
   // TODO: @cllpse: fix it
   // eslint-disable-next-line

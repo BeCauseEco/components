@@ -68,11 +68,17 @@ export const InputCheckbox = (p: InputCheckboxProps) => {
                 name={p.alternateAppearance ? "radio_button_partial" : "indeterminate_check_box"}
                 large
                 fill={[p.color, 700]}
+                style={"filled"}
               />
             )}
 
             {p.value === true && (
-              <Icon name={p.alternateAppearance ? "radio_button_checked" : "check_box"} large fill={[p.color, 700]} />
+              <Icon
+                name={p.alternateAppearance ? "radio_button_checked" : "check_box"}
+                large
+                fill={[p.color, 700]}
+                style={"filled"}
+              />
             )}
 
             {p.value === false && (
