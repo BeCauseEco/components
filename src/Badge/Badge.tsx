@@ -56,6 +56,7 @@ export const Badge = (p: BadgeProps) => {
           fill={[p.color, p.variant === "solid" ? 50 : 700]}
           small={p.size === "small"}
           medium={p.size === "large"}
+          style={"filled"} //This is only to not break compatibility with other areas using the Badge component, e.g. the circle-icon as that is not ideal in outlined mode.
         />
 
         <Spacer tiny={p.size === "small"} xsmall={p.size === "large"} />
