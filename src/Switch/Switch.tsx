@@ -10,13 +10,15 @@ import { PlaywrightProps } from "@new/Playwright"
 import { Icon } from "@new/Icon/Icon"
 import { Spacer } from "@new/Stack/Spacer"
 
-const Container = styled.div({
+const Container = styled.div<{ disabled?: boolean }>(p => ({
   display: "flex",
+  opacity: p.disabled ? 0.5 : 1,
+  pointerEvents: p.disabled ? "none" : "auto",
 
   "& > button": {
     all: "unset",
   },
-})
+}))
 
 const SwitchRoot = styled(RadixSwitch.Root)<Pick<TSwitch, "colorBackground" | "colorValueTrue">>(p => ({
   display: "flex",
@@ -52,11 +54,11 @@ const SwitchThumb = styled(RadixSwitch.Thumb)<Pick<TSwitch, "colorForeground">>(
   },
 }))
 
-const Label = styled.label({
+const Label = styled.label<{ disabled?: boolean }>(p => ({
   display: "flex",
   userSelect: "none",
-  cursor: "pointer",
-})
+  cursor: p.disabled ? "not-allowed" : "pointer",
+}))
 
 export type TSwitch = PlaywrightProps & {
   value: boolean
@@ -66,13 +68,14 @@ export type TSwitch = PlaywrightProps & {
   colorValueTrue: Color
   label?: ReactElement<TextProps>
   tooltip?: string
+  disabled?: boolean
 }
 
 export const Switch = (p: TSwitch) => {
   const key = useId()
 
   return (
-    <Container data-playwright-testid={p["data-playwright-testid"]}>
+    <Container data-playwright-testid={p["data-playwright-testid"]} disabled={p.disabled}>
       <KeyValuePair direction={EDirection.Horizontal} spacing={Size.Xsmall}>
         <SwitchRoot
           id={key}
@@ -80,11 +83,12 @@ export const Switch = (p: TSwitch) => {
           onCheckedChange={value => p.onChange(value)}
           colorBackground={p.colorBackground}
           colorValueTrue={p.colorValueTrue}
+          disabled={p.disabled}
         >
           <SwitchThumb colorForeground={p.colorForeground} />
         </SwitchRoot>
 
-        <Label htmlFor={key}>
+        <Label htmlFor={key} disabled={p.disabled}>
           {p.label}
 
           {p.tooltip && (
