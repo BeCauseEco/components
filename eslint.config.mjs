@@ -47,6 +47,7 @@ export default defineConfig([
 
     rules: {
       ...typescriptEslint.configs.recommended.rules,
+      "no-undef": "off", // TypeScript handles undefined variable checking
       eqeqeq: "warn",
       "no-console": "warn",
       curly: "error",
