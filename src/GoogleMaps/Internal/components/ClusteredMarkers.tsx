@@ -1,4 +1,4 @@
-import React, { useCallback } from "react"
+import React, { useCallback, useMemo } from "react"
 import Supercluster, { ClusterProperties } from "supercluster"
 import { Feature, FeatureCollection, GeoJsonProperties, Point } from "geojson"
 import { useSupercluster } from "@new/GoogleMaps/Internal/hooks/useMapboxSupercluster"
@@ -17,21 +17,19 @@ type ClusteredMarkersProps = {
   ) => void
 }
 
-//These numbers are taken from the examples in this project:
-//https://github.com/visgl/react-google-maps
-const superclusterOptions: Supercluster.Options<GeoJsonProperties, ClusterProperties> = {
-  extent: 256,
-  radius: 80,
-  maxZoom: 12,
-  minPoints: null,
-}
-
 export const ClusteredMarkers = ({ geojson, disallowClustering, setInfoWindowData }: ClusteredMarkersProps) => {
-  if (disallowClustering) {
-    superclusterOptions["minPoints"] = Number.MAX_VALUE
-  } else {
-    superclusterOptions["minPoints"] = null
-  }
+  // These numbers are taken from the examples in this project:
+  // https://github.com/visgl/react-google-maps
+  const superclusterOptions = useMemo<Supercluster.Options<GeoJsonProperties, ClusterProperties>>(
+    () => ({
+      extent: 256,
+      radius: 80,
+      maxZoom: 12,
+      minPoints: disallowClustering ? Number.MAX_VALUE : null,
+    }),
+    [disallowClustering],
+  )
+
   const { clusters } = useSupercluster(geojson, superclusterOptions)
 
   const handleMarkerClick = useCallback(

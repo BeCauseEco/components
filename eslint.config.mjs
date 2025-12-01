@@ -1,50 +1,37 @@
 import { defineConfig, globalIgnores } from "eslint/config"
 import prettier from "eslint-plugin-prettier"
-import react from "eslint-plugin-react"
-import typescriptEslint from "@typescript-eslint/eslint-plugin"
 import jsonFiles from "eslint-plugin-json-files"
 import globals from "globals"
-import path from "node:path"
-import { fileURLToPath } from "node:url"
 import js from "@eslint/js"
-import { FlatCompat } from "@eslint/eslintrc"
+import tsParser from "@typescript-eslint/parser"
+import nextConfig from "eslint-config-next"
 
-const __filename = fileURLToPath(import.meta.url)
-const __dirname = path.dirname(__filename)
-const compat = new FlatCompat({
-  baseDirectory: __dirname,
-  recommendedConfig: js.configs.recommended,
-  allConfig: js.configs.all,
-})
+// Extract the @typescript-eslint plugin from eslint-config-next to avoid version conflicts
+// eslint-config-next bundles its own version, and we must use the same instance
+const typescriptEslint = nextConfig[1].plugins["@typescript-eslint"]
 
 export default defineConfig([
   globalIgnores(["**/sentry.properties", "**/node_modules"]),
+  js.configs.recommended,
+  ...nextConfig,
   {
-    extends: compat.extends(
-      "next",
-      "eslint:recommended",
-      "plugin:react/recommended",
-      "plugin:prettier/recommended",
-      "plugin:@typescript-eslint/recommended",
-    ),
+    files: ["**/*.{js,jsx,ts,tsx}"],
 
     plugins: {
       prettier,
-      react,
-      "@typescript-eslint": typescriptEslint,
       "json-files": jsonFiles,
+      "@typescript-eslint": typescriptEslint,
     },
 
     languageOptions: {
+      parser: tsParser,
       globals: {
         ...globals.browser,
         ...globals.node,
         ...globals.jest,
       },
-
       ecmaVersion: "latest",
       sourceType: "module",
-
       parserOptions: {
         ecmaFeatures: {
           jsx: true,
@@ -53,36 +40,44 @@ export default defineConfig([
     },
 
     settings: {
-      "@emotion/jsx-import": "error",
-      "@emotion/no-vanilla": "error",
-      "@emotion/import-from-emotion": "error",
-      "@emotion/styled-import": "error",
+      react: {
+        version: "detect",
+      },
     },
 
     rules: {
+      // Include TypeScript recommended rules
+      ...typescriptEslint.configs.recommended.rules,
+
+      // ESLint core rules - disabled because TypeScript handles these
+      "no-undef": "off",
+      "no-unused-vars": "off",
+
+      // ESLint core rules
       eqeqeq: "warn",
-      "no-console": "warn",
+      "no-console": "off",
       curly: "error",
+      "no-case-declarations": "warn",
 
-      "prettier/prettier": [
-        "error",
-        {
-          endOfLine: "auto",
-        },
-      ],
+      // Prettier
+      "prettier/prettier": ["error", { endOfLine: "auto" }],
 
+      // React overrides
       "react/no-children-prop": "off",
       "react/react-in-jsx-scope": "off",
-      "@next/next/no-document-import-in-page": "off",
       "react/display-name": "off",
+      "react/prop-types": "off",
+
+      // Next.js overrides
+      "@next/next/no-document-import-in-page": "off",
+
+      // TypeScript overrides
       "@typescript-eslint/no-explicit-any": "warn",
       "@typescript-eslint/no-empty-object-type": "warn",
       "@typescript-eslint/no-unsafe-function-type": "warn",
       "@typescript-eslint/no-wrapper-object-types": "warn",
       "@typescript-eslint/ban-ts-comment": "warn",
-      "@typescript-eslint/prefer-ts-expect-error": "warn",
-      "import/no-anonymous-default-export": "off",
-      "no-case-declarations": "warn",
+      "@typescript-eslint/no-unused-vars": "warn",
     },
   },
 ])
