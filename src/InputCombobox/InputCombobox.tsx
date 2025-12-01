@@ -126,14 +126,12 @@ export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<InputC
     return output
   }, [p.children])
 
-  useEffect(() => {
-    const newItems = Object.keys(items)
-
-    setFilteredValues(newItems)
-  }, [items])
+  // Derive filtered values: when no search, show all items; otherwise use filteredValues state
+  const allItemKeys = useMemo(() => Object.keys(items), [items])
+  const effectiveFilteredValues = search === "" ? allItemKeys : filteredValues
 
   const filteredItems = useMemo(() => {
-    const filteredItemIdsSet = new Set(filteredValues)
+    const filteredItemIdsSet = new Set(effectiveFilteredValues)
 
     const itemsList = Object.entries(items)
       .filter(([id]) => filteredItemIdsSet.has(id))
@@ -145,7 +143,7 @@ export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<InputC
     }
 
     return itemsList
-  }, [filteredValues, items, p.sortAlphabetically])
+  }, [effectiveFilteredValues, items, p.sortAlphabetically])
 
   //Grouping logic created with claude code
   const groupedItems = useMemo(() => {
@@ -226,9 +224,9 @@ export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<InputC
 
   const filterResults = useCallback(
     (value: string) => {
+      // When value is empty, effectiveFilteredValues will use allItemKeys directly
+      // so we only need to compute filtered results for non-empty searches
       if (value === "") {
-        setFilteredValues(Object.keys(items))
-
         return
       }
 
