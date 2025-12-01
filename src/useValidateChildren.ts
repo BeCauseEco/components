@@ -2,7 +2,7 @@ import { CSSObject } from "@emotion/react"
 import React, { Children, ReactNode, useEffect, useState } from "react"
 import { ReactElement } from "react"
 
-type Children = ReactNode | ReactElement | ReactNode[] | ReactElement[]
+type ChildrenType = ReactNode | ReactElement | ReactNode[] | ReactElement[]
 
 type InvalidChildren = string[]
 
@@ -37,7 +37,7 @@ export const generateErrorStyles = (invalidChildren: InvalidChildren): ValidateC
 export const generateErrorClassName = (invalidChildren: InvalidChildren): string =>
   invalidChildren.length ? ` *** INVALID CHILDREN: ${invalidChildren.join(", ")} ***` : ""
 
-const getComponentName = (parentTypeName: string, child: Children): string | undefined => {
+const getComponentName = (parentTypeName: string, child: ChildrenType): string | undefined => {
   const isReactElement = child?.["$$typeof"]?.toString() === "Symbol(react.element)"
   const typeName = child?.["type"]?.["name"]
   const type = child?.["type"]
@@ -69,7 +69,7 @@ const getComponentName = (parentTypeName: string, child: Children): string | und
   return undefined
 }
 
-const getComponentTypeNames = (parentTypeName, children: Children): string[] => {
+const getComponentTypeNames = (parentTypeName, children: ChildrenType): string[] => {
   const r: string[] = []
   const c = Array.isArray(children) ? children : [children]
 
@@ -96,7 +96,7 @@ export const useValidateChildren = (
   parentTypeName: string,
   allowedTypeNames: string[],
   disallowedTypeNames: string[],
-  children: Children,
+  children: ChildrenType,
 ): [InvalidChildren] => {
   const [state, setState] = useState<InvalidChildren>([])
 

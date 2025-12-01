@@ -46,25 +46,38 @@ export default defineConfig([
     },
 
     rules: {
+      // Include TypeScript recommended rules
       ...typescriptEslint.configs.recommended.rules,
-      "no-undef": "off", // TypeScript handles undefined variable checking
+
+      // ESLint core rules - disabled because TypeScript handles these
+      "no-undef": "off",
+      "no-unused-vars": "off",
+
+      // ESLint core rules
       eqeqeq: "warn",
-      "no-console": "warn",
+      "no-console": "off",
       curly: "error",
+      "no-case-declarations": "warn",
+
+      // Prettier
       "prettier/prettier": ["error", { endOfLine: "auto" }],
+
+      // React overrides
       "react/no-children-prop": "off",
       "react/react-in-jsx-scope": "off",
       "react/display-name": "off",
       "react/prop-types": "off",
+
+      // Next.js overrides
       "@next/next/no-document-import-in-page": "off",
+
+      // TypeScript overrides
       "@typescript-eslint/no-explicit-any": "warn",
       "@typescript-eslint/no-empty-object-type": "warn",
       "@typescript-eslint/no-unsafe-function-type": "warn",
       "@typescript-eslint/no-wrapper-object-types": "warn",
       "@typescript-eslint/ban-ts-comment": "warn",
       "@typescript-eslint/no-unused-vars": "warn",
-      "no-unused-vars": "off",
-      "no-case-declarations": "warn",
     },
   },
 ])
