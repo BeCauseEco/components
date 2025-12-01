@@ -115,11 +115,8 @@ export const useValidateChildren = (
       }
 
       if (invalidChildren.length > 0) {
-        // eslint-disable-next-line no-console
         console.groupCollapsed(`⚠️ <${parentTypeName} /> contains invalid children: ${invalidChildren.join(", ")}`)
-        // eslint-disable-next-line no-console
         console.trace()
-        // eslint-disable-next-line no-console
         console.groupEnd()
       }
 
