@@ -1,4 +1,4 @@
-import { ReactElement } from "react"
+import { ReactElement, ReactNode } from "react"
 import { SortDirection } from "ka-table"
 import { ICellTextProps } from "ka-table/props"
 import { AlignProps } from "@new/Stack/Align"
@@ -206,7 +206,7 @@ export type DataTableProps<TData = any> = PlaywrightProps & {
   onChangeRow?: (value: TData) => void
   fill?: ColorWithLightness
   stroke?: ColorWithLightness
-  children?: Children | Children[]
+  children?: ReactNode
   editingMode?: EditingMode
   cellPaddingSize?: "none" | "tiny" | "xsmall" | "small" | "medium"
   textSize?: "xxtiny" | "xtiny" | "tiny" | "xsmall" | "small" | "medium" | "large"
