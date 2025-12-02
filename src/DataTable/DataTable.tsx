@@ -108,7 +108,7 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
           const duration = endTime - startTime
           if (duration > 16) {
             // Log if render takes more than one frame (16ms)
-            console.log(`⚡ DataTable ${label}: ${duration.toFixed(2)}ms`)
+            console.debug(`⚡ DataTable ${label}: ${duration.toFixed(2)}ms`)
           }
         }
       }
