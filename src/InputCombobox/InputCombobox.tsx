@@ -80,6 +80,13 @@ export type InputComboboxProps = ComponentBaseProps & {
   }
 
   tooltip?: string
+
+  /**
+   * When true, renders the popover dropdown within the component's container instead of at the document root.
+   * Use this when the combobox is inside a modal, dialog, or other overlay component to ensure proper stacking context.
+   * Default behavior (false) renders the popover at document root for better positioning in most cases.
+   */
+  renderPopoverInParentContainer?: boolean
 }
 
 export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<InputComboboxProps>>((p, ref) => {
@@ -87,6 +94,7 @@ export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<InputC
   const [search, setSearch] = useState("")
   const [filteredValues, setFilteredValues] = useState<string[]>([])
   const [containerWidth, setContainerWidth] = useState<number | undefined>(undefined)
+  const [mountedContainer, setMountedContainer] = useState<HTMLDivElement | null>(null)
 
   const containerRef = useRef<HTMLDivElement>(null)
 
@@ -102,6 +110,7 @@ export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<InputC
   const mergedRef = useCallback(
     (node: HTMLDivElement | null) => {
       containerRef.current = node
+      setMountedContainer(node)
 
       if (typeof ref === "function") {
         ref(node)
@@ -300,6 +309,7 @@ export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<InputC
         alignment="start"
         open={p.disabled || p.loading ? false : open}
         onOpenChange={p.disabled || p.loading ? () => {} : setOpen}
+        container={p.renderPopoverInParentContainer ? mountedContainer || undefined : undefined}
         trigger={
           <InputButton
             size={p.size}

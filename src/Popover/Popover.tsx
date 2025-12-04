@@ -18,6 +18,8 @@ export type PopoverProps = ComponentBaseProps & {
   onOpenChange?: (value: boolean) => void
 
   children: ReactElement<AlignProps>
+
+  container?: HTMLElement
 }
 
 const slideUpAndFade = keyframes({
@@ -85,7 +87,7 @@ export const Popover = (p: PopoverProps) => {
     <Root open={p.open} onOpenChange={p.onOpenChange}>
       <RadixPopover.Trigger asChild>{p.trigger}</RadixPopover.Trigger>
 
-      <RadixPopover.Portal>
+      <RadixPopover.Portal container={p.container}>
         <Content
           // @ts-expect-error Radix doesn't expose a type for this
           align={p.alignment}
