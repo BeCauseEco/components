@@ -20,7 +20,7 @@ export type InputTextProps = ComponentBaseProps & {
   size: "small" | "large"
   width: "auto" | "fixed"
 
-  rows: 1 | 2 | 3
+  rows: number
 
   color: Color
 
