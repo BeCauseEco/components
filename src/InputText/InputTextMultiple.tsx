@@ -19,6 +19,7 @@ export type InputTextMultipleProps = Pick<
   | "data-playwright-testid"
 > & {
   color: Color
+  rows?: number
 }
 
 export const InputTextMultiple = forwardRef<HTMLTextAreaElement, InputTextMultipleProps>((p, ref) => {
@@ -37,7 +38,7 @@ export const InputTextMultiple = forwardRef<HTMLTextAreaElement, InputTextMultip
       required={p.required}
       loading={p.loading ? true : undefined}
       onChange={p.onChange}
-      rows={3}
+      rows={p.rows ?? 3}
       disabled={p.disabled ? true : undefined}
       value={p.value}
       data-playwright-testid={p["data-playwright-testid"]}
