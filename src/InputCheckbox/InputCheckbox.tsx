@@ -44,6 +44,9 @@ export type InputCheckboxProps = ComponentBaseProps &
 
     label?: string
 
+    /** Optional secondary text shown below the label in smaller, muted style */
+    sublabel?: string
+
     value: boolean | "indeterminate"
 
     onChange: (value: boolean) => void
@@ -96,24 +99,34 @@ export const InputCheckbox = (p: InputCheckboxProps) => {
               <Spacer tiny={p.size === "small"} xsmall={p.size === "large"} />
 
               <Label htmlFor={key}>
-                <Text
-                  xsmall={p.size === "small"}
-                  small={p.size !== "small"}
-                  fill={[Color.Neutral, 700]}
-                  maxWidth={p.maxWidth}
-                  title={p.label}
-                  textOverflow
-                >
-                  {p.label}
-                </Text>
+                <div className="flex flex-col">
+                  <div className="flex items-center">
+                    <Text
+                      xsmall={p.size === "small"}
+                      small={p.size !== "small"}
+                      fill={[Color.Neutral, 700]}
+                      maxWidth={p.maxWidth}
+                      title={p.label}
+                      textOverflow
+                    >
+                      {p.label}
+                    </Text>
 
-                {p.tooltip && (
-                  <>
-                    <Spacer tiny />
+                    {p.tooltip && (
+                      <>
+                        <Spacer tiny />
 
-                    <Icon name="info" small fill={[p.color, 500]} style="outlined" tooltip={p.tooltip} />
-                  </>
-                )}
+                        <Icon name="info" small fill={[p.color, 500]} style="outlined" tooltip={p.tooltip} />
+                      </>
+                    )}
+                  </div>
+
+                  {p.sublabel && (
+                    <Text tiny fill={[Color.Neutral, 500]} textOverflow title={p.sublabel}>
+                      {p.sublabel}
+                    </Text>
+                  )}
+                </div>
               </Label>
             </>
           )}

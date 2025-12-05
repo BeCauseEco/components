@@ -69,6 +69,7 @@ export const ComboboxItem: React.FC<ComboboxItemProps> = ({
               onChange={checked => onSelectMultiple(item.value, checked)}
               color={Color.Primary}
               label={item.label}
+              sublabel={item.sublabel}
             />
           </Align>
         </Stack>
@@ -83,15 +84,25 @@ export const ComboboxItem: React.FC<ComboboxItemProps> = ({
               </>
             ) : null}
 
-            <Text
-              xsmall={size === "small"}
-              small={size === "large"}
-              fill={[color, 700]}
-              textOverflow
-              title={item.label}
-            >
-              {item.label}
-            </Text>
+            <div className="flex flex-col">
+              <Text
+                xsmall={size === "small"}
+                small={size === "large"}
+                fill={[color, 700]}
+                textOverflow
+                title={item.label}
+              >
+                {item.label}
+              </Text>
+
+              {item.sublabel && (
+                <div className="mt-[2px]">
+                  <Text tiny fill={[Color.Neutral, 500]} textOverflow title={item.sublabel}>
+                    {item.sublabel}
+                  </Text>
+                </div>
+              )}
+            </div>
           </Align>
         </Stack>
       )}

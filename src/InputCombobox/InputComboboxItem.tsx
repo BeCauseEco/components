@@ -6,6 +6,8 @@ export type InputComboboxItemProps = PlaywrightProps & {
   label: string
   /** Optional shorter text shown when the combobox is closed. If not provided, uses label */
   shortLabel?: string
+  /** Optional secondary text shown below the label in the dropdown. Not shown in trigger. */
+  sublabel?: string
   icon?: ReactElement
 
   /**
@@ -25,6 +27,8 @@ export const InputComboboxItem = ({
   label,
   // eslint-disable-next-line
   shortLabel,
+  // eslint-disable-next-line
+  sublabel,
   // eslint-disable-next-line
   icon,
   // eslint-disable-next-line
