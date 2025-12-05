@@ -239,9 +239,12 @@ export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<InputC
         return
       }
 
-      const itemsFiltered = Object.entries(items).filter(([, item]) =>
-        item.label.toLowerCase().includes(value.toLowerCase()),
-      )
+      const searchTerm = value.toLowerCase()
+      const itemsFiltered = Object.entries(items).filter(([, item]) => {
+        const labelMatch = item.label.toLowerCase().includes(searchTerm)
+        const sublabelMatch = item.sublabel?.toLowerCase().includes(searchTerm) ?? false
+        return labelMatch || sublabelMatch
+      })
 
       setFilteredValues(itemsFiltered.map(([key]) => key))
     },
