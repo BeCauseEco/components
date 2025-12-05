@@ -32,6 +32,11 @@ const computeSize = (p: IconProps) => {
 }
 
 const computeStyle = (p: IconProps) => {
+  // Backwards compatibility: when we changed the default style from filled to outlined,
+  // we want to keep the circle icon filled by default to avoid breaking existing usage
+  if (p.name === "circle" && p.style === undefined) {
+    return "1" // filled
+  }
   return p.style === "filled" ? "1" : "0"
 }
 
