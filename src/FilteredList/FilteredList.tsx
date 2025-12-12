@@ -13,7 +13,15 @@ import { FixedSizeList } from "react-window"
 import { FilteredVirtualListItem } from "@new/FilteredList/FilteredVirtualListItem"
 import { PlaywrightProps } from "@new/Playwright"
 
-export type ListItemProps = PlaywrightProps & { value: string; label: string; labelFilter?: string; avatarSrc: string }
+export type ListItemProps = PlaywrightProps & {
+  value: string
+  label: string
+  labelFilter?: string
+  avatarSrc: string
+  subtitle?: string
+  isFavorite?: boolean
+  onToggleFavorite?: () => void
+}
 
 export type FilteredListProps = ComponentBaseProps & {
   color: Color

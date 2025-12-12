@@ -1,10 +1,8 @@
 import React from "react"
 import { Color, ColorWithLightness, computeColor } from "@new/Color"
-import { Stack } from "@new/Stack/Stack"
-import { Align } from "@new/Stack/Align"
 import { Avatar } from "@new/Avatar/Avatar"
-import { Spacer } from "@new/Stack/Spacer"
 import { Text } from "@new/Text/Text"
+import { Icon } from "@new/Icon/Icon"
 import styled from "@emotion/styled"
 import { ListItemProps } from "@new/FilteredList/FilteredList"
 
@@ -54,6 +52,11 @@ export const FilteredVirtualListItem = ({
 
   const isSelected = item.value === data.selectedValue
 
+  const handleFavoriteClick = (e: React.MouseEvent) => {
+    e.stopPropagation()
+    item.onToggleFavorite?.()
+  }
+
   return (
     <div style={style}>
       <VirtualizedItemContainer
@@ -62,19 +65,31 @@ export const FilteredVirtualListItem = ({
         colorBackgroundHover={[data.color, 50]}
         onClick={() => data.onChange(item.value)}
       >
-        <Stack horizontal hug>
-          <Align horizontal left hug>
-            <Avatar size="large" src={item.avatarSrc} title={item.label} />
-          </Align>
+        <div className="flex items-center gap-2">
+          <Avatar size="large" src={item.avatarSrc} title={item.label} />
 
-          <Spacer xsmall />
-
-          <Align horizontal left>
+          <div className="flex flex-1 flex-col">
             <Text small fill={[data.color, 700]}>
               {item.label}
             </Text>
-          </Align>
-        </Stack>
+            {item.subtitle && (
+              <Text tiny fill={[data.color, 500]}>
+                {item.subtitle}
+              </Text>
+            )}
+          </div>
+
+          {item.onToggleFavorite && (
+            <Icon
+              name="favorite"
+              medium
+              fill={item.isFavorite ? [Color.Tertiary, 500] : [data.color, 300]}
+              style={item.isFavorite ? "filled" : "outlined"}
+              onClick={handleFavoriteClick}
+              tooltip={item.isFavorite ? "Remove from favorites" : "Add to favorites"}
+            />
+          )}
+        </div>
       </VirtualizedItemContainer>
     </div>
   )
