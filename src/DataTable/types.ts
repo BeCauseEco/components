@@ -161,6 +161,8 @@ export type Column = {
     filterPlaceholder?: string
     /** Text shown when no results match the search. Providing this will automatically enable filtering */
     filterNoResults?: string
+
+    renderPopoverInParentContainer?: boolean
   }
 
   fill?: ((rowData: ICellTextProps["rowData"]) => Color | undefined) | Color | undefined

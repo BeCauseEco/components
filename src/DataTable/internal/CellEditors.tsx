@@ -131,6 +131,7 @@ export const CellInputCombobox = ({ column, rowKeyValue, value, rowData }: ICell
             }
           : undefined
       }
+      renderPopoverInParentContainer={comboboxOptions?.renderPopoverInParentContainer}
     >
       {rowData.selectableOptions.map(option => (
         <InputComboboxItem
