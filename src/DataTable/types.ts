@@ -162,7 +162,7 @@ export type Column = {
     /** Text shown when no results match the search. Providing this will automatically enable filtering */
     filterNoResults?: string
 
-    renderPopoverInParentContainer?: boolean
+    renderPopoverInParentContainer?: boolean | HTMLElement
   }
 
   fill?: ((rowData: ICellTextProps["rowData"]) => Color | undefined) | Color | undefined
