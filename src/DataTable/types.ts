@@ -112,7 +112,7 @@ export type Column = {
     defaultTrailingDecimals?: number
   }
   dateFormat?: {
-    configure: (value: string | Date, rowData: ICellTextProps["rowData"]) => string
+    configure?: (value: string | Date, rowData: ICellTextProps["rowData"]) => string
     /**
      * Default date format for DataType.Date columns when no custom configure function is provided.
      *
