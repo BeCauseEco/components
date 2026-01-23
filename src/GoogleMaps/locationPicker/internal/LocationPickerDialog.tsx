@@ -35,6 +35,7 @@ export const LocationPickerDialog = ({
 }: LocationPickerDialogProps) => {
   const map = useMap()
   const [markerPosition, setMarkerPosition] = useState(initialLocation)
+  const [selectedLocationData, setSelectedLocationData] = useState<LocationData | null>(null)
   const [locationInfo, setLocationInfo] = useState<{
     name?: string
     street?: string
@@ -94,6 +95,7 @@ export const LocationPickerDialog = ({
         }
         setMarkerPosition(newPosition)
         updateLocationInfo(newPosition)
+        setSelectedLocationData(null)
       }
     },
     [updateLocationInfo],
@@ -117,9 +119,35 @@ export const LocationPickerDialog = ({
         }
         setMarkerPosition(newPosition)
         updateLocationInfo(newPosition)
+        setSelectedLocationData(null)
       }
     },
     [updateLocationInfo],
+  )
+
+  const extractLocationDataFromPlace = useCallback(
+    (place: google.maps.places.PlaceResult, position: { lat: number; lng: number }): LocationData => {
+      const addressComponents = place.address_components || []
+      const getComponent = (type: string) => {
+        const component = addressComponents.find(c => c.types.includes(type))
+        return component?.long_name || ""
+      }
+      const getCountryCodeAlpha2 = () => {
+        const component = addressComponents.find(c => c.types.includes("country"))
+        return component?.short_name || ""
+      }
+
+      return {
+        latitude: position.lat,
+        longitude: position.lng,
+        street: `${getComponent("route")} ${getComponent("street_number")}`.trim(),
+        city: getComponent("locality") || getComponent("postal_town") || "",
+        zipCode: getComponent("postal_code") || "",
+        region: getComponent("administrative_area_level_1") || getComponent("administrative_area_level_2") || "",
+        countryAlpha2: getCountryCodeAlpha2() || "",
+      }
+    },
+    [],
   )
 
   const handlePlaceSelect = useCallback(
@@ -132,13 +160,21 @@ export const LocationPickerDialog = ({
         setMarkerPosition(newPosition)
         map?.setCenter(newPosition)
         updateLocationInfo(newPosition, place)
-        // toast.success("Location set from address search")
+
+        const locationData = extractLocationDataFromPlace(place, newPosition)
+        setSelectedLocationData(locationData)
       }
     },
-    [map, updateLocationInfo],
+    [map, updateLocationInfo, extractLocationDataFromPlace],
   )
 
   const handleConfirm = useCallback(async () => {
+    if (selectedLocationData) {
+      onLocationSelect(selectedLocationData)
+      onOpenChange(false)
+      return
+    }
+
     if (window.google && window.google.maps) {
       const geocoder = new google.maps.Geocoder()
 
@@ -160,10 +196,13 @@ export const LocationPickerDialog = ({
             return component?.short_name || ""
           }
 
+          const routeStreet = `${getComponent("route")} ${getComponent("street_number")}`.trim()
+          const street = routeStreet || getComponent("street_address") || getComponent("premise") || ""
+
           const locationData: LocationData = {
             latitude: markerPosition?.lat,
             longitude: markerPosition?.lng,
-            street: `${getComponent("route")} ${getComponent("street_number")}`.trim(),
+            street,
             city: getComponent("locality") || getComponent("postal_town") || "",
             zipCode: getComponent("postal_code") || "",
             region: getComponent("administrative_area_level_1") || getComponent("administrative_area_level_2") || "",
@@ -183,7 +222,7 @@ export const LocationPickerDialog = ({
     } else {
       onOpenChange(false)
     }
-  }, [markerPosition, onLocationSelect, onOpenChange])
+  }, [selectedLocationData, markerPosition, onLocationSelect, onOpenChange])
 
   if (!googleMapsApiKey) {
     console.error("Google Maps API key is required to display the map.")
