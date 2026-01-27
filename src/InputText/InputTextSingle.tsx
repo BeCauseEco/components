@@ -29,6 +29,7 @@ export type InputTextSingleProps = Pick<
   | "onKeyDown"
   | "dropdown"
   | "onDropdownOpenChange"
+  | "hideClearButton"
 > & {
   borderColor?: ColorWithLightness
   color: Color
@@ -80,6 +81,7 @@ export const InputTextSingle = forwardRef<HTMLInputElement, InputTextSingleProps
       endAdornment={p.endAdornment}
       dropdown={p.dropdown}
       onDropdownOpenChange={p.onDropdownOpenChange}
+      hideClearButton={p.hideClearButton}
     />
   )
 })

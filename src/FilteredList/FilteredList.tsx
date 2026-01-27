@@ -77,7 +77,7 @@ export const FilteredList = ({
 
   return (
     <Container id={id} data-playwright-testid={playwrightTestId} className="<FilteredList /> - ">
-      <Stack vertical data-playwright-testid={playwrightTestId}>
+      <Stack hug vertical data-playwright-testid={playwrightTestId}>
         <Align vertical topLeft>
           <InputTextSingle
             size="large"
