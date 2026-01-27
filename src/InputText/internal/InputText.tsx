@@ -66,6 +66,8 @@ export type InputTextProps = ComponentBaseProps & {
 
   dropdown?: ReactNode
   onDropdownOpenChange?: (open: boolean) => void
+
+  hideClearButton?: boolean
 }
 
 export type NumberInputSettings = {
@@ -554,7 +556,7 @@ export const InputText = forwardRef<HTMLInputElement | HTMLTextAreaElement, Inpu
               />
             </Align>
 
-            {p.rows === 1 && p.type !== "date" ? (
+            {p.rows === 1 && p.type !== "date" && !p.hideClearButton ? (
               <Align horizontal center hug="width">
                 <InputButton
                   variant="blank"
