@@ -58,6 +58,9 @@ export type InputTextProps = ComponentBaseProps & {
   borderColor?: ColorWithLightness
   tooltip?: string
 
+  /** When true, allows the label text to wrap to multiple lines instead of staying on a single line */
+  wrap?: boolean
+
   numberSettings?: NumberInputSettings
 
   onBlur?: (event: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>) => void
@@ -302,9 +305,9 @@ export const InputText = forwardRef<HTMLInputElement | HTMLTextAreaElement, Inpu
 
   if (p.label && p.label[0] === "outside") {
     labelOutside = (
-      <Align vertical left hug="width">
+      <Align vertical left hug={p.wrap ? undefined : "width"}>
         <Label htmlFor={id}>
-          <Text xsmall={p.size === "small"} small={p.size !== "small"} fill={[p.color, 700]}>
+          <Text xsmall={p.size === "small"} small={p.size !== "small"} fill={[p.color, 700]} wrap={p.wrap}>
             <b>{p.label[1]}</b>
           </Text>
 
@@ -351,9 +354,9 @@ export const InputText = forwardRef<HTMLInputElement | HTMLTextAreaElement, Inpu
 
   if (p.label && p.label[0] === "outside-small") {
     labelOutside = (
-      <Align vertical left hug="width">
+      <Align vertical left hug={p.wrap ? undefined : "width"}>
         <Label htmlFor={id}>
-          <Text xsmall fill={[Color.Neutral, 700]}>
+          <Text xsmall fill={[Color.Neutral, 700]} wrap={p.wrap}>
             <b>{p.label[1]}</b>
           </Text>
 

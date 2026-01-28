@@ -14,12 +14,14 @@ export interface ComboboxLabelProps {
   tooltip?: string
   size: "small" | "large"
   color: Color
+  /** When true, allows the label text to wrap to multiple lines instead of staying on a single line */
+  wrap?: boolean
 }
 
 /**
  * Renders the label for the combobox (outside or outside-small variants)
  */
-export const ComboboxLabel: React.FC<ComboboxLabelProps> = ({ label, hint, required, tooltip, size, color }) => {
+export const ComboboxLabel: React.FC<ComboboxLabelProps> = ({ label, hint, required, tooltip, size, color, wrap }) => {
   if (!label || label[0] === "inside") {
     return null
   }
@@ -30,12 +32,13 @@ export const ComboboxLabel: React.FC<ComboboxLabelProps> = ({ label, hint, requi
   return (
     <Stack vertical hug>
       <>
-        <Align vertical left hug="width">
+        <Align vertical left hug={wrap ? undefined : "width"}>
           <Label>
             <Text
               xsmall={isOutsideSmall || size === "small"}
               small={!isOutsideSmall && size !== "small"}
               fill={[labelColor, 700]}
+              wrap={wrap}
             >
               <b>{label[1]}</b>
             </Text>
