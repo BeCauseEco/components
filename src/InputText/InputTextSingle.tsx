@@ -38,6 +38,8 @@ export type InputTextSingleProps = Pick<
   name?: string
   startAdornment?: ReactNode
   endAdornment?: ReactNode
+  /** When true, allows the label text to wrap to multiple lines instead of staying on a single line */
+  labelWrap?: boolean
 }
 
 export const InputTextSingle = forwardRef<HTMLInputElement, InputTextSingleProps>((p, ref) => {
@@ -82,6 +84,7 @@ export const InputTextSingle = forwardRef<HTMLInputElement, InputTextSingleProps
       dropdown={p.dropdown}
       onDropdownOpenChange={p.onDropdownOpenChange}
       hideClearButton={p.hideClearButton}
+      wrap={p.labelWrap}
     />
   )
 })

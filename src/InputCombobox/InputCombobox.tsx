@@ -81,6 +81,9 @@ export type InputComboboxProps = ComponentBaseProps & {
 
   tooltip?: string
 
+  /** When true, allows the label text to wrap to multiple lines instead of staying on a single line */
+  labelWrap?: boolean
+
   /**
    * When true, renders the popover dropdown within the component's container instead of at the document root.
    * Can also accept a ref to a specific container element to render the popover within.
@@ -307,6 +310,7 @@ export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<InputC
         tooltip={p.tooltip}
         size={p.size}
         color={p.color}
+        wrap={p.labelWrap}
       />
 
       <Popover
