@@ -49,6 +49,13 @@ interface PlaceAutocompleteProps {
    * @param place - Selected place with full details from Google Places API
    */
   onPlaceSelect: (place: google.maps.places.PlaceResult) => void
+
+  /**
+   * Optional array of place types to filter autocomplete predictions.
+   * Defaults to ["lodging"] to show only accommodation-related places.
+   * @see https://developers.google.com/maps/documentation/places/web-service/supported_types
+   */
+  types?: string[]
 }
 
 /**
@@ -103,7 +110,7 @@ interface PlaceAutocompleteProps {
  * @param props - Component props
  * @param props.onPlaceSelect - Callback invoked when a place is selected with full details
  */
-export const MapAutocompleteInput = ({ onPlaceSelect }: PlaceAutocompleteProps) => {
+export const MapAutocompleteInput = ({ onPlaceSelect, types }: PlaceAutocompleteProps) => {
   const [inputValue, setInputValue] = useState("")
   const [predictions, setPredictions] = useState<google.maps.places.AutocompletePrediction[]>([])
   const [isOpen, setIsOpen] = useState(false)
@@ -179,10 +186,11 @@ export const MapAutocompleteInput = ({ onPlaceSelect }: PlaceAutocompleteProps) 
     // Increment request ID to handle race conditions
     const currentRequestId = ++requestIdRef.current
 
+    const defaultTypes = ["lodging"]
     autocompleteServiceRef.current.getPlacePredictions(
       {
         input,
-        // Request all types of places for maximum flexibility
+        types: types ?? defaultTypes,
       },
       (results, status) => {
         // Ignore stale responses from earlier requests
@@ -206,7 +214,7 @@ export const MapAutocompleteInput = ({ onPlaceSelect }: PlaceAutocompleteProps) 
         }
       },
     )
-  }, [])
+  }, [types])
 
   /**
    * Handles input change with 300ms debouncing.
