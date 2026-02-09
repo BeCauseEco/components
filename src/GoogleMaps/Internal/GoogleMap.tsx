@@ -18,6 +18,8 @@ export interface GenericGoogleMapProps {
   streetViewControl?: boolean
   cameraControl?: boolean
   mapTypeControl?: boolean //Controls whether user can toggle between e.g. satellite and map view
+  /** Place types to filter autocomplete predictions. Defaults to ["lodging", "establishment", "restaurant"]. */
+  autocompleteTypes?: string[]
 }
 
 export interface MapMarkerTooltipProperties {
@@ -42,6 +44,7 @@ export const GoogleMap = ({
   streetViewControl = true,
   cameraControl = true,
   mapTypeControl = true,
+  autocompleteTypes,
 }: GenericGoogleMapProps) => {
   const [infowindowData, setInfowindowData] = useState<{
     anchor: google.maps.marker.AdvancedMarkerElement
@@ -70,9 +73,9 @@ export const GoogleMap = ({
         <div className={"mb-4"}>
           <MapAutocompleteInput
             onPlaceSelect={pr => {
-              console.log(5666)
               onPlaceSelect(pr)
             }}
+            types={autocompleteTypes}
           />
         </div>
       )}
