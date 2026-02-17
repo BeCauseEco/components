@@ -126,6 +126,13 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
   const [deleteId, setDeleteId] = useState<number | null>(null)
   const [dataTemp, setDataTemp] = useState<TData[]>([])
 
+  // Track active sort state so nativeColumns always reflects the current sort,
+  // preventing ka-table's controlled props sync from resetting user sort on re-renders
+  const [activeSort, setActiveSort] = useState<{ column: string; direction: SortDirection | undefined }>({
+    column: p.defaultSortColumn || "",
+    direction: p.defaultSortDirection,
+  })
+
   // Optimization 2: Memoize selected fields count
   const selectedFields = useMemo(() => {
     if (!p.selectedRows) {
@@ -145,12 +152,12 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
     return p.data.filter(d => !p.disabledRows?.includes(d[p.rowKeyField] as string | number)).length
   }, [p.data, p.disabledRows, p.rowKeyField, p.selectedRows, p.onSelectionChange])
 
-  // Optimization 1: Memoize column processing
+  // Memoize column processing with active sort state to keep ka-table in sync
   const nativeColumns = useMemo(() => {
     const columns = p.columns.map(c => {
       const column = c as Column
 
-      const sortDirection = mode !== "edit" && column.key === p.defaultSortColumn ? p.defaultSortDirection : undefined
+      const sortDirection = mode !== "edit" && column.key === activeSort.column ? activeSort.direction : undefined
 
       return {
         key: column.key,
@@ -199,7 +206,7 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
     }
 
     return columns
-  }, [p.columns, mode, p.editingMode, p.rowActions, p.defaultSortColumn, p.defaultSortDirection])
+  }, [p.columns, mode, p.editingMode, p.rowActions, activeSort])
 
   const updateSelectField = useCallback(
     (key: any, value: boolean) => {
@@ -249,6 +256,20 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
 
   const table = useTable({
     onDispatch: d => {
+      // Track sort state changes so nativeColumns stays in sync with ka-table's internal state.
+      // For SortingMode.Single: Ascend ↔ Descend, clicking a new column starts at Ascend.
+      if (d.type === "UpdateSortDirection") {
+        setActiveSort(prev => {
+          if (d.columnKey === prev.column) {
+            return {
+              column: d.columnKey,
+              direction: prev.direction === SortDirection.Ascend ? SortDirection.Descend : SortDirection.Ascend,
+            }
+          }
+          return { column: d.columnKey, direction: SortDirection.Ascend }
+        })
+      }
+
       const rowKeyValue = d.rowKeyValue
       if (d.type === "ComponentDidMount") {
         if (p.data && p.data.length > 0 && !p.data.some(d => d[p.rowKeyField])) {
