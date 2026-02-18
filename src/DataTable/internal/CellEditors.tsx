@@ -58,8 +58,14 @@ export const CellInputTextSingle = ({ column, rowKeyValue, value, autoFocus }: I
             values.forEach((value, index) => {
               if (columnsFromCurrent[index]) {
                 const normalized = value.replace(/,/g, ".").replace(/[^0-9.-]/g, "")
-                const cellValue = normalized === "" || normalized === "." ? undefined : normalized
-                table.updateCellValue(rowKeyValue, columnsFromCurrent[index].key, cellValue)
+                if (normalized === "" || normalized === ".") {
+                  table.updateCellValue(rowKeyValue, columnsFromCurrent[index].key, undefined)
+                  return
+                }
+                if (exceedsDigitLimits(normalized)) {
+                  return
+                }
+                table.updateCellValue(rowKeyValue, columnsFromCurrent[index].key, normalized)
               }
             })
           } else {
@@ -69,7 +75,7 @@ export const CellInputTextSingle = ({ column, rowKeyValue, value, autoFocus }: I
               table.updateCellValue(rowKeyValue, column.key, undefined)
               return
             }
-            if (/^\d*\.?\d*$/.test(normalized)) {
+            if (/^-?\d*\.?\d*$/.test(normalized)) {
               if (exceedsDigitLimits(normalized)) {
                 return
               }
