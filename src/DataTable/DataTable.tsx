@@ -44,7 +44,7 @@ import { OptimizedCell } from "./internal/OptimizedCellComponents"
 // Re-export for backward compatibility
 export { SortDirection } from "ka-table"
 export { DataType } from "./types"
-export type { DataTableProps, Column } from "./types"
+export type { DataTableProps, Column, PaginationConfig, ClientPagination, ServerPagination } from "./types"
 
 const CellHeadLink = styled.a({
   display: "flex",
