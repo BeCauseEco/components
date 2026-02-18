@@ -12,12 +12,26 @@ import { DataType, Column } from "../types"
 export const CellInputTextSingle = ({ column, rowKeyValue, value, autoFocus }: ICellEditorProps) => {
   const table = useTableInstance()
   const inputRef = useRef<HTMLInputElement>(null)
+  const columnConfig = column as Column
+  const { maxIntegerDigits, maxDecimalDigits } = columnConfig.numberValidation ?? {}
 
   useEffect(() => {
     if (autoFocus) {
       inputRef.current?.focus()
     }
   }, [autoFocus])
+
+  const exceedsDigitLimits = (normalized: string): boolean => {
+    const withoutSign = normalized.replace(/^[+-]/, "")
+    const [integerPart, decimalPart] = withoutSign.split(".")
+    if (maxIntegerDigits !== undefined && integerPart && integerPart.length > maxIntegerDigits) {
+      return true
+    }
+    if (maxDecimalDigits !== undefined && decimalPart && decimalPart.length > maxDecimalDigits) {
+      return true
+    }
+    return false
+  }
 
   const displayValue =
     column.dataType === DataType.Number && typeof value === "string" ? value.replace(/,/g, ".") : value
@@ -49,13 +63,16 @@ export const CellInputTextSingle = ({ column, rowKeyValue, value, autoFocus }: I
               }
             })
           } else {
-            // Single cell update (existing logic)
+            // Single cell update
             const normalized = v.replace(/,/g, ".").replace(/[^0-9.-]/g, "")
             if (normalized === "" || normalized === ".") {
               table.updateCellValue(rowKeyValue, column.key, undefined)
               return
             }
             if (/^\d*\.?\d*$/.test(normalized)) {
+              if (exceedsDigitLimits(normalized)) {
+                return
+              }
               table.updateCellValue(rowKeyValue, column.key, normalized)
             }
           }

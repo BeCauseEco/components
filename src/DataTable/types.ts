@@ -156,6 +156,13 @@ export type Column = {
       | undefined
   }
 
+  /** Validation constraints for DataType.Number columns in edit mode.
+   * The cell editor blocks keystrokes that would exceed these limits. */
+  numberValidation?: {
+    maxIntegerDigits?: number
+    maxDecimalDigits?: number
+  }
+
   comboboxOptions?: {
     /** Placeholder text for the search input. Providing this will automatically enable filtering */
     filterPlaceholder?: string
