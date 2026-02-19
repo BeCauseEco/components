@@ -137,7 +137,9 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
   })
 
   const paginationConfig = useMemo(() => {
-    if (!p.pagination) return null
+    if (!p.pagination) {
+      return null
+    }
 
     if (p.pagination.mode === "server") {
       return {
