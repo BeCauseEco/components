@@ -31,6 +31,24 @@ export enum DataType {
   Icon = "icon",
 }
 
+export type ClientPagination = {
+  mode: "client"
+  pageSize: number
+  pageSizeOptions?: number[]
+}
+
+export type ServerPagination = {
+  mode: "server"
+  pageIndex: number
+  pageSize: number
+  totalCount: number
+  onPageChange: (pageIndex: number) => void
+  onPageSizeChange?: (pageSize: number) => void
+  pageSizeOptions?: number[]
+}
+
+export type PaginationConfig = ClientPagination | ServerPagination
+
 export type Column = {
   key: string
   title: string
@@ -230,4 +248,5 @@ export type DataTableProps<TData = any> = PlaywrightProps & {
    * Before using this, see the DataType enum and/or Column enum for available alternatives - tooltips, links, progress indicators, etc. are all possible using these.
    */
   customCellRenderer?: (cellProps: ICellTextProps<TData>) => ReactElement | null
+  pagination?: PaginationConfig
 }

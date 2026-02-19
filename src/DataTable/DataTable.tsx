@@ -40,11 +40,12 @@ import { CellInputTextSingle, CellInputTextDate, CellInputCheckbox, CellInputCom
 import { CellProgressIndicator, CellStatus, CellIcon } from "./internal/CellRenderers"
 import { KEY_DRAG, KEY_ACTIONS_EDIT, KEY_ACTIONS, TABLE_CELL_EMPTY_STRING } from "./internal/constants"
 import { OptimizedCell } from "./internal/OptimizedCellComponents"
+import { DataTablePagination } from "./internal/DataTablePagination"
 
 // Re-export for backward compatibility
 export { SortDirection } from "ka-table"
 export { DataType } from "./types"
-export type { DataTableProps, Column } from "./types"
+export type { DataTableProps, Column, PaginationConfig, ClientPagination, ServerPagination } from "./types"
 
 const CellHeadLink = styled.a({
   display: "flex",
@@ -116,6 +117,8 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
   }
 
   const [filter, setFilter] = useState("")
+  const [clientPageIndex, setClientPageIndex] = useState(0)
+  const [clientPageSize, setClientPageSize] = useState(p.pagination?.pageSize ?? 0)
 
   // Memoize setFilter to prevent SearchInput from re-creating debounced handler
   const handleSearchChange = useCallback((value: string) => {
@@ -132,6 +135,46 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
     column: p.defaultSortColumn || "",
     direction: p.defaultSortDirection,
   })
+
+  const paginationConfig = useMemo(() => {
+    if (!p.pagination) {
+      return null
+    }
+
+    if (p.pagination.mode === "server") {
+      return {
+        pageIndex: p.pagination.pageIndex,
+        pageSize: p.pagination.pageSize,
+        totalCount: p.pagination.totalCount,
+        totalPages: Math.max(1, Math.ceil(p.pagination.totalCount / p.pagination.pageSize)),
+        onPageChange: p.pagination.onPageChange,
+        onPageSizeChange: p.pagination.onPageSizeChange,
+        pageSizeOptions: p.pagination.pageSizeOptions,
+      }
+    }
+
+    return {
+      pageIndex: clientPageIndex,
+      pageSize: clientPageSize,
+      totalCount: p.data.length,
+      totalPages: Math.max(1, Math.ceil(p.data.length / clientPageSize)),
+      onPageChange: setClientPageIndex,
+      onPageSizeChange: (newSize: number) => {
+        setClientPageSize(newSize)
+        setClientPageIndex(0)
+      },
+      pageSizeOptions: p.pagination.pageSizeOptions,
+    }
+  }, [p.pagination, p.data.length, clientPageIndex, clientPageSize])
+
+  const displayData = useMemo(() => {
+    if (!paginationConfig || p.pagination?.mode === "server") {
+      return p.data
+    }
+
+    const start = paginationConfig.pageIndex * paginationConfig.pageSize
+    return p.data.slice(start, start + paginationConfig.pageSize)
+  }, [p.data, paginationConfig, p.pagination?.mode])
 
   // Optimization 2: Memoize selected fields count
   const selectedFields = useMemo(() => {
@@ -503,7 +546,7 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
                       key={`table-${mode === "edit" && p.editingMode === EditingMode.Cell ? "cell-edit" : "readonly"}`}
                       table={table}
                       columns={nativeColumns as any}
-                      data={p.data}
+                      data={displayData}
                       rowKeyField={String(p.rowKeyField)}
                       selectedRows={p.selectedRows || []}
                       sortingMode={p.disableSorting ? SortingMode.None : SortingMode.Single}
@@ -989,6 +1032,20 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
 
                       <Spacer xsmall />
                     </Align>
+                  ) : (
+                    <></>
+                  )}
+
+                  {paginationConfig ? (
+                    <DataTablePagination
+                      pageIndex={paginationConfig.pageIndex}
+                      pageSize={paginationConfig.pageSize}
+                      totalCount={paginationConfig.totalCount}
+                      pageSizeOptions={paginationConfig.pageSizeOptions}
+                      onPageChange={paginationConfig.onPageChange}
+                      onPageSizeChange={paginationConfig.onPageSizeChange}
+                      textSize={p.textSize}
+                    />
                   ) : (
                     <></>
                   )}
