@@ -174,6 +174,19 @@ export type Column = {
       | undefined
   }
 
+  /** Validation constraints for DataType.Number columns in edit mode.
+   * The cell editor blocks keystrokes that would exceed these limits.
+   *
+   * Both `maxIntegerDigits` and `maxDecimalDigits` must be non-negative integers:
+   * - `0` is allowed (e.g. `maxIntegerDigits = 0` permits values like ".5").
+   * - Negative values are not supported. */
+  numberValidation?: {
+    /** Maximum number of digits allowed in the integer part. Must be a non-negative integer. */
+    maxIntegerDigits?: number
+    /** Maximum number of digits allowed in the decimal part. Must be a non-negative integer. */
+    maxDecimalDigits?: number
+  }
+
   comboboxOptions?: {
     /** Placeholder text for the search input. Providing this will automatically enable filtering */
     filterPlaceholder?: string
