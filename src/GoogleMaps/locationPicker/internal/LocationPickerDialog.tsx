@@ -24,6 +24,8 @@ interface LocationPickerDialogProps {
   initialLocation: { lat: number; lng: number } | null
   onLocationSelect: (data: LocationData) => void
   googleMapsApiKey: string
+  /** Place types to filter autocomplete predictions. Defaults to ["lodging", "establishment", "restaurant"]. */
+  autocompleteTypes?: string[]
 }
 
 export const LocationPickerDialog = ({
@@ -32,6 +34,7 @@ export const LocationPickerDialog = ({
   initialLocation,
   onLocationSelect,
   googleMapsApiKey,
+  autocompleteTypes,
 }: LocationPickerDialogProps) => {
   const map = useMap()
   const [markerPosition, setMarkerPosition] = useState(initialLocation)
@@ -255,6 +258,7 @@ export const LocationPickerDialog = ({
                 streetViewControl={false}
                 cameraControl={false}
                 mapTypeControl={false}
+                autocompleteTypes={autocompleteTypes}
               >
                 {markerPosition && <Marker position={markerPosition} draggable onDragEnd={handleMarkerDragEnd} />}
               </GoogleMap>
