@@ -243,6 +243,8 @@ export type DataTableProps<TData = any> = PlaywrightProps & {
   editingMode?: EditingMode
   cellPaddingSize?: "none" | "tiny" | "xsmall" | "small" | "medium"
   textSize?: "xxtiny" | "xtiny" | "tiny" | "xsmall" | "small" | "medium" | "large"
+  /** Enable truncation of column header names with "...". Pass `true` to use the default max length (30), or a number to specify a custom max length. */
+  ellipsisColumnNames?: boolean | number
 
   /**
    * Before using this, see the DataType enum and/or Column enum for available alternatives - tooltips, links, progress indicators, etc. are all possible using these.

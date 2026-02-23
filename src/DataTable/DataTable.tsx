@@ -627,6 +627,11 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
                               mode !== "edit" &&
                               headCellContentAsColumn.dataType !== DataType.Status
 
+                            const fullTitle = headCellContent.column.title
+                            const maxLength = typeof p.ellipsisColumnNames === "number" ? p.ellipsisColumnNames : 30
+                            const isTruncated = p.ellipsisColumnNames && fullTitle && fullTitle.length > maxLength
+                            const displayTitle = isTruncated ? fullTitle.slice(0, maxLength) + "..." : fullTitle
+
                             return (
                               <Stack hug horizontal>
                                 {(mode === "simple" || mode === "filter") && p.onSelectionChange && firstColumn ? (
@@ -654,9 +659,12 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
 
                                 <Align horizontal left={!alignmentRight} right={alignmentRight}>
                                   {allowSort || headCellContentAsColumn.sort ? (
-                                    <CellHeadLink onClick={() => table.updateSortDirection(headCellContent.column.key)}>
+                                    <CellHeadLink
+                                      onClick={() => table.updateSortDirection(headCellContent.column.key)}
+                                      title={isTruncated ? fullTitle : undefined}
+                                    >
                                       <Text fill={[Color.Neutral, 700]} {...getTextSizeProps("xsmall")}>
-                                        <b>{headCellContent.column.title}</b>
+                                        <b>{displayTitle}</b>
                                       </Text>
 
                                       <Spacer tiny />
@@ -664,9 +672,11 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
                                       <Icon medium name={iconName} fill={[Color.Neutral, 700]} />
                                     </CellHeadLink>
                                   ) : (
-                                    <Text fill={[Color.Neutral, 700]} {...getTextSizeProps("xsmall")}>
-                                      <b>{headCellContent.column.title}</b>
-                                    </Text>
+                                    <span title={isTruncated ? fullTitle : undefined}>
+                                      <Text fill={[Color.Neutral, 700]} {...getTextSizeProps("xsmall")}>
+                                        <b>{displayTitle}</b>
+                                      </Text>
+                                    </span>
                                   )}
                                 </Align>
                               </Stack>
