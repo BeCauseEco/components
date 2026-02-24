@@ -692,7 +692,7 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
                                 {p.ellipsisColumnNames ? (
                                   <Tooltip trigger={headerContent}>
                                     <Align horizontal left>
-                                      <Text small fill={[Color.Neutral, 700]} wrap>
+                                      <Text xsmall fill={[Color.Neutral, 700]} wrap>
                                         {fullTitle}
                                       </Text>
                                     </Align>
