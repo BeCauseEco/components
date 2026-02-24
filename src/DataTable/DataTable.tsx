@@ -628,9 +628,41 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
                               headCellContentAsColumn.dataType !== DataType.Status
 
                             const fullTitle = headCellContent.column.title
-                            const maxLength = typeof p.ellipsisColumnNames === "number" ? p.ellipsisColumnNames : 30
-                            const isTruncated = p.ellipsisColumnNames && fullTitle && fullTitle.length > maxLength
-                            const displayTitle = isTruncated ? fullTitle.slice(0, maxLength) + "..." : fullTitle
+                            const ellipsisStyle = p.ellipsisColumnNames
+                              ? ({
+                                  display: "-webkit-box",
+                                  WebkitLineClamp: 2,
+                                  WebkitBoxOrient: "vertical",
+                                  overflow: "hidden",
+                                  textOverflow: "ellipsis",
+                                } as const)
+                              : undefined
+
+                            const headerTitle = (
+                              <Text
+                                fill={[Color.Neutral, 700]}
+                                wrap={p.ellipsisColumnNames}
+                                {...getTextSizeProps("xsmall")}
+                              >
+                                <b style={ellipsisStyle}>{fullTitle}</b>
+                              </Text>
+                            )
+
+                            const headerContent = (
+                              <Align horizontal left={!alignmentRight} right={alignmentRight}>
+                                {allowSort || headCellContentAsColumn.sort ? (
+                                  <CellHeadLink onClick={() => table.updateSortDirection(headCellContent.column.key)}>
+                                    {headerTitle}
+
+                                    <Spacer tiny />
+
+                                    <Icon medium name={iconName} fill={[Color.Neutral, 700]} />
+                                  </CellHeadLink>
+                                ) : (
+                                  headerTitle
+                                )}
+                              </Align>
+                            )
 
                             return (
                               <Stack hug horizontal>
@@ -657,28 +689,17 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
                                   <></>
                                 )}
 
-                                <Align horizontal left={!alignmentRight} right={alignmentRight}>
-                                  {allowSort || headCellContentAsColumn.sort ? (
-                                    <CellHeadLink
-                                      onClick={() => table.updateSortDirection(headCellContent.column.key)}
-                                      title={isTruncated ? fullTitle : undefined}
-                                    >
-                                      <Text fill={[Color.Neutral, 700]} {...getTextSizeProps("xsmall")}>
-                                        <b>{displayTitle}</b>
+                                {p.ellipsisColumnNames ? (
+                                  <Tooltip trigger={headerContent}>
+                                    <Align horizontal left>
+                                      <Text small fill={[Color.Neutral, 700]} wrap>
+                                        {fullTitle}
                                       </Text>
-
-                                      <Spacer tiny />
-
-                                      <Icon medium name={iconName} fill={[Color.Neutral, 700]} />
-                                    </CellHeadLink>
-                                  ) : (
-                                    <span title={isTruncated ? fullTitle : undefined}>
-                                      <Text fill={[Color.Neutral, 700]} {...getTextSizeProps("xsmall")}>
-                                        <b>{displayTitle}</b>
-                                      </Text>
-                                    </span>
-                                  )}
-                                </Align>
+                                    </Align>
+                                  </Tooltip>
+                                ) : (
+                                  headerContent
+                                )}
                               </Stack>
                             )
                           },
