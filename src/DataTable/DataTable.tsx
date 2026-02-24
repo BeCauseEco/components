@@ -627,6 +627,43 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
                               mode !== "edit" &&
                               headCellContentAsColumn.dataType !== DataType.Status
 
+                            const fullTitle = headCellContent.column.title
+                            const ellipsisStyle = p.ellipsisColumnNames
+                              ? ({
+                                  display: "-webkit-box",
+                                  WebkitLineClamp: 2,
+                                  WebkitBoxOrient: "vertical",
+                                  overflow: "hidden",
+                                  textOverflow: "ellipsis",
+                                } as const)
+                              : undefined
+
+                            const headerTitle = (
+                              <Text
+                                fill={[Color.Neutral, 700]}
+                                wrap={p.ellipsisColumnNames}
+                                {...getTextSizeProps("xsmall")}
+                              >
+                                <b style={ellipsisStyle}>{fullTitle}</b>
+                              </Text>
+                            )
+
+                            const headerContent = (
+                              <Align horizontal left={!alignmentRight} right={alignmentRight}>
+                                {allowSort || headCellContentAsColumn.sort ? (
+                                  <CellHeadLink onClick={() => table.updateSortDirection(headCellContent.column.key)}>
+                                    {headerTitle}
+
+                                    <Spacer tiny />
+
+                                    <Icon medium name={iconName} fill={[Color.Neutral, 700]} />
+                                  </CellHeadLink>
+                                ) : (
+                                  headerTitle
+                                )}
+                              </Align>
+                            )
+
                             return (
                               <Stack hug horizontal>
                                 {(mode === "simple" || mode === "filter") && p.onSelectionChange && firstColumn ? (
@@ -652,23 +689,17 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
                                   <></>
                                 )}
 
-                                <Align horizontal left={!alignmentRight} right={alignmentRight}>
-                                  {allowSort || headCellContentAsColumn.sort ? (
-                                    <CellHeadLink onClick={() => table.updateSortDirection(headCellContent.column.key)}>
-                                      <Text fill={[Color.Neutral, 700]} {...getTextSizeProps("xsmall")}>
-                                        <b>{headCellContent.column.title}</b>
+                                {p.ellipsisColumnNames ? (
+                                  <Tooltip trigger={headerContent}>
+                                    <Align horizontal left>
+                                      <Text small fill={[Color.Neutral, 700]} wrap>
+                                        {fullTitle}
                                       </Text>
-
-                                      <Spacer tiny />
-
-                                      <Icon medium name={iconName} fill={[Color.Neutral, 700]} />
-                                    </CellHeadLink>
-                                  ) : (
-                                    <Text fill={[Color.Neutral, 700]} {...getTextSizeProps("xsmall")}>
-                                      <b>{headCellContent.column.title}</b>
-                                    </Text>
-                                  )}
-                                </Align>
+                                    </Align>
+                                  </Tooltip>
+                                ) : (
+                                  headerContent
+                                )}
                               </Stack>
                             )
                           },
