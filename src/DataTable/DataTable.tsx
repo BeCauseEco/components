@@ -17,7 +17,7 @@ import { InputButtonPrimary } from "@new/InputButton/InputButtonPrimary"
 import { Spacer } from "@new/Stack/Spacer"
 import { InputButtonTertiary } from "@new/InputButton/InputButtonTertiary"
 import { InputTextSingle } from "@new/InputText/InputTextSingle"
-import { Color } from "@new/Color"
+import { Color, computeColor } from "@new/Color"
 import { Text } from "@new/Text/Text"
 import { Icon } from "@new/Icon/Icon"
 import styled from "@emotion/styled"
@@ -1024,6 +1024,12 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
 
                             const { width, minWidth, maxWidth } = calculateColumnWidth(column)
 
+                            const fillColor =
+                              typeof column.fill === "function"
+                                ? column.fill(cellElementAttributes.rowData)
+                                : column.fill
+                            const backgroundColor = fillColor ? computeColor([fillColor, 50]) : undefined
+
                             return {
                               id: id,
                               className: classNames.join(" "),
@@ -1033,6 +1039,7 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
                                 width: width,
                                 minWidth: minWidth,
                                 maxWidth: maxWidth,
+                                backgroundColor,
                               },
                             }
                           },
