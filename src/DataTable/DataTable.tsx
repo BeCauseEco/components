@@ -214,6 +214,7 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
         sort: column.sort,
         tooltip: column.tooltip,
         showTooltipIcon: column.showTooltipIcon,
+        headerTooltip: column.headerTooltip,
         sortDirection: sortDirection,
         minWidth: column.minWidth,
         maxWidth: column.maxWidth,
@@ -694,6 +695,14 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
                                     <Align horizontal left>
                                       <Text xsmall fill={[Color.Neutral, 700]} wrap>
                                         {fullTitle}
+                                      </Text>
+                                    </Align>
+                                  </Tooltip>
+                                ) : headCellContentAsColumn.headerTooltip ? (
+                                  <Tooltip trigger={headerContent}>
+                                    <Align horizontal left>
+                                      <Text xsmall fill={[Color.Neutral, 700]} wrap>
+                                        {headCellContentAsColumn.headerTooltip}
                                       </Text>
                                     </Align>
                                   </Tooltip>
