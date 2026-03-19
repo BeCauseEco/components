@@ -1028,7 +1028,9 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
                               typeof column.fill === "function"
                                 ? column.fill(cellElementAttributes.rowData)
                                 : column.fill
-                            const backgroundColor = fillColor ? computeColor([fillColor, 50]) : undefined
+                            const backgroundColor = fillColor
+                              ? computeColor(Array.isArray(fillColor) ? fillColor : [fillColor, 50])
+                              : undefined
 
                             return {
                               id: id,
