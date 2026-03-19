@@ -697,6 +697,14 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
                                       </Text>
                                     </Align>
                                   </Tooltip>
+                                ) : headCellContentAsColumn.headerTooltip ? (
+                                  <Tooltip trigger={headerContent}>
+                                    <Align horizontal left>
+                                      <Text xsmall fill={[Color.Neutral, 700]} wrap>
+                                        {headCellContentAsColumn.headerTooltip}
+                                      </Text>
+                                    </Align>
+                                  </Tooltip>
                                 ) : (
                                   headerContent
                                 )}
