@@ -1029,7 +1029,7 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
                                 ? column.fill(cellElementAttributes.rowData)
                                 : column.fill
                             const backgroundColor = fillColor
-                              ? computeColor(Array.isArray(fillColor) ? fillColor : [fillColor, 50])
+                              ? computeColor([fillColor, fillColor === Color.Neutral ? 50 : 100])
                               : undefined
 
                             return {
