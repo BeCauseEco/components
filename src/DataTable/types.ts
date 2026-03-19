@@ -197,11 +197,7 @@ export type Column = {
     renderPopoverInParentContainer?: boolean | HTMLElement
   }
 
-  fill?:
-    | ((rowData: ICellTextProps["rowData"]) => Color | ColorWithLightness | undefined)
-    | Color
-    | ColorWithLightness
-    | undefined
+  fill?: ((rowData: ICellTextProps["rowData"]) => Color | undefined) | Color | undefined
 }
 
 type Children =
