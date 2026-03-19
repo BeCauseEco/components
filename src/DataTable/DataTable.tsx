@@ -214,6 +214,7 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
         sort: column.sort,
         tooltip: column.tooltip,
         showTooltipIcon: column.showTooltipIcon,
+        headerTooltip: column.headerTooltip,
         sortDirection: sortDirection,
         minWidth: column.minWidth,
         maxWidth: column.maxWidth,
