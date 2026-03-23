@@ -25,12 +25,13 @@ export type ListItemProps = PlaywrightProps & {
 
 export type FilteredListProps = ComponentBaseProps & {
   color: Color
-  maxHeight: OverflowContainerProps["maxHeight"]
+  maxHeight: OverflowContainerProps["maxHeight"] | number
   value: string
   disabled?: boolean
   loading?: boolean
   itemHeight?: number
   items: ListItemProps[]
+  hideSearch?: boolean
 
   onChange: (value: string) => void
 }
@@ -63,13 +64,16 @@ export const FilteredList = ({
   color,
   "data-playwright-testid": playwrightTestId,
   items,
+  hideSearch,
   value,
   onChange,
 }: FilteredListProps) => {
   const [filter, setFilter] = useState("")
 
-  const maxHeightAsNumber = typeof maxHeight === "number" ? maxHeight : 300
+  const maxHeightAsNumber =
+    typeof maxHeight === "number" ? maxHeight : typeof maxHeight === "string" ? parseInt(maxHeight, 10) || 300 : 300
   const itemHeightAsNumber = itemHeight || 60
+  const allItemsFit = items.length * itemHeightAsNumber <= maxHeightAsNumber
 
   const filteredItems = useMemo(() => {
     return items?.filter(item => item.label.toLowerCase().includes(filter.toLowerCase())) ?? []
@@ -79,15 +83,19 @@ export const FilteredList = ({
     <Container id={id} data-playwright-testid={playwrightTestId} className="<FilteredList /> - ">
       <Stack hug vertical data-playwright-testid={playwrightTestId}>
         <Align vertical topLeft>
-          <InputTextSingle
-            size="large"
-            width="auto"
-            color={color}
-            value={filter}
-            onChange={value => setFilter(value)}
-          />
+          {!hideSearch && (
+            <>
+              <InputTextSingle
+                size="large"
+                width="auto"
+                color={color}
+                value={filter}
+                onChange={value => setFilter(value)}
+              />
 
-          <Spacer xsmall />
+              <Spacer xsmall />
+            </>
+          )}
           {filteredItems?.length > 0 ? (
             <VirtualizedListContainer>
               <FixedSizeList
@@ -101,6 +109,7 @@ export const FilteredList = ({
                   color: color,
                 }}
                 width="100%"
+                style={allItemsFit ? { overflow: "hidden" } : undefined}
               >
                 {FilteredVirtualListItem}
               </FixedSizeList>
