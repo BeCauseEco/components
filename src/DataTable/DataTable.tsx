@@ -391,7 +391,7 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
   const referencePrint = useRef<HTMLDivElement>(null)
   const print = useReactToPrint({ contentRef: referencePrint, documentTitle: exportName })
 
-  const css = createDataTableStyles(cssScope, p.fill, p.stroke, p.cellPaddingSize)
+  const css = createDataTableStyles(cssScope, p.fill, p.stroke, p.cellPaddingSize, p.noColumnLines)
 
   // Monitor performance of key operations
   usePerformanceMonitoring("render", [p.data.length, p.columns.length])
@@ -535,7 +535,12 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
               {p.loadingElement ? (
                 p.loadingElement
               ) : (
-                <Stack vertical hug stroke={p.stroke || [Color.Neutral, 100]} fill={p.fill || [Color.Transparent]}>
+                <Stack
+                  vertical
+                  hug
+                  stroke={p.borderless ? [Color.Transparent] : p.stroke || [Color.Neutral, 100]}
+                  fill={p.fill || [Color.Transparent]}
+                >
                   <Align topLeft vertical>
                     {/* 
                       Force ka-table to remount when switching between cell-editing and readonly modes.

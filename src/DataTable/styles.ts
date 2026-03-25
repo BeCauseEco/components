@@ -38,6 +38,7 @@ export const createDataTableStyles = (
   fill?: ColorWithLightness,
   stroke?: ColorWithLightness,
   cellPaddingSize?: "none" | "tiny" | "xsmall" | "small" | "medium",
+  noColumnLines?: boolean,
 ) => `
   .${cssScope} .ka {
     background-color: unset;
@@ -150,7 +151,7 @@ export const createDataTableStyles = (
   }
 
   .${cssScope} .ka-cell:not(:last-child) {
-    border-right: dotted 1px ${computeColor(stroke || [Color.Neutral, 100])};
+    border-right: ${noColumnLines ? "none" : `dotted 1px ${computeColor(stroke || [Color.Neutral, 100])}`};
   }
 
   .${cssScope}[data-mode="edit"] .ka-cell.ka-cell-editable:hover {
@@ -258,13 +259,13 @@ export const createDataTableStyles = (
 
   .${cssScope} .override-ka-fixed-left:after {
     right: -8px;
-    border-left: solid 1px ${computeColor(stroke || [Color.Neutral, 100])};
+    border-left: ${noColumnLines ? "none" : `solid 1px ${computeColor(stroke || [Color.Neutral, 100])}`};
     background: linear-gradient(to right, ${computeColor(fill || [Color.White])}, transparent);
   }
 
   .${cssScope} .override-ka-fixed-right:after {
     left: -8px;
-    border-right: solid 1px ${computeColor(stroke || [Color.Neutral, 100])};
+    border-right: ${noColumnLines ? "none" : `solid 1px ${computeColor(stroke || [Color.Neutral, 100])}`};
     background: linear-gradient(to left, ${computeColor(fill || [Color.White])}, transparent);
   }
 

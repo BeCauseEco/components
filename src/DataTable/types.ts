@@ -240,6 +240,10 @@ export type DataTableProps<TData = any> = PlaywrightProps & {
   onChangeRow?: (value: TData) => void
   fill?: ColorWithLightness
   stroke?: ColorWithLightness
+  /** When true, removes the outer border around the table while keeping internal row/cell borders. */
+  borderless?: boolean
+  /** When true, removes the vertical dotted lines between columns. */
+  noColumnLines?: boolean
   children?: ReactNode
   editingMode?: EditingMode
   cellPaddingSize?: "none" | "tiny" | "xsmall" | "small" | "medium"
