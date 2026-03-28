@@ -1,9 +1,14 @@
 import { useMemo } from "react"
+import { Stack } from "@new/Stack/Stack"
+import { Align } from "@new/Stack/Align"
+import { Spacer } from "@new/Stack/Spacer"
+import { Text } from "@new/Text/Text"
+import { Color } from "@new/Color"
 import { InputButtonIconTertiary } from "@new/InputButton/InputButtonIconTertiary"
 import { InputButtonTertiary } from "@new/InputButton/InputButtonTertiary"
 import { InputCombobox } from "@new/InputCombobox/InputCombobox"
 import { InputComboboxItem } from "@new/InputCombobox/InputComboboxItem"
-import { Color } from "@new/Color"
+import { Divider } from "@new/Divider/Divider"
 
 interface DataTablePaginationProps {
   pageIndex: number
@@ -52,6 +57,11 @@ export const DataTablePagination = (p: DataTablePaginationProps) => {
   const rangeStart = p.totalCount === 0 ? 0 : p.pageIndex * p.pageSize + 1
   const rangeEnd = Math.min((p.pageIndex + 1) * p.pageSize, p.totalCount)
 
+  const textSizeProps = useMemo(() => {
+    const size = p.textSize || "xsmall"
+    return { [size]: true }
+  }, [p.textSize])
+
   const pageNumbers = useMemo(() => buildPageNumbers(p.pageIndex, totalPages), [p.pageIndex, totalPages])
 
   const isFirstPage = p.pageIndex === 0
@@ -60,79 +70,109 @@ export const DataTablePagination = (p: DataTablePaginationProps) => {
   const showPageSizeSelector = p.onPageSizeChange && p.pageSizeOptions && p.pageSizeOptions.length > 0
 
   return (
-    <div className="tw flex flex-col">
-      <hr className="border-t border-[var(--color-neutral-100)] m-0" />
+    <Stack vertical hug>
+      <Divider fill={[Color.Neutral, 100]} />
 
-      <div className="flex items-center justify-end gap-6 px-4 py-2">
-        <span className="text-xs text-[var(--color-neutral-500)] mr-auto">
-          {`Showing ${rangeStart}\u2013${rangeEnd} of ${p.totalCount}`}
-        </span>
+      <Spacer xsmall />
 
-        <div className="flex items-center gap-1">
-          <InputButtonIconTertiary
-            size="small"
-            iconName="chevron_left"
-            disabled={isFirstPage}
-            onClick={() => p.onPageChange(p.pageIndex - 1)}
-            title="Previous page"
-          />
+      <Align horizontal left>
+        <Stack horizontal hug>
+          {/* Left: item range */}
+          <Align left horizontal hug>
+            <Text fill={[Color.Neutral, 500]} {...textSizeProps}>
+              {`Showing ${rangeStart}\u2013${rangeEnd} of ${p.totalCount}`}
+            </Text>
+          </Align>
 
-          {pageNumbers.map((page, index) => {
-            if (page === "ellipsis") {
+          <Spacer large />
+
+          {/* Center: page navigation */}
+          <Align center horizontal hug>
+            <InputButtonIconTertiary
+              size="small"
+              iconName="chevron_left"
+              disabled={isFirstPage}
+              onClick={() => p.onPageChange(p.pageIndex - 1)}
+              title="Previous page"
+            />
+
+            <Spacer tiny />
+
+            {pageNumbers.map((page, index) => {
+              if (page === "ellipsis") {
+                return (
+                  <Align key={`ellipsis-${index}`} center horizontal hug>
+                    <Text fill={[Color.Neutral, 400]} {...textSizeProps}>
+                      ...
+                    </Text>
+
+                    <Spacer tiny />
+                  </Align>
+                )
+              }
+
+              const isCurrent = page === p.pageIndex
+
               return (
-                <span key={`ellipsis-${index}`} className="text-xs text-[var(--color-neutral-400)] px-1">
-                  ...
-                </span>
+                <Align key={String(page)} center horizontal hug>
+                  <InputButtonTertiary
+                    size="small"
+                    width="auto"
+                    label={String(page + 1)}
+                    disabled={isCurrent}
+                    onClick={() => p.onPageChange(page)}
+                  />
+
+                  <Spacer tiny />
+                </Align>
               )
-            }
+            })}
 
-            const isCurrent = page === p.pageIndex
+            <InputButtonIconTertiary
+              size="small"
+              iconName="chevron_right"
+              disabled={isLastPage}
+              onClick={() => p.onPageChange(p.pageIndex + 1)}
+              title="Next page"
+            />
+          </Align>
 
-            return (
-              <InputButtonTertiary
-                key={String(page)}
+          <Spacer large />
+
+          {/* Right: page size selector */}
+          {showPageSizeSelector ? (
+            <Align right horizontal hug>
+              <Text fill={[Color.Neutral, 500]} {...textSizeProps}>
+                Rows per page:
+              </Text>
+
+              <Spacer small />
+
+              <InputCombobox
                 size="small"
                 width="auto"
-                label={String(page + 1)}
-                disabled={isCurrent}
-                onClick={() => p.onPageChange(page)}
-              />
-            )
-          })}
+                color={Color.Neutral}
+                textNoSelection={String(p.pageSize)}
+                value={String(p.pageSize)}
+                onChange={value => {
+                  const newPageSize = Number(value)
+                  if (!isNaN(newPageSize) && p.onPageSizeChange) {
+                    p.onPageSizeChange(newPageSize)
+                  }
+                }}
+              >
+                {p.pageSizeOptions!.map(option => (
+                  <InputComboboxItem key={option} value={String(option)} label={String(option)} />
+                ))}
+              </InputCombobox>
+            </Align>
+          ) : (
+            <></>
+          )}
+        </Stack>
+      </Align>
 
-          <InputButtonIconTertiary
-            size="small"
-            iconName="chevron_right"
-            disabled={isLastPage}
-            onClick={() => p.onPageChange(p.pageIndex + 1)}
-            title="Next page"
-          />
-        </div>
-
-        {showPageSizeSelector ? (
-          <div className="flex items-center gap-2">
-            <span className="text-xs text-[var(--color-neutral-500)]">Rows per page:</span>
-
-            <InputCombobox
-              size="small"
-              width="auto"
-              color={Color.Neutral}
-              textNoSelection={String(p.pageSize)}
-              value={String(p.pageSize)}
-              onChange={value => {
-                const newPageSize = Number(value)
-                if (!isNaN(newPageSize) && p.onPageSizeChange) {
-                  p.onPageSizeChange(newPageSize)
-                }
-              }}
-            >
-              {p.pageSizeOptions!.map(option => (
-                <InputComboboxItem key={option} value={String(option)} label={String(option)} />
-              ))}
-            </InputCombobox>
-          </div>
-        ) : null}
-      </div>
-    </div>
+      <Spacer xsmall />
+    </Stack>
   )
 }
