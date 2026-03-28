@@ -39,6 +39,7 @@ export const createDataTableStyles = (
   stroke?: ColorWithLightness,
   cellPaddingSize?: "none" | "tiny" | "xsmall" | "small" | "medium",
   noColumnLines?: boolean,
+  borderless?: boolean,
 ) => `
   .${cssScope} .ka {
     background-color: unset;
@@ -102,7 +103,7 @@ export const createDataTableStyles = (
   }
 
   .${cssScope} .ka-thead-row .ka-thead-cell:first-child {
-    padding-left: ${getFirstLastCellPadding(cellPaddingSize)};
+    padding-left: ${borderless ? "0" : getFirstLastCellPadding(cellPaddingSize)};
   }
 
   .${cssScope} .ka-thead-row .ka-thead-cell:last-child {
@@ -137,7 +138,7 @@ export const createDataTableStyles = (
   }
 
   .${cssScope} .ka-cell:first-child {
-    padding-left: ${getFirstLastCellPadding(cellPaddingSize)};
+    padding-left: ${borderless ? "0" : getFirstLastCellPadding(cellPaddingSize)};
     z-index: 3;
   }
 
@@ -296,7 +297,7 @@ export const createDataTableStyles = (
 
   .${cssScope} .ka-no-data-cell {
     font-family: ${StyleFontFamily.fontFamily};
-    font-style: ${StyleFontFamily.fontStyle};
+    font-style: italic;
     font-weight: ${StyleFontFamily.fontWeight};
     font-size: ${StyleBodySmall.fontSize};
     line-height: ${StyleBodySmall.lineHeight};

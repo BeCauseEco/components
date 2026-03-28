@@ -391,7 +391,7 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
   const referencePrint = useRef<HTMLDivElement>(null)
   const print = useReactToPrint({ contentRef: referencePrint, documentTitle: exportName })
 
-  const css = createDataTableStyles(cssScope, p.fill, p.stroke, p.cellPaddingSize, p.noColumnLines)
+  const css = createDataTableStyles(cssScope, p.fill, p.stroke, p.cellPaddingSize, p.noColumnLines, p.borderless)
 
   // Monitor performance of key operations
   usePerformanceMonitoring("render", [p.data.length, p.columns.length])
@@ -538,7 +538,7 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
                 <Stack
                   vertical
                   hug
-                  stroke={p.borderless ? [Color.Transparent] : p.stroke || [Color.Neutral, 100]}
+                  stroke={p.borderless ? undefined : p.stroke || [Color.Neutral, 100]}
                   fill={p.fill || [Color.Transparent]}
                 >
                   <Align topLeft vertical>
@@ -558,7 +558,7 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
                       sortingMode={p.disableSorting ? SortingMode.None : SortingMode.Single}
                       editingMode={p.editingMode}
                       rowReordering={mode === "edit" && p.editingMode !== EditingMode.Cell}
-                      noData={{ text: "Nothing found" }}
+                      noData={{ text: p.noDataText || "Nothing found" }}
                       searchText={filter}
                       virtualScrolling={p.virtualScrollingMaxHeight ? { enabled: true } : undefined}
                       search={({ searchText: searchTextValue, rowData, column }) => {

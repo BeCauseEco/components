@@ -256,4 +256,6 @@ export type DataTableProps<TData = any> = PlaywrightProps & {
    */
   customCellRenderer?: (cellProps: ICellTextProps<TData>) => ReactElement | null
   pagination?: PaginationConfig
+  /** Text shown when the table has no data. Defaults to "Nothing found". */
+  noDataText?: string
 }
