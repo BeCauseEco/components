@@ -46,6 +46,7 @@ export type BadgeProps = ComponentBaseProps &
     color: Color
     iconName?: string
 
+    // Used for making the text pulse, e.g. to indicate a changing status or ongoing activity.
     pulse?: boolean
 
     onClear?: () => void
