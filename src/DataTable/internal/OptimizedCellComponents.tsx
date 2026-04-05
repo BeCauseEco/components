@@ -114,7 +114,13 @@ export const OptimizedCell = memo(
             {typeof linkEffect === "string" ? (
               <Link href={linkEffect}>{text}</Link>
             ) : (
-              <a href="javascript: void(0);" onClick={linkEffect}>
+              <a
+                href="#"
+                onClick={e => {
+                  e.preventDefault()
+                  linkEffect()
+                }}
+              >
                 {text}
               </a>
             )}
