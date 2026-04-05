@@ -114,7 +114,18 @@ export const OptimizedCell = memo(
             {typeof linkEffect === "string" ? (
               <Link href={linkEffect}>{text}</Link>
             ) : (
-              <a href="javascript: void(0);" onClick={linkEffect}>
+              // Render a callback-style link as an anchor so it inherits the same
+              // underline/cursor/keyboard-focus styling as the Link case above.
+              // href="#" (+ preventDefault) is a placeholder that keeps the anchor
+              // focusable and visually styled without navigating; React 19 blocks
+              // the more common `href="javascript:void(0)"` idiom as a security risk.
+              <a
+                href="#"
+                onClick={e => {
+                  e.preventDefault()
+                  linkEffect()
+                }}
+              >
                 {text}
               </a>
             )}
