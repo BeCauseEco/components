@@ -52,16 +52,17 @@ export const CellStatus = (
   const status = cellTextProps.column["status"] as Column["status"]
   const textSize = (cellTextProps as any).textSize || "small"
 
-  const { color, label } = status?.configure(cellTextProps.rowData) || {
+  const { color, label, pulse } = status?.configure(cellTextProps.rowData) || {
     color: undefined,
     label: undefined,
+    pulse: undefined,
   }
 
   return (
     <Stack hug horizontal>
       <Align horizontal left>
         {color && label ? (
-          <Badge size="large" variant="transparent" color={color} iconName="circle" label={label} />
+          <Badge size="large" variant="transparent" color={color} iconName="circle" label={label} pulse={pulse} />
         ) : (
           <Text fill={[Color.Neutral, 700]} {...{ [textSize]: true }} monospace>
             {TABLE_CELL_EMPTY_STRING}

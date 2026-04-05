@@ -8,14 +8,22 @@ import { InputButton, InputButtonProps } from "@new/InputButton/internal/InputBu
 import { Align } from "@new/Stack/Align"
 import { Spacer } from "@new/Stack/Spacer"
 import styled from "@emotion/styled"
+import { keyframes } from "@emotion/react"
 import { ComponentBaseProps } from "@new/ComponentBaseProps"
 
-const Container = styled.div<Pick<BadgeProps, "size" | "textOverflow">>(p => ({
+const pulseKeyframes = keyframes({
+  "50%": { opacity: 0.5 },
+})
+
+const Container = styled.div<Pick<BadgeProps, "size" | "textOverflow" | "pulse">>(p => ({
   display: "flex",
   width: "fit-content",
   maxWidth: "inherit",
   ...(p.textOverflow && { overflow: "hidden" }),
   height: p.size === "small" ? "calc(var(--BU) * 6)" : "calc(var(--BU) * 8)",
+  ...(p.pulse && {
+    animation: `${pulseKeyframes} 2s cubic-bezier(0.4, 0, 0.6, 1) infinite`,
+  }),
 
   "& > *": {
     userSelect: "none",
@@ -37,6 +45,8 @@ export type BadgeProps = ComponentBaseProps &
 
     color: Color
     iconName?: string
+
+    pulse?: boolean
 
     onClear?: () => void
   }
@@ -177,6 +187,7 @@ export const Badge = (p: BadgeProps) => {
       size={p.size}
       data-playwright-testid={p["data-playwright-testid"]}
       textOverflow={p.textOverflow}
+      pulse={p.pulse}
       title={p.title}
     >
       {stack}

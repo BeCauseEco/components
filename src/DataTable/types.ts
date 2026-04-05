@@ -89,6 +89,7 @@ export type Column = {
       | {
           color: Color
           label: string
+          pulse?: boolean
         }
       | undefined
   }
