@@ -49,6 +49,13 @@ interface PlaceAutocompleteProps {
    * @param place - Selected place with full details from Google Places API
    */
   onPlaceSelect: (place: google.maps.places.PlaceResult) => void
+
+  /**
+   * Optional array of place types to filter autocomplete predictions.
+   * Defaults to ["lodging", "establishment", "restaurant"].
+   * @see https://developers.google.com/maps/documentation/places/web-service/supported_types
+   */
+  types?: string[]
 }
 
 /**
@@ -103,7 +110,7 @@ interface PlaceAutocompleteProps {
  * @param props - Component props
  * @param props.onPlaceSelect - Callback invoked when a place is selected with full details
  */
-export const MapAutocompleteInput = ({ onPlaceSelect }: PlaceAutocompleteProps) => {
+export const MapAutocompleteInput = ({ onPlaceSelect, types }: PlaceAutocompleteProps) => {
   const [inputValue, setInputValue] = useState("")
   const [predictions, setPredictions] = useState<google.maps.places.AutocompletePrediction[]>([])
   const [isOpen, setIsOpen] = useState(false)
@@ -169,44 +176,48 @@ export const MapAutocompleteInput = ({ onPlaceSelect }: PlaceAutocompleteProps) 
    * Fetches autocomplete predictions with race condition prevention.
    * @param input - Search query string
    */
-  const fetchPredictions = useCallback((input: string) => {
-    if (!autocompleteServiceRef.current || !input.trim()) {
-      setPredictions([])
-      setIsLoading(false)
-      return
-    }
-
-    // Increment request ID to handle race conditions
-    const currentRequestId = ++requestIdRef.current
-
-    autocompleteServiceRef.current.getPlacePredictions(
-      {
-        input,
-        // Request all types of places for maximum flexibility
-      },
-      (results, status) => {
-        // Ignore stale responses from earlier requests
-        if (currentRequestId !== requestIdRef.current || !isMountedRef.current) {
-          return
-        }
-
+  const fetchPredictions = useCallback(
+    (input: string) => {
+      if (!autocompleteServiceRef.current || !input.trim()) {
+        setPredictions([])
         setIsLoading(false)
-        if (status === google.maps.places.PlacesServiceStatus.OK && results) {
-          setPredictions(results)
-          setIsOpen(true)
-        } else if (status === google.maps.places.PlacesServiceStatus.ZERO_RESULTS) {
-          setPredictions([])
-          setIsOpen(false)
-        } else {
-          // Handle other statuses (e.g., network errors, quota exceeded, invalid request)
-          // Fail silently to avoid disrupting user experience
-          console.error(`Places API error: ${status}`)
-          setPredictions([])
-          setIsOpen(false)
-        }
-      },
-    )
-  }, [])
+        return
+      }
+
+      // Increment request ID to handle race conditions
+      const currentRequestId = ++requestIdRef.current
+
+      const defaultTypes = ["lodging", "establishment", "restaurant"]
+      autocompleteServiceRef.current.getPlacePredictions(
+        {
+          input,
+          types: types ?? defaultTypes,
+        },
+        (results, status) => {
+          // Ignore stale responses from earlier requests
+          if (currentRequestId !== requestIdRef.current || !isMountedRef.current) {
+            return
+          }
+
+          setIsLoading(false)
+          if (status === google.maps.places.PlacesServiceStatus.OK && results) {
+            setPredictions(results)
+            setIsOpen(true)
+          } else if (status === google.maps.places.PlacesServiceStatus.ZERO_RESULTS) {
+            setPredictions([])
+            setIsOpen(false)
+          } else {
+            // Handle other statuses (e.g., network errors, quota exceeded, invalid request)
+            // Fail silently to avoid disrupting user experience
+            console.error(`Places API error: ${status}`)
+            setPredictions([])
+            setIsOpen(false)
+          }
+        },
+      )
+    },
+    [types],
+  )
 
   /**
    * Handles input change with 300ms debouncing.
