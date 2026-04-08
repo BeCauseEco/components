@@ -602,15 +602,25 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
                       childComponents={{
                         tableWrapper: {
                           elementAttributes: () => {
+                            const style: Record<string, string> = {}
+                            let className = ""
+
                             if (p.virtualScrollingMaxHeight) {
-                              return {
-                                style: { maxHeight: p.virtualScrollingMaxHeight },
-                              }
+                              style.maxHeight = p.virtualScrollingMaxHeight
+                            }
+
+                            if (p.hideHorizontalScroll) {
+                              className += (className ? " " : "") + "override-ka-hide-scrollbar"
                             }
 
                             if (mode === "edit" && p.editingMode !== EditingMode.Cell) {
+                              className = "override-ka-reorder"
+                            }
+
+                            if (Object.keys(style).length > 0 || className) {
                               return {
-                                className: "override-ka-reorder",
+                                ...(Object.keys(style).length > 0 ? { style } : {}),
+                                ...(className ? { className } : {}),
                               }
                             }
                           },
