@@ -2,6 +2,7 @@
 import { Stack } from "@new/Stack/Stack"
 import { Align } from "@new/Stack/Align"
 import { EditingMode, InsertRowPosition, SortDirection, SortingMode, Table, useTable } from "ka-table"
+import { Group } from "ka-table/models"
 import {
   closeEditor,
   closeRowEditors,
@@ -567,7 +568,11 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
                     <Table
                       key={`table-${mode === "edit" && p.editingMode === EditingMode.Cell ? "cell-edit" : "readonly"}`}
                       table={table}
-                      columns={nativeColumns as any}
+                      columns={
+                        p.groupByColumn
+                          ? [...(nativeColumns as any), { key: p.groupByColumn, visible: false }]
+                          : (nativeColumns as any)
+                      }
                       data={displayData}
                       rowKeyField={String(p.rowKeyField)}
                       selectedRows={p.selectedRows || []}
@@ -577,6 +582,10 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
                       noData={{ text: p.noDataText || "Nothing found" }}
                       searchText={filter}
                       virtualScrolling={p.virtualScrollingMaxHeight ? { enabled: true } : undefined}
+                      groups={p.groupByColumn ? [{ columnKey: p.groupByColumn }] : undefined}
+                      groupsExpanded={
+                        p.groupByColumn ? displayData.map(row => [(row as any)[p.groupByColumn!]]) : undefined
+                      }
                       search={({ searchText: searchTextValue, rowData, column }) => {
                         if (column.dataType === DataType.Boolean) {
                           const b = (rowData as any)[column.key]
@@ -609,16 +618,35 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
 
                         dataRow: {
                           elementAttributes: dataRowElementAttributes => {
+                            const classes: string[] = []
+
                             if (
                               dataRowElementAttributes.rowKeyValue === editRowId &&
                               p.editingMode !== EditingMode.Cell
                             ) {
-                              return {
-                                className: "override-ka-editing-row",
+                              classes.push("override-ka-editing-row")
+                            }
+
+                            if (p.rowClassName) {
+                              const customClass = p.rowClassName(dataRowElementAttributes.rowData)
+                              if (customClass) {
+                                classes.push(customClass)
                               }
+                            }
+
+                            if (classes.length > 0) {
+                              return { className: classes.join(" ") }
                             }
                           },
                         },
+
+                        ...(p.groupRowContent
+                          ? {
+                              groupRow: {
+                                content: (props: any) => p.groupRowContent!(props),
+                              },
+                            }
+                          : {}),
 
                         headCell: {
                           content: headCellContent => {
