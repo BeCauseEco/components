@@ -259,4 +259,6 @@ export type DataTableProps<TData = any> = PlaywrightProps & {
   pagination?: PaginationConfig
   /** Text shown when the table has no data. Defaults to "Nothing found". */
   noDataText?: string
+  /** When true, prepends a "#" column showing the 1-indexed row number for each row. */
+  showRowNumbers?: boolean
 }
