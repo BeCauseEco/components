@@ -38,7 +38,7 @@ import { createDataTableStyles } from "./styles"
 import { ActionEdit, ActionSaveCancel } from "./internal/ActionComponents"
 import { CellInputTextSingle, CellInputTextDate, CellInputCheckbox, CellInputCombobox } from "./internal/CellEditors"
 import { CellProgressIndicator, CellStatus, CellIcon } from "./internal/CellRenderers"
-import { KEY_DRAG, KEY_ACTIONS_EDIT, KEY_ACTIONS, TABLE_CELL_EMPTY_STRING } from "./internal/constants"
+import { KEY_DRAG, KEY_ROW_NUMBER, KEY_ACTIONS_EDIT, KEY_ACTIONS, TABLE_CELL_EMPTY_STRING } from "./internal/constants"
 import { OptimizedCell } from "./internal/OptimizedCellComponents"
 import { DataTablePagination } from "./internal/DataTablePagination"
 
@@ -232,6 +232,18 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
       }
     })
 
+    // Prepend row number column if enabled
+    if (p.showRowNumbers) {
+      columns.unshift({
+        key: KEY_ROW_NUMBER,
+        title: "#",
+        dataType: DataType.Number,
+        sortDirection: undefined,
+        minWidth: "52px",
+        maxWidth: "52px",
+      } as any)
+    }
+
     // Add action columns if needed
     if (mode === "edit" && p.editingMode !== EditingMode.Cell) {
       columns.push({
@@ -250,7 +262,11 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
     }
 
     return columns
-  }, [p.columns, mode, p.editingMode, p.rowActions, activeSort])
+  }, [p.columns, mode, p.editingMode, p.rowActions, activeSort, p.showRowNumbers])
+
+  const firstDataColumnKey = useMemo(() => {
+    return nativeColumns.find(c => c.key !== KEY_ROW_NUMBER)?.key
+  }, [nativeColumns])
 
   const updateSelectField = useCallback(
     (key: any, value: boolean) => {
@@ -614,6 +630,16 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
                               return <></>
                             }
 
+                            if (headCellContent.column.key === KEY_ROW_NUMBER) {
+                              return (
+                                <Align horizontal right>
+                                  <Text fill={[Color.Neutral, 700]} {...getTextSizeProps("xsmall")}>
+                                    <b>#</b>
+                                  </Text>
+                                </Align>
+                              )
+                            }
+
                             let iconName = ""
 
                             if (headCellContent.column.sortDirection === SortDirection.Ascend) {
@@ -625,7 +651,7 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
                             }
 
                             const alignmentRight = headCellContent.column.dataType === DataType.Number
-                            const firstColumn = headCellContent.column.key === nativeColumns[0].key
+                            const firstColumn = headCellContent.column.key === firstDataColumnKey
 
                             const headCellContentAsColumn = headCellContent.column as Column
                             const allowSort =
@@ -737,6 +763,25 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
 
                         cellText: {
                           content: cellTextContent => {
+                            if (cellTextContent.column.key === KEY_ROW_NUMBER) {
+                              const sortedData = kaPropsUtils.getData(table.props)
+                              const rowIndex = sortedData.findIndex(
+                                (d: any) => d[p.rowKeyField] === cellTextContent.rowKeyValue,
+                              )
+                              const pageOffset =
+                                paginationConfig && p.pagination?.mode === "client"
+                                  ? paginationConfig.pageIndex * paginationConfig.pageSize
+                                  : 0
+
+                              return (
+                                <Align horizontal right>
+                                  <Text fill={[Color.Neutral, 500]} {...getTextSizeProps()}>
+                                    {rowIndex + 1 + pageOffset}
+                                  </Text>
+                                </Align>
+                              )
+                            }
+
                             if (cellTextContent.column.key === KEY_ACTIONS_EDIT && p.editingMode !== EditingMode.Cell) {
                               return (
                                 <Stack horizontal hug>
@@ -774,7 +819,7 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
                               const column = cellTextContent.column as Column
 
                               const alignmentRight = column.dataType === DataType.Number
-                              const firstColumn = column.key === nativeColumns[0].key
+                              const firstColumn = column.key === firstDataColumnKey
 
                               const text = formatValue(
                                 cellTextContent.value?.toString(),
@@ -927,7 +972,7 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
 
                         cellEditor: {
                           content: cellEditorContent => {
-                            const firstColumn = cellEditorContent.column.key === nativeColumns[0].key
+                            const firstColumn = cellEditorContent.column.key === firstDataColumnKey
                             return (
                               <Stack hug horizontal>
                                 {mode === "edit" && firstColumn && p.editingMode !== EditingMode.Cell ? (
