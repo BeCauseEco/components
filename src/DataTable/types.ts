@@ -1,6 +1,6 @@
 import { ReactElement, ReactNode } from "react"
 import { SortDirection } from "ka-table"
-import { ICellTextProps } from "ka-table/props"
+import { ICellTextProps, IGroupRowProps } from "ka-table/props"
 import { AlignProps } from "@new/Stack/Align"
 import { Color, ColorWithLightness } from "@new/Color"
 import { InputButtonPrimaryProps } from "@new/InputButton/InputButtonPrimary"
@@ -261,4 +261,12 @@ export type DataTableProps<TData = any> = PlaywrightProps & {
   noDataText?: string
   /** When true, prepends a "#" column showing the 1-indexed row number for each row. */
   showRowNumbers?: boolean
+  /** Callback to apply custom CSS class names to data rows based on row data. */
+  rowClassName?: (rowData: TData) => string | undefined
+  /** When true, hides the horizontal scrollbar on the table wrapper. */
+  hideHorizontalScroll?: boolean
+  /** Group rows by this column key. Creates group header rows using ka-table's native grouping. */
+  groupByColumn?: string
+  /** Custom renderer for group header rows. Receives ka-table's IGroupRowProps. */
+  groupRowContent?: (props: IGroupRowProps<TData>) => ReactElement
 }

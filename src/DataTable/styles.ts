@@ -327,6 +327,15 @@ export const createDataTableStyles = (
     height: inherit;
   }
 
+  .override-ka-hide-scrollbar {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  .override-ka-hide-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
   @media print {
     .ka {
       zoom: 0.5 !important;
