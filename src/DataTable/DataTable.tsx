@@ -506,7 +506,7 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
       <div
         className={cssScope}
         data-mode={mode}
-        style={{ display: "flex", width: "100%", height: "100%" }}
+        style={{ display: "flex", width: "100%", height: p.virtualScrollingMaxHeight ? "100%" : "auto" }}
         ref={referenceContainer}
         data-playwright-testid={p["data-playwright-testid"]}
       >
