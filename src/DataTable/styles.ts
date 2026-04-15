@@ -161,8 +161,8 @@ export const createDataTableStyles = (
   }
   
   .${cssScope} .ka-cell-editor {
-    min-width: 160px !important;
-    max-width: 200px;
+    min-width: 0;
+    max-width: 100%;
   }
 
   .${cssScope} .ka-row {

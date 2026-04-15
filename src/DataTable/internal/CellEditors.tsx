@@ -43,6 +43,7 @@ export const CellInputTextSingle = ({ column, rowKeyValue, value, autoFocus }: I
       width="auto"
       size="small"
       color={Color.Neutral}
+      hideClearButton
       onChange={v => {
         if (column.dataType === DataType.Number) {
           // Check if input contains tabs (Excel paste)
