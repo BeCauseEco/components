@@ -80,37 +80,6 @@ export const formatValue = (
   }
 }
 
-export const csv = <TData = any>(data: TData[], columns: Column[]) => {
-  const dataSanitized: any[][] = [columns.map(c => c.title)]
-
-  data.forEach(row => {
-    const rowSanitized: string[] = []
-
-    columns.forEach(c => {
-      const column = c as Column
-      const value = (row[column.key] || "").toString()
-      const emptyString = column.placeholder || TABLE_CELL_EMPTY_STRING
-
-      if (column.dataType === DataType.Boolean) {
-        rowSanitized.push(value !== undefined ? (value ? "Yes" : "No") : emptyString)
-      } else if (column.dataType === DataType.String) {
-        const stringValue = value || emptyString
-        rowSanitized.push(stringValue.lastIndexOf(";") !== -1 ? `"${stringValue}"` : stringValue)
-      } else if (column.dataType === DataType.ProgressIndicator) {
-        rowSanitized.push(row[column.key]?.["value"] || emptyString)
-      } else {
-        rowSanitized.push(value || emptyString)
-      }
-    })
-
-    dataSanitized.push(rowSanitized)
-  })
-
-  if (window) {
-    window.open("data:text/csv;charset=utf-8," + dataSanitized.map(ds => ds.join(";")).join("\n"))
-  }
-}
-
 export const calculateColumnWidth = (
   column: Column,
 ): { minWidth: string | number; maxWidth: string | number; width: string | number } => {

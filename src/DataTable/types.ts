@@ -226,7 +226,6 @@ export type DataTableProps<TData = any> = PlaywrightProps & {
   defaultSortColumn: keyof TData & string
   defaultSortDirection?: SortDirection
   rowKeyField: keyof TData & string
-  exportName?: string
   fixedKeyField?: keyof TData & string
   selectedRows?: (string | number)[]
   onSelectionChange?: (selectedRows: (string | number)[]) => void
@@ -234,7 +233,6 @@ export type DataTableProps<TData = any> = PlaywrightProps & {
   virtualScrollingMaxHeight?: `${number}${"px"}` | `${number}${"vh"}`
   loading?: boolean
   loadingElement?: ReactElement
-  exportDisable?: boolean
   disableSorting?: boolean
   rowActions?: (rowData: TData) => RowActionsElement[]
   onChange?: (value: TData[]) => void

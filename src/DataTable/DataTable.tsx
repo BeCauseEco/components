@@ -24,7 +24,6 @@ import { Icon } from "@new/Icon/Icon"
 import styled from "@emotion/styled"
 import { Children, ReactNode, useCallback, useEffect, useId, useRef, useState, useMemo } from "react"
 import _debounce from "lodash/debounce"
-import { useReactToPrint } from "react-to-print"
 import { InputButtonIconTertiary } from "@new/InputButton/InputButtonIconTertiary"
 import { InputCheckbox } from "@new/InputCheckbox/InputCheckbox"
 import { Divider } from "@new/Divider/Divider"
@@ -34,7 +33,7 @@ import { Tooltip } from "@new/Tooltip/Tooltip"
 
 // Import from our new modular structure
 import { DataTableProps, DataType, Column } from "./types"
-import { createNewRow, formatValue, csv, calculateColumnWidth } from "./utils"
+import { createNewRow, formatValue, calculateColumnWidth } from "./utils"
 import { createDataTableStyles } from "./styles"
 import { ActionEdit, ActionSaveCancel } from "./internal/ActionComponents"
 import { CellInputTextSingle, CellInputTextDate, CellInputCheckbox, CellInputCombobox } from "./internal/CellEditors"
@@ -88,7 +87,6 @@ const SearchInput = ({ onDebouncedChange }: { onDebouncedChange: (value: string)
 export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
   // Apply defaults for optional props
   const mode = p.mode ?? "simple"
-  const exportName = p.exportName ?? "export"
   const cssScope = useId().replace(/:/g, "datatable")
   const referenceContainer = useRef<HTMLDivElement>(null)
 
@@ -117,9 +115,13 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
     }, deps)
   }
 
+  const DEFAULT_PAGE_SIZE = 25
+  const isVirtualized = !!p.virtualScrollingMaxHeight
+  const useDefaultPagination = !p.pagination && !isVirtualized
+
   const [filter, setFilter] = useState("")
   const [clientPageIndex, setClientPageIndex] = useState(0)
-  const [clientPageSize, setClientPageSize] = useState(p.pagination?.pageSize ?? 0)
+  const [clientPageSize, setClientPageSize] = useState(p.pagination?.pageSize ?? DEFAULT_PAGE_SIZE)
 
   // Memoize setFilter to prevent SearchInput from re-creating debounced handler
   const handleSearchChange = useCallback((value: string) => {
@@ -138,11 +140,7 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
   })
 
   const paginationConfig = useMemo(() => {
-    if (!p.pagination) {
-      return null
-    }
-
-    if (p.pagination.mode === "server") {
+    if (p.pagination?.mode === "server") {
       return {
         pageIndex: p.pagination.pageIndex,
         pageSize: p.pagination.pageSize,
@@ -154,19 +152,23 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
       }
     }
 
-    return {
-      pageIndex: clientPageIndex,
-      pageSize: clientPageSize,
-      totalCount: p.data.length,
-      totalPages: Math.max(1, Math.ceil(p.data.length / clientPageSize)),
-      onPageChange: setClientPageIndex,
-      onPageSizeChange: (newSize: number) => {
-        setClientPageSize(newSize)
-        setClientPageIndex(0)
-      },
-      pageSizeOptions: p.pagination.pageSizeOptions,
+    if (p.pagination?.mode === "client" || useDefaultPagination) {
+      return {
+        pageIndex: clientPageIndex,
+        pageSize: clientPageSize,
+        totalCount: p.data.length,
+        totalPages: Math.max(1, Math.ceil(p.data.length / clientPageSize)),
+        onPageChange: setClientPageIndex,
+        onPageSizeChange: (newSize: number) => {
+          setClientPageSize(newSize)
+          setClientPageIndex(0)
+        },
+        pageSizeOptions: p.pagination?.pageSizeOptions ?? [10, 25, 50, 100],
+      }
     }
-  }, [p.pagination, p.data.length, clientPageIndex, clientPageSize])
+
+    return null
+  }, [p.pagination, p.data.length, clientPageIndex, clientPageSize, useDefaultPagination])
 
   const displayData = useMemo(() => {
     if (!paginationConfig || p.pagination?.mode === "server") {
@@ -405,9 +407,6 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
     },
   })
 
-  const referencePrint = useRef<HTMLDivElement>(null)
-  const print = useReactToPrint({ contentRef: referencePrint, documentTitle: exportName })
-
   const css = createDataTableStyles(cssScope, p.fill, p.stroke, p.cellPaddingSize, p.noColumnLines, p.borderless)
 
   // Monitor performance of key operations
@@ -441,7 +440,7 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
     }
   }, [editRowId, p.editingMode, table])
 
-  const hasFilters = mode === "filter" || Children.toArray(p.children).length > 0 || !p.exportDisable
+  const hasFilters = mode === "filter" || Children.toArray(p.children).length > 0
 
   // Add keyboard navigation support for edit mode
   useEffect(() => {
@@ -519,36 +518,13 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
                   .filter(child => !!child)
                   .map(child => child)}
               </Align>
-
-              <Align bottomRight horizontal hug>
-                {!p.exportDisable && !p.loadingElement ? (
-                  <>
-                    <Spacer large />
-                    <InputButtonIconTertiary
-                      size="large"
-                      iconName="csv"
-                      title="Export to CSV"
-                      onClick={() => csv(p.data, p.columns as Column[])}
-                    />
-
-                    <InputButtonIconTertiary
-                      size="large"
-                      iconName="print"
-                      title="Print table contents"
-                      onClick={() => print()}
-                    />
-                  </>
-                ) : (
-                  <></>
-                )}
-              </Align>
             </Stack>
           </Align>
 
           {hasFilters ? <Spacer medium id="reference-spacer" /> : <></>}
 
           <Align left vertical>
-            <div id="reference-target" ref={referencePrint}>
+            <div id="reference-target">
               {p.loadingElement ? (
                 p.loadingElement
               ) : (
