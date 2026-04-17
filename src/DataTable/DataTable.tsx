@@ -1149,7 +1149,7 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
                     <></>
                   )}
 
-                  {paginationConfig ? (
+                  {paginationConfig && paginationConfig.totalPages > 1 ? (
                     <DataTablePagination
                       pageIndex={paginationConfig.pageIndex}
                       pageSize={paginationConfig.pageSize}

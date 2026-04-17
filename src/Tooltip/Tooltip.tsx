@@ -46,13 +46,7 @@ export const Tooltip = (p: TooltipProps) => {
         <RadixTooltip.Trigger style={wrapperStyle}>{p.trigger}</RadixTooltip.Trigger>
 
         <RadixTooltip.Portal>
-          <RadixTooltip.Content
-            side="bottom"
-            sideOffset={4}
-            alignOffset={4}
-            align="start"
-            style={contentStyle}
-          >
+          <RadixTooltip.Content side="bottom" sideOffset={4} alignOffset={4} align="start" style={contentStyle}>
             <Stack
               vertical
               hug={p.hug ? true : "partly"}
