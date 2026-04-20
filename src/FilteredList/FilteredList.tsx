@@ -17,7 +17,7 @@ export type ListItemProps = PlaywrightProps & {
   value: string
   label: string
   labelFilter?: string
-  avatarSrc: string
+  avatarSrc?: string
   subtitle?: string
   isFavorite?: boolean
   onToggleFavorite?: () => void

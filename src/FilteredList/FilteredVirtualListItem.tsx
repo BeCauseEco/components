@@ -66,7 +66,7 @@ export const FilteredVirtualListItem = ({
         onClick={() => data.onChange(item.value)}
       >
         <div className="flex items-center gap-2">
-          <Avatar size="large" src={item.avatarSrc} title={item.label} />
+          {item.avatarSrc && <Avatar size="large" src={item.avatarSrc} title={item.label} />}
 
           <div className="flex flex-1 flex-col">
             <Text small fill={[data.color, 700]}>
