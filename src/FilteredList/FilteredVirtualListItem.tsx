@@ -3,6 +3,7 @@ import { Color, ColorWithLightness, computeColor } from "@new/Color"
 import { Avatar } from "@new/Avatar/Avatar"
 import { Text } from "@new/Text/Text"
 import { Icon } from "@new/Icon/Icon"
+import { InputCheckbox } from "@new/InputCheckbox/InputCheckbox"
 import styled from "@emotion/styled"
 import { ListItemProps } from "@new/FilteredList/FilteredList"
 
@@ -11,12 +12,16 @@ type ItemData = {
   selectedValue: string
   color: Color
   onChange: (value: string) => void
+  itemBordered: boolean
+  itemLabelBold: boolean
 }
 
 const VirtualizedItemContainer = styled.div<{
   selected: boolean
   colorSelected: ColorWithLightness
   colorBackgroundHover: ColorWithLightness
+  bordered: boolean
+  colorBorder: ColorWithLightness
 }>(p => ({
   display: "flex",
   flexDirection: "column",
@@ -26,6 +31,10 @@ const VirtualizedItemContainer = styled.div<{
   cursor: "pointer",
   userSelect: "none",
   backgroundColor: "transparent",
+
+  ...(p.bordered && {
+    border: `1px solid ${computeColor(p.colorBorder)}`,
+  }),
 
   "&:hover": {
     backgroundColor: computeColor(p.colorBackgroundHover),
@@ -63,17 +72,25 @@ export const FilteredVirtualListItem = ({
         selected={isSelected}
         colorSelected={[data.color, 400]}
         colorBackgroundHover={[data.color, 50]}
-        onClick={() => data.onChange(item.value)}
+        bordered={data.itemBordered}
+        colorBorder={[data.color, 100]}
+        onClick={() => {
+          if (item.onToggleChecked) {
+            item.onToggleChecked()
+          } else {
+            data.onChange(item.value)
+          }
+        }}
       >
-        <div className="flex items-center gap-2">
-          <Avatar size="large" src={item.avatarSrc} title={item.label} />
+        <div className="flex items-center gap-4">
+          {item.avatarSrc && <Avatar size="large" src={item.avatarSrc} title={item.label} />}
 
           <div className="flex flex-1 flex-col">
             <Text small fill={[data.color, 700]}>
-              {item.label}
+              {data.itemLabelBold ? <b>{item.label}</b> : item.label}
             </Text>
             {item.subtitle && (
-              <Text tiny fill={[data.color, 500]}>
+              <Text tiny fill={[data.color, 500]} wrap>
                 {item.subtitle}
               </Text>
             )}
@@ -88,6 +105,17 @@ export const FilteredVirtualListItem = ({
               onClick={handleFavoriteClick}
               tooltip={item.isFavorite ? "Remove from favorites" : "Add to favorites"}
             />
+          )}
+
+          {item.onToggleChecked && (
+            <div onClick={e => e.stopPropagation()} className="flex items-center">
+              <InputCheckbox
+                size="large"
+                color={data.color}
+                value={item.isChecked === true}
+                onChange={() => item.onToggleChecked?.()}
+              />
+            </div>
           )}
         </div>
       </VirtualizedItemContainer>
