@@ -21,6 +21,8 @@ export type ListItemProps = PlaywrightProps & {
   subtitle?: string
   isFavorite?: boolean
   onToggleFavorite?: () => void
+  isChecked?: boolean
+  onToggleChecked?: () => void
 }
 
 export type FilteredListProps = ComponentBaseProps & {
