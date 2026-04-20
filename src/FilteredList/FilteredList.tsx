@@ -82,15 +82,15 @@ export const FilteredList = ({
 
   const listRef = useRef<VariableSizeList>(null)
 
-  useEffect(() => {
-    listRef.current?.resetAfterIndex(0)
-  }, [filteredItems])
-
   const itemSizeFn = useMemo(() => {
     if (typeof itemHeight === "function") return itemHeight
     const fixed = typeof itemHeight === "number" ? itemHeight : 60
     return () => fixed
   }, [itemHeight])
+
+  useEffect(() => {
+    listRef.current?.resetAfterIndex(0)
+  }, [filteredItems, itemSizeFn])
 
   const totalContentHeight = useMemo(() => {
     let total = 0
