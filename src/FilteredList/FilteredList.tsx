@@ -29,14 +29,16 @@ export type ListItemProps = PlaywrightProps & {
 export type FilteredListProps = ComponentBaseProps & {
   color: Color
   maxHeight: OverflowContainerProps["maxHeight"] | number
-  value: string
+  /** Selected item value for single-select mode. Omit when using per-item `onToggleChecked` (multi-select). */
+  value?: string
   disabled?: boolean
   loading?: boolean
   itemHeight?: number | ((index: number) => number)
   items: ListItemProps[]
   hideSearch?: boolean
 
-  onChange: (value: string) => void
+  /** Called with the row's value on row click (single-select mode). Omit when using per-item `onToggleChecked`. */
+  onChange?: (value: string) => void
 }
 
 const Container = styled.div({
@@ -68,8 +70,8 @@ export const FilteredList = ({
   "data-playwright-testid": playwrightTestId,
   items,
   hideSearch,
-  value,
-  onChange,
+  value = "",
+  onChange = () => {},
 }: FilteredListProps) => {
   const [filter, setFilter] = useState("")
 
