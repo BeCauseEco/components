@@ -1,5 +1,5 @@
 import styled from "@emotion/styled"
-import { useState, useMemo } from "react"
+import { useState, useMemo, useRef, useEffect } from "react"
 import React from "react"
 import { Text } from "@new/Text/Text"
 import { Color } from "@new/Color"
@@ -9,7 +9,7 @@ import { Stack } from "@new/Stack/Stack"
 import { Align } from "@new/Stack/Align"
 import { ComponentBaseProps } from "@new/ComponentBaseProps"
 import { OverflowContainerProps } from "@new/OverflowContainer/OverflowContainer"
-import { FixedSizeList } from "react-window"
+import { VariableSizeList } from "react-window"
 import { FilteredVirtualListItem } from "@new/FilteredList/FilteredVirtualListItem"
 import { PlaywrightProps } from "@new/Playwright"
 
@@ -32,7 +32,7 @@ export type FilteredListProps = ComponentBaseProps & {
   value: string
   disabled?: boolean
   loading?: boolean
-  itemHeight?: number
+  itemHeight?: number | ((index: number) => number)
   items: ListItemProps[]
   hideSearch?: boolean
 
@@ -75,12 +75,32 @@ export const FilteredList = ({
 
   const maxHeightAsNumber =
     typeof maxHeight === "number" ? maxHeight : typeof maxHeight === "string" ? parseInt(maxHeight, 10) || 300 : 300
-  const itemHeightAsNumber = itemHeight || 60
-  const allItemsFit = items.length * itemHeightAsNumber <= maxHeightAsNumber
 
   const filteredItems = useMemo(() => {
     return items?.filter(item => item.label.toLowerCase().includes(filter.toLowerCase())) ?? []
   }, [items, filter])
+
+  const listRef = useRef<VariableSizeList>(null)
+
+  useEffect(() => {
+    listRef.current?.resetAfterIndex(0)
+  }, [filteredItems])
+
+  const itemSizeFn = useMemo(() => {
+    if (typeof itemHeight === "function") return itemHeight
+    const fixed = typeof itemHeight === "number" ? itemHeight : 60
+    return () => fixed
+  }, [itemHeight])
+
+  const totalContentHeight = useMemo(() => {
+    let total = 0
+    for (let i = 0; i < filteredItems.length; i++) {
+      total += itemSizeFn(i)
+    }
+    return total
+  }, [filteredItems, itemSizeFn])
+
+  const allItemsFit = totalContentHeight <= maxHeightAsNumber
 
   return (
     <Container id={id} data-playwright-testid={playwrightTestId} className="<FilteredList /> - ">
@@ -101,10 +121,11 @@ export const FilteredList = ({
           )}
           {filteredItems?.length > 0 ? (
             <VirtualizedListContainer>
-              <FixedSizeList
-                height={Math.min(maxHeightAsNumber, filteredItems.length * itemHeightAsNumber)}
+              <VariableSizeList
+                ref={listRef}
+                height={Math.min(maxHeightAsNumber, totalContentHeight)}
                 itemCount={filteredItems.length}
-                itemSize={itemHeightAsNumber}
+                itemSize={itemSizeFn}
                 itemData={{
                   items: filteredItems,
                   selectedValue: value,
@@ -115,7 +136,7 @@ export const FilteredList = ({
                 style={allItemsFit ? { overflow: "hidden" } : undefined}
               >
                 {FilteredVirtualListItem}
-              </FixedSizeList>
+              </VariableSizeList>
             </VirtualizedListContainer>
           ) : (
             <Text fill={[color, 700]} small>
