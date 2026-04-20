@@ -91,7 +91,9 @@ export const FilteredList = ({
   const listRef = useRef<VariableSizeList>(null)
 
   const itemSizeFn = useMemo(() => {
-    if (typeof itemHeight === "function") return itemHeight
+    if (typeof itemHeight === "function") {
+      return itemHeight
+    }
     const fixed = typeof itemHeight === "number" ? itemHeight : 60
     return () => fixed
   }, [itemHeight])

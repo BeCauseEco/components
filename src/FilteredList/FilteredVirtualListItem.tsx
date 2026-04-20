@@ -108,7 +108,7 @@ export const FilteredVirtualListItem = ({
           )}
 
           {item.onToggleChecked && (
-            <div onClick={(e) => e.stopPropagation()} className="flex items-center">
+            <div onClick={e => e.stopPropagation()} className="flex items-center">
               <InputCheckbox
                 size="large"
                 color={data.color}
