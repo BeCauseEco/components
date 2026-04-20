@@ -22,6 +22,7 @@ export type ListItemProps = PlaywrightProps & {
   isFavorite?: boolean
   onToggleFavorite?: () => void
   isChecked?: boolean
+  /** When provided, a checkbox is rendered and row clicks toggle this item instead of firing the list's single-select onChange. */
   onToggleChecked?: () => void
 }
 

@@ -58,11 +58,6 @@ export const FilteredVirtualListItem = ({
     item.onToggleFavorite?.()
   }
 
-  const handleCheckboxChange = (checked: boolean) => {
-    void checked
-    item.onToggleChecked?.()
-  }
-
   return (
     <div style={style}>
       <VirtualizedItemContainer
@@ -108,7 +103,7 @@ export const FilteredVirtualListItem = ({
                 size="large"
                 color={data.color}
                 value={item.isChecked === true}
-                onChange={handleCheckboxChange}
+                onChange={() => item.onToggleChecked?.()}
               />
             </div>
           )}
