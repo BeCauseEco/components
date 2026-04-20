@@ -12,12 +12,16 @@ type ItemData = {
   selectedValue: string
   color: Color
   onChange: (value: string) => void
+  itemBordered: boolean
+  itemLabelBold: boolean
 }
 
 const VirtualizedItemContainer = styled.div<{
   selected: boolean
   colorSelected: ColorWithLightness
   colorBackgroundHover: ColorWithLightness
+  bordered: boolean
+  colorBorder: ColorWithLightness
 }>(p => ({
   display: "flex",
   flexDirection: "column",
@@ -27,6 +31,10 @@ const VirtualizedItemContainer = styled.div<{
   cursor: "pointer",
   userSelect: "none",
   backgroundColor: "transparent",
+
+  ...(p.bordered && {
+    border: `1px solid ${computeColor(p.colorBorder)}`,
+  }),
 
   "&:hover": {
     backgroundColor: computeColor(p.colorBackgroundHover),
@@ -64,6 +72,8 @@ export const FilteredVirtualListItem = ({
         selected={isSelected}
         colorSelected={[data.color, 400]}
         colorBackgroundHover={[data.color, 50]}
+        bordered={data.itemBordered}
+        colorBorder={[data.color, 100]}
         onClick={() => {
           if (item.onToggleChecked) {
             item.onToggleChecked()
@@ -72,12 +82,12 @@ export const FilteredVirtualListItem = ({
           }
         }}
       >
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-4">
           {item.avatarSrc && <Avatar size="large" src={item.avatarSrc} title={item.label} />}
 
           <div className="flex flex-1 flex-col">
             <Text small fill={[data.color, 700]}>
-              {item.label}
+              {data.itemLabelBold ? <b>{item.label}</b> : item.label}
             </Text>
             {item.subtitle && (
               <Text tiny fill={[data.color, 500]} wrap>

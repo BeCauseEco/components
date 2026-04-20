@@ -36,6 +36,10 @@ export type FilteredListProps = ComponentBaseProps & {
   itemHeight?: number | ((index: number) => number)
   items: ListItemProps[]
   hideSearch?: boolean
+  /** When true, each row is rendered with a 1px border for a card-style list. */
+  itemBordered?: boolean
+  /** When true, each row's label is rendered with bold weight. */
+  itemLabelBold?: boolean
 
   /** Called with the row's value on row click (single-select mode). Omit when using per-item `onToggleChecked`. */
   onChange?: (value: string) => void
@@ -72,6 +76,8 @@ export const FilteredList = ({
   hideSearch,
   value = "",
   onChange = () => {},
+  itemBordered = false,
+  itemLabelBold = false,
 }: FilteredListProps) => {
   const [filter, setFilter] = useState("")
 
@@ -133,6 +139,8 @@ export const FilteredList = ({
                   selectedValue: value,
                   onChange: onChange,
                   color: color,
+                  itemBordered,
+                  itemLabelBold,
                 }}
                 width="100%"
                 style={allItemsFit ? { overflow: "hidden" } : undefined}
