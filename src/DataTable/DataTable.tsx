@@ -139,6 +139,41 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
     direction: p.defaultSortDirection,
   })
 
+  // Apply the search filter to the full dataset BEFORE pagination slicing.
+  // Server mode is the caller's responsibility, so we pass data through unchanged.
+  // Without this step, ka-table's built-in search only sees the current page's rows,
+  // causing matches on other pages to appear as "Nothing found".
+  const searchedData = useMemo(() => {
+    const needle = filter.trim().toLowerCase()
+    if (!needle || p.pagination?.mode === "server") {
+      return p.data
+    }
+    const searchableColumns = p.columns.filter(c => c.dataType !== DataType.Internal && c.dataType !== DataType.Object)
+    return p.data.filter(row =>
+      searchableColumns.some(column => {
+        const value = (row as any)[column.key]
+        if (value === null || value === undefined) {
+          return false
+        }
+        if (column.dataType === DataType.Boolean) {
+          return (needle === "yes" && value === true) || (needle === "no" && value === false)
+        }
+        if (Array.isArray(value)) {
+          return value.some(v => String(v).toLowerCase().includes(needle))
+        }
+        return String(value).toLowerCase().includes(needle)
+      }),
+    )
+  }, [p.data, p.columns, p.pagination?.mode, filter])
+
+  // Reset client pagination to page 0 when the active filter changes, otherwise
+  // the user can land on an empty page (e.g. was on page 7, filter now yields 3 rows).
+  useEffect(() => {
+    if (p.pagination?.mode !== "server") {
+      setClientPageIndex(0)
+    }
+  }, [filter, p.pagination?.mode])
+
   const paginationConfig = useMemo(() => {
     if (p.pagination?.mode === "server") {
       return {
@@ -156,8 +191,8 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
       return {
         pageIndex: clientPageIndex,
         pageSize: clientPageSize,
-        totalCount: p.data.length,
-        totalPages: Math.max(1, Math.ceil(p.data.length / clientPageSize)),
+        totalCount: searchedData.length,
+        totalPages: Math.max(1, Math.ceil(searchedData.length / clientPageSize)),
         onPageChange: setClientPageIndex,
         onPageSizeChange: (newSize: number) => {
           setClientPageSize(newSize)
@@ -168,7 +203,7 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
     }
 
     return null
-  }, [p.pagination, p.data.length, clientPageIndex, clientPageSize, useDefaultPagination])
+  }, [p.pagination, searchedData.length, clientPageIndex, clientPageSize, useDefaultPagination])
 
   const displayData = useMemo(() => {
     if (!paginationConfig || p.pagination?.mode === "server") {
@@ -176,8 +211,8 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
     }
 
     const start = paginationConfig.pageIndex * paginationConfig.pageSize
-    return p.data.slice(start, start + paginationConfig.pageSize)
-  }, [p.data, paginationConfig, p.pagination?.mode])
+    return searchedData.slice(start, start + paginationConfig.pageSize)
+  }, [p.data, searchedData, paginationConfig, p.pagination?.mode])
 
   // Optimization 2: Memoize selected fields count
   const selectedFields = useMemo(() => {
