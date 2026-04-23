@@ -174,6 +174,51 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
     }
   }, [filter, p.pagination?.mode])
 
+  // Sort the full (filtered) dataset BEFORE pagination slicing so sorting spans
+  // the whole dataset, not just the current page. Server mode is caller-owned.
+  // The comparator mirrors ka-table's SortUtils so ka-table re-sorting the
+  // sliced page stays a no-op and header click toggling keeps working.
+  const sortedData = useMemo(() => {
+    if (p.pagination?.mode === "server" || p.disableSorting) {
+      return searchedData
+    }
+    if (!activeSort.column || !activeSort.direction) {
+      return searchedData
+    }
+    const column = p.columns.find(c => c.key === activeSort.column) as Column | undefined
+    if (!column) {
+      return searchedData
+    }
+
+    const direction = activeSort.direction
+    const customSort = column.sort?.(direction)
+
+    const comparator = customSort
+      ? (rowA: any, rowB: any) => customSort(rowA[column.key], rowB[column.key])
+      : (rowA: any, rowB: any) => {
+          const aValue = rowA[column.key]
+          const bValue = rowB[column.key]
+
+          if (aValue === bValue) {
+            return 0
+          }
+          if (aValue == null) {
+            return direction === SortDirection.Ascend ? -1 : 1
+          }
+          if (bValue == null) {
+            return direction === SortDirection.Ascend ? 1 : -1
+          }
+          if (typeof aValue === "string" && typeof bValue === "string") {
+            const ascend = aValue.toLowerCase() < bValue.toLowerCase() ? -1 : 1
+            return direction === SortDirection.Ascend ? ascend : -ascend
+          }
+          const ascend = aValue < bValue ? -1 : 1
+          return direction === SortDirection.Ascend ? ascend : -ascend
+        }
+
+    return [...searchedData].sort(comparator)
+  }, [searchedData, p.columns, p.pagination?.mode, p.disableSorting, activeSort])
+
   const paginationConfig = useMemo(() => {
     if (p.pagination?.mode === "server") {
       return {
@@ -211,8 +256,8 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
     }
 
     const start = paginationConfig.pageIndex * paginationConfig.pageSize
-    return searchedData.slice(start, start + paginationConfig.pageSize)
-  }, [p.data, searchedData, paginationConfig, p.pagination?.mode])
+    return sortedData.slice(start, start + paginationConfig.pageSize)
+  }, [p.data, sortedData, paginationConfig, p.pagination?.mode])
 
   // Optimization 2: Memoize selected fields count
   const selectedFields = useMemo(() => {
