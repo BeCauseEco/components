@@ -49,6 +49,15 @@ export type ServerPagination = {
 
 export type PaginationConfig = ClientPagination | ServerPagination
 
+export type DataTableExportConfig = {
+  /** When true, renders a CSV-download button in the filter row, top-right. */
+  allowCsv: boolean
+  /** Base filename, without extension. Example: "Application progress". */
+  filename: string
+  /** When true, appends a UTC timestamp (`yyyyMMddHHmmss`) before the `.csv` extension. */
+  appendTimestampToFilename?: boolean
+}
+
 export type Column = {
   key: string
   title: string
@@ -267,4 +276,8 @@ export type DataTableProps<TData = any> = PlaywrightProps & {
   groupByColumn?: string
   /** Custom renderer for group header rows. Receives ka-table's IGroupRowProps. */
   groupRowContent?: (props: IGroupRowProps<TData>) => ReactElement
+  /** When set with `allowCsv: true`, renders a CSV-download button in the filter row.
+   *  Exports every row in `data` (ignoring search/sort/pagination) and every column except
+   *  `DataType.Internal` and `DataType.Object`. */
+  enableExports?: DataTableExportConfig
 }

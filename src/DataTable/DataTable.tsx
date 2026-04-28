@@ -41,11 +41,19 @@ import { CellProgressIndicator, CellStatus, CellIcon } from "./internal/CellRend
 import { KEY_DRAG, KEY_ROW_NUMBER, KEY_ACTIONS_EDIT, KEY_ACTIONS, TABLE_CELL_EMPTY_STRING } from "./internal/constants"
 import { OptimizedCell } from "./internal/OptimizedCellComponents"
 import { DataTablePagination } from "./internal/DataTablePagination"
+import { CsvExportButton } from "./internal/CsvExportButton"
 
 // Re-export for backward compatibility
 export { SortDirection } from "ka-table"
 export { DataType } from "./types"
-export type { DataTableProps, Column, PaginationConfig, ClientPagination, ServerPagination } from "./types"
+export type {
+  DataTableProps,
+  Column,
+  PaginationConfig,
+  ClientPagination,
+  ServerPagination,
+  DataTableExportConfig,
+} from "./types"
 
 const CellHeadLink = styled.a({
   display: "flex",
@@ -520,7 +528,8 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
     }
   }, [editRowId, p.editingMode, table])
 
-  const hasFilters = mode === "filter" || Children.toArray(p.children).length > 0
+  const showCsvExportButton = p.enableExports?.allowCsv === true
+  const hasFilters = mode === "filter" || Children.toArray(p.children).length > 0 || showCsvExportButton
 
   // Add keyboard navigation support for edit mode
   useEffect(() => {
@@ -590,16 +599,30 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
         data-playwright-testid={p["data-playwright-testid"]}
       >
         <Stack vertical hug loading={p.loading}>
-          <Align left hug="height" horizontal id="reference-filters">
-            <Stack hug horizontal>
-              <Align left horizontal wrap>
-                {mode === "filter" ? <SearchInput onDebouncedChange={handleSearchChange} /> : <></>}
-                {Children.toArray(p.children)
-                  .filter(child => !!child)
-                  .map(child => child)}
+          <div
+            id="reference-filters"
+            style={{
+              display: "flex",
+              flexDirection: "row",
+              justifyContent: "space-between",
+              alignItems: "flex-start",
+              width: "100%",
+            }}
+          >
+            <Align left horizontal wrap>
+              {mode === "filter" ? <SearchInput onDebouncedChange={handleSearchChange} /> : <></>}
+              {Children.toArray(p.children)
+                .filter(child => !!child)
+                .map(child => child)}
+            </Align>
+            {showCsvExportButton && p.enableExports ? (
+              <Align right horizontal hug>
+                <CsvExportButton config={p.enableExports} columns={p.columns} data={p.data} />
               </Align>
-            </Stack>
-          </Align>
+            ) : (
+              <></>
+            )}
+          </div>
 
           {hasFilters ? <Spacer medium id="reference-spacer" /> : <></>}
 
