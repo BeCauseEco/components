@@ -1,9 +1,9 @@
 import { Column, DataType } from "../types"
 
-/** Returns the column subset that should appear in a CSV export.
- *  Internal and Object columns are excluded — the former is for action columns,
- *  the latter holds non-displayable data. */
-export const getExportableColumns = (columns: Column[]): Column[] =>
+/** Returns the column subset whose values are user-perceivable text — used both
+ *  for CSV export and for narrowing the search index. Internal columns hold action
+ *  affordances (no data); Object columns hold raw structures with no display form. */
+export const getDisplayableColumns = (columns: Column[]): Column[] =>
   columns.filter(c => c.dataType !== DataType.Internal && c.dataType !== DataType.Object)
 
 /** UTC date-only or datetime detector for incoming `DataType.Date` values.
@@ -47,8 +47,9 @@ const formatUtcDate = (date: Date): string => {
   return `${yyyy}-${MM}-${dd}`
 }
 
-/** Formats one row's value for the column. See spec §"Per-cell formatting precedence". */
-export const formatCellForCsv = (value: unknown, column: Column, row: any): string => {
+/** Formats one row's cell for the column. See spec §"Per-cell formatting precedence". */
+export const formatCellForCsv = (column: Column, row: any): string => {
+  const value: unknown = row[column.key]
   switch (column.dataType) {
     case DataType.Status: {
       const configured = column.status?.configure(row)
@@ -99,7 +100,6 @@ export const formatCellForCsv = (value: unknown, column: Column, row: any): stri
     }
 
     case DataType.Icon: {
-      // Icons are decorative; export an empty cell.
       return ""
     }
 
@@ -123,11 +123,9 @@ const escapeCsvField = (field: string): string => {
 
 /** Builds a full CSV string from columns and rows. UTF-8 BOM prefix included. */
 export const buildCsv = (columns: Column[], rows: any[]): string => {
-  const exportable = getExportableColumns(columns)
-  const headerLine = exportable.map(c => escapeCsvField(c.title)).join(",")
-  const dataLines = rows.map(row =>
-    exportable.map(column => escapeCsvField(formatCellForCsv((row as any)[column.key], column, row))).join(","),
-  )
+  const displayable = getDisplayableColumns(columns)
+  const headerLine = displayable.map(c => escapeCsvField(c.title)).join(",")
+  const dataLines = rows.map(row => displayable.map(column => escapeCsvField(formatCellForCsv(column, row))).join(","))
   const BOM = "﻿"
   return BOM + [headerLine, ...dataLines].join("\r\n")
 }
@@ -157,5 +155,7 @@ export const triggerCsvDownload = (csv: string, filename: string): void => {
   document.body.appendChild(link)
   link.click()
   document.body.removeChild(link)
-  URL.revokeObjectURL(url)
+  // Defer the revoke until after the browser has begun reading the Blob —
+  // synchronous revoke can race the download in Safari/Firefox.
+  setTimeout(() => URL.revokeObjectURL(url), 0)
 }

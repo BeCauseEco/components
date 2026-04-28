@@ -42,6 +42,7 @@ import { KEY_DRAG, KEY_ROW_NUMBER, KEY_ACTIONS_EDIT, KEY_ACTIONS, TABLE_CELL_EMP
 import { OptimizedCell } from "./internal/OptimizedCellComponents"
 import { DataTablePagination } from "./internal/DataTablePagination"
 import { CsvExportButton } from "./internal/CsvExportButton"
+import { getDisplayableColumns } from "./internal/exportToCsv"
 
 // Re-export for backward compatibility
 export { SortDirection } from "ka-table"
@@ -156,7 +157,7 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
     if (!needle || p.pagination?.mode === "server") {
       return p.data
     }
-    const searchableColumns = p.columns.filter(c => c.dataType !== DataType.Internal && c.dataType !== DataType.Object)
+    const searchableColumns = getDisplayableColumns(p.columns)
     return p.data.filter(row =>
       searchableColumns.some(column => {
         const value = (row as any)[column.key]
@@ -615,12 +616,8 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
                 .filter(child => !!child)
                 .map(child => child)}
             </Align>
-            {showCsvExportButton && p.enableExports ? (
-              <Align right horizontal hug>
-                <CsvExportButton config={p.enableExports} columns={p.columns} data={p.data} />
-              </Align>
-            ) : (
-              <></>
+            {showCsvExportButton && p.enableExports && (
+              <CsvExportButton config={p.enableExports} columns={p.columns} data={p.data} />
             )}
           </div>
 
