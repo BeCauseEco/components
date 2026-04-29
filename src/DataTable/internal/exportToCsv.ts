@@ -96,7 +96,10 @@ export const formatCellForCsv = (column: Column, row: any): string => {
 
     case DataType.ProgressIndicator: {
       const configured = column.progressIndicator?.configure(row)
-      return configured?.value !== undefined ? String(configured.value) : ""
+      if (configured?.csvValue !== undefined) {
+        return configured.csvValue
+      }
+      return configured?.value !== undefined ? `${configured.value}%` : ""
     }
 
     case DataType.Icon: {
