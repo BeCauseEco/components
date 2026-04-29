@@ -1,9 +1,13 @@
 import { EDirection } from "@new/EDirection"
 import { TChartItem } from "../ChartItem"
-import { ReactElement, SVGProps } from "react"
+import { ReactElement, ReactNode, SVGProps } from "react"
 
 export type AxisConfiguration = {
-  tick?: SVGProps<SVGTextElement> | ReactElement<SVGElement> | ((props: any) => ReactElement<SVGElement>) | boolean
+  tick?:
+    | Omit<SVGProps<SVGTextElement>, "children">
+    | ReactElement<SVGElement>
+    | ((props: any) => ReactNode)
+    | boolean
   tickFormatter?: (value: any, index: number) => string
   type?: "number" | "category"
   dataKey?: string

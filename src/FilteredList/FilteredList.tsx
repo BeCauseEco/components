@@ -1,6 +1,5 @@
 import styled from "@emotion/styled"
-import { useState, useMemo, useRef, useEffect } from "react"
-import React from "react"
+import { useState, useMemo } from "react"
 import { Text } from "@new/Text/Text"
 import { Color } from "@new/Color"
 import { InputTextSingle } from "@new/InputText/InputTextSingle"
@@ -9,8 +8,8 @@ import { Stack } from "@new/Stack/Stack"
 import { Align } from "@new/Stack/Align"
 import { ComponentBaseProps } from "@new/ComponentBaseProps"
 import { OverflowContainerProps } from "@new/OverflowContainer/OverflowContainer"
-import { VariableSizeList } from "react-window"
-import { FilteredVirtualListItem } from "@new/FilteredList/FilteredVirtualListItem"
+import { List } from "react-window"
+import { FilteredVirtualListItem, FilteredVirtualListItemProps } from "@new/FilteredList/FilteredVirtualListItem"
 import { PlaywrightProps } from "@new/Playwright"
 
 export type ListItemProps = PlaywrightProps & {
@@ -88,8 +87,6 @@ export const FilteredList = ({
     return items?.filter(item => item.label.toLowerCase().includes(filter.toLowerCase())) ?? []
   }, [items, filter])
 
-  const listRef = useRef<VariableSizeList>(null)
-
   const itemSizeFn = useMemo(() => {
     if (typeof itemHeight === "function") {
       return itemHeight
@@ -97,10 +94,6 @@ export const FilteredList = ({
     const fixed = typeof itemHeight === "number" ? itemHeight : 60
     return () => fixed
   }, [itemHeight])
-
-  useEffect(() => {
-    listRef.current?.resetAfterIndex(0)
-  }, [filteredItems, itemSizeFn])
 
   const totalContentHeight = useMemo(() => {
     let total = 0
@@ -130,13 +123,12 @@ export const FilteredList = ({
             </>
           )}
           {filteredItems?.length > 0 ? (
-            <VirtualizedListContainer>
-              <VariableSizeList
-                ref={listRef}
-                height={Math.min(maxHeightAsNumber, totalContentHeight)}
-                itemCount={filteredItems.length}
-                itemSize={itemSizeFn}
-                itemData={{
+            <VirtualizedListContainer style={{ height: Math.min(maxHeightAsNumber, totalContentHeight) }}>
+              <List<FilteredVirtualListItemProps>
+                rowComponent={FilteredVirtualListItem}
+                rowCount={filteredItems.length}
+                rowHeight={itemSizeFn}
+                rowProps={{
                   items: filteredItems,
                   selectedValue: value,
                   onChange: onChange,
@@ -144,11 +136,8 @@ export const FilteredList = ({
                   itemBordered,
                   itemLabelBold,
                 }}
-                width="100%"
                 style={allItemsFit ? { overflow: "hidden" } : undefined}
-              >
-                {FilteredVirtualListItem}
-              </VariableSizeList>
+              />
             </VirtualizedListContainer>
           ) : (
             <Text fill={[color, 700]} small>
