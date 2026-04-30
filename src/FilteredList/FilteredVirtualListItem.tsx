@@ -7,7 +7,7 @@ import { InputCheckbox } from "@new/InputCheckbox/InputCheckbox"
 import styled from "@emotion/styled"
 import { ListItemProps } from "@new/FilteredList/FilteredList"
 
-type ItemData = {
+export type FilteredVirtualListItemProps = {
   items: ListItemProps[]
   selectedValue: string
   color: Color
@@ -48,18 +48,22 @@ const VirtualizedItemContainer = styled.div<{
 export const FilteredVirtualListItem = ({
   index,
   style,
-  data,
+  items,
+  selectedValue,
+  color,
+  onChange,
+  itemBordered,
+  itemLabelBold,
 }: {
   index: number
   style: React.CSSProperties
-  data: ItemData
-}) => {
-  const item = data.items[index]
+} & FilteredVirtualListItemProps) => {
+  const item = items[index]
   if (!item) {
     return null
   }
 
-  const isSelected = item.value === data.selectedValue
+  const isSelected = item.value === selectedValue
 
   const handleFavoriteClick = (e: React.MouseEvent) => {
     e.stopPropagation()
@@ -70,15 +74,15 @@ export const FilteredVirtualListItem = ({
     <div style={style}>
       <VirtualizedItemContainer
         selected={isSelected}
-        colorSelected={[data.color, 400]}
-        colorBackgroundHover={[data.color, 50]}
-        bordered={data.itemBordered}
-        colorBorder={[data.color, 100]}
+        colorSelected={[color, 400]}
+        colorBackgroundHover={[color, 50]}
+        bordered={itemBordered}
+        colorBorder={[color, 100]}
         onClick={() => {
           if (item.onToggleChecked) {
             item.onToggleChecked()
           } else {
-            data.onChange(item.value)
+            onChange(item.value)
           }
         }}
       >
@@ -86,11 +90,11 @@ export const FilteredVirtualListItem = ({
           {item.avatarSrc && <Avatar size="large" src={item.avatarSrc} title={item.label} />}
 
           <div className="flex flex-1 flex-col">
-            <Text small fill={[data.color, 700]}>
-              {data.itemLabelBold ? <b>{item.label}</b> : item.label}
+            <Text small fill={[color, 700]}>
+              {itemLabelBold ? <b>{item.label}</b> : item.label}
             </Text>
             {item.subtitle && (
-              <Text tiny fill={[data.color, 500]} wrap>
+              <Text tiny fill={[color, 500]} wrap>
                 {item.subtitle}
               </Text>
             )}
@@ -100,7 +104,7 @@ export const FilteredVirtualListItem = ({
             <Icon
               name="favorite"
               medium
-              fill={item.isFavorite ? [Color.Tertiary, 500] : [data.color, 300]}
+              fill={item.isFavorite ? [Color.Tertiary, 500] : [color, 300]}
               style={item.isFavorite ? "filled" : "outlined"}
               onClick={handleFavoriteClick}
               tooltip={item.isFavorite ? "Remove from favorites" : "Add to favorites"}
@@ -111,7 +115,7 @@ export const FilteredVirtualListItem = ({
             <div onClick={e => e.stopPropagation()} className="flex items-center">
               <InputCheckbox
                 size="large"
-                color={data.color}
+                color={color}
                 value={item.isChecked === true}
                 onChange={() => item.onToggleChecked?.()}
               />

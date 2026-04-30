@@ -41,7 +41,12 @@ export default defineConfig([
 
     settings: {
       react: {
-        version: "detect",
+        // Hardcoded to bypass eslint-plugin-react's auto-detection, which calls
+        // the removed-in-ESLint-10 context.getFilename() API and crashes the lint
+        // step. See vercel/next.js#89764 and the upstream fix in
+        // jsx-eslint/eslint-plugin-react#3979. Restore "detect" once eslint-plugin-react
+        // ships a release containing that fix.
+        version: "19.2",
       },
     },
 

@@ -63,7 +63,7 @@ export const FeaturesClusterMarker = ({ position, size, sizeAsText }: TreeCluste
     map?.setZoom(currentZoom! + 1)
   }, [map])
 
-  let markerSizeInPx = 20
+  let markerSizeInPx: number
 
   // Reduced sizes by ~20% and removed icon size variables since we're removing the icon
   if (size > 1000) {
