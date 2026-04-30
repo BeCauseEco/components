@@ -89,6 +89,8 @@ export type Column = {
       | {
           value: number
           color: Color
+          /** Used by CSV export; falls back to `${value}%` when absent */
+          csvValue?: string
         }
       | undefined
   }
