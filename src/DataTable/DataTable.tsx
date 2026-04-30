@@ -754,7 +754,7 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
                               )
                             }
 
-                            let iconName = ""
+                            let iconName: string
 
                             if (headCellContent.column.sortDirection === SortDirection.Ascend) {
                               iconName = "keyboard_arrow_up"
@@ -974,7 +974,7 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
                                 footerElement = column.footer(cellTextContent.rowData)
                               }
 
-                              let output = <></>
+                              let output: ReactNode
 
                               if (column.dataType === DataType.ProgressIndicator) {
                                 output = <CellProgressIndicator {...cellTextContent} textSize={p.textSize} />

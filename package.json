@@ -55,5 +55,9 @@
     "globals": "^17.5.0",
     "prettier": "^3.8.3",
     "typescript": "^6.0.3"
+  },
+  "//resolutions": "Force @typescript-eslint/utils >= 8.59 everywhere. eslint-config-next bundles typescript-eslint@8.48 whose @typescript-eslint/utils still does `class FlatESLint extends use_at_your_own_risk.FlatESLint` directly, which crashes under ESLint 10 (FlatESLint was removed). 8.59+ falls back to ESLint when FlatESLint is undefined. Remove this resolution once eslint-config-next ships with typescript-eslint >= 8.49.",
+  "resolutions": {
+    "@typescript-eslint/utils": "^8.59.1"
   }
 }
