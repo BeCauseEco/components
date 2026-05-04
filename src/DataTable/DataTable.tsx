@@ -42,6 +42,7 @@ import { KEY_DRAG, KEY_ROW_NUMBER, KEY_ACTIONS_EDIT, KEY_ACTIONS, TABLE_CELL_EMP
 import { OptimizedCell } from "./internal/OptimizedCellComponents"
 import { DataTableFooter } from "./internal/DataTableFooter"
 import { DataTableEdgeFade } from "./internal/DataTableHorizontalAffordance"
+import { useDataTableHorizontalOverflow } from "./internal/useDataTableHorizontalOverflow"
 import { CsvExportButton } from "./internal/CsvExportButton"
 import { getDisplayableColumns } from "./internal/exportToCsv"
 
@@ -142,6 +143,7 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
   const [deleteId, setDeleteId] = useState<number | null>(null)
   const [dataTemp, setDataTemp] = useState<TData[]>([])
   const [scrollContainer, setScrollContainer] = useState<HTMLElement | null>(null)
+  const overflow = useDataTableHorizontalOverflow(p.hideHorizontalScroll ? null : scrollContainer)
 
   // Track active sort state so nativeColumns always reflects the current sort,
   // preventing ka-table's controlled props sync from resetting user sort on re-renders
@@ -1222,7 +1224,7 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
                           },
                         }}
                       />
-                      <DataTableEdgeFade scrollContainer={p.hideHorizontalScroll ? null : scrollContainer} />
+                      <DataTableEdgeFade overflow={overflow} />
                     </div>
                   </Align>
 
@@ -1253,7 +1255,7 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
                   )}
 
                   <DataTableFooter
-                    scrollContainer={p.hideHorizontalScroll ? null : scrollContainer}
+                    overflow={overflow}
                     pagination={
                       paginationConfig
                         ? {

@@ -1,5 +1,6 @@
 import { DataTablePagination } from "./DataTablePagination"
 import { DataTableHorizontalAffordance } from "./DataTableHorizontalAffordance"
+import { HorizontalOverflowApi } from "./useDataTableHorizontalOverflow"
 
 interface PaginationProps {
   pageIndex: number
@@ -12,7 +13,7 @@ interface PaginationProps {
 }
 
 interface DataTableFooterProps {
-  scrollContainer: HTMLElement | null
+  overflow: HorizontalOverflowApi
   pagination: PaginationProps | null
   textSize?: "xxtiny" | "xtiny" | "tiny" | "xsmall" | "small" | "medium" | "large"
 }
@@ -22,7 +23,7 @@ export const DataTableFooter = (p: DataTableFooterProps) => {
 
   return (
     <>
-      <DataTableHorizontalAffordance scrollContainer={p.scrollContainer} />
+      <DataTableHorizontalAffordance overflow={p.overflow} />
 
       {showPagination && (
         <DataTablePagination
