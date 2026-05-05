@@ -336,24 +336,6 @@ export const createDataTableStyles = (
     display: none;
   }
 
-  .datatable-edge-fade {
-    pointer-events: none;
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    width: calc(var(--BU) * 8);
-    z-index: 1;
-  }
-
-  .datatable-edge-fade-left {
-    background: linear-gradient(to right, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0));
-  }
-
-  .datatable-edge-fade-right {
-    right: 0;
-    background: linear-gradient(to left, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0));
-  }
-
   @media print {
     .ka {
       zoom: 0.5 !important;
