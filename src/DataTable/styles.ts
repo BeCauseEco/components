@@ -336,30 +336,6 @@ export const createDataTableStyles = (
     display: none;
   }
 
-  .datatable-horizontal-scroll-proxy {
-    flex: 1 1 auto;
-    min-width: 0;
-    height: 12px;
-    overflow-x: scroll;
-    overflow-y: hidden;
-    scrollbar-width: thin;
-    scrollbar-color: var(--color-neutral-400, #878787) transparent;
-  }
-
-  .datatable-horizontal-scroll-proxy::-webkit-scrollbar {
-    height: 8px;
-    background: transparent;
-  }
-
-  .datatable-horizontal-scroll-proxy::-webkit-scrollbar-thumb {
-    background-color: var(--color-neutral-400, #878787);
-    border-radius: 999px;
-  }
-
-  .datatable-horizontal-scroll-proxy:hover::-webkit-scrollbar-thumb {
-    background-color: var(--color-neutral-500, #6f6f6f);
-  }
-
   .datatable-edge-fade {
     pointer-events: none;
     position: absolute;
