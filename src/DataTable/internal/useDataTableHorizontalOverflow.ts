@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react"
+import { useEffect, useState } from "react"
 
 export interface HorizontalOverflowState {
   isOverflowing: boolean
@@ -11,9 +11,6 @@ export interface HorizontalOverflowState {
 export interface HorizontalOverflowApi extends HorizontalOverflowState {
   canScrollLeft: boolean
   canScrollRight: boolean
-  scrollByColumn: (direction: "left" | "right") => void
-  scrollToOffset: (offset: number) => void
-  scrollContainer: HTMLElement | null
 }
 
 const EDGE_TOLERANCE_PX = 1
@@ -50,23 +47,6 @@ const stateEquals = (a: HorizontalOverflowState, b: HorizontalOverflowState): bo
   a.scrollWidth === b.scrollWidth &&
   a.clientWidth === b.clientWidth &&
   a.stickyLeftOffset === b.stickyLeftOffset
-
-const findColumnTargets = (scrollContainer: HTMLElement): number[] => {
-  const containerRect = scrollContainer.getBoundingClientRect()
-  const headers = scrollContainer.querySelectorAll<HTMLTableCellElement>("thead th")
-  const offsets: number[] = []
-  headers.forEach(th => {
-    if (window.getComputedStyle(th).position === "sticky") {
-      return
-    }
-    const rect = th.getBoundingClientRect()
-    const offset = rect.left - containerRect.left + scrollContainer.scrollLeft
-    if (Number.isFinite(offset)) {
-      offsets.push(offset)
-    }
-  })
-  return Array.from(new Set(offsets)).sort((a, b) => a - b)
-}
 
 export const useDataTableHorizontalOverflow = (scrollContainer: HTMLElement | null): HorizontalOverflowApi => {
   const [state, setState] = useState<HorizontalOverflowState>(INITIAL_STATE)
@@ -107,48 +87,6 @@ export const useDataTableHorizontalOverflow = (scrollContainer: HTMLElement | nu
     }
   }, [scrollContainer])
 
-  const scrollToOffset = useCallback(
-    (offset: number) => {
-      if (!scrollContainer) {
-        return
-      }
-      const max = scrollContainer.scrollWidth - scrollContainer.clientWidth
-      const clamped = Math.max(0, Math.min(max, offset))
-      scrollContainer.scrollTo({ left: clamped, behavior: "smooth" })
-    },
-    [scrollContainer],
-  )
-
-  const scrollByColumn = useCallback(
-    (direction: "left" | "right") => {
-      if (!scrollContainer) {
-        return
-      }
-      const targets = findColumnTargets(scrollContainer)
-      const current = scrollContainer.scrollLeft
-      let target: number | undefined
-      if (direction === "right") {
-        target = targets.find(left => left > current + EDGE_TOLERANCE_PX)
-      } else {
-        for (let i = targets.length - 1; i >= 0; i--) {
-          if (targets[i] < current - EDGE_TOLERANCE_PX) {
-            target = targets[i]
-            break
-          }
-        }
-      }
-
-      if (target === undefined) {
-        const delta = scrollContainer.clientWidth * 0.8
-        scrollToOffset(direction === "right" ? current + delta : current - delta)
-        return
-      }
-
-      scrollToOffset(target)
-    },
-    [scrollContainer, scrollToOffset],
-  )
-
   const canScrollLeft = state.scrollLeft > EDGE_TOLERANCE_PX
   const canScrollRight = state.scrollWidth - state.clientWidth - state.scrollLeft > EDGE_TOLERANCE_PX
 
@@ -156,8 +94,5 @@ export const useDataTableHorizontalOverflow = (scrollContainer: HTMLElement | nu
     ...state,
     canScrollLeft,
     canScrollRight,
-    scrollByColumn,
-    scrollToOffset,
-    scrollContainer,
   }
 }

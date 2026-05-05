@@ -40,8 +40,8 @@ import { CellInputTextSingle, CellInputTextDate, CellInputCheckbox, CellInputCom
 import { CellProgressIndicator, CellStatus, CellIcon } from "./internal/CellRenderers"
 import { KEY_DRAG, KEY_ROW_NUMBER, KEY_ACTIONS_EDIT, KEY_ACTIONS, TABLE_CELL_EMPTY_STRING } from "./internal/constants"
 import { OptimizedCell } from "./internal/OptimizedCellComponents"
-import { DataTableFooter } from "./internal/DataTableFooter"
-import { DataTableEdgeFade } from "./internal/DataTableHorizontalAffordance"
+import { DataTablePagination } from "./internal/DataTablePagination"
+import { DataTableEdgeFade } from "./internal/DataTableEdgeFade"
 import { useDataTableHorizontalOverflow } from "./internal/useDataTableHorizontalOverflow"
 import { CsvExportButton } from "./internal/CsvExportButton"
 import { getDisplayableColumns } from "./internal/exportToCsv"
@@ -684,20 +684,24 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
                           tableWrapper: {
                             elementAttributes: () => {
                               const style: Record<string, string> = {}
-                              let className = "override-ka-hide-scrollbar"
+                              let className = ""
 
                               if (p.virtualScrollingMaxHeight) {
                                 style.maxHeight = p.virtualScrollingMaxHeight
                               }
 
+                              if (p.hideHorizontalScroll) {
+                                className += (className ? " " : "") + "override-ka-hide-scrollbar"
+                              }
+
                               if (mode === "edit" && p.editingMode !== EditingMode.Cell) {
-                                className = "override-ka-reorder override-ka-hide-scrollbar"
+                                className = "override-ka-reorder"
                               }
 
                               return {
                                 ref: setScrollContainer,
                                 ...(Object.keys(style).length > 0 ? { style } : {}),
-                                className,
+                                ...(className ? { className } : {}),
                               }
                             },
                           },
@@ -1254,23 +1258,19 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
                     <></>
                   )}
 
-                  <DataTableFooter
-                    overflow={overflow}
-                    pagination={
-                      paginationConfig
-                        ? {
-                            pageIndex: paginationConfig.pageIndex,
-                            pageSize: paginationConfig.pageSize,
-                            totalCount: paginationConfig.totalCount,
-                            totalPages: paginationConfig.totalPages,
-                            pageSizeOptions: paginationConfig.pageSizeOptions,
-                            onPageChange: paginationConfig.onPageChange,
-                            onPageSizeChange: paginationConfig.onPageSizeChange,
-                          }
-                        : null
-                    }
-                    textSize={p.textSize}
-                  />
+                  {paginationConfig && paginationConfig.totalPages > 1 ? (
+                    <DataTablePagination
+                      pageIndex={paginationConfig.pageIndex}
+                      pageSize={paginationConfig.pageSize}
+                      totalCount={paginationConfig.totalCount}
+                      pageSizeOptions={paginationConfig.pageSizeOptions}
+                      onPageChange={paginationConfig.onPageChange}
+                      onPageSizeChange={paginationConfig.onPageSizeChange}
+                      textSize={p.textSize}
+                    />
+                  ) : (
+                    <></>
+                  )}
                 </Stack>
               )}
             </div>
