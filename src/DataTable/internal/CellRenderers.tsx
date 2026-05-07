@@ -24,7 +24,7 @@ export const CellProgressIndicator = (
       <Align horizontal left={type === "bar"} center={type === "circle"}>
         <ProgressIndicator
           type={type}
-          size="large"
+          size="small"
           color={Color.Neutral}
           labelStart={
             typeof cellTextProps.column["startAdornment"] === "function"
