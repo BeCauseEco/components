@@ -16,14 +16,13 @@ export const CellProgressIndicator = (
   },
 ) => {
   const progressIndicator = cellTextProps.column["progressIndicator"] as Column["progressIndicator"]
-  const type = progressIndicator?.type || "bar"
   const { value, color } = progressIndicator?.configure(cellTextProps.rowData) || { value: 0, color: Color.Neutral }
 
   return (
     <Stack hug horizontal>
-      <Align horizontal left={type === "bar"} center={type === "circle"}>
+      <Align horizontal left>
         <ProgressIndicator
-          type={type}
+          type="bar"
           size="large"
           color={Color.Neutral}
           labelStart={

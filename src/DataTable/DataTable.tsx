@@ -1,22 +1,11 @@
 "use client"
 import { Stack } from "@new/Stack/Stack"
 import { Align } from "@new/Stack/Align"
-import { EditingMode, InsertRowPosition, SortDirection, SortingMode, Table, useTable } from "ka-table"
-import { Group } from "ka-table/models"
-import {
-  closeEditor,
-  closeRowEditors,
-  deleteRow,
-  openEditor,
-  setFocused,
-  moveFocusedRight,
-  moveFocusedLeft,
-} from "ka-table/actionCreators"
+import { EditingMode, SortDirection, SortingMode, Table, useTable } from "ka-table"
+import { closeEditor, closeRowEditors, openEditor, setFocused, moveFocusedRight, moveFocusedLeft } from "ka-table/actionCreators"
 import { Cell } from "ka-table/Models/Cell"
 import { Focused } from "ka-table/Models/Focused"
-import { InputButtonPrimary } from "@new/InputButton/InputButtonPrimary"
 import { Spacer } from "@new/Stack/Spacer"
-import { InputButtonTertiary } from "@new/InputButton/InputButtonTertiary"
 import { InputTextSingle } from "@new/InputText/InputTextSingle"
 import { Color, computeColor } from "@new/Color"
 import { Text } from "@new/Text/Text"
@@ -24,21 +13,17 @@ import { Icon } from "@new/Icon/Icon"
 import styled from "@emotion/styled"
 import { Children, ReactNode, useCallback, useEffect, useId, useRef, useState, useMemo } from "react"
 import _debounce from "lodash/debounce"
-import { InputButtonIconTertiary } from "@new/InputButton/InputButtonIconTertiary"
 import { InputCheckbox } from "@new/InputCheckbox/InputCheckbox"
-import { Divider } from "@new/Divider/Divider"
 import { kaPropsUtils } from "ka-table/utils"
-import { Alert } from "@new/Alert/Alert"
 import { Tooltip } from "@new/Tooltip/Tooltip"
 
 // Import from our new modular structure
 import { DataTableProps, DataType, Column } from "./types"
-import { createNewRow, formatValue, calculateColumnWidth } from "./utils"
+import { formatValue, calculateColumnWidth } from "./utils"
 import { createDataTableStyles } from "./styles"
-import { ActionEdit, ActionSaveCancel } from "./internal/ActionComponents"
 import { CellInputTextSingle, CellInputTextDate, CellInputCheckbox, CellInputCombobox } from "./internal/CellEditors"
 import { CellProgressIndicator, CellStatus, CellIcon } from "./internal/CellRenderers"
-import { KEY_DRAG, KEY_ROW_NUMBER, KEY_ACTIONS_EDIT, KEY_ACTIONS, TABLE_CELL_EMPTY_STRING } from "./internal/constants"
+import { KEY_ROW_NUMBER, KEY_ACTIONS, TABLE_CELL_EMPTY_STRING } from "./internal/constants"
 import { OptimizedCell } from "./internal/OptimizedCellComponents"
 import { DataTablePagination } from "./internal/DataTablePagination"
 import { CsvExportButton } from "./internal/CsvExportButton"
@@ -138,8 +123,6 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
   }, [])
   const [editRowId, setEditRowId] = useState<number | null>(null)
   const [editColumnId, setEditColumnId] = useState<string>("")
-  const [deleteId, setDeleteId] = useState<number | null>(null)
-  const [dataTemp, setDataTemp] = useState<TData[]>([])
 
   // Track active sort state so nativeColumns always reflects the current sort,
   // preventing ka-table's controlled props sync from resetting user sort on re-renders
@@ -311,7 +294,6 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
         minWidth: column.minWidth,
         maxWidth: column.maxWidth,
         explodeWidth: column.explodeWidth,
-        preventContentCollapse: column.preventContentCollapse,
         isEditable: column.isEditable,
         endAdornment: column.endAdornment,
         startAdornment: column.startAdornment,
@@ -336,15 +318,8 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
       } as any)
     }
 
-    // Add action columns if needed
-    if (mode === "edit" && p.editingMode !== EditingMode.Cell) {
-      columns.push({
-        key: KEY_ACTIONS_EDIT,
-        title: "",
-        dataType: DataType.Internal,
-        sortDirection: undefined,
-      } as any)
-    } else if (p.rowActions) {
+    // Add action column for row-level rowActions buttons
+    if (p.rowActions) {
       columns.push({
         key: KEY_ACTIONS,
         title: "",
@@ -354,7 +329,7 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
     }
 
     return columns
-  }, [p.columns, mode, p.editingMode, p.rowActions, activeSort, p.showRowNumbers])
+  }, [p.columns, mode, p.rowActions, activeSort, p.showRowNumbers])
 
   const firstDataColumnKey = useMemo(() => {
     return nativeColumns.find(c => c.key !== KEY_ROW_NUMBER)?.key
@@ -438,60 +413,15 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
           }
           setEditRowId(rowKeyValue)
           setEditColumnId(d.columnKey)
-          setDataTemp(p.data)
         }
 
         if (d.type === "UpdateCellValue") {
           const updatedData = kaPropsUtils.getData(table.props)
 
-          setDataTemp(updatedData)
-
           if (p.onChange) {
             p.onChange(updatedData)
           }
         }
-        return
-      }
-
-      if (d.type === "OpenRowEditors") {
-        setEditRowId(d.rowKeyValue)
-        setDataTemp(p.data)
-      }
-
-      if (d.type === "ReorderRows") {
-        setDataTemp(kaPropsUtils.getData(table.props))
-      }
-
-      if (d.type === "CloseRowEditors") {
-        setEditRowId(null)
-
-        if (p.onChange) {
-          p.onChange(dataTemp)
-        }
-
-        table.updateData(dataTemp)
-      }
-
-      if (d.type === "SaveRowEditors" || d.type === "ReorderRows" || d.type === "InsertRow" || d.type === "DeleteRow") {
-        const data = kaPropsUtils.getData(table.props)
-
-        if (d.type !== "ReorderRows") {
-          setEditRowId(null)
-        }
-
-        if (p.onChange) {
-          p.onChange(data)
-        }
-
-        if (p.onChangeRow) {
-          if (d.type === "InsertRow") {
-            p.onChangeRow(data[data.length - 1])
-          } else {
-            p.onChangeRow(data.filter(d => d.id === rowKeyValue)?.[0])
-          }
-        }
-
-        setDeleteId(null)
       }
     },
   })
@@ -642,26 +572,17 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
                       Without this key, cells remain editable even after switching from EditingMode.Cell to None.
                     */}
                     <Table
-                      key={`table-${mode === "edit" && p.editingMode === EditingMode.Cell ? "cell-edit" : "readonly"}`}
+                      key={p.editingMode === EditingMode.Cell ? "cell-edit" : "readonly"}
                       table={table}
-                      columns={
-                        p.groupByColumn
-                          ? [...(nativeColumns as any), { key: p.groupByColumn, visible: false }]
-                          : (nativeColumns as any)
-                      }
+                      columns={nativeColumns as any}
                       data={displayData}
                       rowKeyField={String(p.rowKeyField)}
                       selectedRows={p.selectedRows || []}
                       sortingMode={p.disableSorting ? SortingMode.None : SortingMode.Single}
                       editingMode={p.editingMode}
-                      rowReordering={mode === "edit" && p.editingMode !== EditingMode.Cell}
                       noData={{ text: p.noDataText || "Nothing found" }}
                       searchText={filter}
                       virtualScrolling={p.virtualScrollingMaxHeight ? { enabled: true } : undefined}
-                      groups={p.groupByColumn ? [{ columnKey: p.groupByColumn }] : undefined}
-                      groupsExpanded={
-                        p.groupByColumn ? displayData.map(row => [(row as any)[p.groupByColumn!]]) : undefined
-                      }
                       search={({ searchText: searchTextValue, rowData, column }) => {
                         if (column.dataType === DataType.Boolean) {
                           const b = (rowData as any)[column.key]
@@ -678,69 +599,15 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
                       childComponents={{
                         tableWrapper: {
                           elementAttributes: () => {
-                            const style: Record<string, string> = {}
-                            let className = ""
-
                             if (p.virtualScrollingMaxHeight) {
-                              style.maxHeight = p.virtualScrollingMaxHeight
-                            }
-
-                            if (p.hideHorizontalScroll) {
-                              className += (className ? " " : "") + "override-ka-hide-scrollbar"
-                            }
-
-                            if (mode === "edit" && p.editingMode !== EditingMode.Cell) {
-                              className = "override-ka-reorder"
-                            }
-
-                            if (Object.keys(style).length > 0 || className) {
-                              return {
-                                ...(Object.keys(style).length > 0 ? { style } : {}),
-                                ...(className ? { className } : {}),
-                              }
+                              return { style: { maxHeight: p.virtualScrollingMaxHeight } }
                             }
                           },
                         },
-
-                        dataRow: {
-                          elementAttributes: dataRowElementAttributes => {
-                            const classes: string[] = []
-
-                            if (
-                              dataRowElementAttributes.rowKeyValue === editRowId &&
-                              p.editingMode !== EditingMode.Cell
-                            ) {
-                              classes.push("override-ka-editing-row")
-                            }
-
-                            if (p.rowClassName) {
-                              const customClass = p.rowClassName(dataRowElementAttributes.rowData)
-                              if (customClass) {
-                                classes.push(customClass)
-                              }
-                            }
-
-                            if (classes.length > 0) {
-                              return { className: classes.join(" ") }
-                            }
-                          },
-                        },
-
-                        ...(p.groupRowContent
-                          ? {
-                              groupRow: {
-                                content: (props: any) => p.groupRowContent!(props),
-                              },
-                            }
-                          : {}),
 
                         headCell: {
                           content: headCellContent => {
-                            if (
-                              headCellContent.column.key === KEY_DRAG ||
-                              headCellContent.column.key === KEY_ACTIONS_EDIT ||
-                              headCellContent.column.key === KEY_ACTIONS
-                            ) {
+                            if (headCellContent.column.key === KEY_ACTIONS) {
                               return <></>
                             }
 
@@ -865,11 +732,7 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
                               return { className: "override-ka-fixed-left" }
                             }
 
-                            if (
-                              column.key === KEY_DRAG ||
-                              column.key === KEY_ACTIONS_EDIT ||
-                              column.key === KEY_ACTIONS
-                            ) {
+                            if (column.key === KEY_ACTIONS) {
                               return { className: "override-ka-fixed-right" }
                             }
                           },
@@ -896,23 +759,7 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
                               )
                             }
 
-                            if (cellTextContent.column.key === KEY_ACTIONS_EDIT && p.editingMode !== EditingMode.Cell) {
-                              return (
-                                <Stack horizontal hug>
-                                  <Align horizontal right>
-                                    <InputButtonIconTertiary
-                                      size="small"
-                                      iconName="delete"
-                                      onClick={() => setDeleteId(cellTextContent.rowKeyValue)}
-                                      disabled={editRowId !== null}
-                                      destructive
-                                    />
-
-                                    <ActionEdit {...cellTextContent} disabled={editRowId !== null} />
-                                  </Align>
-                                </Stack>
-                              )
-                            } else if (cellTextContent.column.key === KEY_ACTIONS && p.rowActions) {
+                            if (cellTextContent.column.key === KEY_ACTIONS && p.rowActions) {
                               const actionElements: ReactNode[] = []
 
                               Children.toArray(p.rowActions(cellTextContent.rowData)).forEach(r => {
@@ -1002,16 +849,6 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
 
                               return (
                                 <Stack hug horizontal>
-                                  {mode === "edit" && firstColumn && p.editingMode !== EditingMode.Cell ? (
-                                    <Align left horizontal hug>
-                                      <Icon name="drag_indicator" medium fill={[Color.Neutral, 700]} />
-
-                                      <Spacer xsmall />
-                                    </Align>
-                                  ) : (
-                                    <></>
-                                  )}
-
                                   {(mode === "simple" || mode === "filter") && p.onSelectionChange && firstColumn ? (
                                     <>
                                       <Align left horizontal hug>
@@ -1086,79 +923,38 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
 
                         cellEditor: {
                           content: cellEditorContent => {
-                            const firstColumn = cellEditorContent.column.key === firstDataColumnKey
+                            const column = cellEditorContent.column as Column
+                            let editor: ReactNode = null
+                            switch (column.dataType) {
+                              case DataType.ProgressIndicator:
+                                editor = <CellProgressIndicator {...cellEditorContent} textSize={p.textSize} />
+                                break
+                              case DataType.List:
+                                editor = <CellInputCombobox {...cellEditorContent} />
+                                break
+                              case DataType.Status:
+                                editor = <CellStatus {...cellEditorContent} textSize={p.textSize} />
+                                break
+                              case DataType.Boolean:
+                                editor = <CellInputCheckbox {...cellEditorContent} />
+                                break
+                              case DataType.Date:
+                                editor = <CellInputTextDate {...cellEditorContent} />
+                                break
+                              case DataType.Number:
+                              case DataType.String:
+                                editor = (
+                                  <CellInputTextSingle
+                                    {...cellEditorContent}
+                                    autoFocus={p.editingMode === EditingMode.Cell}
+                                  />
+                                )
+                                break
+                            }
                             return (
-                              <Stack hug horizontal>
-                                {mode === "edit" && firstColumn && p.editingMode !== EditingMode.Cell ? (
-                                  <Align left horizontal hug>
-                                    <Icon name="drag_indicator" medium fill={[Color.Neutral, 700]} />
-
-                                    <Spacer xsmall />
-                                  </Align>
-                                ) : (
-                                  <></>
-                                )}
-
-                                {(cellEditorContent.column as Column).dataType === DataType.ProgressIndicator ? (
-                                  <Align left horizontal>
-                                    <CellProgressIndicator {...cellEditorContent} textSize={p.textSize} />
-                                  </Align>
-                                ) : (
-                                  <></>
-                                )}
-
-                                {(cellEditorContent.column as Column).dataType === DataType.List ? (
-                                  <Stack vertical hug>
-                                    <CellInputCombobox {...cellEditorContent} />
-                                  </Stack>
-                                ) : (
-                                  <></>
-                                )}
-
-                                {(cellEditorContent.column as Column).dataType === DataType.Status ? (
-                                  <Align left horizontal>
-                                    <CellStatus {...cellEditorContent} textSize={p.textSize} />
-                                  </Align>
-                                ) : (
-                                  <></>
-                                )}
-
-                                {cellEditorContent.column.dataType === DataType.Boolean ? (
-                                  <Align left horizontal>
-                                    <CellInputCheckbox {...cellEditorContent} />
-                                  </Align>
-                                ) : (
-                                  <></>
-                                )}
-
-                                {cellEditorContent.column.dataType === DataType.Date ? (
-                                  <Align left horizontal>
-                                    <CellInputTextDate {...cellEditorContent} />
-                                  </Align>
-                                ) : (
-                                  <></>
-                                )}
-
-                                {cellEditorContent.column.dataType === DataType.Number ||
-                                cellEditorContent.column.dataType === DataType.String ? (
-                                  <Align left horizontal>
-                                    <CellInputTextSingle
-                                      {...cellEditorContent}
-                                      autoFocus={p.editingMode === EditingMode.Cell}
-                                    />
-                                  </Align>
-                                ) : (
-                                  <></>
-                                )}
-
-                                {cellEditorContent.column.key === KEY_ACTIONS_EDIT ? (
-                                  <Align left horizontal>
-                                    <ActionSaveCancel {...cellEditorContent} />
-                                  </Align>
-                                ) : (
-                                  <></>
-                                )}
-                              </Stack>
+                              <Align left horizontal>
+                                {editor}
+                              </Align>
                             )
                           },
                         },
@@ -1175,12 +971,8 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
                               classNames.push("override-ka-fixed-left")
                             }
 
-                            if (column.key === KEY_ACTIONS_EDIT || column.key === KEY_ACTIONS) {
+                            if (column.key === KEY_ACTIONS) {
                               classNames.push("override-ka-fixed-right")
-                            }
-
-                            if (column.preventContentCollapse) {
-                              classNames.push("override-ka-prevent-content-collapse")
                             }
 
                             if (column.dataType === DataType.Icon) {
@@ -1223,32 +1015,6 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
                     />
                   </Align>
 
-                  {mode === "edit" && p.editingMode !== EditingMode.Cell ? (
-                    <Align center vertical>
-                      <Divider fill={[Color.Neutral, 100]} />
-
-                      <Spacer xsmall />
-
-                      <InputButtonTertiary
-                        width="auto"
-                        size="small"
-                        iconNameLeft="add"
-                        label="Add row"
-                        disabled={editRowId !== null}
-                        onClick={() => {
-                          table.insertRow(createNewRow(p.data), {
-                            rowKeyValue: (p.data[p.data.length - 1] as any)?.key || 0,
-                            insertRowPosition: InsertRowPosition.after,
-                          })
-                        }}
-                      />
-
-                      <Spacer xsmall />
-                    </Align>
-                  ) : (
-                    <></>
-                  )}
-
                   {paginationConfig && paginationConfig.totalPages > 1 ? (
                     <DataTablePagination
                       pageIndex={paginationConfig.pageIndex}
@@ -1268,34 +1034,6 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
           </Align>
         </Stack>
       </div>
-
-      <Alert
-        open={deleteId !== null}
-        title={
-          <Text fill={[Color.Error, 700]} {...getTextSizeProps()}>
-            Delete row?
-          </Text>
-        }
-        description={
-          <Text fill={[Color.Neutral, 700]} {...getTextSizeProps("xsmall")} wrap>
-            Are you sure you want to delete this row?
-          </Text>
-        }
-        buttonPrimary={
-          <InputButtonPrimary
-            size="small"
-            width="auto"
-            onClick={() => {
-              table.dispatch(deleteRow(deleteId))
-            }}
-            label="Delete"
-            destructive
-          />
-        }
-        buttonSecondary={
-          <InputButtonTertiary size="small" width="auto" onClick={() => setDeleteId(null)} label="Cancel" />
-        }
-      />
     </>
   )
 }

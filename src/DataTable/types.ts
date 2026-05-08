@@ -1,6 +1,6 @@
 import { ReactElement, ReactNode } from "react"
 import { SortDirection } from "ka-table"
-import { ICellTextProps, IGroupRowProps } from "ka-table/props"
+import { ICellTextProps } from "ka-table/props"
 import { AlignProps } from "@new/Stack/Align"
 import { Color, ColorWithLightness } from "@new/Color"
 import { InputButtonPrimaryProps } from "@new/InputButton/InputButtonPrimary"
@@ -65,7 +65,6 @@ export type Column = {
   maxWidth?: `${number}${"px"}` | `${number}${"%"}`
   minWidth?: `${number}${"px"}` | `${number}${"%"}`
   explodeWidth?: boolean
-  preventContentCollapse?: boolean
   sort?: (sortDirection: SortDirection) => (a: any, b: any) => number
   avatar?: string | ((rowData: ICellTextProps["rowData"]) => string | ReactElement | undefined)
   link?: (rowData: ICellTextProps["rowData"]) => string | (() => void) | undefined
@@ -83,8 +82,6 @@ export type Column = {
   footer?: (rowData: ICellTextProps["rowData"]) => ReactElement | undefined | null
   placeholder?: string
   progressIndicator?: {
-    type: "bar" | "circle"
-
     configure: (rowData: ICellTextProps["rowData"]) =>
       | {
           value: number
@@ -270,14 +267,6 @@ export type DataTableProps<TData = any> = PlaywrightProps & {
   noDataText?: string
   /** When true, prepends a "#" column showing the 1-indexed row number for each row. */
   showRowNumbers?: boolean
-  /** Callback to apply custom CSS class names to data rows based on row data. */
-  rowClassName?: (rowData: TData) => string | undefined
-  /** When true, hides the horizontal scrollbar on the table wrapper. */
-  hideHorizontalScroll?: boolean
-  /** Group rows by this column key. Creates group header rows using ka-table's native grouping. */
-  groupByColumn?: string
-  /** Custom renderer for group header rows. Receives ka-table's IGroupRowProps. */
-  groupRowContent?: (props: IGroupRowProps<TData>) => ReactElement
   /** When set with `allowCsv: true`, renders a CSV-download button in the filter row.
    *  Exports every row in `data` (ignoring search/sort/pagination) and every column except
    *  `DataType.Internal` and `DataType.Object`. */

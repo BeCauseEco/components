@@ -2,10 +2,6 @@ import { DataType, Column } from "./types"
 import { TABLE_CELL_EMPTY_STRING } from "./internal/constants"
 import { format } from "date-fns"
 
-export const createNewRow = <TData = any>(data: TData[]): object => {
-  return { id: Math.max(...data.map((d: any) => d.id)) + 1 }
-}
-
 /**
  * Formats a value according to its data type and optional formatting parameters.
  *
