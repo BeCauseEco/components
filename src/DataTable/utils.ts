@@ -76,6 +76,9 @@ export const formatValue = (
   }
 }
 
+export const computeTotalPages = (totalCount: number, pageSize: number): number =>
+  Math.max(1, Math.ceil(totalCount / pageSize))
+
 export const calculateColumnWidth = (
   column: Column,
 ): { minWidth: string | number; maxWidth: string | number; width: string | number } => {

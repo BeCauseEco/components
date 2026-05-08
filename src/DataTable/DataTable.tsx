@@ -21,7 +21,7 @@ import { Tooltip } from "@new/Tooltip/Tooltip"
 
 // Import from our new modular structure
 import { DataTableProps, DataType, Column } from "./types"
-import { formatValue, calculateColumnWidth } from "./utils"
+import { formatValue, calculateColumnWidth, computeTotalPages } from "./utils"
 import { createDataTableStyles } from "./styles"
 import { CellInputTextSingle, CellInputTextDate, CellInputCheckbox, CellInputCombobox } from "./internal/CellEditors"
 import { CellProgressIndicator, CellStatus, CellIcon } from "./internal/CellRenderers"
@@ -80,6 +80,7 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
   const referenceContainer = useRef<HTMLDivElement>(null)
 
   const textSize = p.textSize
+  const isServerMode = p.pagination?.mode === "server"
 
   const DEFAULT_PAGE_SIZE = 25
 
@@ -114,7 +115,7 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
   // causing matches on other pages to appear as "Nothing found".
   const searchedData = useMemo(() => {
     const needle = filter.trim().toLowerCase()
-    if (!needle || p.pagination?.mode === "server") {
+    if (!needle || isServerMode) {
       return p.data
     }
     const searchableColumns = getDisplayableColumns(p.columns)
@@ -140,7 +141,7 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
   // The comparator mirrors ka-table's SortUtils so ka-table re-sorting the
   // sliced page stays a no-op and header click toggling keeps working.
   const sortedData = useMemo(() => {
-    if (p.pagination?.mode === "server" || p.disableSorting) {
+    if (isServerMode || p.disableSorting) {
       return searchedData
     }
     if (!activeSort.column || !activeSort.direction) {
@@ -187,7 +188,7 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
         pageIndex: p.pagination.pageIndex,
         pageSize: p.pagination.pageSize,
         totalCount: p.pagination.totalCount,
-        totalPages: Math.max(1, Math.ceil(p.pagination.totalCount / p.pagination.pageSize)),
+        totalPages: computeTotalPages(p.pagination.totalCount, p.pagination.pageSize),
         onPageChange: p.pagination.onPageChange,
         onPageSizeChange: p.pagination.onPageSizeChange,
         pageSizeOptions: p.pagination.pageSizeOptions,
@@ -198,7 +199,7 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
       pageIndex: clientPageIndex,
       pageSize: clientPageSize,
       totalCount: searchedData.length,
-      totalPages: Math.max(1, Math.ceil(searchedData.length / clientPageSize)),
+      totalPages: computeTotalPages(searchedData.length, clientPageSize),
       onPageChange: setClientPageIndex,
       onPageSizeChange: (newSize: number) => {
         setClientPageSize(newSize)
@@ -209,12 +210,12 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
   }, [p.pagination, searchedData.length, clientPageIndex, clientPageSize])
 
   const displayData = useMemo(() => {
-    if (p.pagination?.mode === "server") {
+    if (isServerMode) {
       return p.data
     }
     const start = paginationConfig.pageIndex * paginationConfig.pageSize
     return sortedData.slice(start, start + paginationConfig.pageSize)
-  }, [p.data, sortedData, paginationConfig, p.pagination?.mode])
+  }, [p.data, sortedData, paginationConfig, isServerMode])
 
   const selectedFields = useMemo(() => {
     if (!p.selectedRows) {
@@ -641,10 +642,7 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
                             const rowIndex = sortedData.findIndex(
                               (d: any) => d[p.rowKeyField] === cellTextContent.rowKeyValue,
                             )
-                            const pageOffset =
-                              paginationConfig && p.pagination?.mode === "client"
-                                ? paginationConfig.pageIndex * paginationConfig.pageSize
-                                : 0
+                            const pageOffset = isServerMode ? 0 : paginationConfig.pageIndex * paginationConfig.pageSize
 
                             return (
                               <span className={`tw flex justify-end text-neutral-500 ${sizeClass(textSize, "small")}`}>
@@ -845,7 +843,7 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
                     }}
                   />
 
-                  {paginationConfig && paginationConfig.totalPages > 1 ? (
+                  {paginationConfig.totalPages > 1 ? (
                     <DataTablePagination
                       pageIndex={paginationConfig.pageIndex}
                       pageSize={paginationConfig.pageSize}
