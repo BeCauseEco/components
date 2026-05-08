@@ -1,21 +1,10 @@
 import React, { memo } from "react"
-import { Stack } from "@new/Stack/Stack"
-import { Align } from "@new/Stack/Align"
-import { Text } from "@new/Text/Text"
-import { Color, Lightness } from "@new/Color"
 import { Avatar } from "@new/Avatar/Avatar"
-import { Spacer } from "@new/Stack/Spacer"
 import Link from "next/link"
+import { Color, Lightness, computeColor } from "@new/Color"
 import { Column, DataType } from "../types"
 import { formatValue } from "../utils"
 import { TABLE_CELL_EMPTY_STRING } from "./constants"
-import styled from "@emotion/styled"
-
-const AdornmentCenteringContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  justify-content: "center";
-`
 
 interface OptimizedCellProps {
   column: Column
@@ -25,61 +14,67 @@ interface OptimizedCellProps {
   firstColumn: boolean
   tooltipElement?: React.ReactNode
   textSize?: "xxtiny" | "xtiny" | "tiny" | "xsmall" | "small" | "medium" | "large"
-  // Include all props from cellTextContent
   [key: string]: any
 }
 
-// Memoized cell component for better performance
+const textSizeClass: Record<NonNullable<OptimizedCellProps["textSize"]>, string> = {
+  xxtiny: "text-[8px] leading-[12px]",
+  xtiny: "text-[10px] leading-[14px]",
+  tiny: "text-tiny",
+  xsmall: "text-xs",
+  small: "text-sm",
+  medium: "text-md",
+  large: "text-lg",
+}
+
+const textColor = (color: Color | undefined, lightness: Lightness): string =>
+  computeColor([color ?? Color.Neutral, lightness]) ?? ""
+
 export const OptimizedCell = memo(
   (props: OptimizedCellProps) => {
     const { column, value, rowData, textSize = "small" } = props
     const alignmentRight = column.dataType === DataType.Number
 
-    // Apply number formatting with precedence hierarchy:
-    // 1. Custom configure() function takes absolute priority
-    // 2. defaultTrailingDecimals from column configuration
-    // 3. Global default (2 decimal places) handled in formatValue
     let text: string
     if (column.dataType === DataType.Number && column.numberFormat?.configure && typeof value === "number") {
-      // Priority 1: Custom configure() function overrides all other formatting
       text = column.numberFormat.configure(value, rowData)
     } else if (
       column.dataType === DataType.Date &&
       column.dateFormat?.configure &&
       (typeof value === "string" || value instanceof Date)
     ) {
-      // Priority 1: Custom date configure() function overrides all other formatting
       text = column.dateFormat.configure(value, rowData)
     } else {
-      // Priority 2 & 3: Use defaultTrailingDecimals/defaultFormat or global default
       text = formatValue(
         value?.toString(),
         column.dataType || DataType.String,
         column.placeholder,
-        column.numberFormat?.defaultTrailingDecimals, // Falls back to global default if undefined
-        column.dateFormat?.defaultFormat, // Falls back to global default if undefined
+        column.numberFormat?.defaultTrailingDecimals,
+        column.dateFormat?.defaultFormat,
       )
     }
+
+    const sizeCls = textSizeClass[textSize]
 
     if (column.dataType === DataType.List) {
       const selectedOption = rowData?.selectableOptions?.find((o: any) => o.value === value)
       if (!selectedOption) {
-        return <></>
+        return null
       }
+      const truncate = column.maxWidth !== undefined ? "overflow-hidden text-ellipsis" : ""
       return (
-        <Align horizontal left>
-          <Text fill={[Color.Neutral, 700]} {...{ [textSize]: true }} textOverflow={column.maxWidth !== undefined}>
-            {selectedOption.shortLabel || selectedOption.label}
-          </Text>
-        </Align>
+        <span className={`tw inline-block ${sizeCls} ${truncate}`} style={{ color: textColor(undefined, 700) }}>
+          {selectedOption.shortLabel || selectedOption.label}
+        </span>
       )
     }
 
-    // Regular cell rendering
-    const monospace =
+    const monospaceCls =
       column.dataType === DataType.Date || column.dataType === DataType.Number || column.dataType === DataType.Boolean
+        ? "font-mono"
+        : ""
+    const truncateCls = column.maxWidth !== undefined ? "overflow-hidden text-ellipsis whitespace-nowrap" : ""
 
-    // Get dynamic values
     const avatarValue = typeof column.avatar === "function" ? column.avatar(rowData) : column.avatar
     const linkEffect = typeof column.link === "function" ? column.link(rowData) : undefined
     const fillColor = typeof column.fill === "function" ? column.fill(rowData) : column.fill
@@ -87,38 +82,25 @@ export const OptimizedCell = memo(
     const endAdornment = column?.endAdornment?.(rowData)
 
     const avatarElement = avatarValue ? (
-      <>
-        {typeof avatarValue === "string" ? <Avatar size="small" src={avatarValue} title={text} /> : avatarValue}
-        <Spacer xsmall />
-      </>
+      typeof avatarValue === "string" ? (
+        <Avatar size="small" src={avatarValue} title={text} />
+      ) : (
+        avatarValue
+      )
     ) : null
 
-    const getColorWithLightness = (color: Color | undefined, lightness: Lightness = 700): [Color, Lightness] => {
-      if (typeof color === "undefined") {
-        return [Color.Neutral, lightness]
-      }
-      return [color, lightness]
-    }
+    const textCls = `tw ${sizeCls} ${monospaceCls} ${truncateCls}`
+    const textStyle = { color: textColor(fillColor, 700) }
 
     const emptyString = column.placeholder || TABLE_CELL_EMPTY_STRING
     if (linkEffect && text !== emptyString) {
       return (
-        <>
+        <span className="tw flex items-center gap-1">
           {avatarElement}
-          <Text
-            fill={[Color.Neutral, 700]}
-            {...{ [textSize]: true }}
-            monospace={monospace}
-            textOverflow={column.maxWidth !== undefined}
-          >
+          <span className={textCls} style={textStyle}>
             {typeof linkEffect === "string" ? (
               <Link href={linkEffect}>{text}</Link>
             ) : (
-              // Render a callback-style link as an anchor so it inherits the same
-              // underline/cursor/keyboard-focus styling as the Link case above.
-              // href="#" (+ preventDefault) is a placeholder that keeps the anchor
-              // focusable and visually styled without navigating; React 19 blocks
-              // the more common `href="javascript:void(0)"` idiom as a security risk.
               <a
                 href="#"
                 onClick={e => {
@@ -129,48 +111,34 @@ export const OptimizedCell = memo(
                 {text}
               </a>
             )}
-          </Text>
-        </>
+          </span>
+        </span>
       )
     }
 
+    const isPlain = !avatarElement && !startAdornment && !endAdornment && !fillColor
+    if (isPlain) {
+      return <span className={textCls} style={textStyle}>{text}</span>
+    }
+
+    const justify = alignmentRight ? "justify-end" : "justify-start"
+    const wrapperStyle: React.CSSProperties = fillColor
+      ? { backgroundColor: computeColor([fillColor, fillColor === Color.Neutral ? 50 : 100]) }
+      : {}
+
     return (
-      <Stack
-        horizontal
-        hug={typeof fillColor !== "undefined" ? "partly" : true}
-        fill={typeof fillColor !== "undefined" ? getColorWithLightness(fillColor, 100) : undefined}
-        cornerRadius="small"
+      <span
+        className={`tw flex items-center gap-1 ${justify} ${fillColor ? "rounded-sm px-2" : ""}`}
+        style={wrapperStyle}
       >
-        <>
-          {avatarElement}
-          {startAdornment && (
-            <>
-              <AdornmentCenteringContainer>{startAdornment}</AdornmentCenteringContainer>
-              <Spacer xsmall />
-            </>
-          )}
-          <Align horizontal right={alignmentRight} left={!alignmentRight}>
-            <Text
-              fill={getColorWithLightness(fillColor, 700)}
-              {...{ [textSize]: true }}
-              monospace={monospace}
-              textOverflow={column.maxWidth !== undefined}
-            >
-              {text}
-            </Text>
-          </Align>
-          {endAdornment && (
-            <>
-              <Spacer xsmall />
-              {endAdornment}
-            </>
-          )}
-        </>
-      </Stack>
+        {avatarElement}
+        {startAdornment}
+        <span className={textCls} style={textStyle}>{text}</span>
+        {endAdornment}
+      </span>
     )
   },
   (prevProps, nextProps) => {
-    // Custom comparison function for better memoization
     return (
       prevProps.value === nextProps.value &&
       prevProps.column.key === nextProps.column.key &&

@@ -1,91 +1,58 @@
-import { Stack } from "@new/Stack/Stack"
-import { Align } from "@new/Stack/Align"
 import { ProgressIndicator } from "@new/ProgressIndicator/ProgressIndicator"
 import { ProgressIndicatorSegment } from "@new/ProgressIndicator/ProgressIndicatorSegment"
 import { Badge } from "@new/Badge/Badge"
-import { Text } from "@new/Text/Text"
 import { Icon } from "@new/Icon/Icon"
 import { Color } from "@new/Color"
 import { ICellTextProps, ICellEditorProps } from "ka-table/props"
 import { Column } from "../types"
 import { TABLE_CELL_EMPTY_STRING } from "@new/DataTable/internal/constants"
 
-export const CellProgressIndicator = (
-  cellTextProps: (ICellTextProps | ICellEditorProps) & {
-    textSize?: "xxtiny" | "xtiny" | "tiny" | "xsmall" | "small" | "medium" | "large"
-  },
-) => {
+type CellRendererProps = (ICellTextProps | ICellEditorProps) & {
+  textSize?: "xxtiny" | "xtiny" | "tiny" | "xsmall" | "small" | "medium" | "large"
+}
+
+export const CellProgressIndicator = (cellTextProps: CellRendererProps) => {
   const progressIndicator = cellTextProps.column["progressIndicator"] as Column["progressIndicator"]
   const { value, color } = progressIndicator?.configure(cellTextProps.rowData) || { value: 0, color: Color.Neutral }
+  const startAdornment = cellTextProps.column["startAdornment"] as Column["startAdornment"]
+  const endAdornment = cellTextProps.column["endAdornment"] as Column["endAdornment"]
 
   return (
-    <Stack hug horizontal>
-      <Align horizontal left>
-        <ProgressIndicator
-          type="bar"
-          size="large"
-          color={Color.Neutral}
-          labelStart={
-            typeof cellTextProps.column["startAdornment"] === "function"
-              ? cellTextProps.column["startAdornment"](cellTextProps.rowData)
-              : undefined
-          }
-          labelEnd={
-            typeof cellTextProps.column["endAdornment"] === "function"
-              ? cellTextProps.column["endAdornment"](cellTextProps.rowData)
-              : undefined
-          }
-        >
-          <ProgressIndicatorSegment width={`${value}%`} color={color} label={`${value}%`} />
-        </ProgressIndicator>
-      </Align>
-    </Stack>
+    <ProgressIndicator
+      type="bar"
+      size="large"
+      color={Color.Neutral}
+      labelStart={typeof startAdornment === "function" ? (startAdornment(cellTextProps.rowData) as any) : undefined}
+      labelEnd={typeof endAdornment === "function" ? (endAdornment(cellTextProps.rowData) as any) : undefined}
+    >
+      <ProgressIndicatorSegment width={`${value}%`} color={color} label={`${value}%`} />
+    </ProgressIndicator>
   )
 }
 
-export const CellStatus = (
-  cellTextProps: (ICellTextProps | ICellEditorProps) & {
-    textSize?: "xxtiny" | "xtiny" | "tiny" | "xsmall" | "small" | "medium" | "large"
-  },
-) => {
+export const CellStatus = (cellTextProps: CellRendererProps) => {
   const status = cellTextProps.column["status"] as Column["status"]
-  const textSize = (cellTextProps as any).textSize || "small"
+  const configured = status?.configure(cellTextProps.rowData)
 
-  const { color, label, pulse } = status?.configure(cellTextProps.rowData) || {
-    color: undefined,
-    label: undefined,
-    pulse: undefined,
+  if (!configured?.color || !configured.label) {
+    return <span className="font-mono text-sm text-neutral-700">{TABLE_CELL_EMPTY_STRING}</span>
   }
 
   return (
-    <Stack hug horizontal>
-      <Align horizontal left>
-        {color && label ? (
-          <Badge size="large" variant="transparent" color={color} iconName="circle" label={label} pulse={pulse} />
-        ) : (
-          <Text fill={[Color.Neutral, 700]} {...{ [textSize]: true }} monospace>
-            {TABLE_CELL_EMPTY_STRING}
-          </Text>
-        )}
-      </Align>
-    </Stack>
+    <Badge
+      size="large"
+      variant="transparent"
+      color={configured.color}
+      iconName="circle"
+      label={configured.label}
+      pulse={configured.pulse}
+    />
   )
 }
 
-export const CellIcon = (
-  cellTextProps: (ICellTextProps | ICellEditorProps) & {
-    textSize?: "xxtiny" | "xtiny" | "tiny" | "xsmall" | "small" | "medium" | "large"
-  },
-) => {
+export const CellIcon = (cellTextProps: CellRendererProps) => {
   const column = cellTextProps.column as Column
-  const icon = column.icon
-  const iconConfig = icon?.configure(cellTextProps.rowData)
+  const iconConfig = column.icon?.configure(cellTextProps.rowData)
 
-  return (
-    <Stack hug horizontal>
-      <Align horizontal center>
-        {iconConfig ? <Icon name={iconConfig.name} fill={iconConfig.color} medium /> : null}
-      </Align>
-    </Stack>
-  )
+  return iconConfig ? <Icon name={iconConfig.name} fill={iconConfig.color} medium /> : null
 }

@@ -1,7 +1,6 @@
 import { ReactElement, ReactNode } from "react"
 import { SortDirection } from "ka-table"
 import { ICellTextProps } from "ka-table/props"
-import { AlignProps } from "@new/Stack/Align"
 import { Color, ColorWithLightness } from "@new/Color"
 import { InputButtonPrimaryProps } from "@new/InputButton/InputButtonPrimary"
 import { InputButtonTertiaryProps } from "@new/InputButton/InputButtonTertiary"
@@ -68,12 +67,12 @@ export type Column = {
   sort?: (sortDirection: SortDirection) => (a: any, b: any) => number
   avatar?: string | ((rowData: ICellTextProps["rowData"]) => string | ReactElement | undefined)
   link?: (rowData: ICellTextProps["rowData"]) => string | (() => void) | undefined
-  tooltip?: ((rowData: ICellTextProps["rowData"]) => ReactElement<AlignProps> | string | undefined) | boolean
+  tooltip?: ((rowData: ICellTextProps["rowData"]) => ReactElement | string | undefined) | boolean
   showTooltipIcon?: boolean
   headerTooltip?: string
   isEditable?: boolean
-  endAdornment?: (rowData: ICellTextProps["rowData"]) => ReactElement<AlignProps> | string | undefined
-  startAdornment?: (rowData: ICellTextProps["rowData"]) => ReactElement<AlignProps> | string | undefined
+  endAdornment?: (rowData: ICellTextProps["rowData"]) => ReactElement | string | undefined
+  startAdornment?: (rowData: ICellTextProps["rowData"]) => ReactElement | string | undefined
   /**
    * Function to generate footer content for each cell
    * @param rowData - The data object for the current row

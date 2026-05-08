@@ -1,16 +1,11 @@
 "use client"
-import { Stack } from "@new/Stack/Stack"
-import { Align } from "@new/Stack/Align"
 import { EditingMode, SortDirection, SortingMode, Table, useTable } from "ka-table"
 import { closeEditor, closeRowEditors, openEditor, setFocused, moveFocusedRight, moveFocusedLeft } from "ka-table/actionCreators"
 import { Cell } from "ka-table/Models/Cell"
 import { Focused } from "ka-table/Models/Focused"
-import { Spacer } from "@new/Stack/Spacer"
 import { InputTextSingle } from "@new/InputText/InputTextSingle"
 import { Color, computeColor } from "@new/Color"
-import { Text } from "@new/Text/Text"
 import { Icon } from "@new/Icon/Icon"
-import styled from "@emotion/styled"
 import { Children, ReactNode, useCallback, useEffect, useId, useRef, useState, useMemo } from "react"
 import _debounce from "lodash/debounce"
 import { InputCheckbox } from "@new/InputCheckbox/InputCheckbox"
@@ -41,12 +36,20 @@ export type {
   DataTableExportConfig,
 } from "./types"
 
-const CellHeadLink = styled.a({
-  display: "flex",
-  alignItems: "center",
-  cursor: "pointer",
-  userSelect: "none",
-})
+type TextSize = NonNullable<DataTableProps["textSize"]>
+
+const TEXT_SIZE_CLASS: Record<TextSize, string> = {
+  xxtiny: "text-[8px] leading-[12px]",
+  xtiny: "text-[10px] leading-[14px]",
+  tiny: "text-tiny",
+  xsmall: "text-xs",
+  small: "text-sm",
+  medium: "text-md",
+  large: "text-lg",
+}
+
+const sizeClass = (override: TextSize | undefined, fallback: TextSize): string =>
+  TEXT_SIZE_CLASS[override ?? fallback]
 
 // Separate search input component to prevent expensive table re-renders whenever the inputValue state changes
 const SearchInput = ({ onDebouncedChange }: { onDebouncedChange: (value: string) => void }) => {
@@ -84,13 +87,7 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
   const cssScope = useId().replace(/:/g, "datatable")
   const referenceContainer = useRef<HTMLDivElement>(null)
 
-  // Helper to get text size props for Text components
-  const getTextSizeProps = (
-    defaultSize: "xxtiny" | "xtiny" | "tiny" | "xsmall" | "small" | "medium" | "large" = "small",
-  ) => {
-    const size = p.textSize || defaultSize
-    return { [size]: true }
-  }
+  const textSize = p.textSize
 
   // Optimization 5: Performance monitoring hook for development
   const usePerformanceMonitoring = (label: string, deps: any[]) => {
@@ -529,42 +526,36 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
         ref={referenceContainer}
         data-playwright-testid={p["data-playwright-testid"]}
       >
-        <Stack vertical hug loading={p.loading}>
+        <div className={`tw flex w-full flex-col ${p.loading ? "pointer-events-none opacity-60" : ""}`}>
           <div
             id="reference-filters"
-            style={{
-              display: "flex",
-              flexDirection: "row",
-              justifyContent: "space-between",
-              alignItems: "flex-start",
-              width: "100%",
-            }}
+            className="tw flex w-full flex-row items-start justify-between"
           >
-            <Align left horizontal wrap>
-              {mode === "filter" ? <SearchInput onDebouncedChange={handleSearchChange} /> : <></>}
-              {Children.toArray(p.children)
-                .filter(child => !!child)
-                .map(child => child)}
-            </Align>
+            <div className="tw flex flex-row flex-wrap gap-4">
+              {mode === "filter" ? <SearchInput onDebouncedChange={handleSearchChange} /> : null}
+              {Children.toArray(p.children)}
+            </div>
             {showCsvExportButton && p.enableExports && (
               <CsvExportButton config={p.enableExports} columns={p.columns} data={p.data} />
             )}
           </div>
 
-          {hasFilters ? <Spacer medium id="reference-spacer" /> : <></>}
+          {hasFilters ? <div id="reference-spacer" className="tw h-4 shrink-0" /> : null}
 
-          <Align left vertical>
+          <div className="tw flex w-full flex-col">
             <div id="reference-target">
               {p.loadingElement ? (
                 p.loadingElement
               ) : (
-                <Stack
-                  vertical
-                  hug
-                  stroke={p.borderless ? undefined : p.stroke || [Color.Neutral, 100]}
-                  fill={p.fill || [Color.Transparent]}
+                <div
+                  className="tw flex w-full flex-col"
+                  style={{
+                    border: p.borderless
+                      ? undefined
+                      : `1px solid ${computeColor(p.stroke || [Color.Neutral, 100])}`,
+                    backgroundColor: computeColor(p.fill || [Color.Transparent]),
+                  }}
                 >
-                  <Align topLeft vertical>
                     {/* 
                       Force ka-table to remount when switching between cell-editing and readonly modes.
                       This is necessary because ka-table maintains internal state and event handlers that don't 
@@ -613,11 +604,9 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
 
                             if (headCellContent.column.key === KEY_ROW_NUMBER) {
                               return (
-                                <Align horizontal right>
-                                  <Text fill={[Color.Neutral, 700]} {...getTextSizeProps("xsmall")}>
-                                    <b>#</b>
-                                  </Text>
-                                </Align>
+                                <span className={`tw flex justify-end font-semibold text-neutral-700 ${sizeClass(textSize, "xsmall")}`}>
+                                  #
+                                </span>
                               )
                             }
 
@@ -641,87 +630,63 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
                               headCellContentAsColumn.dataType !== DataType.Status
 
                             const fullTitle = headCellContent.column.title
-                            const ellipsisStyle = p.ellipsisColumnNames
-                              ? ({
-                                  display: "-webkit-box",
-                                  WebkitLineClamp: 2,
-                                  WebkitBoxOrient: "vertical",
-                                  overflow: "hidden",
-                                  textOverflow: "ellipsis",
-                                } as const)
-                              : undefined
+                            const titleSizeCls = sizeClass(textSize, "xsmall")
+                            const ellipsisCls = p.ellipsisColumnNames
+                              ? "[display:-webkit-box] [-webkit-line-clamp:2] [-webkit-box-orient:vertical] overflow-hidden text-ellipsis"
+                              : ""
 
                             const headerTitle = (
-                              <Text
-                                fill={[Color.Neutral, 700]}
-                                wrap={p.ellipsisColumnNames}
-                                {...getTextSizeProps("xsmall")}
-                              >
-                                <b style={ellipsisStyle}>{fullTitle}</b>
-                              </Text>
+                              <span className={`tw font-semibold text-neutral-700 ${titleSizeCls} ${ellipsisCls}`}>
+                                {fullTitle}
+                              </span>
                             )
 
+                            const headerJustify = alignmentRight ? "justify-end" : "justify-start"
                             const headerContent = (
-                              <Align horizontal left={!alignmentRight} right={alignmentRight}>
+                              <div className={`tw flex items-center ${headerJustify}`}>
                                 {allowSort || headCellContentAsColumn.sort ? (
-                                  <CellHeadLink onClick={() => table.updateSortDirection(headCellContent.column.key)}>
+                                  <a
+                                    className="tw flex cursor-pointer items-center gap-0.5 select-none"
+                                    onClick={() => table.updateSortDirection(headCellContent.column.key)}
+                                  >
                                     {headerTitle}
-
-                                    <Spacer tiny />
-
                                     <Icon medium name={iconName} fill={[Color.Neutral, 700]} />
-                                  </CellHeadLink>
+                                  </a>
                                 ) : (
                                   headerTitle
                                 )}
-                              </Align>
+                              </div>
                             )
 
+                            const tooltipText = p.ellipsisColumnNames
+                              ? fullTitle
+                              : headCellContentAsColumn.headerTooltip
+
                             return (
-                              <Stack hug horizontal>
+                              <div className="tw flex items-center gap-1">
                                 {(mode === "simple" || mode === "filter") && p.onSelectionChange && firstColumn ? (
-                                  <>
-                                    <Align left horizontal hug>
-                                      <InputCheckbox
-                                        size="small"
-                                        color={Color.Neutral}
-                                        value={
-                                          selectedFields === totalSelectableFields && totalSelectableFields > 0
-                                            ? true
-                                            : selectedFields === 0
-                                              ? false
-                                              : "indeterminate"
-                                        }
-                                        onChange={value => updateSelectFieldAll(value)}
-                                      />
-                                    </Align>
+                                  <InputCheckbox
+                                    size="small"
+                                    color={Color.Neutral}
+                                    value={
+                                      selectedFields === totalSelectableFields && totalSelectableFields > 0
+                                        ? true
+                                        : selectedFields === 0
+                                          ? false
+                                          : "indeterminate"
+                                    }
+                                    onChange={value => updateSelectFieldAll(value)}
+                                  />
+                                ) : null}
 
-                                    <Spacer xsmall />
-                                  </>
-                                ) : (
-                                  <></>
-                                )}
-
-                                {p.ellipsisColumnNames ? (
+                                {tooltipText ? (
                                   <Tooltip trigger={headerContent}>
-                                    <Align horizontal left>
-                                      <Text xsmall fill={[Color.Neutral, 700]} wrap>
-                                        {fullTitle}
-                                      </Text>
-                                    </Align>
-                                  </Tooltip>
-                                ) : headCellContentAsColumn.headerTooltip ? (
-                                  <Tooltip trigger={headerContent}>
-                                    <Align horizontal left>
-                                      <Text xsmall fill={[Color.Neutral, 700]} wrap>
-                                        {headCellContentAsColumn.headerTooltip}
-                                      </Text>
-                                    </Align>
+                                    <span className="tw text-xs text-neutral-700">{tooltipText}</span>
                                   </Tooltip>
                                 ) : (
                                   headerContent
                                 )}
-                              </Stack>
+                              </div>
                             )
                           },
 
@@ -751,30 +716,17 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
                                   : 0
 
                               return (
-                                <Align horizontal right>
-                                  <Text fill={[Color.Neutral, 500]} {...getTextSizeProps()}>
-                                    {rowIndex + 1 + pageOffset}
-                                  </Text>
-                                </Align>
+                                <span className={`tw flex justify-end text-neutral-500 ${sizeClass(textSize, "small")}`}>
+                                  {rowIndex + 1 + pageOffset}
+                                </span>
                               )
                             }
 
                             if (cellTextContent.column.key === KEY_ACTIONS && p.rowActions) {
-                              const actionElements: ReactNode[] = []
-
-                              Children.toArray(p.rowActions(cellTextContent.rowData)).forEach(r => {
-                                actionElements.push(r)
-                                actionElements.push(<Spacer xsmall />)
-                              })
-
-                              actionElements.pop()
-
                               return (
-                                <Stack horizontal hug>
-                                  <Align horizontal right>
-                                    {actionElements}
-                                  </Align>
-                                </Stack>
+                                <div className="tw flex items-center justify-end gap-1">
+                                  {Children.toArray(p.rowActions(cellTextContent.rowData))}
+                                </div>
                               )
                             } else {
                               const column = cellTextContent.column as Column
@@ -789,29 +741,18 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
                               )
 
                               const tooltip = column.tooltip as Column["tooltip"]
+                              const tooltipTextCls = `tw text-neutral-700 ${sizeClass(textSize, "small")}`
 
                               let tooltipElement
 
                               const emptyString = column.placeholder || TABLE_CELL_EMPTY_STRING
                               if (typeof tooltip === "boolean" && text !== emptyString) {
-                                tooltipElement = (
-                                  <Align horizontal left>
-                                    <Text {...getTextSizeProps()} fill={[Color.Neutral, 700]} wrap>
-                                      {text}
-                                    </Text>
-                                  </Align>
-                                )
+                                tooltipElement = <span className={tooltipTextCls}>{text}</span>
                               } else if (typeof tooltip === "function") {
                                 tooltipElement = tooltip(cellTextContent.rowData)
 
                                 if (typeof tooltipElement === "string") {
-                                  tooltipElement = (
-                                    <Align horizontal left>
-                                      <Text {...getTextSizeProps()} fill={[Color.Neutral, 700]} wrap>
-                                        {tooltipElement}
-                                      </Text>
-                                    </Align>
-                                  )
+                                  tooltipElement = <span className={tooltipTextCls}>{tooltipElement}</span>
                                 }
                               }
 
@@ -847,75 +788,55 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
                                   ? p.customCellRenderer(cellTextContent)
                                   : null
 
+                              const justify = alignmentRight ? "justify-end" : "justify-start"
+                              const showTooltipIconWrap =
+                                tooltipElement &&
+                                column.dataType !== DataType.Status &&
+                                column.dataType !== DataType.ProgressIndicator &&
+                                column.showTooltipIcon === true
+
+                              const trigger = showTooltipIconWrap ? (
+                                <span className="tw flex items-center gap-1">
+                                  {output}
+                                  <Icon name="info" small fill={[Color.Neutral, 200]} />
+                                </span>
+                              ) : (
+                                output
+                              )
+
+                              const main = tooltipElement ? (
+                                <Tooltip trigger={trigger}>{tooltipElement}</Tooltip>
+                              ) : (
+                                output
+                              )
+
+                              const inner = customCellRendererElement ? (
+                                customCellRendererElement
+                              ) : footerElement ? (
+                                <span className="tw flex flex-col py-0.5 gap-0.5">
+                                  <span className={`tw flex ${justify}`}>{main}</span>
+                                  <span className={`tw flex ${justify}`}>{footerElement}</span>
+                                </span>
+                              ) : (
+                                main
+                              )
+
                               return (
-                                <Stack hug horizontal>
+                                <span className="tw flex items-center gap-1">
                                   {(mode === "simple" || mode === "filter") && p.onSelectionChange && firstColumn ? (
-                                    <>
-                                      <Align left horizontal hug>
-                                        <InputCheckbox
-                                          size="small"
-                                          color={Color.Neutral}
-                                          disabled={p.disabledRows?.includes(cellTextContent.rowKeyValue) ?? false}
-                                          value={p.selectedRows?.includes(cellTextContent.rowKeyValue) ?? false}
-                                          onChange={value => {
-                                            updateSelectField(cellTextContent.rowKeyValue, value)
-                                          }}
-                                        />
-                                      </Align>
+                                    <InputCheckbox
+                                      size="small"
+                                      color={Color.Neutral}
+                                      disabled={p.disabledRows?.includes(cellTextContent.rowKeyValue) ?? false}
+                                      value={p.selectedRows?.includes(cellTextContent.rowKeyValue) ?? false}
+                                      onChange={value => {
+                                        updateSelectField(cellTextContent.rowKeyValue, value)
+                                      }}
+                                    />
+                                  ) : null}
 
-                                      <Spacer xsmall />
-                                    </>
-                                  ) : (
-                                    <></>
-                                  )}
-
-                                  <Align left={!alignmentRight} right={alignmentRight} horizontal>
-                                    {customCellRendererElement ? (
-                                      customCellRendererElement
-                                    ) : (
-                                      <Stack vertical hug>
-                                        {/* If there is a footer element, the content gets pushed closer to the borders of the cell. Add a tiny spacer for the cell to become larger */}
-                                        {footerElement && <Spacer tiny />}
-
-                                        <Align horizontal left={!alignmentRight} right={alignmentRight}>
-                                          {tooltipElement ? (
-                                            <Tooltip
-                                              trigger={
-                                                column.dataType !== DataType.Status &&
-                                                column.dataType !== DataType.ProgressIndicator &&
-                                                column.showTooltipIcon === true ? (
-                                                  <Align horizontal center hug>
-                                                    {output}
-                                                    <Spacer xsmall />
-                                                    <Icon name="info" small fill={[Color.Neutral, 200]} />
-                                                  </Align>
-                                                ) : (
-                                                  output
-                                                )
-                                              }
-                                            >
-                                              {tooltipElement}
-                                            </Tooltip>
-                                          ) : (
-                                            output
-                                          )}
-                                        </Align>
-
-                                        {footerElement && (
-                                          <>
-                                            <Spacer tiny />
-
-                                            <Align horizontal left={!alignmentRight} right={alignmentRight}>
-                                              {footerElement}
-                                            </Align>
-
-                                            <Spacer tiny />
-                                          </>
-                                        )}
-                                      </Stack>
-                                    )}
-                                  </Align>
-                                </Stack>
+                                  <span className={`tw flex flex-1 ${justify}`}>{inner}</span>
+                                </span>
                               )
                             }
                           },
@@ -951,11 +872,7 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
                                 )
                                 break
                             }
-                            return (
-                              <Align left horizontal>
-                                {editor}
-                              </Align>
-                            )
+                            return <span className="tw flex items-center justify-start">{editor}</span>
                           },
                         },
 
@@ -1013,26 +930,23 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
                         },
                       }}
                     />
-                  </Align>
 
-                  {paginationConfig && paginationConfig.totalPages > 1 ? (
-                    <DataTablePagination
-                      pageIndex={paginationConfig.pageIndex}
-                      pageSize={paginationConfig.pageSize}
-                      totalCount={paginationConfig.totalCount}
-                      pageSizeOptions={paginationConfig.pageSizeOptions}
-                      onPageChange={paginationConfig.onPageChange}
-                      onPageSizeChange={paginationConfig.onPageSizeChange}
-                      textSize={p.textSize}
-                    />
-                  ) : (
-                    <></>
-                  )}
-                </Stack>
+                    {paginationConfig && paginationConfig.totalPages > 1 ? (
+                      <DataTablePagination
+                        pageIndex={paginationConfig.pageIndex}
+                        pageSize={paginationConfig.pageSize}
+                        totalCount={paginationConfig.totalCount}
+                        pageSizeOptions={paginationConfig.pageSizeOptions}
+                        onPageChange={paginationConfig.onPageChange}
+                        onPageSizeChange={paginationConfig.onPageSizeChange}
+                        textSize={p.textSize}
+                      />
+                    ) : null}
+                </div>
               )}
             </div>
-          </Align>
-        </Stack>
+          </div>
+        </div>
       </div>
     </>
   )

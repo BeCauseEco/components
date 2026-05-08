@@ -1,5 +1,4 @@
 import { Color, ColorWithLightness, adjustLightness, computeColor } from "@new/Color"
-import { StyleBodySmall, StyleFontFamily } from "@new/Text/Text"
 
 const getCellPadding = (size?: "none" | "tiny" | "xsmall" | "small" | "medium") => {
   switch (size) {
@@ -266,11 +265,10 @@ export const createDataTableStyles = (
   }
 
   .${cssScope} .ka-no-data-cell {
-    font-family: ${StyleFontFamily.fontFamily};
     font-style: italic;
-    font-weight: ${StyleFontFamily.fontWeight};
-    font-size: ${StyleBodySmall.fontSize};
-    line-height: ${StyleBodySmall.lineHeight};
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 24px;
     height: calc(var(--BU) * 16);
     border-bottom: dotted 1px ${computeColor(stroke || [Color.Neutral, 100])};
   }
