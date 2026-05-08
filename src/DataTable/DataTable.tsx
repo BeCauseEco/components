@@ -1,6 +1,13 @@
 "use client"
 import { EditingMode, SortDirection, SortingMode, Table, useTable } from "ka-table"
-import { closeEditor, closeRowEditors, openEditor, setFocused, moveFocusedRight, moveFocusedLeft } from "ka-table/actionCreators"
+import {
+  closeEditor,
+  closeRowEditors,
+  openEditor,
+  setFocused,
+  moveFocusedRight,
+  moveFocusedLeft,
+} from "ka-table/actionCreators"
 import { Cell } from "ka-table/Models/Cell"
 import { Focused } from "ka-table/Models/Focused"
 import { InputTextSingle } from "@new/InputText/InputTextSingle"
@@ -48,8 +55,7 @@ const TEXT_SIZE_CLASS: Record<TextSize, string> = {
   large: "text-lg",
 }
 
-const sizeClass = (override: TextSize | undefined, fallback: TextSize): string =>
-  TEXT_SIZE_CLASS[override ?? fallback]
+const sizeClass = (override: TextSize | undefined, fallback: TextSize): string => TEXT_SIZE_CLASS[override ?? fallback]
 
 // Separate search input component to prevent expensive table re-renders whenever the inputValue state changes
 const SearchInput = ({ onDebouncedChange }: { onDebouncedChange: (value: string) => void }) => {
@@ -96,6 +102,11 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
   const [filter, setFilter] = useState("")
   const [clientPageIndex, setClientPageIndex] = useState(0)
   const [clientPageSize, setClientPageSize] = useState(p.pagination?.pageSize ?? DEFAULT_PAGE_SIZE)
+  const [filterAtPageReset, setFilterAtPageReset] = useState(filter)
+  if (filter !== filterAtPageReset && p.pagination?.mode !== "server") {
+    setFilterAtPageReset(filter)
+    setClientPageIndex(0)
+  }
 
   // Memoize setFilter to prevent SearchInput from re-creating debounced handler
   const handleSearchChange = useCallback((value: string) => {
@@ -137,14 +148,6 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
       }),
     )
   }, [p.data, p.columns, p.pagination?.mode, filter])
-
-  // Reset client pagination to page 0 when the active filter changes, otherwise
-  // the user can land on an empty page (e.g. was on page 7, filter now yields 3 rows).
-  useEffect(() => {
-    if (p.pagination?.mode !== "server") {
-      setClientPageIndex(0)
-    }
-  }, [filter, p.pagination?.mode])
 
   // Sort the full (filtered) dataset BEFORE pagination slicing so sorting spans
   // the whole dataset, not just the current page. Server mode is caller-owned.
@@ -508,10 +511,7 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
         data-playwright-testid={p["data-playwright-testid"]}
       >
         <div className={`tw flex w-full flex-col ${p.loading ? "pointer-events-none opacity-60" : ""}`}>
-          <div
-            id="reference-filters"
-            className="tw flex w-full flex-row items-start justify-between"
-          >
+          <div id="reference-filters" className="tw flex w-full flex-row items-start justify-between">
             <div className="tw flex flex-row flex-wrap gap-4">
               {mode === "filter" ? <SearchInput onDebouncedChange={handleSearchChange} /> : null}
               {Children.toArray(p.children)}
@@ -531,398 +531,388 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
                 <div
                   className="tw flex w-full flex-col"
                   style={{
-                    border: p.borderless
-                      ? undefined
-                      : `1px solid ${computeColor(p.stroke || [Color.Neutral, 100])}`,
+                    border: p.borderless ? undefined : `1px solid ${computeColor(p.stroke || [Color.Neutral, 100])}`,
                     backgroundColor: computeColor(p.fill || [Color.Transparent]),
                   }}
                 >
-                    {/* 
+                  {/* 
                       Force ka-table to remount when switching between cell-editing and readonly modes.
                       This is necessary because ka-table maintains internal state and event handlers that don't 
                       get properly reset when editingMode prop changes dynamically after initial render.
                       Without this key, cells remain editable even after switching from EditingMode.Cell to None.
                     */}
-                    <Table
-                      key={p.editingMode === EditingMode.Cell ? "cell-edit" : "readonly"}
-                      table={table}
-                      columns={nativeColumns as any}
-                      data={displayData}
-                      rowKeyField={String(p.rowKeyField)}
-                      selectedRows={p.selectedRows || []}
-                      sortingMode={p.disableSorting ? SortingMode.None : SortingMode.Single}
-                      editingMode={p.editingMode}
-                      noData={{ text: p.noDataText || "Nothing found" }}
-                      searchText={filter}
-                      virtualScrolling={p.virtualScrollingMaxHeight ? { enabled: true } : undefined}
-                      search={({ searchText: searchTextValue, rowData, column }) => {
-                        if (column.dataType === DataType.Boolean) {
-                          const b = (rowData as any)[column.key]
-                          const s = searchTextValue.toLowerCase()
+                  <Table
+                    key={p.editingMode === EditingMode.Cell ? "cell-edit" : "readonly"}
+                    table={table}
+                    columns={nativeColumns as any}
+                    data={displayData}
+                    rowKeyField={String(p.rowKeyField)}
+                    selectedRows={p.selectedRows || []}
+                    sortingMode={p.disableSorting ? SortingMode.None : SortingMode.Single}
+                    editingMode={p.editingMode}
+                    noData={{ text: p.noDataText || "Nothing found" }}
+                    searchText={filter}
+                    virtualScrolling={p.virtualScrollingMaxHeight ? { enabled: true } : undefined}
+                    search={({ searchText: searchTextValue, rowData, column }) => {
+                      if (column.dataType === DataType.Boolean) {
+                        const b = (rowData as any)[column.key]
+                        const s = searchTextValue.toLowerCase()
 
-                          return (s === "yes" && b === true) || (s === "no" && b === false)
-                        }
-                      }}
-                      sort={({ column }) => {
-                        if (column["sort"]) {
-                          return column["sort"](column.sortDirection)
-                        }
-                      }}
-                      childComponents={{
-                        tableWrapper: {
-                          elementAttributes: () => {
-                            if (p.virtualScrollingMaxHeight) {
-                              return { style: { maxHeight: p.virtualScrollingMaxHeight } }
-                            }
-                          },
+                        return (s === "yes" && b === true) || (s === "no" && b === false)
+                      }
+                    }}
+                    sort={({ column }) => {
+                      if (column["sort"]) {
+                        return column["sort"](column.sortDirection)
+                      }
+                    }}
+                    childComponents={{
+                      tableWrapper: {
+                        elementAttributes: () => {
+                          if (p.virtualScrollingMaxHeight) {
+                            return { style: { maxHeight: p.virtualScrollingMaxHeight } }
+                          }
+                        },
+                      },
+
+                      headCell: {
+                        content: headCellContent => {
+                          if (headCellContent.column.key === KEY_ACTIONS) {
+                            return <></>
+                          }
+
+                          if (headCellContent.column.key === KEY_ROW_NUMBER) {
+                            return (
+                              <span
+                                className={`tw flex justify-end font-semibold text-neutral-700 ${sizeClass(textSize, "xsmall")}`}
+                              >
+                                #
+                              </span>
+                            )
+                          }
+
+                          let iconName: string
+
+                          if (headCellContent.column.sortDirection === SortDirection.Ascend) {
+                            iconName = "keyboard_arrow_up"
+                          } else if (headCellContent.column.sortDirection === SortDirection.Descend) {
+                            iconName = "keyboard_arrow_down"
+                          } else {
+                            iconName = "unfold_more"
+                          }
+
+                          const alignmentRight = headCellContent.column.dataType === DataType.Number
+                          const firstColumn = headCellContent.column.key === firstDataColumnKey
+
+                          const headCellContentAsColumn = headCellContent.column as Column
+                          const allowSort =
+                            !p.disableSorting && mode !== "edit" && headCellContentAsColumn.dataType !== DataType.Status
+
+                          const fullTitle = headCellContent.column.title
+                          const titleSizeCls = sizeClass(textSize, "xsmall")
+                          const ellipsisCls = p.ellipsisColumnNames
+                            ? "[display:-webkit-box] [-webkit-line-clamp:2] [-webkit-box-orient:vertical] overflow-hidden text-ellipsis"
+                            : ""
+
+                          const headerTitle = (
+                            <span className={`tw font-semibold text-neutral-700 ${titleSizeCls} ${ellipsisCls}`}>
+                              {fullTitle}
+                            </span>
+                          )
+
+                          const headerJustify = alignmentRight ? "justify-end" : "justify-start"
+                          const headerContent = (
+                            <div className={`tw flex items-center ${headerJustify}`}>
+                              {allowSort || headCellContentAsColumn.sort ? (
+                                <a
+                                  className="tw flex cursor-pointer items-center gap-0.5 select-none"
+                                  onClick={() => table.updateSortDirection(headCellContent.column.key)}
+                                >
+                                  {headerTitle}
+                                  <Icon medium name={iconName} fill={[Color.Neutral, 700]} />
+                                </a>
+                              ) : (
+                                headerTitle
+                              )}
+                            </div>
+                          )
+
+                          const tooltipText = p.ellipsisColumnNames ? fullTitle : headCellContentAsColumn.headerTooltip
+
+                          return (
+                            <div className="tw flex items-center gap-1">
+                              {(mode === "simple" || mode === "filter") && p.onSelectionChange && firstColumn ? (
+                                <InputCheckbox
+                                  size="small"
+                                  color={Color.Neutral}
+                                  value={
+                                    selectedFields === totalSelectableFields && totalSelectableFields > 0
+                                      ? true
+                                      : selectedFields === 0
+                                        ? false
+                                        : "indeterminate"
+                                  }
+                                  onChange={value => updateSelectFieldAll(value)}
+                                />
+                              ) : null}
+
+                              {tooltipText ? (
+                                <Tooltip trigger={headerContent}>
+                                  <span className="tw text-xs text-neutral-700">{tooltipText}</span>
+                                </Tooltip>
+                              ) : (
+                                headerContent
+                              )}
+                            </div>
+                          )
                         },
 
-                        headCell: {
-                          content: headCellContent => {
-                            if (headCellContent.column.key === KEY_ACTIONS) {
-                              return <></>
+                        elementAttributes: headCellElementAttributes => {
+                          const column = headCellElementAttributes.column as Column
+
+                          if (p.fixedKeyField === column.key) {
+                            return { className: "override-ka-fixed-left" }
+                          }
+
+                          if (column.key === KEY_ACTIONS) {
+                            return { className: "override-ka-fixed-right" }
+                          }
+                        },
+                      },
+
+                      cellText: {
+                        content: cellTextContent => {
+                          if (cellTextContent.column.key === KEY_ROW_NUMBER) {
+                            const sortedData = kaPropsUtils.getData(table.props)
+                            const rowIndex = sortedData.findIndex(
+                              (d: any) => d[p.rowKeyField] === cellTextContent.rowKeyValue,
+                            )
+                            const pageOffset =
+                              paginationConfig && p.pagination?.mode === "client"
+                                ? paginationConfig.pageIndex * paginationConfig.pageSize
+                                : 0
+
+                            return (
+                              <span className={`tw flex justify-end text-neutral-500 ${sizeClass(textSize, "small")}`}>
+                                {rowIndex + 1 + pageOffset}
+                              </span>
+                            )
+                          }
+
+                          if (cellTextContent.column.key === KEY_ACTIONS && p.rowActions) {
+                            return (
+                              <div className="tw flex items-center justify-end gap-1">
+                                {Children.toArray(p.rowActions(cellTextContent.rowData))}
+                              </div>
+                            )
+                          } else {
+                            const column = cellTextContent.column as Column
+
+                            const alignmentRight = column.dataType === DataType.Number
+                            const firstColumn = column.key === firstDataColumnKey
+
+                            const text = formatValue(
+                              cellTextContent.value?.toString(),
+                              column.dataType || DataType.String,
+                              column.placeholder,
+                            )
+
+                            const tooltip = column.tooltip as Column["tooltip"]
+                            const tooltipTextCls = `tw text-neutral-700 ${sizeClass(textSize, "small")}`
+
+                            let tooltipElement
+
+                            const emptyString = column.placeholder || TABLE_CELL_EMPTY_STRING
+                            if (typeof tooltip === "boolean" && text !== emptyString) {
+                              tooltipElement = <span className={tooltipTextCls}>{text}</span>
+                            } else if (typeof tooltip === "function") {
+                              tooltipElement = tooltip(cellTextContent.rowData)
+
+                              if (typeof tooltipElement === "string") {
+                                tooltipElement = <span className={tooltipTextCls}>{tooltipElement}</span>
+                              }
                             }
 
-                            if (headCellContent.column.key === KEY_ROW_NUMBER) {
-                              return (
-                                <span className={`tw flex justify-end font-semibold text-neutral-700 ${sizeClass(textSize, "xsmall")}`}>
-                                  #
-                                </span>
+                            // Process footer similar to tooltip
+                            let footerElement
+                            if (typeof column.footer === "function") {
+                              footerElement = column.footer(cellTextContent.rowData)
+                            }
+
+                            let output: ReactNode
+
+                            if (column.dataType === DataType.ProgressIndicator) {
+                              output = <CellProgressIndicator {...cellTextContent} textSize={p.textSize} />
+                            } else if (column.dataType === DataType.Status) {
+                              output = <CellStatus {...cellTextContent} textSize={p.textSize} />
+                            } else if (column.dataType === DataType.Icon) {
+                              output = <CellIcon {...cellTextContent} textSize={p.textSize} />
+                            } else {
+                              // Use optimized cell component for regular cells
+                              output = (
+                                <OptimizedCell
+                                  {...cellTextContent}
+                                  column={column}
+                                  firstColumn={firstColumn}
+                                  tooltipElement={tooltipElement}
+                                  textSize={p.textSize}
+                                />
                               )
                             }
 
-                            let iconName: string
+                            const customCellRendererElement =
+                              p.customCellRenderer && typeof p.customCellRenderer === "function"
+                                ? p.customCellRenderer(cellTextContent)
+                                : null
 
-                            if (headCellContent.column.sortDirection === SortDirection.Ascend) {
-                              iconName = "keyboard_arrow_up"
-                            } else if (headCellContent.column.sortDirection === SortDirection.Descend) {
-                              iconName = "keyboard_arrow_down"
-                            } else {
-                              iconName = "unfold_more"
-                            }
+                            const justify = alignmentRight ? "justify-end" : "justify-start"
+                            const showTooltipIconWrap =
+                              tooltipElement &&
+                              column.dataType !== DataType.Status &&
+                              column.dataType !== DataType.ProgressIndicator &&
+                              column.showTooltipIcon === true
 
-                            const alignmentRight = headCellContent.column.dataType === DataType.Number
-                            const firstColumn = headCellContent.column.key === firstDataColumnKey
-
-                            const headCellContentAsColumn = headCellContent.column as Column
-                            const allowSort =
-                              !p.disableSorting &&
-                              mode !== "edit" &&
-                              headCellContentAsColumn.dataType !== DataType.Status
-
-                            const fullTitle = headCellContent.column.title
-                            const titleSizeCls = sizeClass(textSize, "xsmall")
-                            const ellipsisCls = p.ellipsisColumnNames
-                              ? "[display:-webkit-box] [-webkit-line-clamp:2] [-webkit-box-orient:vertical] overflow-hidden text-ellipsis"
-                              : ""
-
-                            const headerTitle = (
-                              <span className={`tw font-semibold text-neutral-700 ${titleSizeCls} ${ellipsisCls}`}>
-                                {fullTitle}
+                            const trigger = showTooltipIconWrap ? (
+                              <span className="tw flex items-center gap-1">
+                                {output}
+                                <Icon name="info" small fill={[Color.Neutral, 200]} />
                               </span>
+                            ) : (
+                              output
                             )
 
-                            const headerJustify = alignmentRight ? "justify-end" : "justify-start"
-                            const headerContent = (
-                              <div className={`tw flex items-center ${headerJustify}`}>
-                                {allowSort || headCellContentAsColumn.sort ? (
-                                  <a
-                                    className="tw flex cursor-pointer items-center gap-0.5 select-none"
-                                    onClick={() => table.updateSortDirection(headCellContent.column.key)}
-                                  >
-                                    {headerTitle}
-                                    <Icon medium name={iconName} fill={[Color.Neutral, 700]} />
-                                  </a>
-                                ) : (
-                                  headerTitle
-                                )}
-                              </div>
-                            )
+                            const main = tooltipElement ? <Tooltip trigger={trigger}>{tooltipElement}</Tooltip> : output
 
-                            const tooltipText = p.ellipsisColumnNames
-                              ? fullTitle
-                              : headCellContentAsColumn.headerTooltip
+                            const inner = customCellRendererElement ? (
+                              customCellRendererElement
+                            ) : footerElement ? (
+                              <span className="tw flex flex-col py-0.5 gap-0.5">
+                                <span className={`tw flex ${justify}`}>{main}</span>
+                                <span className={`tw flex ${justify}`}>{footerElement}</span>
+                              </span>
+                            ) : (
+                              main
+                            )
 
                             return (
-                              <div className="tw flex items-center gap-1">
+                              <span className="tw flex items-center gap-1">
                                 {(mode === "simple" || mode === "filter") && p.onSelectionChange && firstColumn ? (
                                   <InputCheckbox
                                     size="small"
                                     color={Color.Neutral}
-                                    value={
-                                      selectedFields === totalSelectableFields && totalSelectableFields > 0
-                                        ? true
-                                        : selectedFields === 0
-                                          ? false
-                                          : "indeterminate"
-                                    }
-                                    onChange={value => updateSelectFieldAll(value)}
+                                    disabled={p.disabledRows?.includes(cellTextContent.rowKeyValue) ?? false}
+                                    value={p.selectedRows?.includes(cellTextContent.rowKeyValue) ?? false}
+                                    onChange={value => {
+                                      updateSelectField(cellTextContent.rowKeyValue, value)
+                                    }}
                                   />
                                 ) : null}
 
-                                {tooltipText ? (
-                                  <Tooltip trigger={headerContent}>
-                                    <span className="tw text-xs text-neutral-700">{tooltipText}</span>
-                                  </Tooltip>
-                                ) : (
-                                  headerContent
-                                )}
-                              </div>
+                                <span className={`tw flex flex-1 ${justify}`}>{inner}</span>
+                              </span>
                             )
-                          },
-
-                          elementAttributes: headCellElementAttributes => {
-                            const column = headCellElementAttributes.column as Column
-
-                            if (p.fixedKeyField === column.key) {
-                              return { className: "override-ka-fixed-left" }
-                            }
-
-                            if (column.key === KEY_ACTIONS) {
-                              return { className: "override-ka-fixed-right" }
-                            }
-                          },
+                          }
                         },
+                      },
 
-                        cellText: {
-                          content: cellTextContent => {
-                            if (cellTextContent.column.key === KEY_ROW_NUMBER) {
-                              const sortedData = kaPropsUtils.getData(table.props)
-                              const rowIndex = sortedData.findIndex(
-                                (d: any) => d[p.rowKeyField] === cellTextContent.rowKeyValue,
+                      cellEditor: {
+                        content: cellEditorContent => {
+                          const column = cellEditorContent.column as Column
+                          let editor: ReactNode = null
+                          switch (column.dataType) {
+                            case DataType.ProgressIndicator:
+                              editor = <CellProgressIndicator {...cellEditorContent} textSize={p.textSize} />
+                              break
+                            case DataType.List:
+                              editor = <CellInputCombobox {...cellEditorContent} />
+                              break
+                            case DataType.Status:
+                              editor = <CellStatus {...cellEditorContent} textSize={p.textSize} />
+                              break
+                            case DataType.Boolean:
+                              editor = <CellInputCheckbox {...cellEditorContent} />
+                              break
+                            case DataType.Date:
+                              editor = <CellInputTextDate {...cellEditorContent} />
+                              break
+                            case DataType.Number:
+                            case DataType.String:
+                              editor = (
+                                <CellInputTextSingle
+                                  {...cellEditorContent}
+                                  autoFocus={p.editingMode === EditingMode.Cell}
+                                />
                               )
-                              const pageOffset =
-                                paginationConfig && p.pagination?.mode === "client"
-                                  ? paginationConfig.pageIndex * paginationConfig.pageSize
-                                  : 0
-
-                              return (
-                                <span className={`tw flex justify-end text-neutral-500 ${sizeClass(textSize, "small")}`}>
-                                  {rowIndex + 1 + pageOffset}
-                                </span>
-                              )
-                            }
-
-                            if (cellTextContent.column.key === KEY_ACTIONS && p.rowActions) {
-                              return (
-                                <div className="tw flex items-center justify-end gap-1">
-                                  {Children.toArray(p.rowActions(cellTextContent.rowData))}
-                                </div>
-                              )
-                            } else {
-                              const column = cellTextContent.column as Column
-
-                              const alignmentRight = column.dataType === DataType.Number
-                              const firstColumn = column.key === firstDataColumnKey
-
-                              const text = formatValue(
-                                cellTextContent.value?.toString(),
-                                column.dataType || DataType.String,
-                                column.placeholder,
-                              )
-
-                              const tooltip = column.tooltip as Column["tooltip"]
-                              const tooltipTextCls = `tw text-neutral-700 ${sizeClass(textSize, "small")}`
-
-                              let tooltipElement
-
-                              const emptyString = column.placeholder || TABLE_CELL_EMPTY_STRING
-                              if (typeof tooltip === "boolean" && text !== emptyString) {
-                                tooltipElement = <span className={tooltipTextCls}>{text}</span>
-                              } else if (typeof tooltip === "function") {
-                                tooltipElement = tooltip(cellTextContent.rowData)
-
-                                if (typeof tooltipElement === "string") {
-                                  tooltipElement = <span className={tooltipTextCls}>{tooltipElement}</span>
-                                }
-                              }
-
-                              // Process footer similar to tooltip
-                              let footerElement
-                              if (typeof column.footer === "function") {
-                                footerElement = column.footer(cellTextContent.rowData)
-                              }
-
-                              let output: ReactNode
-
-                              if (column.dataType === DataType.ProgressIndicator) {
-                                output = <CellProgressIndicator {...cellTextContent} textSize={p.textSize} />
-                              } else if (column.dataType === DataType.Status) {
-                                output = <CellStatus {...cellTextContent} textSize={p.textSize} />
-                              } else if (column.dataType === DataType.Icon) {
-                                output = <CellIcon {...cellTextContent} textSize={p.textSize} />
-                              } else {
-                                // Use optimized cell component for regular cells
-                                output = (
-                                  <OptimizedCell
-                                    {...cellTextContent}
-                                    column={column}
-                                    firstColumn={firstColumn}
-                                    tooltipElement={tooltipElement}
-                                    textSize={p.textSize}
-                                  />
-                                )
-                              }
-
-                              const customCellRendererElement =
-                                p.customCellRenderer && typeof p.customCellRenderer === "function"
-                                  ? p.customCellRenderer(cellTextContent)
-                                  : null
-
-                              const justify = alignmentRight ? "justify-end" : "justify-start"
-                              const showTooltipIconWrap =
-                                tooltipElement &&
-                                column.dataType !== DataType.Status &&
-                                column.dataType !== DataType.ProgressIndicator &&
-                                column.showTooltipIcon === true
-
-                              const trigger = showTooltipIconWrap ? (
-                                <span className="tw flex items-center gap-1">
-                                  {output}
-                                  <Icon name="info" small fill={[Color.Neutral, 200]} />
-                                </span>
-                              ) : (
-                                output
-                              )
-
-                              const main = tooltipElement ? (
-                                <Tooltip trigger={trigger}>{tooltipElement}</Tooltip>
-                              ) : (
-                                output
-                              )
-
-                              const inner = customCellRendererElement ? (
-                                customCellRendererElement
-                              ) : footerElement ? (
-                                <span className="tw flex flex-col py-0.5 gap-0.5">
-                                  <span className={`tw flex ${justify}`}>{main}</span>
-                                  <span className={`tw flex ${justify}`}>{footerElement}</span>
-                                </span>
-                              ) : (
-                                main
-                              )
-
-                              return (
-                                <span className="tw flex items-center gap-1">
-                                  {(mode === "simple" || mode === "filter") && p.onSelectionChange && firstColumn ? (
-                                    <InputCheckbox
-                                      size="small"
-                                      color={Color.Neutral}
-                                      disabled={p.disabledRows?.includes(cellTextContent.rowKeyValue) ?? false}
-                                      value={p.selectedRows?.includes(cellTextContent.rowKeyValue) ?? false}
-                                      onChange={value => {
-                                        updateSelectField(cellTextContent.rowKeyValue, value)
-                                      }}
-                                    />
-                                  ) : null}
-
-                                  <span className={`tw flex flex-1 ${justify}`}>{inner}</span>
-                                </span>
-                              )
-                            }
-                          },
+                              break
+                          }
+                          return <span className="tw flex items-center justify-start">{editor}</span>
                         },
+                      },
 
-                        cellEditor: {
-                          content: cellEditorContent => {
-                            const column = cellEditorContent.column as Column
-                            let editor: ReactNode = null
-                            switch (column.dataType) {
-                              case DataType.ProgressIndicator:
-                                editor = <CellProgressIndicator {...cellEditorContent} textSize={p.textSize} />
-                                break
-                              case DataType.List:
-                                editor = <CellInputCombobox {...cellEditorContent} />
-                                break
-                              case DataType.Status:
-                                editor = <CellStatus {...cellEditorContent} textSize={p.textSize} />
-                                break
-                              case DataType.Boolean:
-                                editor = <CellInputCheckbox {...cellEditorContent} />
-                                break
-                              case DataType.Date:
-                                editor = <CellInputTextDate {...cellEditorContent} />
-                                break
-                              case DataType.Number:
-                              case DataType.String:
-                                editor = (
-                                  <CellInputTextSingle
-                                    {...cellEditorContent}
-                                    autoFocus={p.editingMode === EditingMode.Cell}
-                                  />
-                                )
-                                break
-                            }
-                            return <span className="tw flex items-center justify-start">{editor}</span>
-                          },
+                      cell: {
+                        elementAttributes: cellElementAttributes => {
+                          const column = cellElementAttributes.column as Column
+                          const id = (cellElementAttributes?.rowData as any)?.id
+                            ? `cell-${column.key}-${(cellElementAttributes?.rowData as any)?.id}`
+                            : undefined
+                          const classNames: string[] = []
+
+                          if (p.fixedKeyField === column.key) {
+                            classNames.push("override-ka-fixed-left")
+                          }
+
+                          if (column.key === KEY_ACTIONS) {
+                            classNames.push("override-ka-fixed-right")
+                          }
+
+                          if (column.dataType === DataType.Icon) {
+                            classNames.push("ka-cell-icon")
+                          }
+
+                          if (
+                            mode === "edit" &&
+                            p.editingMode === EditingMode.Cell &&
+                            (column.isEditable || column.isEditable === undefined)
+                          ) {
+                            classNames.push("ka-cell-editable")
+                          }
+
+                          const { width, minWidth, maxWidth } = calculateColumnWidth(column)
+
+                          const fillColor =
+                            typeof column.fill === "function" ? column.fill(cellElementAttributes.rowData) : column.fill
+                          const backgroundColor = fillColor
+                            ? computeColor([fillColor, fillColor === Color.Neutral ? 50 : 100])
+                            : undefined
+
+                          return {
+                            id: id,
+                            className: classNames.join(" "),
+                            tabIndex: p.mode === "edit" && column.isEditable ? -1 : undefined,
+
+                            style: {
+                              width: width,
+                              minWidth: minWidth,
+                              maxWidth: maxWidth,
+                              backgroundColor,
+                            },
+                          }
                         },
+                      },
+                    }}
+                  />
 
-                        cell: {
-                          elementAttributes: cellElementAttributes => {
-                            const column = cellElementAttributes.column as Column
-                            const id = (cellElementAttributes?.rowData as any)?.id
-                              ? `cell-${column.key}-${(cellElementAttributes?.rowData as any)?.id}`
-                              : undefined
-                            const classNames: string[] = []
-
-                            if (p.fixedKeyField === column.key) {
-                              classNames.push("override-ka-fixed-left")
-                            }
-
-                            if (column.key === KEY_ACTIONS) {
-                              classNames.push("override-ka-fixed-right")
-                            }
-
-                            if (column.dataType === DataType.Icon) {
-                              classNames.push("ka-cell-icon")
-                            }
-
-                            if (
-                              mode === "edit" &&
-                              p.editingMode === EditingMode.Cell &&
-                              (column.isEditable || column.isEditable === undefined)
-                            ) {
-                              classNames.push("ka-cell-editable")
-                            }
-
-                            const { width, minWidth, maxWidth } = calculateColumnWidth(column)
-
-                            const fillColor =
-                              typeof column.fill === "function"
-                                ? column.fill(cellElementAttributes.rowData)
-                                : column.fill
-                            const backgroundColor = fillColor
-                              ? computeColor([fillColor, fillColor === Color.Neutral ? 50 : 100])
-                              : undefined
-
-                            return {
-                              id: id,
-                              className: classNames.join(" "),
-                              tabIndex: p.mode === "edit" && column.isEditable ? -1 : undefined,
-
-                              style: {
-                                width: width,
-                                minWidth: minWidth,
-                                maxWidth: maxWidth,
-                                backgroundColor,
-                              },
-                            }
-                          },
-                        },
-                      }}
+                  {paginationConfig && paginationConfig.totalPages > 1 ? (
+                    <DataTablePagination
+                      pageIndex={paginationConfig.pageIndex}
+                      pageSize={paginationConfig.pageSize}
+                      totalCount={paginationConfig.totalCount}
+                      pageSizeOptions={paginationConfig.pageSizeOptions}
+                      onPageChange={paginationConfig.onPageChange}
+                      onPageSizeChange={paginationConfig.onPageSizeChange}
+                      textSize={p.textSize}
                     />
-
-                    {paginationConfig && paginationConfig.totalPages > 1 ? (
-                      <DataTablePagination
-                        pageIndex={paginationConfig.pageIndex}
-                        pageSize={paginationConfig.pageSize}
-                        totalCount={paginationConfig.totalCount}
-                        pageSizeOptions={paginationConfig.pageSizeOptions}
-                        onPageChange={paginationConfig.onPageChange}
-                        onPageSizeChange={paginationConfig.onPageSizeChange}
-                        textSize={p.textSize}
-                      />
-                    ) : null}
+                  ) : null}
                 </div>
               )}
             </div>
