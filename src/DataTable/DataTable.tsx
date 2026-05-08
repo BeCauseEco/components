@@ -476,7 +476,7 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
       >
         <div className={`tw flex w-full flex-col ${p.loading ? "pointer-events-none opacity-60" : ""}`}>
           <div id="reference-filters" className="tw flex w-full flex-row items-start justify-between">
-            <div className="tw flex flex-row flex-wrap gap-4">
+            <div className="tw flex flex-row flex-wrap items-center gap-4">
               {mode === "filter" ? <SearchInput onDebouncedChange={handleSearchChange} /> : null}
               {Children.toArray(p.children)}
             </div>
