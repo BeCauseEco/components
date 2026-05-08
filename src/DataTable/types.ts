@@ -1,7 +1,6 @@
 import { ReactElement, ReactNode } from "react"
 import { SortDirection } from "ka-table"
-import { ICellTextProps, IGroupRowProps } from "ka-table/props"
-import { AlignProps } from "@new/Stack/Align"
+import { ICellTextProps } from "ka-table/props"
 import { Color, ColorWithLightness } from "@new/Color"
 import { InputButtonPrimaryProps } from "@new/InputButton/InputButtonPrimary"
 import { InputButtonTertiaryProps } from "@new/InputButton/InputButtonTertiary"
@@ -17,6 +16,8 @@ import { EditingMode } from "ka-table"
 import { PlaywrightProps } from "@new/Playwright"
 
 export { SortDirection } from "ka-table"
+
+export type DataTableTextSize = "xxtiny" | "xtiny" | "tiny" | "xsmall" | "small" | "medium" | "large"
 
 export enum DataType {
   Internal = "internal",
@@ -65,16 +66,15 @@ export type Column = {
   maxWidth?: `${number}${"px"}` | `${number}${"%"}`
   minWidth?: `${number}${"px"}` | `${number}${"%"}`
   explodeWidth?: boolean
-  preventContentCollapse?: boolean
   sort?: (sortDirection: SortDirection) => (a: any, b: any) => number
   avatar?: string | ((rowData: ICellTextProps["rowData"]) => string | ReactElement | undefined)
   link?: (rowData: ICellTextProps["rowData"]) => string | (() => void) | undefined
-  tooltip?: ((rowData: ICellTextProps["rowData"]) => ReactElement<AlignProps> | string | undefined) | boolean
+  tooltip?: ((rowData: ICellTextProps["rowData"]) => ReactElement | string | undefined) | boolean
   showTooltipIcon?: boolean
   headerTooltip?: string
   isEditable?: boolean
-  endAdornment?: (rowData: ICellTextProps["rowData"]) => ReactElement<AlignProps> | string | undefined
-  startAdornment?: (rowData: ICellTextProps["rowData"]) => ReactElement<AlignProps> | string | undefined
+  endAdornment?: (rowData: ICellTextProps["rowData"]) => ReactElement | string | undefined
+  startAdornment?: (rowData: ICellTextProps["rowData"]) => ReactElement | string | undefined
   /**
    * Function to generate footer content for each cell
    * @param rowData - The data object for the current row
@@ -83,8 +83,6 @@ export type Column = {
   footer?: (rowData: ICellTextProps["rowData"]) => ReactElement | undefined | null
   placeholder?: string
   progressIndicator?: {
-    type: "bar" | "circle"
-
     configure: (rowData: ICellTextProps["rowData"]) =>
       | {
           value: number
@@ -257,7 +255,7 @@ export type DataTableProps<TData = any> = PlaywrightProps & {
   children?: ReactNode
   editingMode?: EditingMode
   cellPaddingSize?: "none" | "tiny" | "xsmall" | "small" | "medium"
-  textSize?: "xxtiny" | "xtiny" | "tiny" | "xsmall" | "small" | "medium" | "large"
+  textSize?: DataTableTextSize
   /** Enable truncation of column header names with ellipsis. Text wraps up to 2 lines and overflows with "..." after that. Full title shown on hover. */
   ellipsisColumnNames?: boolean
 
@@ -270,14 +268,6 @@ export type DataTableProps<TData = any> = PlaywrightProps & {
   noDataText?: string
   /** When true, prepends a "#" column showing the 1-indexed row number for each row. */
   showRowNumbers?: boolean
-  /** Callback to apply custom CSS class names to data rows based on row data. */
-  rowClassName?: (rowData: TData) => string | undefined
-  /** When true, hides the horizontal scrollbar on the table wrapper. */
-  hideHorizontalScroll?: boolean
-  /** Group rows by this column key. Creates group header rows using ka-table's native grouping. */
-  groupByColumn?: string
-  /** Custom renderer for group header rows. Receives ka-table's IGroupRowProps. */
-  groupRowContent?: (props: IGroupRowProps<TData>) => ReactElement
   /** When set with `allowCsv: true`, renders a CSV-download button in the filter row.
    *  Exports every row in `data` (ignoring search/sort/pagination) and every column except
    *  `DataType.Internal` and `DataType.Object`. */

@@ -1,12 +1,8 @@
 "use client"
-import { Stack } from "@new/Stack/Stack"
-import { Align } from "@new/Stack/Align"
-import { EditingMode, InsertRowPosition, SortDirection, SortingMode, Table, useTable } from "ka-table"
-import { Group } from "ka-table/models"
+import { EditingMode, SortDirection, SortingMode, Table, useTable } from "ka-table"
 import {
   closeEditor,
   closeRowEditors,
-  deleteRow,
   openEditor,
   setFocused,
   moveFocusedRight,
@@ -14,35 +10,27 @@ import {
 } from "ka-table/actionCreators"
 import { Cell } from "ka-table/Models/Cell"
 import { Focused } from "ka-table/Models/Focused"
-import { InputButtonPrimary } from "@new/InputButton/InputButtonPrimary"
-import { Spacer } from "@new/Stack/Spacer"
-import { InputButtonTertiary } from "@new/InputButton/InputButtonTertiary"
 import { InputTextSingle } from "@new/InputText/InputTextSingle"
 import { Color, computeColor } from "@new/Color"
-import { Text } from "@new/Text/Text"
 import { Icon } from "@new/Icon/Icon"
-import styled from "@emotion/styled"
 import { Children, ReactNode, useCallback, useEffect, useId, useRef, useState, useMemo } from "react"
 import _debounce from "lodash/debounce"
-import { InputButtonIconTertiary } from "@new/InputButton/InputButtonIconTertiary"
 import { InputCheckbox } from "@new/InputCheckbox/InputCheckbox"
-import { Divider } from "@new/Divider/Divider"
 import { kaPropsUtils } from "ka-table/utils"
-import { Alert } from "@new/Alert/Alert"
 import { Tooltip } from "@new/Tooltip/Tooltip"
 
 // Import from our new modular structure
 import { DataTableProps, DataType, Column } from "./types"
-import { createNewRow, formatValue, calculateColumnWidth } from "./utils"
+import { formatValue, calculateColumnWidth } from "./utils"
 import { createDataTableStyles } from "./styles"
-import { ActionEdit, ActionSaveCancel } from "./internal/ActionComponents"
 import { CellInputTextSingle, CellInputTextDate, CellInputCheckbox, CellInputCombobox } from "./internal/CellEditors"
 import { CellProgressIndicator, CellStatus, CellIcon } from "./internal/CellRenderers"
-import { KEY_DRAG, KEY_ROW_NUMBER, KEY_ACTIONS_EDIT, KEY_ACTIONS, TABLE_CELL_EMPTY_STRING } from "./internal/constants"
+import { KEY_ROW_NUMBER, KEY_ACTIONS, TABLE_CELL_EMPTY_STRING } from "./internal/constants"
 import { OptimizedCell } from "./internal/OptimizedCellComponents"
 import { DataTablePagination } from "./internal/DataTablePagination"
 import { CsvExportButton } from "./internal/CsvExportButton"
 import { getDisplayableColumns } from "./internal/exportToCsv"
+import { sizeClass } from "./internal/textSize"
 
 // Re-export for backward compatibility
 export { SortDirection } from "ka-table"
@@ -55,13 +43,6 @@ export type {
   ServerPagination,
   DataTableExportConfig,
 } from "./types"
-
-const CellHeadLink = styled.a({
-  display: "flex",
-  alignItems: "center",
-  cursor: "pointer",
-  userSelect: "none",
-})
 
 // Separate search input component to prevent expensive table re-renders whenever the inputValue state changes
 const SearchInput = ({ onDebouncedChange }: { onDebouncedChange: (value: string) => void }) => {
@@ -94,35 +75,11 @@ const SearchInput = ({ onDebouncedChange }: { onDebouncedChange: (value: string)
 }
 
 export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
-  // Apply defaults for optional props
   const mode = p.mode ?? "simple"
   const cssScope = useId().replace(/:/g, "datatable")
   const referenceContainer = useRef<HTMLDivElement>(null)
 
-  // Helper to get text size props for Text components
-  const getTextSizeProps = (
-    defaultSize: "xxtiny" | "xtiny" | "tiny" | "xsmall" | "small" | "medium" | "large" = "small",
-  ) => {
-    const size = p.textSize || defaultSize
-    return { [size]: true }
-  }
-
-  // Optimization 5: Performance monitoring hook for development
-  const usePerformanceMonitoring = (label: string, deps: any[]) => {
-    useEffect(() => {
-      if (process.env.NODE_ENV === "development") {
-        const startTime = performance.now()
-        return () => {
-          const endTime = performance.now()
-          const duration = endTime - startTime
-          if (duration > 16) {
-            // Log if render takes more than one frame (16ms)
-            console.debug(`⚡ DataTable ${label}: ${duration.toFixed(2)}ms`)
-          }
-        }
-      }
-    }, deps)
-  }
+  const textSize = p.textSize
 
   const DEFAULT_PAGE_SIZE = 25
   const isVirtualized = !!p.virtualScrollingMaxHeight
@@ -131,15 +88,20 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
   const [filter, setFilter] = useState("")
   const [clientPageIndex, setClientPageIndex] = useState(0)
   const [clientPageSize, setClientPageSize] = useState(p.pagination?.pageSize ?? DEFAULT_PAGE_SIZE)
+  const pageResetKey = `${filter}|${p.pagination?.mode ?? ""}`
+  const [lastPageResetKey, setLastPageResetKey] = useState(pageResetKey)
+  if (pageResetKey !== lastPageResetKey) {
+    setLastPageResetKey(pageResetKey)
+    if (p.pagination?.mode !== "server") {
+      setClientPageIndex(0)
+    }
+  }
 
-  // Memoize setFilter to prevent SearchInput from re-creating debounced handler
   const handleSearchChange = useCallback((value: string) => {
     setFilter(value)
   }, [])
   const [editRowId, setEditRowId] = useState<number | null>(null)
   const [editColumnId, setEditColumnId] = useState<string>("")
-  const [deleteId, setDeleteId] = useState<number | null>(null)
-  const [dataTemp, setDataTemp] = useState<TData[]>([])
 
   // Track active sort state so nativeColumns always reflects the current sort,
   // preventing ka-table's controlled props sync from resetting user sort on re-renders
@@ -175,14 +137,6 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
     )
   }, [p.data, p.columns, p.pagination?.mode, filter])
 
-  // Reset client pagination to page 0 when the active filter changes, otherwise
-  // the user can land on an empty page (e.g. was on page 7, filter now yields 3 rows).
-  useEffect(() => {
-    if (p.pagination?.mode !== "server") {
-      setClientPageIndex(0)
-    }
-  }, [filter, p.pagination?.mode])
-
   // Sort the full (filtered) dataset BEFORE pagination slicing so sorting spans
   // the whole dataset, not just the current page. Server mode is caller-owned.
   // The comparator mirrors ka-table's SortUtils so ka-table re-sorting the
@@ -201,6 +155,8 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
 
     const direction = activeSort.direction
     const customSort = column.sort?.(direction)
+    const sign = direction === SortDirection.Ascend ? 1 : -1
+    let collator: Intl.Collator | null = null
 
     const comparator = customSort
       ? (rowA: any, rowB: any) => customSort(rowA[column.key], rowB[column.key])
@@ -212,17 +168,16 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
             return 0
           }
           if (aValue == null) {
-            return direction === SortDirection.Ascend ? -1 : 1
+            return -sign
           }
           if (bValue == null) {
-            return direction === SortDirection.Ascend ? 1 : -1
+            return sign
           }
           if (typeof aValue === "string" && typeof bValue === "string") {
-            const ascend = aValue.toLowerCase() < bValue.toLowerCase() ? -1 : 1
-            return direction === SortDirection.Ascend ? ascend : -ascend
+            collator ??= new Intl.Collator(undefined, { sensitivity: "base", numeric: true })
+            return sign * collator.compare(aValue, bValue)
           }
-          const ascend = aValue < bValue ? -1 : 1
-          return direction === SortDirection.Ascend ? ascend : -ascend
+          return sign * (aValue < bValue ? -1 : 1)
         }
 
     return [...searchedData].sort(comparator)
@@ -268,7 +223,6 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
     return sortedData.slice(start, start + paginationConfig.pageSize)
   }, [p.data, sortedData, paginationConfig, p.pagination?.mode])
 
-  // Optimization 2: Memoize selected fields count
   const selectedFields = useMemo(() => {
     if (!p.selectedRows) {
       return 0
@@ -276,7 +230,6 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
     return p.selectedRows.length
   }, [p.selectedRows])
 
-  // Memoize total selectable fields count
   const totalSelectableFields = useMemo(() => {
     if (!p.selectedRows && !p.onSelectionChange) {
       return 0
@@ -287,7 +240,6 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
     return p.data.filter(d => !p.disabledRows?.includes(d[p.rowKeyField] as string | number)).length
   }, [p.data, p.disabledRows, p.rowKeyField, p.selectedRows, p.onSelectionChange])
 
-  // Memoize column processing with active sort state to keep ka-table in sync
   const nativeColumns = useMemo(() => {
     const columns = p.columns.map(c => {
       const column = c as Column
@@ -311,7 +263,6 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
         minWidth: column.minWidth,
         maxWidth: column.maxWidth,
         explodeWidth: column.explodeWidth,
-        preventContentCollapse: column.preventContentCollapse,
         isEditable: column.isEditable,
         endAdornment: column.endAdornment,
         startAdornment: column.startAdornment,
@@ -336,15 +287,8 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
       } as any)
     }
 
-    // Add action columns if needed
-    if (mode === "edit" && p.editingMode !== EditingMode.Cell) {
-      columns.push({
-        key: KEY_ACTIONS_EDIT,
-        title: "",
-        dataType: DataType.Internal,
-        sortDirection: undefined,
-      } as any)
-    } else if (p.rowActions) {
+    // Add action column for row-level rowActions buttons
+    if (p.rowActions) {
       columns.push({
         key: KEY_ACTIONS,
         title: "",
@@ -354,57 +298,41 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
     }
 
     return columns
-  }, [p.columns, mode, p.editingMode, p.rowActions, activeSort, p.showRowNumbers])
+  }, [p.columns, mode, p.rowActions, activeSort, p.showRowNumbers])
 
   const firstDataColumnKey = useMemo(() => {
     return nativeColumns.find(c => c.key !== KEY_ROW_NUMBER)?.key
   }, [nativeColumns])
 
-  const updateSelectField = useCallback(
-    (key: any, value: boolean) => {
-      if (!p.onSelectionChange) {
-        return
+  const updateSelectField = (key: any, value: boolean) => {
+    if (!p.onSelectionChange) {
+      return
+    }
+
+    const currentSelected = p.selectedRows || []
+    if (value) {
+      if (!currentSelected.includes(key)) {
+        p.onSelectionChange([...currentSelected, key])
       }
+    } else {
+      p.onSelectionChange(currentSelected.filter(id => id !== key))
+    }
+  }
 
-      const currentSelected = p.selectedRows || []
-      let newSelectedRows: (string | number)[]
+  const updateSelectFieldAll = (value: boolean) => {
+    if (!p.onSelectionChange) {
+      return
+    }
 
-      if (value) {
-        // Add to selection if not already selected
-        if (!currentSelected.includes(key)) {
-          newSelectedRows = [...currentSelected, key]
-        } else {
-          newSelectedRows = currentSelected
-        }
-      } else {
-        // Remove from selection
-        newSelectedRows = currentSelected.filter(id => id !== key)
-      }
-
-      p.onSelectionChange(newSelectedRows)
-    },
-    [p.selectedRows, p.onSelectionChange],
-  )
-
-  const updateSelectFieldAll = useCallback(
-    (value: boolean) => {
-      if (!p.onSelectionChange) {
-        return
-      }
-
-      if (value) {
-        // Select all non-disabled rows
-        const selectableRowIds = p.data
-          .filter(d => !p.disabledRows?.includes(d[p.rowKeyField] as string | number))
-          .map(d => d[p.rowKeyField] as string | number)
-        p.onSelectionChange(selectableRowIds)
-      } else {
-        // Deselect all
-        p.onSelectionChange([])
-      }
-    },
-    [p.data, p.disabledRows, p.rowKeyField, p.onSelectionChange],
-  )
+    if (value) {
+      const selectableRowIds = p.data
+        .filter(d => !p.disabledRows?.includes(d[p.rowKeyField] as string | number))
+        .map(d => d[p.rowKeyField] as string | number)
+      p.onSelectionChange(selectableRowIds)
+    } else {
+      p.onSelectionChange([])
+    }
+  }
 
   const table = useTable({
     onDispatch: d => {
@@ -438,70 +366,23 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
           }
           setEditRowId(rowKeyValue)
           setEditColumnId(d.columnKey)
-          setDataTemp(p.data)
         }
 
         if (d.type === "UpdateCellValue") {
           const updatedData = kaPropsUtils.getData(table.props)
 
-          setDataTemp(updatedData)
-
           if (p.onChange) {
             p.onChange(updatedData)
           }
         }
-        return
-      }
-
-      if (d.type === "OpenRowEditors") {
-        setEditRowId(d.rowKeyValue)
-        setDataTemp(p.data)
-      }
-
-      if (d.type === "ReorderRows") {
-        setDataTemp(kaPropsUtils.getData(table.props))
-      }
-
-      if (d.type === "CloseRowEditors") {
-        setEditRowId(null)
-
-        if (p.onChange) {
-          p.onChange(dataTemp)
-        }
-
-        table.updateData(dataTemp)
-      }
-
-      if (d.type === "SaveRowEditors" || d.type === "ReorderRows" || d.type === "InsertRow" || d.type === "DeleteRow") {
-        const data = kaPropsUtils.getData(table.props)
-
-        if (d.type !== "ReorderRows") {
-          setEditRowId(null)
-        }
-
-        if (p.onChange) {
-          p.onChange(data)
-        }
-
-        if (p.onChangeRow) {
-          if (d.type === "InsertRow") {
-            p.onChangeRow(data[data.length - 1])
-          } else {
-            p.onChangeRow(data.filter(d => d.id === rowKeyValue)?.[0])
-          }
-        }
-
-        setDeleteId(null)
       }
     },
   })
 
-  const css = createDataTableStyles(cssScope, p.fill, p.stroke, p.cellPaddingSize, p.noColumnLines, p.borderless)
-
-  // Monitor performance of key operations
-  usePerformanceMonitoring("render", [p.data.length, p.columns.length])
-  usePerformanceMonitoring("column processing", [nativeColumns])
-  usePerformanceMonitoring("data selection", [selectedFields, totalSelectableFields])
+  const css = useMemo(
+    () => createDataTableStyles(cssScope, p.fill, p.stroke, p.cellPaddingSize, p.noColumnLines, p.borderless),
+    [cssScope, p.fill, p.stroke, p.cellPaddingSize, p.noColumnLines, p.borderless],
+  )
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -599,655 +480,386 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
         ref={referenceContainer}
         data-playwright-testid={p["data-playwright-testid"]}
       >
-        <Stack vertical hug loading={p.loading}>
-          <div
-            id="reference-filters"
-            style={{
-              display: "flex",
-              flexDirection: "row",
-              justifyContent: "space-between",
-              alignItems: "flex-start",
-              width: "100%",
-            }}
-          >
-            <Align left horizontal wrap>
-              {mode === "filter" ? <SearchInput onDebouncedChange={handleSearchChange} /> : <></>}
-              {Children.toArray(p.children)
-                .filter(child => !!child)
-                .map(child => child)}
-            </Align>
+        <div className={`tw flex w-full flex-col ${p.loading ? "pointer-events-none opacity-60" : ""}`}>
+          <div id="reference-filters" className="tw flex w-full flex-row items-start justify-between">
+            <div className="tw flex flex-row flex-wrap gap-4">
+              {mode === "filter" ? <SearchInput onDebouncedChange={handleSearchChange} /> : null}
+              {Children.toArray(p.children)}
+            </div>
             {showCsvExportButton && p.enableExports && (
               <CsvExportButton config={p.enableExports} columns={p.columns} data={p.data} />
             )}
           </div>
 
-          {hasFilters ? <Spacer medium id="reference-spacer" /> : <></>}
+          {hasFilters ? <div id="reference-spacer" className="tw h-4 shrink-0" /> : null}
 
-          <Align left vertical>
+          <div className="tw flex w-full flex-col">
             <div id="reference-target">
               {p.loadingElement ? (
                 p.loadingElement
               ) : (
-                <Stack
-                  vertical
-                  hug
-                  stroke={p.borderless ? undefined : p.stroke || [Color.Neutral, 100]}
-                  fill={p.fill || [Color.Transparent]}
+                <div
+                  className="tw flex w-full flex-col"
+                  style={{
+                    border: p.borderless ? undefined : `1px solid ${computeColor(p.stroke || [Color.Neutral, 100])}`,
+                    backgroundColor: computeColor(p.fill || [Color.Transparent]),
+                  }}
                 >
-                  <Align topLeft vertical>
-                    {/* 
+                  {/* 
                       Force ka-table to remount when switching between cell-editing and readonly modes.
                       This is necessary because ka-table maintains internal state and event handlers that don't 
                       get properly reset when editingMode prop changes dynamically after initial render.
                       Without this key, cells remain editable even after switching from EditingMode.Cell to None.
                     */}
-                    <Table
-                      key={`table-${mode === "edit" && p.editingMode === EditingMode.Cell ? "cell-edit" : "readonly"}`}
-                      table={table}
-                      columns={
-                        p.groupByColumn
-                          ? [...(nativeColumns as any), { key: p.groupByColumn, visible: false }]
-                          : (nativeColumns as any)
+                  <Table
+                    key={p.editingMode === EditingMode.Cell ? "cell-edit" : "readonly"}
+                    table={table}
+                    columns={nativeColumns as any}
+                    data={displayData}
+                    rowKeyField={String(p.rowKeyField)}
+                    selectedRows={p.selectedRows || []}
+                    sortingMode={p.disableSorting ? SortingMode.None : SortingMode.Single}
+                    editingMode={p.editingMode}
+                    noData={{ text: p.noDataText || "Nothing found" }}
+                    searchText={filter}
+                    virtualScrolling={p.virtualScrollingMaxHeight ? { enabled: true } : undefined}
+                    search={({ searchText: searchTextValue, rowData, column }) => {
+                      if (column.dataType === DataType.Boolean) {
+                        const b = (rowData as any)[column.key]
+                        const s = searchTextValue.toLowerCase()
+
+                        return (s === "yes" && b === true) || (s === "no" && b === false)
                       }
-                      data={displayData}
-                      rowKeyField={String(p.rowKeyField)}
-                      selectedRows={p.selectedRows || []}
-                      sortingMode={p.disableSorting ? SortingMode.None : SortingMode.Single}
-                      editingMode={p.editingMode}
-                      rowReordering={mode === "edit" && p.editingMode !== EditingMode.Cell}
-                      noData={{ text: p.noDataText || "Nothing found" }}
-                      searchText={filter}
-                      virtualScrolling={p.virtualScrollingMaxHeight ? { enabled: true } : undefined}
-                      groups={p.groupByColumn ? [{ columnKey: p.groupByColumn }] : undefined}
-                      groupsExpanded={
-                        p.groupByColumn ? displayData.map(row => [(row as any)[p.groupByColumn!]]) : undefined
+                    }}
+                    sort={({ column }) => {
+                      if (column["sort"]) {
+                        return column["sort"](column.sortDirection)
                       }
-                      search={({ searchText: searchTextValue, rowData, column }) => {
-                        if (column.dataType === DataType.Boolean) {
-                          const b = (rowData as any)[column.key]
-                          const s = searchTextValue.toLowerCase()
-
-                          return (s === "yes" && b === true) || (s === "no" && b === false)
-                        }
-                      }}
-                      sort={({ column }) => {
-                        if (column["sort"]) {
-                          return column["sort"](column.sortDirection)
-                        }
-                      }}
-                      childComponents={{
-                        tableWrapper: {
-                          elementAttributes: () => {
-                            const style: Record<string, string> = {}
-                            let className = ""
-
-                            if (p.virtualScrollingMaxHeight) {
-                              style.maxHeight = p.virtualScrollingMaxHeight
-                            }
-
-                            if (p.hideHorizontalScroll) {
-                              className += (className ? " " : "") + "override-ka-hide-scrollbar"
-                            }
-
-                            if (mode === "edit" && p.editingMode !== EditingMode.Cell) {
-                              className = "override-ka-reorder"
-                            }
-
-                            if (Object.keys(style).length > 0 || className) {
-                              return {
-                                ...(Object.keys(style).length > 0 ? { style } : {}),
-                                ...(className ? { className } : {}),
-                              }
-                            }
-                          },
+                    }}
+                    childComponents={{
+                      tableWrapper: {
+                        elementAttributes: () => {
+                          if (p.virtualScrollingMaxHeight) {
+                            return { style: { maxHeight: p.virtualScrollingMaxHeight } }
+                          }
                         },
+                      },
 
-                        dataRow: {
-                          elementAttributes: dataRowElementAttributes => {
-                            const classes: string[] = []
+                      headCell: {
+                        content: headCellContent => {
+                          if (headCellContent.column.key === KEY_ACTIONS) {
+                            return <></>
+                          }
 
-                            if (
-                              dataRowElementAttributes.rowKeyValue === editRowId &&
-                              p.editingMode !== EditingMode.Cell
-                            ) {
-                              classes.push("override-ka-editing-row")
-                            }
-
-                            if (p.rowClassName) {
-                              const customClass = p.rowClassName(dataRowElementAttributes.rowData)
-                              if (customClass) {
-                                classes.push(customClass)
-                              }
-                            }
-
-                            if (classes.length > 0) {
-                              return { className: classes.join(" ") }
-                            }
-                          },
-                        },
-
-                        ...(p.groupRowContent
-                          ? {
-                              groupRow: {
-                                content: (props: any) => p.groupRowContent!(props),
-                              },
-                            }
-                          : {}),
-
-                        headCell: {
-                          content: headCellContent => {
-                            if (
-                              headCellContent.column.key === KEY_DRAG ||
-                              headCellContent.column.key === KEY_ACTIONS_EDIT ||
-                              headCellContent.column.key === KEY_ACTIONS
-                            ) {
-                              return <></>
-                            }
-
-                            if (headCellContent.column.key === KEY_ROW_NUMBER) {
-                              return (
-                                <Align horizontal right>
-                                  <Text fill={[Color.Neutral, 700]} {...getTextSizeProps("xsmall")}>
-                                    <b>#</b>
-                                  </Text>
-                                </Align>
-                              )
-                            }
-
-                            let iconName: string
-
-                            if (headCellContent.column.sortDirection === SortDirection.Ascend) {
-                              iconName = "keyboard_arrow_up"
-                            } else if (headCellContent.column.sortDirection === SortDirection.Descend) {
-                              iconName = "keyboard_arrow_down"
-                            } else {
-                              iconName = "unfold_more"
-                            }
-
-                            const alignmentRight = headCellContent.column.dataType === DataType.Number
-                            const firstColumn = headCellContent.column.key === firstDataColumnKey
-
-                            const headCellContentAsColumn = headCellContent.column as Column
-                            const allowSort =
-                              !p.disableSorting &&
-                              mode !== "edit" &&
-                              headCellContentAsColumn.dataType !== DataType.Status
-
-                            const fullTitle = headCellContent.column.title
-                            const ellipsisStyle = p.ellipsisColumnNames
-                              ? ({
-                                  display: "-webkit-box",
-                                  WebkitLineClamp: 2,
-                                  WebkitBoxOrient: "vertical",
-                                  overflow: "hidden",
-                                  textOverflow: "ellipsis",
-                                } as const)
-                              : undefined
-
-                            const headerTitle = (
-                              <Text
-                                fill={[Color.Neutral, 700]}
-                                wrap={p.ellipsisColumnNames}
-                                {...getTextSizeProps("xsmall")}
+                          if (headCellContent.column.key === KEY_ROW_NUMBER) {
+                            return (
+                              <span
+                                className={`tw flex justify-end font-semibold text-neutral-700 ${sizeClass(textSize, "xsmall")}`}
                               >
-                                <b style={ellipsisStyle}>{fullTitle}</b>
-                              </Text>
+                                #
+                              </span>
                             )
+                          }
 
-                            const headerContent = (
-                              <Align horizontal left={!alignmentRight} right={alignmentRight}>
-                                {allowSort || headCellContentAsColumn.sort ? (
-                                  <CellHeadLink onClick={() => table.updateSortDirection(headCellContent.column.key)}>
-                                    {headerTitle}
+                          let iconName: string
 
-                                    <Spacer tiny />
+                          if (headCellContent.column.sortDirection === SortDirection.Ascend) {
+                            iconName = "keyboard_arrow_up"
+                          } else if (headCellContent.column.sortDirection === SortDirection.Descend) {
+                            iconName = "keyboard_arrow_down"
+                          } else {
+                            iconName = "unfold_more"
+                          }
 
-                                    <Icon medium name={iconName} fill={[Color.Neutral, 700]} />
-                                  </CellHeadLink>
-                                ) : (
-                                  headerTitle
-                                )}
-                              </Align>
-                            )
+                          const alignmentRight = headCellContent.column.dataType === DataType.Number
+                          const firstColumn = headCellContent.column.key === firstDataColumnKey
 
-                            return (
-                              <Stack hug horizontal>
-                                {(mode === "simple" || mode === "filter") && p.onSelectionChange && firstColumn ? (
-                                  <>
-                                    <Align left horizontal hug>
-                                      <InputCheckbox
-                                        size="small"
-                                        color={Color.Neutral}
-                                        value={
-                                          selectedFields === totalSelectableFields && totalSelectableFields > 0
-                                            ? true
-                                            : selectedFields === 0
-                                              ? false
-                                              : "indeterminate"
-                                        }
-                                        onChange={value => updateSelectFieldAll(value)}
-                                      />
-                                    </Align>
+                          const headCellContentAsColumn = headCellContent.column as Column
+                          const allowSort =
+                            !p.disableSorting && mode !== "edit" && headCellContentAsColumn.dataType !== DataType.Status
 
-                                    <Spacer xsmall />
-                                  </>
-                                ) : (
-                                  <></>
-                                )}
+                          const fullTitle = headCellContent.column.title
+                          const titleSizeCls = sizeClass(textSize, "xsmall")
+                          const ellipsisCls = p.ellipsisColumnNames
+                            ? "[display:-webkit-box] [-webkit-line-clamp:2] [-webkit-box-orient:vertical] overflow-hidden text-ellipsis"
+                            : ""
 
-                                {p.ellipsisColumnNames ? (
-                                  <Tooltip trigger={headerContent}>
-                                    <Align horizontal left>
-                                      <Text xsmall fill={[Color.Neutral, 700]} wrap>
-                                        {fullTitle}
-                                      </Text>
-                                    </Align>
-                                  </Tooltip>
-                                ) : headCellContentAsColumn.headerTooltip ? (
-                                  <Tooltip trigger={headerContent}>
-                                    <Align horizontal left>
-                                      <Text xsmall fill={[Color.Neutral, 700]} wrap>
-                                        {headCellContentAsColumn.headerTooltip}
-                                      </Text>
-                                    </Align>
-                                  </Tooltip>
-                                ) : (
-                                  headerContent
-                                )}
-                              </Stack>
-                            )
-                          },
+                          const headerTitle = (
+                            <span className={`tw font-semibold text-neutral-700 ${titleSizeCls} ${ellipsisCls}`}>
+                              {fullTitle}
+                            </span>
+                          )
 
-                          elementAttributes: headCellElementAttributes => {
-                            const column = headCellElementAttributes.column as Column
+                          const headerJustify = alignmentRight ? "justify-end" : "justify-start"
+                          const headerContent = (
+                            <div className={`tw flex items-center ${headerJustify}`}>
+                              {allowSort || headCellContentAsColumn.sort ? (
+                                <a
+                                  className="tw flex cursor-pointer items-center gap-0.5 select-none"
+                                  onClick={() => table.updateSortDirection(headCellContent.column.key)}
+                                >
+                                  {headerTitle}
+                                  <Icon medium name={iconName} fill={[Color.Neutral, 700]} />
+                                </a>
+                              ) : (
+                                headerTitle
+                              )}
+                            </div>
+                          )
 
-                            if (p.fixedKeyField === column.key) {
-                              return { className: "override-ka-fixed-left" }
-                            }
+                          const tooltipText = p.ellipsisColumnNames ? fullTitle : headCellContentAsColumn.headerTooltip
 
-                            if (
-                              column.key === KEY_DRAG ||
-                              column.key === KEY_ACTIONS_EDIT ||
-                              column.key === KEY_ACTIONS
-                            ) {
-                              return { className: "override-ka-fixed-right" }
-                            }
-                          },
+                          return (
+                            <div className="tw flex items-center gap-1">
+                              {(mode === "simple" || mode === "filter") && p.onSelectionChange && firstColumn ? (
+                                <InputCheckbox
+                                  size="small"
+                                  color={Color.Neutral}
+                                  value={
+                                    selectedFields === totalSelectableFields && totalSelectableFields > 0
+                                      ? true
+                                      : selectedFields === 0
+                                        ? false
+                                        : "indeterminate"
+                                  }
+                                  onChange={value => updateSelectFieldAll(value)}
+                                />
+                              ) : null}
+
+                              {tooltipText ? (
+                                <Tooltip trigger={headerContent}>
+                                  <span className="tw text-xs text-neutral-700">{tooltipText}</span>
+                                </Tooltip>
+                              ) : (
+                                headerContent
+                              )}
+                            </div>
+                          )
                         },
 
-                        cellText: {
-                          content: cellTextContent => {
-                            if (cellTextContent.column.key === KEY_ROW_NUMBER) {
-                              const sortedData = kaPropsUtils.getData(table.props)
-                              const rowIndex = sortedData.findIndex(
-                                (d: any) => d[p.rowKeyField] === cellTextContent.rowKeyValue,
-                              )
-                              const pageOffset =
-                                paginationConfig && p.pagination?.mode === "client"
-                                  ? paginationConfig.pageIndex * paginationConfig.pageSize
-                                  : 0
+                        elementAttributes: headCellElementAttributes => {
+                          const column = headCellElementAttributes.column as Column
 
-                              return (
-                                <Align horizontal right>
-                                  <Text fill={[Color.Neutral, 500]} {...getTextSizeProps()}>
-                                    {rowIndex + 1 + pageOffset}
-                                  </Text>
-                                </Align>
-                              )
+                          if (p.fixedKeyField === column.key) {
+                            return { className: "override-ka-fixed-left" }
+                          }
+
+                          if (column.key === KEY_ACTIONS) {
+                            return { className: "override-ka-fixed-right" }
+                          }
+                        },
+                      },
+
+                      cellText: {
+                        content: cellTextContent => {
+                          if (cellTextContent.column.key === KEY_ROW_NUMBER) {
+                            const sortedData = kaPropsUtils.getData(table.props)
+                            const rowIndex = sortedData.findIndex(
+                              (d: any) => d[p.rowKeyField] === cellTextContent.rowKeyValue,
+                            )
+                            const pageOffset =
+                              paginationConfig && p.pagination?.mode === "client"
+                                ? paginationConfig.pageIndex * paginationConfig.pageSize
+                                : 0
+
+                            return (
+                              <span className={`tw flex justify-end text-neutral-500 ${sizeClass(textSize, "small")}`}>
+                                {rowIndex + 1 + pageOffset}
+                              </span>
+                            )
+                          }
+
+                          if (cellTextContent.column.key === KEY_ACTIONS && p.rowActions) {
+                            return (
+                              <div className="tw flex items-center justify-end gap-1">
+                                {Children.toArray(p.rowActions(cellTextContent.rowData))}
+                              </div>
+                            )
+                          } else {
+                            const column = cellTextContent.column as Column
+
+                            const alignmentRight = column.dataType === DataType.Number
+                            const firstColumn = column.key === firstDataColumnKey
+
+                            const text = formatValue(
+                              cellTextContent.value?.toString(),
+                              column.dataType || DataType.String,
+                              column.placeholder,
+                            )
+
+                            const tooltip = column.tooltip as Column["tooltip"]
+                            const tooltipTextCls = `tw text-neutral-700 ${sizeClass(textSize, "small")}`
+
+                            let tooltipElement
+
+                            const emptyString = column.placeholder || TABLE_CELL_EMPTY_STRING
+                            if (typeof tooltip === "boolean" && text !== emptyString) {
+                              tooltipElement = <span className={tooltipTextCls}>{text}</span>
+                            } else if (typeof tooltip === "function") {
+                              tooltipElement = tooltip(cellTextContent.rowData)
+
+                              if (typeof tooltipElement === "string") {
+                                tooltipElement = <span className={tooltipTextCls}>{tooltipElement}</span>
+                              }
                             }
 
-                            if (cellTextContent.column.key === KEY_ACTIONS_EDIT && p.editingMode !== EditingMode.Cell) {
-                              return (
-                                <Stack horizontal hug>
-                                  <Align horizontal right>
-                                    <InputButtonIconTertiary
-                                      size="small"
-                                      iconName="delete"
-                                      onClick={() => setDeleteId(cellTextContent.rowKeyValue)}
-                                      disabled={editRowId !== null}
-                                      destructive
-                                    />
+                            const footerElement =
+                              typeof column.footer === "function" ? column.footer(cellTextContent.rowData) : undefined
 
-                                    <ActionEdit {...cellTextContent} disabled={editRowId !== null} />
-                                  </Align>
-                                </Stack>
-                              )
-                            } else if (cellTextContent.column.key === KEY_ACTIONS && p.rowActions) {
-                              const actionElements: ReactNode[] = []
-
-                              Children.toArray(p.rowActions(cellTextContent.rowData)).forEach(r => {
-                                actionElements.push(r)
-                                actionElements.push(<Spacer xsmall />)
-                              })
-
-                              actionElements.pop()
-
-                              return (
-                                <Stack horizontal hug>
-                                  <Align horizontal right>
-                                    {actionElements}
-                                  </Align>
-                                </Stack>
-                              )
+                            let output: ReactNode
+                            if (column.dataType === DataType.ProgressIndicator) {
+                              output = <CellProgressIndicator {...cellTextContent} textSize={p.textSize} />
+                            } else if (column.dataType === DataType.Status) {
+                              output = <CellStatus {...cellTextContent} textSize={p.textSize} />
+                            } else if (column.dataType === DataType.Icon) {
+                              output = <CellIcon {...cellTextContent} textSize={p.textSize} />
                             } else {
-                              const column = cellTextContent.column as Column
-
-                              const alignmentRight = column.dataType === DataType.Number
-                              const firstColumn = column.key === firstDataColumnKey
-
-                              const text = formatValue(
-                                cellTextContent.value?.toString(),
-                                column.dataType || DataType.String,
-                                column.placeholder,
-                              )
-
-                              const tooltip = column.tooltip as Column["tooltip"]
-
-                              let tooltipElement
-
-                              const emptyString = column.placeholder || TABLE_CELL_EMPTY_STRING
-                              if (typeof tooltip === "boolean" && text !== emptyString) {
-                                tooltipElement = (
-                                  <Align horizontal left>
-                                    <Text {...getTextSizeProps()} fill={[Color.Neutral, 700]} wrap>
-                                      {text}
-                                    </Text>
-                                  </Align>
-                                )
-                              } else if (typeof tooltip === "function") {
-                                tooltipElement = tooltip(cellTextContent.rowData)
-
-                                if (typeof tooltipElement === "string") {
-                                  tooltipElement = (
-                                    <Align horizontal left>
-                                      <Text {...getTextSizeProps()} fill={[Color.Neutral, 700]} wrap>
-                                        {tooltipElement}
-                                      </Text>
-                                    </Align>
-                                  )
-                                }
-                              }
-
-                              // Process footer similar to tooltip
-                              let footerElement
-                              if (typeof column.footer === "function") {
-                                footerElement = column.footer(cellTextContent.rowData)
-                              }
-
-                              let output: ReactNode
-
-                              if (column.dataType === DataType.ProgressIndicator) {
-                                output = <CellProgressIndicator {...cellTextContent} textSize={p.textSize} />
-                              } else if (column.dataType === DataType.Status) {
-                                output = <CellStatus {...cellTextContent} textSize={p.textSize} />
-                              } else if (column.dataType === DataType.Icon) {
-                                output = <CellIcon {...cellTextContent} textSize={p.textSize} />
-                              } else {
-                                // Use optimized cell component for regular cells
-                                output = (
-                                  <OptimizedCell
-                                    {...cellTextContent}
-                                    column={column}
-                                    firstColumn={firstColumn}
-                                    tooltipElement={tooltipElement}
-                                    textSize={p.textSize}
-                                  />
-                                )
-                              }
-
-                              const customCellRendererElement =
-                                p.customCellRenderer && typeof p.customCellRenderer === "function"
-                                  ? p.customCellRenderer(cellTextContent)
-                                  : null
-
-                              return (
-                                <Stack hug horizontal>
-                                  {mode === "edit" && firstColumn && p.editingMode !== EditingMode.Cell ? (
-                                    <Align left horizontal hug>
-                                      <Icon name="drag_indicator" medium fill={[Color.Neutral, 700]} />
-
-                                      <Spacer xsmall />
-                                    </Align>
-                                  ) : (
-                                    <></>
-                                  )}
-
-                                  {(mode === "simple" || mode === "filter") && p.onSelectionChange && firstColumn ? (
-                                    <>
-                                      <Align left horizontal hug>
-                                        <InputCheckbox
-                                          size="small"
-                                          color={Color.Neutral}
-                                          disabled={p.disabledRows?.includes(cellTextContent.rowKeyValue) ?? false}
-                                          value={p.selectedRows?.includes(cellTextContent.rowKeyValue) ?? false}
-                                          onChange={value => {
-                                            updateSelectField(cellTextContent.rowKeyValue, value)
-                                          }}
-                                        />
-                                      </Align>
-
-                                      <Spacer xsmall />
-                                    </>
-                                  ) : (
-                                    <></>
-                                  )}
-
-                                  <Align left={!alignmentRight} right={alignmentRight} horizontal>
-                                    {customCellRendererElement ? (
-                                      customCellRendererElement
-                                    ) : (
-                                      <Stack vertical hug>
-                                        {/* If there is a footer element, the content gets pushed closer to the borders of the cell. Add a tiny spacer for the cell to become larger */}
-                                        {footerElement && <Spacer tiny />}
-
-                                        <Align horizontal left={!alignmentRight} right={alignmentRight}>
-                                          {tooltipElement ? (
-                                            <Tooltip
-                                              trigger={
-                                                column.dataType !== DataType.Status &&
-                                                column.dataType !== DataType.ProgressIndicator &&
-                                                column.showTooltipIcon === true ? (
-                                                  <Align horizontal center hug>
-                                                    {output}
-                                                    <Spacer xsmall />
-                                                    <Icon name="info" small fill={[Color.Neutral, 200]} />
-                                                  </Align>
-                                                ) : (
-                                                  output
-                                                )
-                                              }
-                                            >
-                                              {tooltipElement}
-                                            </Tooltip>
-                                          ) : (
-                                            output
-                                          )}
-                                        </Align>
-
-                                        {footerElement && (
-                                          <>
-                                            <Spacer tiny />
-
-                                            <Align horizontal left={!alignmentRight} right={alignmentRight}>
-                                              {footerElement}
-                                            </Align>
-
-                                            <Spacer tiny />
-                                          </>
-                                        )}
-                                      </Stack>
-                                    )}
-                                  </Align>
-                                </Stack>
+                              output = (
+                                <OptimizedCell
+                                  {...cellTextContent}
+                                  column={column}
+                                  firstColumn={firstColumn}
+                                  tooltipElement={tooltipElement}
+                                  textSize={p.textSize}
+                                />
                               )
                             }
-                          },
-                        },
 
-                        cellEditor: {
-                          content: cellEditorContent => {
-                            const firstColumn = cellEditorContent.column.key === firstDataColumnKey
-                            return (
-                              <Stack hug horizontal>
-                                {mode === "edit" && firstColumn && p.editingMode !== EditingMode.Cell ? (
-                                  <Align left horizontal hug>
-                                    <Icon name="drag_indicator" medium fill={[Color.Neutral, 700]} />
+                            const customCellRendererElement =
+                              p.customCellRenderer && typeof p.customCellRenderer === "function"
+                                ? p.customCellRenderer(cellTextContent)
+                                : null
 
-                                    <Spacer xsmall />
-                                  </Align>
-                                ) : (
-                                  <></>
-                                )}
+                            const justify = alignmentRight ? "justify-end" : "justify-start"
+                            const showTooltipIconWrap =
+                              tooltipElement &&
+                              column.dataType !== DataType.Status &&
+                              column.dataType !== DataType.ProgressIndicator &&
+                              column.showTooltipIcon === true
 
-                                {(cellEditorContent.column as Column).dataType === DataType.ProgressIndicator ? (
-                                  <Align left horizontal>
-                                    <CellProgressIndicator {...cellEditorContent} textSize={p.textSize} />
-                                  </Align>
-                                ) : (
-                                  <></>
-                                )}
-
-                                {(cellEditorContent.column as Column).dataType === DataType.List ? (
-                                  <Stack vertical hug>
-                                    <CellInputCombobox {...cellEditorContent} />
-                                  </Stack>
-                                ) : (
-                                  <></>
-                                )}
-
-                                {(cellEditorContent.column as Column).dataType === DataType.Status ? (
-                                  <Align left horizontal>
-                                    <CellStatus {...cellEditorContent} textSize={p.textSize} />
-                                  </Align>
-                                ) : (
-                                  <></>
-                                )}
-
-                                {cellEditorContent.column.dataType === DataType.Boolean ? (
-                                  <Align left horizontal>
-                                    <CellInputCheckbox {...cellEditorContent} />
-                                  </Align>
-                                ) : (
-                                  <></>
-                                )}
-
-                                {cellEditorContent.column.dataType === DataType.Date ? (
-                                  <Align left horizontal>
-                                    <CellInputTextDate {...cellEditorContent} />
-                                  </Align>
-                                ) : (
-                                  <></>
-                                )}
-
-                                {cellEditorContent.column.dataType === DataType.Number ||
-                                cellEditorContent.column.dataType === DataType.String ? (
-                                  <Align left horizontal>
-                                    <CellInputTextSingle
-                                      {...cellEditorContent}
-                                      autoFocus={p.editingMode === EditingMode.Cell}
-                                    />
-                                  </Align>
-                                ) : (
-                                  <></>
-                                )}
-
-                                {cellEditorContent.column.key === KEY_ACTIONS_EDIT ? (
-                                  <Align left horizontal>
-                                    <ActionSaveCancel {...cellEditorContent} />
-                                  </Align>
-                                ) : (
-                                  <></>
-                                )}
-                              </Stack>
+                            const trigger = showTooltipIconWrap ? (
+                              <span className="tw flex items-center gap-1">
+                                {output}
+                                <Icon name="info" small fill={[Color.Neutral, 200]} />
+                              </span>
+                            ) : (
+                              output
                             )
-                          },
+
+                            const main = tooltipElement ? <Tooltip trigger={trigger}>{tooltipElement}</Tooltip> : output
+
+                            const inner = customCellRendererElement ? (
+                              customCellRendererElement
+                            ) : footerElement ? (
+                              <span className="tw flex flex-col py-0.5 gap-0.5">
+                                <span className={`tw flex ${justify}`}>{main}</span>
+                                <span className={`tw flex ${justify}`}>{footerElement}</span>
+                              </span>
+                            ) : (
+                              main
+                            )
+
+                            return (
+                              <span className="tw flex items-center gap-1">
+                                {(mode === "simple" || mode === "filter") && p.onSelectionChange && firstColumn ? (
+                                  <InputCheckbox
+                                    size="small"
+                                    color={Color.Neutral}
+                                    disabled={p.disabledRows?.includes(cellTextContent.rowKeyValue) ?? false}
+                                    value={p.selectedRows?.includes(cellTextContent.rowKeyValue) ?? false}
+                                    onChange={value => {
+                                      updateSelectField(cellTextContent.rowKeyValue, value)
+                                    }}
+                                  />
+                                ) : null}
+
+                                <span className={`tw flex flex-1 ${justify}`}>{inner}</span>
+                              </span>
+                            )
+                          }
                         },
+                      },
 
-                        cell: {
-                          elementAttributes: cellElementAttributes => {
-                            const column = cellElementAttributes.column as Column
-                            const id = (cellElementAttributes?.rowData as any)?.id
-                              ? `cell-${column.key}-${(cellElementAttributes?.rowData as any)?.id}`
-                              : undefined
-                            const classNames: string[] = []
-
-                            if (p.fixedKeyField === column.key) {
-                              classNames.push("override-ka-fixed-left")
-                            }
-
-                            if (column.key === KEY_ACTIONS_EDIT || column.key === KEY_ACTIONS) {
-                              classNames.push("override-ka-fixed-right")
-                            }
-
-                            if (column.preventContentCollapse) {
-                              classNames.push("override-ka-prevent-content-collapse")
-                            }
-
-                            if (column.dataType === DataType.Icon) {
-                              classNames.push("ka-cell-icon")
-                            }
-
-                            if (
-                              mode === "edit" &&
-                              p.editingMode === EditingMode.Cell &&
-                              (column.isEditable || column.isEditable === undefined)
-                            ) {
-                              classNames.push("ka-cell-editable")
-                            }
-
-                            const { width, minWidth, maxWidth } = calculateColumnWidth(column)
-
-                            const fillColor =
-                              typeof column.fill === "function"
-                                ? column.fill(cellElementAttributes.rowData)
-                                : column.fill
-                            const backgroundColor = fillColor
-                              ? computeColor([fillColor, fillColor === Color.Neutral ? 50 : 100])
-                              : undefined
-
-                            return {
-                              id: id,
-                              className: classNames.join(" "),
-                              tabIndex: p.mode === "edit" && column.isEditable ? -1 : undefined,
-
-                              style: {
-                                width: width,
-                                minWidth: minWidth,
-                                maxWidth: maxWidth,
-                                backgroundColor,
-                              },
-                            }
-                          },
+                      cellEditor: {
+                        content: cellEditorContent => {
+                          const column = cellEditorContent.column as Column
+                          switch (column.dataType) {
+                            case DataType.ProgressIndicator:
+                              return <CellProgressIndicator {...cellEditorContent} textSize={p.textSize} />
+                            case DataType.List:
+                              return <CellInputCombobox {...cellEditorContent} />
+                            case DataType.Status:
+                              return <CellStatus {...cellEditorContent} textSize={p.textSize} />
+                            case DataType.Boolean:
+                              return <CellInputCheckbox {...cellEditorContent} />
+                            case DataType.Date:
+                              return <CellInputTextDate {...cellEditorContent} />
+                            case DataType.Number:
+                            case DataType.String:
+                              return (
+                                <CellInputTextSingle
+                                  {...cellEditorContent}
+                                  autoFocus={p.editingMode === EditingMode.Cell}
+                                />
+                              )
+                            default:
+                              return null
+                          }
                         },
-                      }}
-                    />
-                  </Align>
+                      },
 
-                  {mode === "edit" && p.editingMode !== EditingMode.Cell ? (
-                    <Align center vertical>
-                      <Divider fill={[Color.Neutral, 100]} />
+                      cell: {
+                        elementAttributes: cellElementAttributes => {
+                          const column = cellElementAttributes.column as Column
+                          const id = (cellElementAttributes?.rowData as any)?.id
+                            ? `cell-${column.key}-${(cellElementAttributes?.rowData as any)?.id}`
+                            : undefined
+                          const classNames: string[] = []
 
-                      <Spacer xsmall />
+                          if (p.fixedKeyField === column.key) {
+                            classNames.push("override-ka-fixed-left")
+                          }
 
-                      <InputButtonTertiary
-                        width="auto"
-                        size="small"
-                        iconNameLeft="add"
-                        label="Add row"
-                        disabled={editRowId !== null}
-                        onClick={() => {
-                          table.insertRow(createNewRow(p.data), {
-                            rowKeyValue: (p.data[p.data.length - 1] as any)?.key || 0,
-                            insertRowPosition: InsertRowPosition.after,
-                          })
-                        }}
-                      />
+                          if (column.key === KEY_ACTIONS) {
+                            classNames.push("override-ka-fixed-right")
+                          }
 
-                      <Spacer xsmall />
-                    </Align>
-                  ) : (
-                    <></>
-                  )}
+                          if (column.dataType === DataType.Icon) {
+                            classNames.push("ka-cell-icon")
+                          }
+
+                          if (
+                            mode === "edit" &&
+                            p.editingMode === EditingMode.Cell &&
+                            (column.isEditable || column.isEditable === undefined)
+                          ) {
+                            classNames.push("ka-cell-editable")
+                          }
+
+                          const { width, minWidth, maxWidth } = calculateColumnWidth(column)
+
+                          const fillColor =
+                            typeof column.fill === "function" ? column.fill(cellElementAttributes.rowData) : column.fill
+                          const backgroundColor = fillColor
+                            ? computeColor([fillColor, fillColor === Color.Neutral ? 50 : 100])
+                            : undefined
+
+                          return {
+                            id: id,
+                            className: classNames.join(" "),
+                            tabIndex: p.mode === "edit" && column.isEditable ? -1 : undefined,
+
+                            style: {
+                              width: width,
+                              minWidth: minWidth,
+                              maxWidth: maxWidth,
+                              backgroundColor,
+                            },
+                          }
+                        },
+                      },
+                    }}
+                  />
 
                   {paginationConfig && paginationConfig.totalPages > 1 ? (
                     <DataTablePagination
@@ -1259,43 +871,13 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
                       onPageSizeChange={paginationConfig.onPageSizeChange}
                       textSize={p.textSize}
                     />
-                  ) : (
-                    <></>
-                  )}
-                </Stack>
+                  ) : null}
+                </div>
               )}
             </div>
-          </Align>
-        </Stack>
+          </div>
+        </div>
       </div>
-
-      <Alert
-        open={deleteId !== null}
-        title={
-          <Text fill={[Color.Error, 700]} {...getTextSizeProps()}>
-            Delete row?
-          </Text>
-        }
-        description={
-          <Text fill={[Color.Neutral, 700]} {...getTextSizeProps("xsmall")} wrap>
-            Are you sure you want to delete this row?
-          </Text>
-        }
-        buttonPrimary={
-          <InputButtonPrimary
-            size="small"
-            width="auto"
-            onClick={() => {
-              table.dispatch(deleteRow(deleteId))
-            }}
-            label="Delete"
-            destructive
-          />
-        }
-        buttonSecondary={
-          <InputButtonTertiary size="small" width="auto" onClick={() => setDeleteId(null)} label="Cancel" />
-        }
-      />
     </>
   )
 }

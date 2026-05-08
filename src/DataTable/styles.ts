@@ -1,5 +1,4 @@
 import { Color, ColorWithLightness, adjustLightness, computeColor } from "@new/Color"
-import { StyleBodySmall, StyleFontFamily } from "@new/Text/Text"
 
 const getCellPadding = (size?: "none" | "tiny" | "xsmall" | "small" | "medium") => {
   switch (size) {
@@ -128,11 +127,6 @@ export const createDataTableStyles = (
     background-color: unset;
   }
 
-  .${cssScope} .override-ka-prevent-content-collapse .ka-cell-text,
-  .${cssScope} .override-ka-prevent-content-collapse .ka-cell-text p {
-    overflow: visible;
-  }
-
   .${cssScope} .ka-cell.override-ka-fixed-right {
     padding-left: ${getFirstLastCellPadding(cellPaddingSize)};
   }
@@ -240,10 +234,6 @@ export const createDataTableStyles = (
     background: linear-gradient(to bottom, ${computeColor(fill || [Color.White])}, transparent);
   }
 
-  .${cssScope} .override-ka-reorder .ka-row {
-    cursor: move;
-  }
-
   .${cssScope} .ka-thead-row .override-ka-fixed-left:after {
     width: 20px;
     right: -20px;
@@ -270,37 +260,15 @@ export const createDataTableStyles = (
     background: linear-gradient(to left, ${computeColor(fill || [Color.White])}, transparent);
   }
 
-  .${cssScope} .override-ka-editing-row,
-  .${cssScope} .override-ka-editing-row:hover,
-  .${cssScope} .override-ka-editing-row .override-ka-fixed-left,
-  .${cssScope} .override-ka-editing-row:hover .override-ka-fixed-left,
-  .${cssScope} .override-ka-editing-row .override-ka-fixed-right,
-  .${cssScope} .override-ka-editing-row:hover .override-ka-fixed-right {
-    background-color: ${computeColor([Color.Quarternary, 50])};
-  }
-
-  .${cssScope} .override-ka-editing-row .override-ka-fixed-left:after {
-    background: linear-gradient(to right, ${computeColor([Color.Quarternary, 50])}, transparent);
-  }
-
-  .${cssScope} .override-ka-editing-row .override-ka-fixed-right:after {
-    background: linear-gradient(to left, ${computeColor([Color.Quarternary, 50])}, transparent);
-  }
-
-  .${cssScope} .override-ka-editing-row {
-    border: solid 1px ${computeColor([Color.Quarternary, 100])};
-  }
-
   .${cssScope} .ka-no-data-row {
     height: unset;
   }
 
   .${cssScope} .ka-no-data-cell {
-    font-family: ${StyleFontFamily.fontFamily};
     font-style: italic;
-    font-weight: ${StyleFontFamily.fontWeight};
-    font-size: ${StyleBodySmall.fontSize};
-    line-height: ${StyleBodySmall.lineHeight};
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 24px;
     height: calc(var(--BU) * 16);
     border-bottom: dotted 1px ${computeColor(stroke || [Color.Neutral, 100])};
   }
@@ -309,31 +277,12 @@ export const createDataTableStyles = (
     left: unset;
   }
 
-  .${cssScope} .ka-drag-over-row,
-  .${cssScope} .ka-drag-over-row th,
-  .${cssScope} .ka-drag-over-row td {
-    box-shadow: inset 0 1px 0 0 ${computeColor([Color.Quarternary, 700])};
-  }
-
-  .${cssScope} .ka-dragged-row ~ .ka-drag-over-row {
-    box-shadow: unset;
-  }
-
   .${cssScope} #reference-target {
     display: flex;
     flexDirection: column;
     position: relative;
     width: inherit;
     height: inherit;
-  }
-
-  .override-ka-hide-scrollbar {
-    scrollbar-width: none;
-    -ms-overflow-style: none;
-  }
-
-  .override-ka-hide-scrollbar::-webkit-scrollbar {
-    display: none;
   }
 
   @media print {
