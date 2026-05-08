@@ -1,10 +1,11 @@
 import React, { memo } from "react"
 import { Avatar } from "@new/Avatar/Avatar"
 import Link from "next/link"
-import { Color, Lightness, computeColor } from "@new/Color"
-import { Column, DataType } from "../types"
+import { Color, computeColor } from "@new/Color"
+import { Column, DataType, DataTableTextSize } from "../types"
 import { formatValue } from "../utils"
 import { TABLE_CELL_EMPTY_STRING } from "./constants"
+import { TEXT_SIZE_CLASS } from "./textSize"
 
 interface OptimizedCellProps {
   column: Column
@@ -13,27 +14,16 @@ interface OptimizedCellProps {
   rowKeyValue: any
   firstColumn: boolean
   tooltipElement?: React.ReactNode
-  textSize?: "xxtiny" | "xtiny" | "tiny" | "xsmall" | "small" | "medium" | "large"
+  textSize?: DataTableTextSize
   [key: string]: any
 }
 
-const textSizeClass: Record<NonNullable<OptimizedCellProps["textSize"]>, string> = {
-  xxtiny: "text-[8px] leading-[12px]",
-  xtiny: "text-[10px] leading-[14px]",
-  tiny: "text-tiny",
-  xsmall: "text-xs",
-  small: "text-sm",
-  medium: "text-md",
-  large: "text-lg",
-}
-
-const textColor = (color: Color | undefined, lightness: Lightness): string =>
-  computeColor([color ?? Color.Neutral, lightness]) ?? ""
+const NEUTRAL_700 = computeColor([Color.Neutral, 700]) ?? ""
 
 export const OptimizedCell = memo(
   (props: OptimizedCellProps) => {
     const { column, value, rowData, textSize = "small" } = props
-    const alignmentRight = column.dataType === DataType.Number
+    const sizeCls = TEXT_SIZE_CLASS[textSize]
 
     let text: string
     if (column.dataType === DataType.Number && column.numberFormat?.configure && typeof value === "number") {
@@ -54,8 +44,6 @@ export const OptimizedCell = memo(
       )
     }
 
-    const sizeCls = textSizeClass[textSize]
-
     if (column.dataType === DataType.List) {
       const selectedOption = rowData?.selectableOptions?.find((o: any) => o.value === value)
       if (!selectedOption) {
@@ -63,7 +51,7 @@ export const OptimizedCell = memo(
       }
       const truncate = column.maxWidth !== undefined ? "overflow-hidden text-ellipsis" : ""
       return (
-        <span className={`tw inline-block ${sizeCls} ${truncate}`} style={{ color: textColor(undefined, 700) }}>
+        <span className={`tw inline-block ${sizeCls} ${truncate}`} style={{ color: NEUTRAL_700 }}>
           {selectedOption.shortLabel || selectedOption.label}
         </span>
       )
@@ -74,12 +62,21 @@ export const OptimizedCell = memo(
         ? "font-mono"
         : ""
     const truncateCls = column.maxWidth !== undefined ? "overflow-hidden text-ellipsis whitespace-nowrap" : ""
+    const baseTextCls = `tw ${sizeCls} ${monospaceCls} ${truncateCls}`
+
+    if (!column.avatar && !column.link && !column.fill && !column.startAdornment && !column.endAdornment) {
+      return (
+        <span className={baseTextCls} style={{ color: NEUTRAL_700 }}>
+          {text}
+        </span>
+      )
+    }
 
     const avatarValue = typeof column.avatar === "function" ? column.avatar(rowData) : column.avatar
     const linkEffect = typeof column.link === "function" ? column.link(rowData) : undefined
     const fillColor = typeof column.fill === "function" ? column.fill(rowData) : column.fill
-    const startAdornment = column?.startAdornment?.(rowData)
-    const endAdornment = column?.endAdornment?.(rowData)
+    const startAdornment = column.startAdornment?.(rowData)
+    const endAdornment = column.endAdornment?.(rowData)
 
     const avatarElement = avatarValue ? (
       typeof avatarValue === "string" ? (
@@ -89,15 +86,15 @@ export const OptimizedCell = memo(
       )
     ) : null
 
-    const textCls = `tw ${sizeCls} ${monospaceCls} ${truncateCls}`
-    const textStyle = { color: textColor(fillColor, 700) }
+    const textColor = fillColor ? computeColor([fillColor, 700]) : NEUTRAL_700
+    const textCls = baseTextCls
 
     const emptyString = column.placeholder || TABLE_CELL_EMPTY_STRING
     if (linkEffect && text !== emptyString) {
       return (
         <span className="tw flex items-center gap-1">
           {avatarElement}
-          <span className={textCls} style={textStyle}>
+          <span className={textCls} style={{ color: textColor }}>
             {typeof linkEffect === "string" ? (
               <Link href={linkEffect}>{text}</Link>
             ) : (
@@ -116,15 +113,7 @@ export const OptimizedCell = memo(
       )
     }
 
-    const isPlain = !avatarElement && !startAdornment && !endAdornment && !fillColor
-    if (isPlain) {
-      return (
-        <span className={textCls} style={textStyle}>
-          {text}
-        </span>
-      )
-    }
-
+    const alignmentRight = column.dataType === DataType.Number
     const justify = alignmentRight ? "justify-end" : "justify-start"
     const wrapperStyle: React.CSSProperties = fillColor
       ? { backgroundColor: computeColor([fillColor, fillColor === Color.Neutral ? 50 : 100]) }
@@ -137,23 +126,20 @@ export const OptimizedCell = memo(
       >
         {avatarElement}
         {startAdornment}
-        <span className={textCls} style={textStyle}>
+        <span className={textCls} style={{ color: textColor }}>
           {text}
         </span>
         {endAdornment}
       </span>
     )
   },
-  (prevProps, nextProps) => {
-    return (
-      prevProps.value === nextProps.value &&
-      prevProps.column.key === nextProps.column.key &&
-      prevProps.rowData === nextProps.rowData &&
-      prevProps.firstColumn === nextProps.firstColumn &&
-      prevProps.tooltipElement === nextProps.tooltipElement &&
-      prevProps.textSize === nextProps.textSize
-    )
-  },
+  (prev, next) =>
+    prev.value === next.value &&
+    prev.column === next.column &&
+    prev.rowData === next.rowData &&
+    prev.firstColumn === next.firstColumn &&
+    prev.tooltipElement === next.tooltipElement &&
+    prev.textSize === next.textSize,
 )
 
 OptimizedCell.displayName = "OptimizedCell"

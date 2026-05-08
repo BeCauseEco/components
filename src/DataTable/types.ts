@@ -17,6 +17,8 @@ import { PlaywrightProps } from "@new/Playwright"
 
 export { SortDirection } from "ka-table"
 
+export type DataTableTextSize = "xxtiny" | "xtiny" | "tiny" | "xsmall" | "small" | "medium" | "large"
+
 export enum DataType {
   Internal = "internal",
   Boolean = "boolean",
@@ -253,7 +255,7 @@ export type DataTableProps<TData = any> = PlaywrightProps & {
   children?: ReactNode
   editingMode?: EditingMode
   cellPaddingSize?: "none" | "tiny" | "xsmall" | "small" | "medium"
-  textSize?: "xxtiny" | "xtiny" | "tiny" | "xsmall" | "small" | "medium" | "large"
+  textSize?: DataTableTextSize
   /** Enable truncation of column header names with ellipsis. Text wraps up to 2 lines and overflows with "..." after that. Full title shown on hover. */
   ellipsisColumnNames?: boolean
 

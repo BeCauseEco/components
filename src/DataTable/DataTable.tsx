@@ -30,6 +30,7 @@ import { OptimizedCell } from "./internal/OptimizedCellComponents"
 import { DataTablePagination } from "./internal/DataTablePagination"
 import { CsvExportButton } from "./internal/CsvExportButton"
 import { getDisplayableColumns } from "./internal/exportToCsv"
+import { sizeClass } from "./internal/textSize"
 
 // Re-export for backward compatibility
 export { SortDirection } from "ka-table"
@@ -42,20 +43,6 @@ export type {
   ServerPagination,
   DataTableExportConfig,
 } from "./types"
-
-type TextSize = NonNullable<DataTableProps["textSize"]>
-
-const TEXT_SIZE_CLASS: Record<TextSize, string> = {
-  xxtiny: "text-[8px] leading-[12px]",
-  xtiny: "text-[10px] leading-[14px]",
-  tiny: "text-tiny",
-  xsmall: "text-xs",
-  small: "text-sm",
-  medium: "text-md",
-  large: "text-lg",
-}
-
-const sizeClass = (override: TextSize | undefined, fallback: TextSize): string => TEXT_SIZE_CLASS[override ?? fallback]
 
 // Separate search input component to prevent expensive table re-renders whenever the inputValue state changes
 const SearchInput = ({ onDebouncedChange }: { onDebouncedChange: (value: string) => void }) => {
@@ -88,7 +75,6 @@ const SearchInput = ({ onDebouncedChange }: { onDebouncedChange: (value: string)
 }
 
 export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
-  // Apply defaults for optional props
   const mode = p.mode ?? "simple"
   const cssScope = useId().replace(/:/g, "datatable")
   const referenceContainer = useRef<HTMLDivElement>(null)
@@ -102,13 +88,15 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
   const [filter, setFilter] = useState("")
   const [clientPageIndex, setClientPageIndex] = useState(0)
   const [clientPageSize, setClientPageSize] = useState(p.pagination?.pageSize ?? DEFAULT_PAGE_SIZE)
-  const [filterAtPageReset, setFilterAtPageReset] = useState(filter)
-  if (filter !== filterAtPageReset && p.pagination?.mode !== "server") {
-    setFilterAtPageReset(filter)
-    setClientPageIndex(0)
+  const pageResetKey = `${filter}|${p.pagination?.mode ?? ""}`
+  const [lastPageResetKey, setLastPageResetKey] = useState(pageResetKey)
+  if (pageResetKey !== lastPageResetKey) {
+    setLastPageResetKey(pageResetKey)
+    if (p.pagination?.mode !== "server") {
+      setClientPageIndex(0)
+    }
   }
 
-  // Memoize setFilter to prevent SearchInput from re-creating debounced handler
   const handleSearchChange = useCallback((value: string) => {
     setFilter(value)
   }, [])
@@ -168,7 +156,7 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
     const direction = activeSort.direction
     const customSort = column.sort?.(direction)
     const sign = direction === SortDirection.Ascend ? 1 : -1
-    const collator = new Intl.Collator(undefined, { sensitivity: "base", numeric: true })
+    let collator: Intl.Collator | null = null
 
     const comparator = customSort
       ? (rowA: any, rowB: any) => customSort(rowA[column.key], rowB[column.key])
@@ -186,6 +174,7 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
             return sign
           }
           if (typeof aValue === "string" && typeof bValue === "string") {
+            collator ??= new Intl.Collator(undefined, { sensitivity: "base", numeric: true })
             return sign * collator.compare(aValue, bValue)
           }
           return sign * (aValue < bValue ? -1 : 1)
@@ -234,7 +223,6 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
     return sortedData.slice(start, start + paginationConfig.pageSize)
   }, [p.data, sortedData, paginationConfig, p.pagination?.mode])
 
-  // Optimization 2: Memoize selected fields count
   const selectedFields = useMemo(() => {
     if (!p.selectedRows) {
       return 0
@@ -242,7 +230,6 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
     return p.selectedRows.length
   }, [p.selectedRows])
 
-  // Memoize total selectable fields count
   const totalSelectableFields = useMemo(() => {
     if (!p.selectedRows && !p.onSelectionChange) {
       return 0
@@ -253,7 +240,6 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
     return p.data.filter(d => !p.disabledRows?.includes(d[p.rowKeyField] as string | number)).length
   }, [p.data, p.disabledRows, p.rowKeyField, p.selectedRows, p.onSelectionChange])
 
-  // Memoize column processing with active sort state to keep ka-table in sync
   const nativeColumns = useMemo(() => {
     const columns = p.columns.map(c => {
       const column = c as Column
@@ -717,14 +703,10 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
                               }
                             }
 
-                            // Process footer similar to tooltip
-                            let footerElement
-                            if (typeof column.footer === "function") {
-                              footerElement = column.footer(cellTextContent.rowData)
-                            }
+                            const footerElement =
+                              typeof column.footer === "function" ? column.footer(cellTextContent.rowData) : undefined
 
                             let output: ReactNode
-
                             if (column.dataType === DataType.ProgressIndicator) {
                               output = <CellProgressIndicator {...cellTextContent} textSize={p.textSize} />
                             } else if (column.dataType === DataType.Status) {
@@ -732,7 +714,6 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
                             } else if (column.dataType === DataType.Icon) {
                               output = <CellIcon {...cellTextContent} textSize={p.textSize} />
                             } else {
-                              // Use optimized cell component for regular cells
                               output = (
                                 <OptimizedCell
                                   {...cellTextContent}
@@ -802,34 +783,28 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
                       cellEditor: {
                         content: cellEditorContent => {
                           const column = cellEditorContent.column as Column
-                          let editor: ReactNode = null
                           switch (column.dataType) {
                             case DataType.ProgressIndicator:
-                              editor = <CellProgressIndicator {...cellEditorContent} textSize={p.textSize} />
-                              break
+                              return <CellProgressIndicator {...cellEditorContent} textSize={p.textSize} />
                             case DataType.List:
-                              editor = <CellInputCombobox {...cellEditorContent} />
-                              break
+                              return <CellInputCombobox {...cellEditorContent} />
                             case DataType.Status:
-                              editor = <CellStatus {...cellEditorContent} textSize={p.textSize} />
-                              break
+                              return <CellStatus {...cellEditorContent} textSize={p.textSize} />
                             case DataType.Boolean:
-                              editor = <CellInputCheckbox {...cellEditorContent} />
-                              break
+                              return <CellInputCheckbox {...cellEditorContent} />
                             case DataType.Date:
-                              editor = <CellInputTextDate {...cellEditorContent} />
-                              break
+                              return <CellInputTextDate {...cellEditorContent} />
                             case DataType.Number:
                             case DataType.String:
-                              editor = (
+                              return (
                                 <CellInputTextSingle
                                   {...cellEditorContent}
                                   autoFocus={p.editingMode === EditingMode.Cell}
                                 />
                               )
-                              break
+                            default:
+                              return null
                           }
-                          return <span className="tw flex items-center justify-start">{editor}</span>
                         },
                       },
 
