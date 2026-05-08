@@ -89,23 +89,6 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
 
   const textSize = p.textSize
 
-  // Optimization 5: Performance monitoring hook for development
-  const usePerformanceMonitoring = (label: string, deps: any[]) => {
-    useEffect(() => {
-      if (process.env.NODE_ENV === "development") {
-        const startTime = performance.now()
-        return () => {
-          const endTime = performance.now()
-          const duration = endTime - startTime
-          if (duration > 16) {
-            // Log if render takes more than one frame (16ms)
-            console.debug(`⚡ DataTable ${label}: ${duration.toFixed(2)}ms`)
-          }
-        }
-      }
-    }, deps)
-  }
-
   const DEFAULT_PAGE_SIZE = 25
   const isVirtualized = !!p.virtualScrollingMaxHeight
   const useDefaultPagination = !p.pagination && !isVirtualized
@@ -181,6 +164,8 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
 
     const direction = activeSort.direction
     const customSort = column.sort?.(direction)
+    const sign = direction === SortDirection.Ascend ? 1 : -1
+    const collator = new Intl.Collator(undefined, { sensitivity: "base", numeric: true })
 
     const comparator = customSort
       ? (rowA: any, rowB: any) => customSort(rowA[column.key], rowB[column.key])
@@ -192,17 +177,15 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
             return 0
           }
           if (aValue == null) {
-            return direction === SortDirection.Ascend ? -1 : 1
+            return -sign
           }
           if (bValue == null) {
-            return direction === SortDirection.Ascend ? 1 : -1
+            return sign
           }
           if (typeof aValue === "string" && typeof bValue === "string") {
-            const ascend = aValue.toLowerCase() < bValue.toLowerCase() ? -1 : 1
-            return direction === SortDirection.Ascend ? ascend : -ascend
+            return sign * collator.compare(aValue, bValue)
           }
-          const ascend = aValue < bValue ? -1 : 1
-          return direction === SortDirection.Ascend ? ascend : -ascend
+          return sign * (aValue < bValue ? -1 : 1)
         }
 
     return [...searchedData].sort(comparator)
@@ -423,12 +406,10 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
     },
   })
 
-  const css = createDataTableStyles(cssScope, p.fill, p.stroke, p.cellPaddingSize, p.noColumnLines, p.borderless)
-
-  // Monitor performance of key operations
-  usePerformanceMonitoring("render", [p.data.length, p.columns.length])
-  usePerformanceMonitoring("column processing", [nativeColumns])
-  usePerformanceMonitoring("data selection", [selectedFields, totalSelectableFields])
+  const css = useMemo(
+    () => createDataTableStyles(cssScope, p.fill, p.stroke, p.cellPaddingSize, p.noColumnLines, p.borderless),
+    [cssScope, p.fill, p.stroke, p.cellPaddingSize, p.noColumnLines, p.borderless],
+  )
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
