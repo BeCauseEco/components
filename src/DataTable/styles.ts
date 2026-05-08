@@ -222,18 +222,6 @@ export const createDataTableStyles = (
     background-color: ${computeColor(stroke || [Color.Neutral, 100])};
   }
 
-  .${cssScope} .override-ka-virtual .ka-thead-row .ka-thead-cell:before {
-    content: "";
-    position: absolute;
-    bottom: -8px;
-    left: 0;
-    right: 0;
-    height: 8px;
-    width: 100%;
-    border-top: solid 1px ${computeColor(stroke || [Color.Neutral, 100])};
-    background: linear-gradient(to bottom, ${computeColor(fill || [Color.White])}, transparent);
-  }
-
   .${cssScope} .ka-thead-row .override-ka-fixed-left:after {
     width: 20px;
     right: -20px;
