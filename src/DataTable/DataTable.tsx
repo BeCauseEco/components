@@ -318,51 +318,35 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
     return nativeColumns.find(c => c.key !== KEY_ROW_NUMBER)?.key
   }, [nativeColumns])
 
-  const updateSelectField = useCallback(
-    (key: any, value: boolean) => {
-      if (!p.onSelectionChange) {
-        return
+  const updateSelectField = (key: any, value: boolean) => {
+    if (!p.onSelectionChange) {
+      return
+    }
+
+    const currentSelected = p.selectedRows || []
+    if (value) {
+      if (!currentSelected.includes(key)) {
+        p.onSelectionChange([...currentSelected, key])
       }
+    } else {
+      p.onSelectionChange(currentSelected.filter(id => id !== key))
+    }
+  }
 
-      const currentSelected = p.selectedRows || []
-      let newSelectedRows: (string | number)[]
+  const updateSelectFieldAll = (value: boolean) => {
+    if (!p.onSelectionChange) {
+      return
+    }
 
-      if (value) {
-        // Add to selection if not already selected
-        if (!currentSelected.includes(key)) {
-          newSelectedRows = [...currentSelected, key]
-        } else {
-          newSelectedRows = currentSelected
-        }
-      } else {
-        // Remove from selection
-        newSelectedRows = currentSelected.filter(id => id !== key)
-      }
-
-      p.onSelectionChange(newSelectedRows)
-    },
-    [p.selectedRows, p.onSelectionChange],
-  )
-
-  const updateSelectFieldAll = useCallback(
-    (value: boolean) => {
-      if (!p.onSelectionChange) {
-        return
-      }
-
-      if (value) {
-        // Select all non-disabled rows
-        const selectableRowIds = p.data
-          .filter(d => !p.disabledRows?.includes(d[p.rowKeyField] as string | number))
-          .map(d => d[p.rowKeyField] as string | number)
-        p.onSelectionChange(selectableRowIds)
-      } else {
-        // Deselect all
-        p.onSelectionChange([])
-      }
-    },
-    [p.data, p.disabledRows, p.rowKeyField, p.onSelectionChange],
-  )
+    if (value) {
+      const selectableRowIds = p.data
+        .filter(d => !p.disabledRows?.includes(d[p.rowKeyField] as string | number))
+        .map(d => d[p.rowKeyField] as string | number)
+      p.onSelectionChange(selectableRowIds)
+    } else {
+      p.onSelectionChange([])
+    }
+  }
 
   const table = useTable({
     onDispatch: d => {

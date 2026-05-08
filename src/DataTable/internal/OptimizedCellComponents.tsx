@@ -118,7 +118,11 @@ export const OptimizedCell = memo(
 
     const isPlain = !avatarElement && !startAdornment && !endAdornment && !fillColor
     if (isPlain) {
-      return <span className={textCls} style={textStyle}>{text}</span>
+      return (
+        <span className={textCls} style={textStyle}>
+          {text}
+        </span>
+      )
     }
 
     const justify = alignmentRight ? "justify-end" : "justify-start"
@@ -133,7 +137,9 @@ export const OptimizedCell = memo(
       >
         {avatarElement}
         {startAdornment}
-        <span className={textCls} style={textStyle}>{text}</span>
+        <span className={textCls} style={textStyle}>
+          {text}
+        </span>
         {endAdornment}
       </span>
     )
