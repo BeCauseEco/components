@@ -239,7 +239,6 @@ export type DataTableProps<TData = any> = PlaywrightProps & {
   selectedRows?: (string | number)[]
   onSelectionChange?: (selectedRows: (string | number)[]) => void
   disabledRows?: (string | number)[]
-  virtualScrollingMaxHeight?: `${number}${"px"}` | `${number}${"vh"}`
   loading?: boolean
   loadingElement?: ReactElement
   disableSorting?: boolean

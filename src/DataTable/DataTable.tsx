@@ -82,8 +82,6 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
   const textSize = p.textSize
 
   const DEFAULT_PAGE_SIZE = 25
-  const isVirtualized = !!p.virtualScrollingMaxHeight
-  const useDefaultPagination = !p.pagination && !isVirtualized
 
   const [filter, setFilter] = useState("")
   const [clientPageIndex, setClientPageIndex] = useState(0)
@@ -196,29 +194,24 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
       }
     }
 
-    if (p.pagination?.mode === "client" || useDefaultPagination) {
-      return {
-        pageIndex: clientPageIndex,
-        pageSize: clientPageSize,
-        totalCount: searchedData.length,
-        totalPages: Math.max(1, Math.ceil(searchedData.length / clientPageSize)),
-        onPageChange: setClientPageIndex,
-        onPageSizeChange: (newSize: number) => {
-          setClientPageSize(newSize)
-          setClientPageIndex(0)
-        },
-        pageSizeOptions: p.pagination?.pageSizeOptions ?? [10, 25, 50, 100],
-      }
+    return {
+      pageIndex: clientPageIndex,
+      pageSize: clientPageSize,
+      totalCount: searchedData.length,
+      totalPages: Math.max(1, Math.ceil(searchedData.length / clientPageSize)),
+      onPageChange: setClientPageIndex,
+      onPageSizeChange: (newSize: number) => {
+        setClientPageSize(newSize)
+        setClientPageIndex(0)
+      },
+      pageSizeOptions: p.pagination?.pageSizeOptions ?? [10, 25, 50, 100],
     }
-
-    return null
-  }, [p.pagination, searchedData.length, clientPageIndex, clientPageSize, useDefaultPagination])
+  }, [p.pagination, searchedData.length, clientPageIndex, clientPageSize])
 
   const displayData = useMemo(() => {
-    if (!paginationConfig || p.pagination?.mode === "server") {
+    if (p.pagination?.mode === "server") {
       return p.data
     }
-
     const start = paginationConfig.pageIndex * paginationConfig.pageSize
     return sortedData.slice(start, start + paginationConfig.pageSize)
   }, [p.data, sortedData, paginationConfig, p.pagination?.mode])
@@ -476,7 +469,7 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
       <div
         className={cssScope}
         data-mode={mode}
-        style={{ display: "flex", width: "100%", height: p.virtualScrollingMaxHeight ? "100%" : "auto" }}
+        style={{ display: "flex", width: "100%" }}
         ref={referenceContainer}
         data-playwright-testid={p["data-playwright-testid"]}
       >
@@ -522,7 +515,6 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
                     editingMode={p.editingMode}
                     noData={{ text: p.noDataText || "Nothing found" }}
                     searchText={filter}
-                    virtualScrolling={p.virtualScrollingMaxHeight ? { enabled: true } : undefined}
                     search={({ searchText: searchTextValue, rowData, column }) => {
                       if (column.dataType === DataType.Boolean) {
                         const b = (rowData as any)[column.key]
@@ -537,14 +529,6 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
                       }
                     }}
                     childComponents={{
-                      tableWrapper: {
-                        elementAttributes: () => {
-                          if (p.virtualScrollingMaxHeight) {
-                            return { style: { maxHeight: p.virtualScrollingMaxHeight } }
-                          }
-                        },
-                      },
-
                       headCell: {
                         content: headCellContent => {
                           if (headCellContent.column.key === KEY_ACTIONS) {
