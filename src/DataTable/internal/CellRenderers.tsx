@@ -20,7 +20,7 @@ export const CellProgressIndicator = (cellTextProps: CellRendererProps) => {
   return (
     <ProgressIndicator
       type="bar"
-      size="large"
+      size="small"
       color={Color.Neutral}
       labelStart={typeof startAdornment === "function" ? (startAdornment(cellTextProps.rowData) as any) : undefined}
       labelEnd={typeof endAdornment === "function" ? (endAdornment(cellTextProps.rowData) as any) : undefined}
