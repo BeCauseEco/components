@@ -122,7 +122,16 @@ export const createDataTableStyles = (
     width: 100%;
     height: 100%;
   }
-  
+
+  .${cssScope} .ka-cell-text a {
+    color: ${computeColor([Color.Quarternary, 700])};
+    text-decoration: none;
+  }
+
+  .${cssScope} .ka-cell-text a:hover {
+    text-decoration: underline;
+  }
+
   .${cssScope} .ka-cell:hover {
     background-color: unset;
   }

@@ -49,9 +49,11 @@ export const OptimizedCell = memo(
       if (!selectedOption) {
         return null
       }
-      const truncate = column.maxWidth !== undefined ? "overflow-hidden text-ellipsis" : ""
       return (
-        <span className={`tw inline-block ${sizeCls} ${truncate}`} style={{ color: NEUTRAL_700 }}>
+        <span
+          className={`tw inline-block min-w-0 overflow-hidden text-ellipsis whitespace-nowrap ${sizeCls}`}
+          style={{ color: NEUTRAL_700 }}
+        >
           {selectedOption.shortLabel || selectedOption.label}
         </span>
       )
@@ -61,8 +63,7 @@ export const OptimizedCell = memo(
       column.dataType === DataType.Date || column.dataType === DataType.Number || column.dataType === DataType.Boolean
         ? "font-mono"
         : ""
-    const truncateCls = column.maxWidth !== undefined ? "overflow-hidden text-ellipsis whitespace-nowrap" : ""
-    const baseTextCls = `tw ${sizeCls} ${monospaceCls} ${truncateCls}`
+    const baseTextCls = `tw min-w-0 overflow-hidden text-ellipsis whitespace-nowrap ${sizeCls} ${monospaceCls}`
 
     if (!column.avatar && !column.link && !column.fill && !column.startAdornment && !column.endAdornment) {
       return (
