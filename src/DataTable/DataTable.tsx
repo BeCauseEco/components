@@ -735,16 +735,16 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
                             const inner = customCellRendererElement ? (
                               customCellRendererElement
                             ) : footerElement ? (
-                              <span className="tw flex flex-col py-0.5 gap-0.5">
-                                <span className={`tw flex ${justify}`}>{main}</span>
-                                <span className={`tw flex ${justify}`}>{footerElement}</span>
+                              <span className="tw flex w-full flex-col py-0.5 gap-0.5">
+                                <span className={`tw flex w-full ${justify}`}>{main}</span>
+                                <span className={`tw flex w-full ${justify}`}>{footerElement}</span>
                               </span>
                             ) : (
                               main
                             )
 
                             return (
-                              <span className="tw flex items-center gap-1">
+                              <span className="tw flex w-full items-center gap-1">
                                 {(mode === "simple" || mode === "filter") && p.onSelectionChange && firstColumn ? (
                                   <InputCheckbox
                                     size="small"
@@ -757,7 +757,7 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
                                   />
                                 ) : null}
 
-                                <span className={`tw flex flex-1 ${justify}`}>{inner}</span>
+                                <span className={`tw flex w-full flex-1 ${justify}`}>{inner}</span>
                               </span>
                             )
                           }
