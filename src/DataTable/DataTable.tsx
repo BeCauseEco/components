@@ -567,7 +567,7 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
                           const titleSizeCls = sizeClass(textSize, "xsmall")
                           const ellipsisCls = p.ellipsisColumnNames
                             ? "[display:-webkit-box] [-webkit-line-clamp:2] [-webkit-box-orient:vertical] overflow-hidden text-ellipsis"
-                            : ""
+                            : "min-w-0 overflow-hidden text-ellipsis whitespace-nowrap"
 
                           const headerTitle = (
                             <span className={`tw font-semibold text-neutral-700 ${titleSizeCls} ${ellipsisCls}`}>
@@ -577,14 +577,16 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
 
                           const headerJustify = alignmentRight ? "justify-end" : "justify-start"
                           const headerContent = (
-                            <div className={`tw flex items-center ${headerJustify}`}>
+                            <div className={`tw flex items-center min-w-0 ${headerJustify}`}>
                               {allowSort || headCellContentAsColumn.sort ? (
                                 <a
-                                  className="tw flex cursor-pointer items-center gap-0.5 select-none"
+                                  className="tw flex min-w-0 cursor-pointer items-center gap-0.5 select-none"
                                   onClick={() => table.updateSortDirection(headCellContent.column.key)}
                                 >
                                   {headerTitle}
-                                  <Icon medium name={iconName} fill={[Color.Neutral, 700]} />
+                                  <span className="tw shrink-0">
+                                    <Icon medium name={iconName} fill={[Color.Neutral, 700]} />
+                                  </span>
                                 </a>
                               ) : (
                                 headerTitle
