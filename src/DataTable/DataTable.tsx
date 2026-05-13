@@ -597,7 +597,7 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
                           const tooltipText = p.ellipsisColumnNames ? fullTitle : headCellContentAsColumn.headerTooltip
 
                           return (
-                            <div className="tw flex items-center gap-1">
+                            <div className="tw flex w-full items-center gap-1">
                               {(mode === "simple" || mode === "filter") && p.onSelectionChange && firstColumn ? (
                                 <InputCheckbox
                                   size="small"
@@ -613,13 +613,15 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
                                 />
                               ) : null}
 
-                              {tooltipText ? (
-                                <Tooltip trigger={headerContent}>
-                                  <span className="tw text-xs text-neutral-700">{tooltipText}</span>
-                                </Tooltip>
-                              ) : (
-                                headerContent
-                              )}
+                              <span className={`tw flex w-full flex-1 ${headerJustify}`}>
+                                {tooltipText ? (
+                                  <Tooltip trigger={headerContent}>
+                                    <span className="tw text-xs text-neutral-700">{tooltipText}</span>
+                                  </Tooltip>
+                                ) : (
+                                  headerContent
+                                )}
+                              </span>
                             </div>
                           )
                         },
