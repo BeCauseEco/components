@@ -20,12 +20,20 @@ export type AutocompleteProps = PlaywrightProps & {
   onOpenChange: (open: boolean) => void
 
   colorBackground: Color
+
+  /**
+   * Optional container element for the dropdown's portal. When omitted, the dropdown
+   * portals to `document.body`. Provide an element inside a native `<dialog>` opened
+   * with `showModal()` so the dropdown renders in the dialog's top layer and is not
+   * obscured by it.
+   */
+  container?: HTMLElement
 }
 
 export const Autocomplete = forwardRef<HTMLDivElement, PropsWithChildren<AutocompleteProps>>((p, ref) => {
   return (
     <Container ref={ref} data-playwright-testid={p["data-playwright-testid"]}>
-      <Popover open={p.open} onOpenChange={p.onOpenChange} alignment="start" trigger={p.input}>
+      <Popover open={p.open} onOpenChange={p.onOpenChange} alignment="start" trigger={p.input} container={p.container}>
         <Align vertical topLeft>
           {p.results}
         </Align>
