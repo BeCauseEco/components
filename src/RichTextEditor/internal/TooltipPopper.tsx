@@ -42,7 +42,7 @@ export const TooltipPopper = ({
   onDelete,
   onCloseEditor,
 }: TooltipPopperProps) => {
-  const [, setTriggerEl] = useState<HTMLSpanElement | null>(null)
+  const [triggerEl, setTriggerEl] = useState<HTMLSpanElement | null>(null)
   const triggerElRef = useRef<HTMLSpanElement | null>(null)
   const [hoverState, setHoverState] = useState<HoverState>("closed")
   const closeTimerRef = useRef<number | null>(null)
@@ -210,10 +210,21 @@ export const TooltipPopper = ({
     </TooltipTrigger>
   )
 
+  // A native <dialog> opened with showModal() renders in the browser's top layer, which sits
+  // above any z-index. @new/Popover portals its content to document.body by default, so when the
+  // editor lives inside such a dialog the popover would render BEHIND the modal. Radix's Portal
+  // accepts a `container`, so we resolve the trigger's nearest ancestor <dialog> and portal the
+  // popover INTO it — that keeps the popover within the dialog's top-layer ancestry and on top.
+  // Outside a modal dialog there's no ancestor, so `container` is undefined and the popover keeps
+  // the default body portal (unchanged behaviour for the common case). This faithfully preserves
+  // the original MUI <Popper disablePortal popperOptions={{ strategy: "fixed" }}> intent.
+  const dialogContainer = (triggerEl?.closest("dialog") as HTMLElement | null) ?? undefined
+
   return (
     <Popover
       trigger={trigger}
       alignment="start"
+      container={dialogContainer}
       open={open}
       onOpenChange={next => {
         // Radix requests close on outside-click / Escape. Mirror the old ClickAwayListener
