@@ -87,6 +87,10 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
   const [filter, setFilter] = useState("")
   const [clientPageIndex, setClientPageIndex] = useState(0)
   const [clientPageSize, setClientPageSize] = useState(p.pagination?.pageSize ?? DEFAULT_PAGE_SIZE)
+  // Captured once: the page size the table started with. Used to keep the
+  // pagination footer (and its page-size selector) visible after the user
+  // enlarges the page size past the row count, so they can change it back.
+  const initialClientPageSize = useRef(p.pagination?.pageSize ?? DEFAULT_PAGE_SIZE)
   const pageResetKey = `${filter}|${p.pagination?.mode ?? ""}`
   const [lastPageResetKey, setLastPageResetKey] = useState(pageResetKey)
   if (pageResetKey !== lastPageResetKey) {
@@ -216,6 +220,14 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
     const start = paginationConfig.pageIndex * paginationConfig.pageSize
     return sortedData.slice(start, start + paginationConfig.pageSize)
   }, [p.data, sortedData, paginationConfig, isServerMode])
+
+  // Show the pagination footer when there is more than one page, OR when the
+  // user has changed the (client) page size away from its initial value. The
+  // latter keeps the page-size selector reachable so a user who enlarged the
+  // page size past the row count can still change it back. Server-mode page
+  // size is parent-controlled, so the user-changed check only applies client side.
+  const userChangedClientPageSize = !isServerMode && clientPageSize !== initialClientPageSize.current
+  const showPagination = paginationConfig.totalPages > 1 || userChangedClientPageSize
 
   const selectedFields = useMemo(() => {
     if (!p.selectedRows) {
@@ -847,7 +859,7 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
                     }}
                   />
 
-                  {paginationConfig.totalPages > 1 ? (
+                  {showPagination ? (
                     <DataTablePagination
                       pageIndex={paginationConfig.pageIndex}
                       pageSize={paginationConfig.pageSize}
