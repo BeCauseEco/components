@@ -1,4 +1,4 @@
-import { KeyboardEvent, ReactNode, useEffect, useRef, useState } from "react"
+import { KeyboardEvent, ReactNode, useEffect, useLayoutEffect, useRef, useState } from "react"
 import { Descendant } from "slate"
 import { RenderElementProps } from "slate-react"
 import { Icon } from "@new/Icon/Icon"
@@ -44,6 +44,7 @@ export const TooltipPopper = ({
 }: TooltipPopperProps) => {
   const [triggerEl, setTriggerEl] = useState<HTMLSpanElement | null>(null)
   const triggerElRef = useRef<HTMLSpanElement | null>(null)
+  const [dialogContainer, setDialogContainer] = useState<HTMLElement | undefined>(undefined)
   const [hoverState, setHoverState] = useState<HoverState>("closed")
   const closeTimerRef = useRef<number | null>(null)
   const openTimerRef = useRef<number | null>(null)
@@ -215,10 +216,28 @@ export const TooltipPopper = ({
   // editor lives inside such a dialog the popover would render BEHIND the modal. Radix's Portal
   // accepts a `container`, so we resolve the trigger's nearest ancestor <dialog> and portal the
   // popover INTO it — that keeps the popover within the dialog's top-layer ancestry and on top.
-  // Outside a modal dialog there's no ancestor, so `container` is undefined and the popover keeps
-  // the default body portal (unchanged behaviour for the common case). This faithfully preserves
-  // the original MUI <Popper disablePortal popperOptions={{ strategy: "fixed" }}> intent.
-  const dialogContainer = (triggerEl?.closest("dialog") as HTMLElement | null) ?? undefined
+  // Outside a modal dialog there's no ancestor, so `container` stays undefined and the popover
+  // keeps the default body portal (unchanged behaviour for the common case). This faithfully
+  // preserves the original MUI <Popper disablePortal popperOptions={{ strategy: "fixed" }}> intent.
+  //
+  // Resolve in a layout effect that re-runs when `open` flips true (and when the trigger
+  // element identity changes): a freshly-created pinned tooltip opens on the same render the
+  // trigger first mounts, when reading the `triggerEl` *state* would still see null. Reading
+  // `triggerElRef.current` (already populated by the ref callback) inside a layout effect, and
+  // re-running once `setTriggerEl` commits the mounted node, guarantees the ancestor <dialog>
+  // is resolved and the container committed before the browser paints the open popover —
+  // fixing the first-open-behind-modal case.
+  useLayoutEffect(() => {
+    if (!open) {
+      return
+    }
+    const resolved = ((triggerEl ?? triggerElRef.current)?.closest("dialog") as HTMLElement | null) ?? undefined
+    // Synchronising React state with a DOM-ancestry fact (the nearest <dialog>) that React
+    // cannot derive declaratively is exactly the sanctioned use of an effect. The early
+    // `prev === resolved` bail makes this a no-op once stable, so it does not cascade.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setDialogContainer(prev => (prev === resolved ? prev : resolved))
+  }, [open, triggerEl])
 
   return (
     <Popover

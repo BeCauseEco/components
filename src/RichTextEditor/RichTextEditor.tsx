@@ -149,6 +149,22 @@ const LinkToolbarButton = ({ onOpen }: { onOpen: () => void }) => {
 }
 
 export type RichTextEditorProps = PlaywrightProps & {
+  /**
+   * Editor content as a JSON string of Slate `Descendant[]`.
+   *
+   * IMPORTANT — value semantics differ by mode:
+   *
+   * - **Editable mode** (`readOnly` falsy): `value` is read **once on mount** and the editor
+   *   is then **uncontrolled** — Slate owns the document and subsequent `value` prop changes
+   *   are ignored. ~40 ui consumers rely on this (it prevents the user's in-progress edits
+   *   from being clobbered by parent re-renders). To reset or replace the content externally,
+   *   the consumer must **remount** the component (e.g. give it a React `key` that changes
+   *   when the desired content changes).
+   * - **readOnly mode**: the component remounts automatically whenever `value` changes (an
+   *   internal `key={value}` is applied), so it always reflects the latest `value`.
+   *
+   * `setFieldValue` is the source of truth for outgoing changes in editable mode.
+   */
   value: string
   label?: string
   maxCounter?: number
@@ -189,7 +205,10 @@ export const RichTextEditor = React.forwardRef<HTMLDivElement, RichTextEditorPro
     },
     ref,
   ) => {
-    const renderElement = useCallback((props: RenderElementProps) => <Element {...props} color={color} />, [color])
+    const renderElement = useCallback(
+      (props: RenderElementProps) => <Element {...props} color={color} disableTooltips={disableTooltips} />,
+      [color, disableTooltips],
+    )
     const renderLeaf = useCallback((props: RenderLeafProps) => <Leaf {...props} />, [])
     const editor = useMemo(() => createEditorWithPlugins(createEditor()), [])
     const [currentCounter, setCurrentCounter] = useState(countCharactersInNode(value))
@@ -255,19 +274,26 @@ export const RichTextEditor = React.forwardRef<HTMLDivElement, RichTextEditorPro
     }
 
     return (
-      <Wrapper className={className}>
+      <Wrapper>
         {label && <Label>{label}</Label>}
         <EditorBox
           ref={ref}
+          // The ui original merged the consumer `className` onto the inner editor-box div
+          // (the bordered/padded container), not the outer wrapper. Preserve that semantics
+          // so consumer layout/spacing overrides land on the same element as before.
+          className={className}
           readOnly={readOnly}
           increasedHeight={increasedHeight}
           hasCustomMenu={!!customMenu}
           style={{ maxWidth }}
         >
           <Slate
-            // <Slate initialValue> is only read on mount; readOnly callers drive `value`
-            // from server state, so remount when it changes to pick up the new content.
-            // Editable callers preserve their in-progress local state across renders.
+            // <Slate initialValue> is read ONCE on mount. Editable mode is therefore
+            // UNCONTROLLED: `value` prop changes after mount are intentionally ignored so
+            // the user's in-progress edits survive parent re-renders (~40 ui consumers
+            // depend on this). Consumers that need to reset/replace content externally must
+            // remount via a changing React `key`. readOnly mode opts INTO remount-on-change
+            // by keying on `value` below, so it always shows the latest server content.
             key={readOnly ? value : undefined}
             editor={editor}
             initialValue={validString(value ?? "")}

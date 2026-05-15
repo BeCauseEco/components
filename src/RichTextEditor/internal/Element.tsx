@@ -29,9 +29,10 @@ type CustomElement =
 
 type ElementProps = RenderElementProps & {
   color?: string
+  disableTooltips?: boolean
 }
 
-const Element = ({ attributes, children, element, color }: ElementProps) => {
+const Element = ({ attributes, children, element, color, disableTooltips }: ElementProps) => {
   const editor = useSlateStatic()
   const selected = useSelected()
   const readOnly = useReadOnly()
@@ -97,6 +98,15 @@ const Element = ({ attributes, children, element, color }: ElementProps) => {
       )
 
     case "tooltip": {
+      // When tooltips are disabled (the inner tooltip-body editor is rendered with
+      // `disableTooltips`), render the node inertly — just the anchor text. Rendering a
+      // `TooltipPopper` here would mount another inner RichTextEditor whose body could
+      // itself contain a tooltip node, recursing without bound (data-driven crash via
+      // paste / bad server data). The top-level editor keeps tooltips enabled, so its
+      // behaviour is unchanged.
+      if (disableTooltips) {
+        return <span {...attributes}>{children}</span>
+      }
       const updateBody = (next: Descendant[]) => {
         const path = ReactEditor.findPath(editor as ReactEditor, element as SlateElement)
         Transforms.setNodes(editor, { body: next } as Partial<SlateElement>, { at: path })
