@@ -1,0 +1,168 @@
+name: Claude PR review (on request)
+
+# Runs ONLY when explicitly requested — never proactively:
+#   * a PR comment containing "@claude" (interactive). Use
+#     "@claude /ci-pr-review" for the scored, criticality-ranked review.
+#   * the "claude-review" label applied to a PR (automation) — runs the
+#     vendored .claude/skills/ci-pr-review skill.
+# On success it labels the PR "claude-reviewed" and sets the
+# "review-gate" commit status to success (see on-pr-review-gate.yml).
+
+on:
+  issue_comment:
+    types: [created]
+  pull_request_review_comment:
+    types: [created]
+  pull_request:
+    types: [labeled]
+
+concurrency:
+  group: claude-review-${{ github.event.issue.number || github.event.pull_request.number }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  actions: read # required for the github_ci MCP server (CI status checks)
+  pull-requests: write
+  issues: write
+  statuses: write
+  id-token: write # required by claude-code-action@v1 for GitHub App OIDC auth
+
+jobs:
+  claude-mention:
+    name: CLAUDE-REVIEW-MENTION
+    if: >
+      github.event.comment.user.type != 'Bot' &&
+      (
+        (github.event_name == 'issue_comment' && github.event.issue.pull_request != null && contains(github.event.comment.body, '@claude')) ||
+        (github.event_name == 'pull_request_review_comment' && contains(github.event.comment.body, '@claude'))
+      )
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Run Claude Code (interactive)
+        uses: anthropics/claude-code-action@v1
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          additional_permissions: |
+            actions: read
+          claude_args: |
+            --max-turns 400
+            --allowedTools "Bash(git diff:*),Bash(git log:*),Bash(git merge-base:*),Bash(git fetch:*),Bash(gh pr diff:*),Bash(gh pr view:*)"
+
+      - name: Resolve PR number and head SHA
+        id: resolve
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const eventName = context.eventName;
+            let prNumber, headSha;
+            if (eventName === 'issue_comment') {
+              prNumber = context.payload.issue.number;
+              const { data: pr } = await github.rest.pulls.get({
+                owner: context.repo.owner, repo: context.repo.repo, pull_number: prNumber,
+              });
+              headSha = pr.head.sha;
+            } else {
+              prNumber = context.payload.pull_request.number;
+              headSha = context.payload.pull_request.head.sha;
+            }
+            core.setOutput('pr', String(prNumber));
+            core.setOutput('sha', headSha);
+
+      - name: Mark PR as Claude-reviewed and pass the gate
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const prNumber = Number('${{ steps.resolve.outputs.pr }}');
+            const headSha = '${{ steps.resolve.outputs.sha }}';
+            try {
+              await github.rest.issues.createLabel({
+                owner, repo, name: 'claude-reviewed', color: '6f42c1',
+                description: 'Claude Code has reviewed this PR',
+              });
+            } catch (e) { /* already exists */ }
+            await github.rest.issues.addLabels({
+              owner, repo, issue_number: prNumber, labels: ['claude-reviewed'],
+            });
+            await github.rest.repos.createCommitStatus({
+              owner, repo, sha: headSha, state: 'success', context: 'review-gate',
+              description: 'Claude reviewed this PR',
+              target_url: `${process.env.GITHUB_SERVER_URL}/${owner}/${repo}/actions/runs/${context.runId}`,
+            });
+
+      - name: Report review failure
+        if: failure()
+        uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          header: claude-review
+          number: ${{ steps.resolve.outputs.pr }}
+          message: |
+            Claude review did not complete — [view logs](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}).
+            Re-request by commenting `@claude /ci-pr-review` or re-applying the `claude-review` label.
+
+  claude-label:
+    name: CLAUDE-REVIEW-LABEL
+    if: >
+      github.event_name == 'pull_request' &&
+      github.event.action == 'labeled' &&
+      github.event.label.name == 'claude-review'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Run Claude Code (automation)
+        uses: anthropics/claude-code-action@v1
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          additional_permissions: |
+            actions: read
+          claude_args: |
+            --max-turns 400
+            --allowedTools "Bash(git diff:*),Bash(git log:*),Bash(git merge-base:*),Bash(git fetch:*),Bash(gh pr diff:*),Bash(gh pr view:*)"
+          prompt: "/ci-pr-review"
+
+      - name: Mark PR as Claude-reviewed and pass the gate
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const prNumber = context.payload.pull_request.number;
+            const headSha = context.payload.pull_request.head.sha;
+            try {
+              await github.rest.issues.createLabel({
+                owner, repo, name: 'claude-reviewed', color: '6f42c1',
+                description: 'Claude Code has reviewed this PR',
+              });
+            } catch (e) { /* already exists */ }
+            await github.rest.issues.addLabels({
+              owner, repo, issue_number: prNumber, labels: ['claude-reviewed'],
+            });
+            // Remove the trigger label so it can be re-applied to re-review.
+            try {
+              await github.rest.issues.removeLabel({
+                owner, repo, issue_number: prNumber, name: 'claude-review',
+              });
+            } catch (e) { /* not present */ }
+            await github.rest.repos.createCommitStatus({
+              owner, repo, sha: headSha, state: 'success', context: 'review-gate',
+              description: 'Claude reviewed this PR',
+              target_url: `${process.env.GITHUB_SERVER_URL}/${owner}/${repo}/actions/runs/${context.runId}`,
+            });
+
+      - name: Report review failure
+        if: failure()
+        uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          header: claude-review
+          message: |
+            Claude review did not complete — [view logs](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}).
+            Re-request by re-applying the `claude-review` label or commenting `@claude review`.

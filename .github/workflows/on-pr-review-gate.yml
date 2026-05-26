@@ -1,0 +1,68 @@
+name: PR review gate
+
+# Posts the required "review-gate" commit status. The gate passes when EITHER
+# a human has approved the PR OR Claude has reviewed it (the "claude-reviewed"
+# label, set by on-pr-claude-review.yml). This implements the "human OR Claude"
+# merge rule that GitHub branch protection cannot express natively.
+#
+# Note: when on-pr-claude-review.yml adds the "claude-reviewed" label using the
+# default GITHUB_TOKEN, that does NOT trigger this workflow's "labeled" event,
+# so the reviewer workflow sets "review-gate" itself. This workflow handles the
+# human-approval path, PR open/sync, and review dismissal.
+
+on:
+  pull_request:
+    types: [opened, reopened, synchronize, labeled, unlabeled]
+  pull_request_review:
+    types: [submitted, dismissed, edited]
+
+concurrency:
+  group: review-gate-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  statuses: write
+  pull-requests: read
+  issues: read
+
+jobs:
+  evaluate:
+    name: REVIEW-GATE
+    runs-on: ubuntu-latest
+    steps:
+      - name: Evaluate review gate
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const prNumber = context.payload.pull_request.number;
+
+            const { data: pr } = await github.rest.pulls.get({
+              owner, repo, pull_number: prNumber,
+            });
+
+            const reviews = await github.paginate(github.rest.pulls.listReviews, {
+              owner, repo, pull_number: prNumber, per_page: 100,
+            });
+            const humanApproved = reviews.some(
+              r => r.state === 'APPROVED' && r.user && r.user.type === 'User',
+            );
+
+            const claudeReviewed = (pr.labels || [])
+              .map(l => l.name)
+              .includes('claude-reviewed');
+
+            const ok = humanApproved || claudeReviewed;
+            const description = ok
+              ? (humanApproved ? 'Human approved' : 'Claude reviewed')
+              : 'Awaiting human approval or Claude review';
+
+            await github.rest.repos.createCommitStatus({
+              owner, repo, sha: pr.head.sha,
+              state: ok ? 'success' : 'failure',
+              context: 'review-gate',
+              description,
+              target_url: `${process.env.GITHUB_SERVER_URL}/${owner}/${repo}/actions/runs/${context.runId}`,
+            });
