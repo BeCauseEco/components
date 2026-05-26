@@ -127,8 +127,29 @@ const escapeCsvField = (field: string): string => {
 /** Builds a full CSV string from columns and rows. UTF-8 BOM prefix included. */
 export const buildCsv = (columns: Column[], rows: any[]): string => {
   const displayable = getDisplayableColumns(columns)
-  const headerLine = displayable.map(c => escapeCsvField(c.title)).join(",")
-  const dataLines = rows.map(row => displayable.map(column => escapeCsvField(formatCellForCsv(column, row))).join(","))
+
+  const headerLine = displayable
+    .flatMap(c => {
+      if (c.csvExpand) {
+        return rows.length > 0 ? c.csvExpand(rows[0]).map(e => e.title) : [c.title]
+      }
+      return [c.title]
+    })
+    .map(escapeCsvField)
+    .join(",")
+
+  const dataLines = rows.map(row =>
+    displayable
+      .flatMap(c => {
+        if (c.csvExpand) {
+          return c.csvExpand(row).map(e => e.value)
+        }
+        return [formatCellForCsv(c, row)]
+      })
+      .map(escapeCsvField)
+      .join(","),
+  )
+
   const BOM = "﻿"
   return BOM + [headerLine, ...dataLines].join("\r\n")
 }
