@@ -57,6 +57,8 @@ export type DataTableExportConfig = {
   filename: string
   /** When true, appends a UTC timestamp (`yyyyMMddHHmmss`) before the `.csv` extension. */
   appendTimestampToFilename?: boolean
+  /** Optional callback invoked after a successful CSV download. Use for analytics. */
+  onExport?: () => void
 }
 
 export type Column = {
@@ -282,7 +284,10 @@ export type DataTableProps<TData = any> = PlaywrightProps & {
   /** When true, prepends a "#" column showing the 1-indexed row number for each row. */
   showRowNumbers?: boolean
   /** When set with `allowCsv: true`, renders a CSV-download button in the filter row.
-   *  Exports every row in `data` (ignoring search/sort/pagination) and every column except
-   *  `DataType.Internal` and `DataType.Object`. */
+   *  Exports every row in `data` (or, when `onSelectionChange` is set and at least one
+   *  row is selected, just the selected rows) — ignoring search/sort/pagination — and
+   *  every column except `DataType.Internal` and `DataType.Object`. Columns with
+   *  `alwaysHidden: true` are always included in the CSV even though they never render
+   *  in the table; columns with `csvExpand` produce N CSV columns each. */
   enableExports?: DataTableExportConfig
 }

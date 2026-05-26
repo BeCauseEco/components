@@ -113,6 +113,10 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
     direction: p.defaultSortDirection,
   })
 
+  // alwaysHidden columns are stripped from ka-table's input so they have zero render cost.
+  // CsvExportButton still receives the full p.columns so it can include them in the export.
+  const tableColumns = useMemo(() => p.columns.filter(c => !c.alwaysHidden), [p.columns])
+
   // Apply the search filter to the full dataset BEFORE pagination slicing.
   // Server mode is the caller's responsibility, so we pass data through unchanged.
   // Without this step, ka-table's built-in search only sees the current page's rows,
@@ -122,7 +126,7 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
     if (!needle || isServerMode) {
       return p.data
     }
-    const searchableColumns = getDisplayableColumns(p.columns)
+    const searchableColumns = getDisplayableColumns(tableColumns)
     return p.data.filter(row =>
       searchableColumns.some(column => {
         const value = (row as any)[column.key]
@@ -138,7 +142,7 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
         return String(value).toLowerCase().includes(needle)
       }),
     )
-  }, [p.data, p.columns, p.pagination?.mode, filter])
+  }, [p.data, tableColumns, p.pagination?.mode, filter])
 
   // Sort the full (filtered) dataset BEFORE pagination slicing so sorting spans
   // the whole dataset, not just the current page. Server mode is caller-owned.
@@ -151,7 +155,7 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
     if (!activeSort.column || !activeSort.direction) {
       return searchedData
     }
-    const column = p.columns.find(c => c.key === activeSort.column) as Column | undefined
+    const column = tableColumns.find(c => c.key === activeSort.column) as Column | undefined
     if (!column) {
       return searchedData
     }
@@ -184,7 +188,7 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
         }
 
     return [...searchedData].sort(comparator)
-  }, [searchedData, p.columns, p.pagination?.mode, p.disableSorting, activeSort])
+  }, [searchedData, tableColumns, p.pagination?.mode, p.disableSorting, activeSort])
 
   const paginationConfig = useMemo(() => {
     if (p.pagination?.mode === "server") {
@@ -247,7 +251,7 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
   }, [p.data, p.disabledRows, p.rowKeyField, p.selectedRows, p.onSelectionChange])
 
   const nativeColumns = useMemo(() => {
-    const columns = p.columns.map(c => {
+    const columns = tableColumns.map(c => {
       const column = c as Column
 
       const sortDirection = mode !== "edit" && column.key === activeSort.column ? activeSort.direction : undefined
@@ -304,7 +308,7 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
     }
 
     return columns
-  }, [p.columns, mode, p.rowActions, activeSort, p.showRowNumbers])
+  }, [tableColumns, mode, p.rowActions, activeSort, p.showRowNumbers])
 
   const firstDataColumnKey = useMemo(() => {
     return nativeColumns.find(c => c.key !== KEY_ROW_NUMBER)?.key
@@ -475,6 +479,17 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
     }
   }, [p.mode, p.editingMode, editRowId, editColumnId, table])
 
+  const exportData = useMemo(() => {
+    if (p.onSelectionChange && p.selectedRows && p.selectedRows.length > 0) {
+      const selectedSet = new Set(p.selectedRows)
+      return p.data.filter(row => selectedSet.has((row as any)[p.rowKeyField]))
+    }
+    return p.data
+  }, [p.data, p.selectedRows, p.onSelectionChange, p.rowKeyField])
+
+  const selectionActive = Boolean(p.onSelectionChange)
+  const selectionCount = p.selectedRows?.length ?? 0
+
   return (
     <>
       <style suppressHydrationWarning>{css}</style>
@@ -493,7 +508,13 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
               {Children.toArray(p.children)}
             </div>
             {showCsvExportButton && p.enableExports && (
-              <CsvExportButton config={p.enableExports} columns={p.columns} data={p.data} />
+              <CsvExportButton
+                config={p.enableExports}
+                columns={p.columns}
+                data={exportData}
+                selectionActive={selectionActive}
+                selectionCount={selectionCount}
+              />
             )}
           </div>
 
