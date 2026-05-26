@@ -63,6 +63,13 @@ export type Column = {
   key: string
   title: string
   dataType: DataType
+  /** When true, this column is never rendered in the table (never reaches ka-table,
+   *  never appears in any "visible columns" surface), but is always included in CSV
+   *  export when `enableExports.allowCsv` is true. Use for machine-only data (e.g.
+   *  GUIDs) that users should not see but that downstream import workflows depend on.
+   *  Performance: alwaysHidden columns are stripped from p.columns before reaching
+   *  ka-table, so they have zero render cost. */
+  alwaysHidden?: boolean
   maxWidth?: `${number}${"px"}` | `${number}${"%"}`
   minWidth?: `${number}${"px"}` | `${number}${"%"}`
   explodeWidth?: boolean
@@ -208,6 +215,13 @@ export type Column = {
   }
 
   fill?: ((rowData: ICellTextProps["rowData"]) => Color | undefined) | Color | undefined
+
+  /** When present, this column emits N CSV columns instead of 1. Used when a single
+   *  display column shows joined fields ("12.345, -67.890") but the CSV needs them
+   *  split for downstream import workflows. The function must return the same number
+   *  of entries in the same order for every row, or columns will misalign. Headers
+   *  come from each entry's `title` (the column's own `title` is ignored for CSV). */
+  csvExpand?: (rowData: ICellTextProps["rowData"]) => { title: string; value: string }[]
 }
 
 type Children =
