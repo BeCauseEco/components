@@ -136,7 +136,7 @@ export const FilteredList = ({
                   itemBordered,
                   itemLabelBold,
                 }}
-                style={allItemsFit ? { overflow: "hidden" } : undefined}
+                style={{ overflowY: allItemsFit ? "hidden" : "auto" }}
               />
             </VirtualizedListContainer>
           ) : (
