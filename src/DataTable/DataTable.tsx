@@ -273,10 +273,14 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
         minWidth: column.minWidth,
         maxWidth: column.maxWidth,
         explodeWidth: column.explodeWidth,
-        isEditable: column.isEditable,
+        // Flatten per-row callbacks to `true` so ka-table treats the column as editable;
+        // per-row gating happens in the onDispatch interceptor and cell elementAttributes below.
+        isEditable: typeof column.isEditable === "function" ? true : column.isEditable,
         endAdornment: column.endAdornment,
+        suffixAdornment: column.suffixAdornment,
         startAdornment: column.startAdornment,
         fill: column.fill,
+        cellStyle: column.cellStyle,
         footer: column.footer,
         placeholder: column.placeholder,
         numberFormat: column.numberFormat,
@@ -343,6 +347,26 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
       p.onSelectionChange([])
     }
   }
+
+  // Resolves whether a specific cell is editable, taking into account per-row callbacks
+  // on `column.isEditable`. Used to block ka-table from opening an editor on locked rows.
+  const isCellEditable = useCallback(
+    (columnKey: string, rowKeyValue: string | number): boolean => {
+      const column = p.columns.find(c => c.key === columnKey) as Column | undefined
+      if (!column) {
+        return true
+      }
+      if (typeof column.isEditable === "function") {
+        const rowData = p.data.find(row => row[p.rowKeyField] === rowKeyValue)
+        if (!rowData) {
+          return true
+        }
+        return column.isEditable(rowData)
+      }
+      return column.isEditable !== false
+    },
+    [p.columns, p.data, p.rowKeyField],
+  )
 
   const table = useTable({
     onDispatch: d => {
@@ -464,7 +488,9 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
         setTimeout(() => {
           const newFocused = table.props.focused
           if (newFocused?.cell) {
-            table.dispatch(openEditor(newFocused.cell.rowKeyValue, newFocused.cell.columnKey))
+            if (isCellEditable(newFocused.cell.columnKey, newFocused.cell.rowKeyValue)) {
+              table.dispatch(openEditor(newFocused.cell.rowKeyValue, newFocused.cell.columnKey))
+            }
           }
         }, 0)
 
@@ -673,6 +699,15 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
                       },
 
                       cellText: {
+                        // Override the default onClick that dispatches openEditor when a per-row
+                        // callback locks this cell. The second arg's `baseFunc` is ka-table's
+                        // original handler — by not calling it we prevent the editor from opening.
+                        elementAttributes: cellTextProps => {
+                          if (!isCellEditable(cellTextProps.column.key, cellTextProps.rowKeyValue)) {
+                            return { onClick: () => {} }
+                          }
+                          return {}
+                        },
                         content: cellTextContent => {
                           if (cellTextContent.column.key === KEY_ROW_NUMBER) {
                             const sortedData = kaPropsUtils.getData(table.props)
@@ -722,6 +757,20 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
                               }
                             }
 
+                            // When showTooltipIcon is set, render the info icon inline with the cell content
+                            // (next to it, before any end adornment) as an indicator. The tooltip itself is
+                            // applied to the whole cell below, so hovering anywhere in the cell shows it.
+                            const showTooltipIconWrap =
+                              !!tooltipElement &&
+                              column.dataType !== DataType.Status &&
+                              column.dataType !== DataType.ProgressIndicator &&
+                              column.dataType !== DataType.Icon &&
+                              column.showTooltipIcon === true
+
+                            const tooltipIcon = showTooltipIconWrap ? (
+                              <Icon name="info" small fill={[Color.Neutral, 200]} />
+                            ) : undefined
+
                             const footerElement =
                               typeof column.footer === "function" ? column.footer(cellTextContent.rowData) : undefined
 
@@ -739,6 +788,7 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
                                   column={column}
                                   firstColumn={firstColumn}
                                   tooltipElement={tooltipElement}
+                                  tooltipIcon={tooltipIcon}
                                   textSize={p.textSize}
                                 />
                               )
@@ -750,22 +800,8 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
                                 : null
 
                             const justify = alignmentRight ? "justify-end" : "justify-start"
-                            const showTooltipIconWrap =
-                              tooltipElement &&
-                              column.dataType !== DataType.Status &&
-                              column.dataType !== DataType.ProgressIndicator &&
-                              column.showTooltipIcon === true
 
-                            const trigger = showTooltipIconWrap ? (
-                              <span className="tw flex items-center gap-1">
-                                {output}
-                                <Icon name="info" small fill={[Color.Neutral, 200]} />
-                              </span>
-                            ) : (
-                              output
-                            )
-
-                            const main = tooltipElement ? <Tooltip trigger={trigger}>{tooltipElement}</Tooltip> : output
+                            const main = tooltipElement ? <Tooltip trigger={output}>{tooltipElement}</Tooltip> : output
 
                             const inner = customCellRendererElement ? (
                               customCellRendererElement
@@ -847,11 +883,16 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
                             classNames.push("ka-cell-icon")
                           }
 
-                          if (
-                            mode === "edit" &&
-                            p.editingMode === EditingMode.Cell &&
-                            (column.isEditable || column.isEditable === undefined)
-                          ) {
+                          const rowKeyValue = (cellElementAttributes?.rowData as any)?.[p.rowKeyField] as
+                            | string
+                            | number
+                            | undefined
+                          const editableForThisRow =
+                            rowKeyValue !== undefined
+                              ? isCellEditable(column.key, rowKeyValue)
+                              : column.isEditable !== false
+
+                          if (mode === "edit" && p.editingMode === EditingMode.Cell && editableForThisRow) {
                             classNames.push("ka-cell-editable")
                           }
 
@@ -866,7 +907,7 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
                           return {
                             id: id,
                             className: classNames.join(" "),
-                            tabIndex: p.mode === "edit" && column.isEditable ? -1 : undefined,
+                            tabIndex: p.mode === "edit" && editableForThisRow ? -1 : undefined,
 
                             style: {
                               width: width,
