@@ -290,4 +290,8 @@ export type DataTableProps<TData = any> = PlaywrightProps & {
    *  `alwaysHidden: true` are always included in the CSV even though they never render
    *  in the table; columns with `csvExpand` produce N CSV columns each. */
   enableExports?: DataTableExportConfig
+  /** When provided and it returns true for a row, that row's cells are rendered dimmed
+   *  (reduced opacity) to signal a disabled/inactive state. Purely cosmetic; does not
+   *  affect selection, sorting, or actions. */
+  dimRow?: (rowData: TData) => boolean
 }

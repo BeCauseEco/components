@@ -863,6 +863,8 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
                             ? computeColor([fillColor, fillColor === Color.Neutral ? 50 : 100])
                             : undefined
 
+                          const dimmed = p.dimRow?.(cellElementAttributes.rowData as TData) ?? false
+
                           return {
                             id: id,
                             className: classNames.join(" "),
@@ -873,6 +875,7 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
                               minWidth: minWidth,
                               maxWidth: maxWidth,
                               backgroundColor,
+                              opacity: dimmed ? 0.55 : undefined,
                             },
                           }
                         },
