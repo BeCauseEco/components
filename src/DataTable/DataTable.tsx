@@ -32,6 +32,8 @@ import { CsvExportButton } from "./internal/CsvExportButton"
 import { getDisplayableColumns } from "./internal/exportToCsv"
 import { sizeClass } from "./internal/textSize"
 
+const DIMMED_ROW_OPACITY = 0.55
+
 // Re-export for backward compatibility
 export { SortDirection } from "ka-table"
 export { DataType } from "./types"
@@ -875,7 +877,7 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
                               minWidth: minWidth,
                               maxWidth: maxWidth,
                               backgroundColor,
-                              opacity: dimmed ? 0.55 : undefined,
+                              opacity: dimmed ? DIMMED_ROW_OPACITY : undefined,
                             },
                           }
                         },

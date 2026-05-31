@@ -291,7 +291,7 @@ export type DataTableProps<TData = any> = PlaywrightProps & {
    *  in the table; columns with `csvExpand` produce N CSV columns each. */
   enableExports?: DataTableExportConfig
   /** When provided and it returns true for a row, that row's cells are rendered dimmed
-   *  (reduced opacity) to signal a disabled/inactive state. Purely cosmetic; does not
-   *  affect selection, sorting, or actions. */
+   *  (reduced opacity) to signal a disabled/inactive state. Purely cosmetic — independent
+   *  of `disabledRows` (which controls selection); this only affects visual opacity. */
   dimRow?: (rowData: TData) => boolean
 }
