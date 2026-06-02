@@ -803,12 +803,19 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
 
                             const main = tooltipElement ? <Tooltip trigger={output}>{tooltipElement}</Tooltip> : output
 
+                            const cellStyleValue =
+                              typeof column.cellStyle === "function"
+                                ? column.cellStyle(cellTextContent.rowData)
+                                : column.cellStyle
+
                             const inner = customCellRendererElement ? (
                               customCellRendererElement
                             ) : footerElement ? (
                               <span className="tw flex w-full flex-col py-0.5 gap-0.5">
                                 <span className={`tw flex w-full ${justify}`}>{main}</span>
-                                <span className={`tw flex w-full ${justify}`}>{footerElement}</span>
+                                <span className={`tw flex w-full ${justify}`} style={cellStyleValue}>
+                                  {footerElement}
+                                </span>
                               </span>
                             ) : (
                               main
