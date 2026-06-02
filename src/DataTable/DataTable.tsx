@@ -395,6 +395,14 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
 
       if (p.editingMode === EditingMode.Cell) {
         if (d.type === "OpenEditor") {
+          // ka-table opens the editor from a click AND from Enter on a focused cell. The click path
+          // is neutralized separately via cellText.elementAttributes, but Enter dispatches straight
+          // here — so this is the single choke point that blocks editing a locked cell from either
+          // path. Close the editor ka-table just opened and bail before tracking edit state.
+          if (!isCellEditable(d.columnKey, rowKeyValue)) {
+            table.dispatch(closeEditor(rowKeyValue, d.columnKey))
+            return
+          }
           if (editRowId !== null && (editRowId !== rowKeyValue || editColumnId !== d.columnKey)) {
             table.dispatch(closeEditor(editRowId, editColumnId))
           }
@@ -503,7 +511,7 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
       tableContainer.addEventListener("keydown", handleKeyDown, true)
       return () => tableContainer.removeEventListener("keydown", handleKeyDown, true)
     }
-  }, [p.mode, p.editingMode, editRowId, editColumnId, table])
+  }, [p.mode, p.editingMode, editRowId, editColumnId, table, isCellEditable])
 
   const exportData = useMemo(() => {
     if (p.onSelectionChange && p.selectedRows && p.selectedRows.length > 0) {
@@ -699,9 +707,11 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
                       },
 
                       cellText: {
-                        // Override the default onClick that dispatches openEditor when a per-row
-                        // callback locks this cell. The second arg's `baseFunc` is ka-table's
-                        // original handler — by not calling it we prevent the editor from opening.
+                        // ka-table merges the attributes returned here over its own defaults for the
+                        // cell-text element. When a per-row `isEditable` callback locks this cell,
+                        // returning a no-op onClick replaces ka-table's default handler (which
+                        // dispatches OpenEditor), so clicking no longer opens the editor. The
+                        // keyboard/Enter path is blocked separately in onDispatch.
                         elementAttributes: cellTextProps => {
                           if (!isCellEditable(cellTextProps.column.key, cellTextProps.rowKeyValue)) {
                             return { onClick: () => {} }

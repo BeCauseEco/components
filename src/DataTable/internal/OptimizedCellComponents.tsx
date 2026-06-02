@@ -53,12 +53,21 @@ export const OptimizedCell = memo(
       if (!selectedOption) {
         return null
       }
-      return (
+      const listLabel = (
         <span
           className={`tw inline-block min-w-0 overflow-hidden text-ellipsis whitespace-nowrap ${sizeCls}`}
           style={{ color: NEUTRAL_700, ...cellStyle }}
         >
           {selectedOption.shortLabel || selectedOption.label}
+        </span>
+      )
+      if (!props.tooltipIcon) {
+        return listLabel
+      }
+      return (
+        <span className="tw flex items-center gap-1">
+          {listLabel}
+          {props.tooltipIcon}
         </span>
       )
     }
@@ -75,7 +84,8 @@ export const OptimizedCell = memo(
       !column.fill &&
       !column.startAdornment &&
       !column.endAdornment &&
-      !column.suffixAdornment
+      !column.suffixAdornment &&
+      !props.tooltipIcon
     ) {
       return (
         <span className={baseTextCls} style={{ color: NEUTRAL_700, ...cellStyle }}>
