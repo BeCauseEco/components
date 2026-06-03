@@ -1,4 +1,4 @@
-import { ReactElement, ReactNode } from "react"
+import { CSSProperties, ReactElement, ReactNode } from "react"
 import { SortDirection } from "ka-table"
 import { ICellTextProps } from "ka-table/props"
 import { Color, ColorWithLightness } from "@new/Color"
@@ -81,8 +81,29 @@ export type Column = {
   tooltip?: ((rowData: ICellTextProps["rowData"]) => ReactElement | string | undefined) | boolean
   showTooltipIcon?: boolean
   headerTooltip?: string
-  isEditable?: boolean
+  /**
+   * Whether this column's cells are editable in `mode="edit"` + `editingMode="Cell"`.
+   * Pass a function for per-row gating; ka-table's cell editor will not open on rows
+   * where the function returns `false`. Omitted = editable; explicit `false` = never editable.
+   */
+  isEditable?: boolean | ((rowData: ICellTextProps["rowData"]) => boolean)
+  /**
+   * Inline CSS applied to the cell's text by the built-in cell renderers (OptimizedCell, List),
+   * so it survives emotion class specificity without consumers having to override rendering themselves.
+   * Pass a function for per-row styling; return `undefined` for rows that should keep the default style.
+   */
+  cellStyle?: CSSProperties | ((rowData: ICellTextProps["rowData"]) => CSSProperties | undefined)
+  /**
+   * Adornment pushed to the trailing edge (end) of the cell, separated from the content.
+   * Use for end-of-row affordances like action menus, status markers, or icon buttons.
+   * For an inline suffix that hugs the content (e.g. a "%" unit), use {@link suffixAdornment}.
+   */
   endAdornment?: (rowData: ICellTextProps["rowData"]) => ReactElement | string | undefined
+  /**
+   * Adornment rendered inline immediately after the cell content (a suffix), e.g. a unit like "%".
+   * Unlike {@link endAdornment}, it is not pushed to the end of the cell.
+   */
+  suffixAdornment?: (rowData: ICellTextProps["rowData"]) => ReactElement | string | undefined
   startAdornment?: (rowData: ICellTextProps["rowData"]) => ReactElement | string | undefined
   /**
    * Function to generate footer content for each cell

@@ -275,10 +275,14 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
         minWidth: column.minWidth,
         maxWidth: column.maxWidth,
         explodeWidth: column.explodeWidth,
-        isEditable: column.isEditable,
+        // Flatten per-row callbacks to `true` so ka-table treats the column as editable;
+        // per-row gating happens in the onDispatch interceptor and cell elementAttributes below.
+        isEditable: typeof column.isEditable === "function" ? true : column.isEditable,
         endAdornment: column.endAdornment,
+        suffixAdornment: column.suffixAdornment,
         startAdornment: column.startAdornment,
         fill: column.fill,
+        cellStyle: column.cellStyle,
         footer: column.footer,
         placeholder: column.placeholder,
         numberFormat: column.numberFormat,
@@ -346,6 +350,26 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
     }
   }
 
+  // Resolves whether a specific cell is editable, taking into account per-row callbacks
+  // on `column.isEditable`. Used to block ka-table from opening an editor on locked rows.
+  const isCellEditable = useCallback(
+    (columnKey: string, rowKeyValue: string | number): boolean => {
+      const column = p.columns.find(c => c.key === columnKey) as Column | undefined
+      if (!column) {
+        return true
+      }
+      if (typeof column.isEditable === "function") {
+        const rowData = p.data.find(row => row[p.rowKeyField] === rowKeyValue)
+        if (!rowData) {
+          return true
+        }
+        return column.isEditable(rowData)
+      }
+      return column.isEditable !== false
+    },
+    [p.columns, p.data, p.rowKeyField],
+  )
+
   const table = useTable({
     onDispatch: d => {
       // Track sort state changes so nativeColumns stays in sync with ka-table's internal state.
@@ -373,6 +397,14 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
 
       if (p.editingMode === EditingMode.Cell) {
         if (d.type === "OpenEditor") {
+          // ka-table opens the editor from a click AND from Enter on a focused cell. The click path
+          // is neutralized separately via cellText.elementAttributes, but Enter dispatches straight
+          // here — so this is the single choke point that blocks editing a locked cell from either
+          // path. Close the editor ka-table just opened and bail before tracking edit state.
+          if (!isCellEditable(d.columnKey, rowKeyValue)) {
+            table.dispatch(closeEditor(rowKeyValue, d.columnKey))
+            return
+          }
           if (editRowId !== null && (editRowId !== rowKeyValue || editColumnId !== d.columnKey)) {
             table.dispatch(closeEditor(editRowId, editColumnId))
           }
@@ -466,7 +498,9 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
         setTimeout(() => {
           const newFocused = table.props.focused
           if (newFocused?.cell) {
-            table.dispatch(openEditor(newFocused.cell.rowKeyValue, newFocused.cell.columnKey))
+            if (isCellEditable(newFocused.cell.columnKey, newFocused.cell.rowKeyValue)) {
+              table.dispatch(openEditor(newFocused.cell.rowKeyValue, newFocused.cell.columnKey))
+            }
           }
         }, 0)
 
@@ -479,7 +513,7 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
       tableContainer.addEventListener("keydown", handleKeyDown, true)
       return () => tableContainer.removeEventListener("keydown", handleKeyDown, true)
     }
-  }, [p.mode, p.editingMode, editRowId, editColumnId, table])
+  }, [p.mode, p.editingMode, editRowId, editColumnId, table, isCellEditable])
 
   const exportData = useMemo(() => {
     if (p.onSelectionChange && p.selectedRows && p.selectedRows.length > 0) {
@@ -675,6 +709,17 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
                       },
 
                       cellText: {
+                        // ka-table merges the attributes returned here over its own defaults for the
+                        // cell-text element. When a per-row `isEditable` callback locks this cell,
+                        // returning a no-op onClick replaces ka-table's default handler (which
+                        // dispatches OpenEditor), so clicking no longer opens the editor. The
+                        // keyboard/Enter path is blocked separately in onDispatch.
+                        elementAttributes: cellTextProps => {
+                          if (!isCellEditable(cellTextProps.column.key, cellTextProps.rowKeyValue)) {
+                            return { onClick: () => {} }
+                          }
+                          return {}
+                        },
                         content: cellTextContent => {
                           if (cellTextContent.column.key === KEY_ROW_NUMBER) {
                             const sortedData = kaPropsUtils.getData(table.props)
@@ -724,6 +769,20 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
                               }
                             }
 
+                            // When showTooltipIcon is set, render the info icon inline with the cell content
+                            // (next to it, before any end adornment) as an indicator. The tooltip itself is
+                            // applied to the whole cell below, so hovering anywhere in the cell shows it.
+                            const showTooltipIconWrap =
+                              !!tooltipElement &&
+                              column.dataType !== DataType.Status &&
+                              column.dataType !== DataType.ProgressIndicator &&
+                              column.dataType !== DataType.Icon &&
+                              column.showTooltipIcon === true
+
+                            const tooltipIcon = showTooltipIconWrap ? (
+                              <Icon name="info" small fill={[Color.Neutral, 200]} />
+                            ) : undefined
+
                             const footerElement =
                               typeof column.footer === "function" ? column.footer(cellTextContent.rowData) : undefined
 
@@ -741,6 +800,7 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
                                   column={column}
                                   firstColumn={firstColumn}
                                   tooltipElement={tooltipElement}
+                                  tooltipIcon={tooltipIcon}
                                   textSize={p.textSize}
                                 />
                               )
@@ -752,29 +812,22 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
                                 : null
 
                             const justify = alignmentRight ? "justify-end" : "justify-start"
-                            const showTooltipIconWrap =
-                              tooltipElement &&
-                              column.dataType !== DataType.Status &&
-                              column.dataType !== DataType.ProgressIndicator &&
-                              column.showTooltipIcon === true
 
-                            const trigger = showTooltipIconWrap ? (
-                              <span className="tw flex items-center gap-1">
-                                {output}
-                                <Icon name="info" small fill={[Color.Neutral, 200]} />
-                              </span>
-                            ) : (
-                              output
-                            )
+                            const main = tooltipElement ? <Tooltip trigger={output}>{tooltipElement}</Tooltip> : output
 
-                            const main = tooltipElement ? <Tooltip trigger={trigger}>{tooltipElement}</Tooltip> : output
+                            const cellStyleValue =
+                              typeof column.cellStyle === "function"
+                                ? column.cellStyle(cellTextContent.rowData)
+                                : column.cellStyle
 
                             const inner = customCellRendererElement ? (
                               customCellRendererElement
                             ) : footerElement ? (
                               <span className="tw flex w-full flex-col py-0.5 gap-0.5">
                                 <span className={`tw flex w-full ${justify}`}>{main}</span>
-                                <span className={`tw flex w-full ${justify}`}>{footerElement}</span>
+                                <span className={`tw flex w-full ${justify}`} style={cellStyleValue}>
+                                  {footerElement}
+                                </span>
                               </span>
                             ) : (
                               main
@@ -849,11 +902,16 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
                             classNames.push("ka-cell-icon")
                           }
 
-                          if (
-                            mode === "edit" &&
-                            p.editingMode === EditingMode.Cell &&
-                            (column.isEditable || column.isEditable === undefined)
-                          ) {
+                          const rowKeyValue = (cellElementAttributes?.rowData as any)?.[p.rowKeyField] as
+                            | string
+                            | number
+                            | undefined
+                          const editableForThisRow =
+                            rowKeyValue !== undefined
+                              ? isCellEditable(column.key, rowKeyValue)
+                              : column.isEditable !== false
+
+                          if (mode === "edit" && p.editingMode === EditingMode.Cell && editableForThisRow) {
                             classNames.push("ka-cell-editable")
                           }
 
@@ -870,7 +928,7 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
                           return {
                             id: id,
                             className: classNames.join(" "),
-                            tabIndex: p.mode === "edit" && column.isEditable ? -1 : undefined,
+                            tabIndex: p.mode === "edit" && editableForThisRow ? -1 : undefined,
 
                             style: {
                               width: width,
