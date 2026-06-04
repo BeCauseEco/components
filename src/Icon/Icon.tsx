@@ -51,8 +51,11 @@ const Container = styled.i<{ size: string; fontVariationSettings: string; _fill:
   p => ({
     display: "flex !important",
     flexShrink: 0,
-    width: "fit-content",
+    alignItems: "center",
+    justifyContent: "center",
+    width: p.size,
     height: p.size,
+    overflow: "hidden",
     lineHeight: `${p.size} !important`,
     fontSize: `calc(${p.size} * 0.875) !important`,
     color: computeColor(p._fill),
