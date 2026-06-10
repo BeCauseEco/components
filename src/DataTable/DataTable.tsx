@@ -756,24 +756,25 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
                             const tooltip = column.tooltip as Column["tooltip"]
                             const tooltipTextCls = `tw text-neutral-700 ${sizeClass(textSize, "small")}`
 
-                            let tooltipElement
+                            let tooltipContent
 
                             const emptyString = column.placeholder || TABLE_CELL_EMPTY_STRING
                             if (typeof tooltip === "boolean" && text !== emptyString) {
-                              tooltipElement = <span className={tooltipTextCls}>{text}</span>
+                              tooltipContent = <span className={tooltipTextCls}>{text}</span>
                             } else if (typeof tooltip === "function") {
-                              tooltipElement = tooltip(cellTextContent.rowData)
+                              tooltipContent = tooltip(cellTextContent.rowData)
 
-                              if (typeof tooltipElement === "string") {
-                                tooltipElement = <span className={tooltipTextCls}>{tooltipElement}</span>
+                              if (typeof tooltipContent === "string") {
+                                tooltipContent = <span className={tooltipTextCls}>{tooltipContent}</span>
                               }
                             }
 
                             // When showTooltipIcon is set, render the info icon inline with the cell content
-                            // (next to it, before any end adornment) as an indicator. The tooltip itself is
-                            // applied to the whole cell below, so hovering anywhere in the cell shows it.
+                            // (next to it, before any end adornment) as an indicator. In this case the tooltip
+                            // is scoped to the title content + icon inside OptimizedCell (not the whole cell),
+                            // so it doesn't overlap a separate tooltip on an end adornment in the same cell.
                             const showTooltipIconWrap =
-                              !!tooltipElement &&
+                              !!tooltipContent &&
                               column.dataType !== DataType.Status &&
                               column.dataType !== DataType.ProgressIndicator &&
                               column.dataType !== DataType.Icon &&
@@ -799,7 +800,7 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
                                   {...cellTextContent}
                                   column={column}
                                   firstColumn={firstColumn}
-                                  tooltipElement={tooltipElement}
+                                  tooltipContent={tooltipContent}
                                   tooltipIcon={tooltipIcon}
                                   textSize={p.textSize}
                                 />
@@ -813,7 +814,18 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
 
                             const justify = alignmentRight ? "justify-end" : "justify-start"
 
-                            const main = tooltipElement ? <Tooltip trigger={output}>{tooltipElement}</Tooltip> : output
+                            // When the info icon is shown, OptimizedCell scopes the tooltip to the title content +
+                            // icon itself, so we must not also wrap the whole cell here — that would re-trigger the
+                            // cell tooltip over an end adornment that has its own tooltip (showing two at once).
+                            // List/link cells render markup that doesn't carry the tooltip, so they keep the wrap.
+                            const tooltipOwnedByContent =
+                              showTooltipIconWrap && column.dataType !== DataType.List && !column.link
+                            const main =
+                              tooltipContent && !tooltipOwnedByContent ? (
+                                <Tooltip trigger={output}>{tooltipContent}</Tooltip>
+                              ) : (
+                                output
+                              )
 
                             const cellStyleValue =
                               typeof column.cellStyle === "function"
