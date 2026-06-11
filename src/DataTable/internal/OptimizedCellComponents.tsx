@@ -2,6 +2,8 @@ import React, { memo } from "react"
 import { Avatar } from "@new/Avatar/Avatar"
 import Link from "next/link"
 import { Color, computeColor } from "@new/Color"
+import { Tooltip } from "@new/Tooltip/Tooltip"
+import { AlignProps } from "@new/Stack/Align"
 import { Column, DataType, DataTableTextSize } from "../types"
 import { formatValue } from "../utils"
 import { TABLE_CELL_EMPTY_STRING } from "./constants"
@@ -13,8 +15,7 @@ interface OptimizedCellProps {
   rowData: any
   rowKeyValue: any
   firstColumn: boolean
-  tooltipElement?: React.ReactNode
-  /** Pre-built info icon (with its own tooltip) rendered inline after the content when `showTooltipIcon` is set. */
+  tooltipContent?: React.ReactNode
   tooltipIcon?: React.ReactNode
   textSize?: DataTableTextSize
   [key: string]: any
@@ -139,7 +140,7 @@ export const OptimizedCell = memo(
     const alignmentRight = column.dataType === DataType.Number
     const justify = alignmentRight ? "justify-end" : "justify-start"
 
-    const content = (
+    const titleContent = (
       <>
         {avatarElement}
         {startAdornment}
@@ -149,6 +150,15 @@ export const OptimizedCell = memo(
         {suffixAdornment}
         {props.tooltipIcon}
       </>
+    )
+
+    // With the info icon shown, the tooltip opens from the title content + icon rather than the
+    // whole cell (DataTable skips its whole-cell wrap in this case). That keeps it from overlapping
+    // tooltips on an end adornment — e.g. a status badge or action button — in the same cell.
+    const content = props.tooltipIcon ? (
+      <Tooltip trigger={titleContent}>{props.tooltipContent as React.ReactElement<AlignProps>}</Tooltip>
+    ) : (
+      titleContent
     )
 
     // With an end adornment, the content takes the available width (so the text truncates
@@ -169,7 +179,7 @@ export const OptimizedCell = memo(
     prev.column === next.column &&
     prev.rowData === next.rowData &&
     prev.firstColumn === next.firstColumn &&
-    prev.tooltipElement === next.tooltipElement &&
+    prev.tooltipContent === next.tooltipContent &&
     prev.tooltipIcon === next.tooltipIcon &&
     prev.textSize === next.textSize,
 )
