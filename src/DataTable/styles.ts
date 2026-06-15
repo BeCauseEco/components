@@ -168,6 +168,11 @@ export const createDataTableStyles = (
     max-width: 100%;
   }
 
+  .${cssScope} .ka-number-editor input,
+  .${cssScope} .ka-number-editor textarea {
+    text-align: right;
+  }
+
   .${cssScope} .ka-row {
     border-bottom: solid 1px ${computeColor(stroke || [Color.Neutral, 100])};
     border-top: solid 1px ${computeColor(stroke || [Color.Neutral, 100])};

@@ -1,13 +1,6 @@
 "use client"
 import { EditingMode, SortDirection, SortingMode, Table, useTable } from "ka-table"
-import {
-  closeEditor,
-  closeRowEditors,
-  openEditor,
-  setFocused,
-  moveFocusedRight,
-  moveFocusedLeft,
-} from "ka-table/actionCreators"
+import { closeEditor, closeRowEditors, openEditor, setFocused } from "ka-table/actionCreators"
 import { Cell } from "ka-table/Models/Cell"
 import { Focused } from "ka-table/Models/Focused"
 import { InputTextSingle } from "@new/InputText/InputTextSingle"
@@ -370,6 +363,34 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
     [p.columns, p.data, p.rowKeyField],
   )
 
+  // Next/previous editable cell in page order, wrapping across rows. Null at page ends.
+  const getAdjacentEditableCell = useCallback(
+    (
+      columnKey: string,
+      rowKeyValue: string | number,
+      forward: boolean,
+    ): { columnKey: string; rowKeyValue: string | number } | null => {
+      const cells: { columnKey: string; rowKeyValue: string | number }[] = []
+      for (const row of displayData) {
+        const rowKey = (row as any)[p.rowKeyField] as string | number
+        for (const column of tableColumns) {
+          if (isCellEditable(column.key, rowKey)) {
+            cells.push({ columnKey: column.key, rowKeyValue: rowKey })
+          }
+        }
+      }
+
+      const currentIndex = cells.findIndex(c => c.columnKey === columnKey && c.rowKeyValue === rowKeyValue)
+      if (currentIndex === -1) {
+        return null
+      }
+
+      const nextIndex = forward ? currentIndex + 1 : currentIndex - 1
+      return cells[nextIndex] ?? null
+    },
+    [displayData, tableColumns, isCellEditable, p.rowKeyField],
+  )
+
   const table = useTable({
     onDispatch: d => {
       // Track sort state changes so nativeColumns stays in sync with ka-table's internal state.
@@ -487,21 +508,21 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
 
         table.dispatch(closeEditor(editRowId, editColumnId))
 
-        const currentCell = new Cell()
-        currentCell.columnKey = editColumnId
-        currentCell.rowKeyValue = editRowId
+        // Wrap to the adjacent row at row ends; null = nowhere to move.
+        const nextCell = getAdjacentEditableCell(editColumnId, editRowId, !event.shiftKey)
+        if (!nextCell) {
+          return
+        }
+
+        const targetCell = new Cell()
+        targetCell.columnKey = nextCell.columnKey
+        targetCell.rowKeyValue = nextCell.rowKeyValue
         const focused = new Focused()
-        focused.cell = currentCell
+        focused.cell = targetCell
         table.dispatch(setFocused(focused))
-        table.dispatch(event.shiftKey ? moveFocusedLeft({ end: false }) : moveFocusedRight({ end: false }))
 
         setTimeout(() => {
-          const newFocused = table.props.focused
-          if (newFocused?.cell) {
-            if (isCellEditable(newFocused.cell.columnKey, newFocused.cell.rowKeyValue)) {
-              table.dispatch(openEditor(newFocused.cell.rowKeyValue, newFocused.cell.columnKey))
-            }
-          }
+          table.dispatch(openEditor(nextCell.rowKeyValue, nextCell.columnKey))
         }, 0)
 
         return
@@ -513,7 +534,7 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
       tableContainer.addEventListener("keydown", handleKeyDown, true)
       return () => tableContainer.removeEventListener("keydown", handleKeyDown, true)
     }
-  }, [p.mode, p.editingMode, editRowId, editColumnId, table, isCellEditable])
+  }, [p.mode, p.editingMode, editRowId, editColumnId, table, getAdjacentEditableCell])
 
   const exportData = useMemo(() => {
     if (p.onSelectionChange && p.selectedRows && p.selectedRows.length > 0) {
@@ -869,28 +890,44 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
                       cellEditor: {
                         content: cellEditorContent => {
                           const column = cellEditorContent.column as Column
+
+                          let editor: ReactNode
                           switch (column.dataType) {
                             case DataType.ProgressIndicator:
-                              return <CellProgressIndicator {...cellEditorContent} textSize={p.textSize} />
+                              editor = <CellProgressIndicator {...cellEditorContent} textSize={p.textSize} />
+                              break
                             case DataType.List:
-                              return <CellInputCombobox {...cellEditorContent} />
+                              editor = <CellInputCombobox {...cellEditorContent} />
+                              break
                             case DataType.Status:
-                              return <CellStatus {...cellEditorContent} textSize={p.textSize} />
+                              editor = <CellStatus {...cellEditorContent} textSize={p.textSize} />
+                              break
                             case DataType.Boolean:
-                              return <CellInputCheckbox {...cellEditorContent} />
+                              editor = <CellInputCheckbox {...cellEditorContent} />
+                              break
                             case DataType.Date:
-                              return <CellInputTextDate {...cellEditorContent} />
+                              editor = <CellInputTextDate {...cellEditorContent} />
+                              break
                             case DataType.Number:
                             case DataType.String:
-                              return (
+                              editor = (
                                 <CellInputTextSingle
                                   {...cellEditorContent}
                                   autoFocus={p.editingMode === EditingMode.Cell}
                                 />
                               )
+                              break
                             default:
                               return null
                           }
+
+                          // Mirror read-mode alignment: Number right, others left.
+                          // `ka-number-editor` right-aligns the input text (see styles.ts).
+                          const isNumber = column.dataType === DataType.Number
+
+                          return (
+                            <span className={`tw flex w-full ${isNumber ? "  ka-number-editor" : ""}`}>{editor}</span>
+                          )
                         },
                       },
 
