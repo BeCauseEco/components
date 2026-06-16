@@ -460,9 +460,21 @@ export const InputText = forwardRef<HTMLInputElement | HTMLTextAreaElement, Inpu
       <Align vertical left hug="width">
         <Spacer xsmall={p.size === "small"} small={p.size === "large"} />
 
-        <Text tiny={p.size === "small"} xsmall={p.size !== "small"} fill={[Color.Error, 700]}>
-          {p.error}
-        </Text>
+        <Align horizontal center hug>
+          <Icon
+            name="error"
+            style="filled"
+            small={p.size === "small"}
+            medium={p.size === "large"}
+            fill={[Color.Error, 700]}
+          />
+
+          <Spacer tiny />
+
+          <Text tiny={p.size === "small"} xsmall={p.size !== "small"} fill={[Color.Error, 700]}>
+            {p.error}
+          </Text>
+        </Align>
       </Align>
     )
   }
