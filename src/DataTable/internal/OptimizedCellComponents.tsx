@@ -172,7 +172,14 @@ export const OptimizedCell = memo(
       )
     }
 
-    return <span className={`tw flex items-center gap-1 ${justify}`}>{content}</span>
+    // Without an end adornment, still bound the content so long text truncates instead of
+    // overflowing the cell (mirrors the end-adornment branch above). The inner `min-w-0 flex-1`
+    // gives the text a bounded width to ellipsize within.
+    return (
+      <span className={`tw flex w-full items-center gap-1 ${justify}`}>
+        <span className={`tw flex min-w-0 flex-1 items-center gap-1 ${justify}`}>{content}</span>
+      </span>
+    )
   },
   (prev, next) =>
     prev.value === next.value &&
