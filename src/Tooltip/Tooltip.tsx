@@ -21,6 +21,10 @@ const triggerWrapperStyle: React.CSSProperties = {
   display: "inline-flex",
   flexDirection: "inherit",
   width: "inherit",
+  // Without this, the trigger is a flex item with the default `min-width: auto` and refuses to
+  // shrink below its content's intrinsic width — breaking text truncation in tooltip-wrapped
+  // table cells (e.g. long titles overflowing and overlapping end adornments). Allow it to shrink.
+  minWidth: 0,
   height: "inherit",
   justifyContent: "inherit",
   alignItems: "inherit",
