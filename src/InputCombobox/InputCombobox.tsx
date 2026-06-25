@@ -73,10 +73,14 @@ export type InputComboboxProps = ComponentBaseProps & {
   /**
    * When provided, displays the combobox trigger as a button with the specified label and optional icon.
    * If undefined, shows the default behavior with selected values.
+   * An empty label with an icon renders an icon-only square button; set `ariaLabel` for its
+   * accessible name.
    */
   button?: {
     label: string
     icon?: string
+    /** Accessible name for an icon-only button (empty label); rendered as the trigger's title. */
+    ariaLabel?: string
   }
 
   tooltip?: string
@@ -294,6 +298,10 @@ export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<InputC
     />
   )
 
+  // An icon-only button (empty label + icon) renders as a compact square via InputButton's
+  // `labelNotSpecified` placement, with `ariaLabel` supplying the accessible name.
+  const isIconOnlyButton = Boolean(p.button && p.button.icon && !p.button.label)
+
   return (
     <Container
       ref={mergedRef}
@@ -327,7 +335,7 @@ export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<InputC
         trigger={
           <InputButton
             size={p.size}
-            width="full"
+            width={isIconOnlyButton ? "auto" : "full"}
             variant="outlined"
             colorForeground={[p.color, 700]}
             borderColor={strokeColor}
@@ -335,28 +343,39 @@ export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<InputC
             colorBackground={p.disabled ? [p.color, 50] : [Color.White, 700]}
             colorBackgroundHover={[p.color, 50]}
             colorLoading={[p.color, 700]}
-            iconName={p.button ? undefined : open ? "keyboard_arrow_up" : "keyboard_arrow_down"}
-            iconPlacement={p.button ? undefined : "afterLabel"}
+            iconName={
+              isIconOnlyButton
+                ? p.button?.icon
+                : p.button
+                  ? undefined
+                  : open
+                    ? "keyboard_arrow_up"
+                    : "keyboard_arrow_down"
+            }
+            iconPlacement={isIconOnlyButton ? "labelNotSpecified" : p.button ? undefined : "afterLabel"}
+            title={isIconOnlyButton ? p.button?.ariaLabel : undefined}
             disabled={p.disabled ? true : undefined}
             loading={p.loading ? true : undefined}
             content={
-              <ComboboxTriggerContent
-                button={p.button}
-                label={p.label}
-                multiple={p.multiple}
-                value={p.value}
-                items={items}
-                size={p.size}
-                color={p.color}
-                disabled={p.disabled}
-                clearable={p.clearable}
-                resettable={p.resettable}
-                required={p.required}
-                tooltip={p.tooltip}
-                textNoSelection={p.textNoSelection}
-                onChange={p.onChange}
-                onRemoveItem={handleRemoveItem}
-              />
+              isIconOnlyButton ? undefined : (
+                <ComboboxTriggerContent
+                  button={p.button}
+                  label={p.label}
+                  multiple={p.multiple}
+                  value={p.value}
+                  items={items}
+                  size={p.size}
+                  color={p.color}
+                  disabled={p.disabled}
+                  clearable={p.clearable}
+                  resettable={p.resettable}
+                  required={p.required}
+                  tooltip={p.tooltip}
+                  textNoSelection={p.textNoSelection}
+                  onChange={p.onChange}
+                  onRemoveItem={handleRemoveItem}
+                />
+              )
             }
           />
         }
