@@ -317,6 +317,8 @@ export type DataTableProps<TData = any> = PlaywrightProps & {
   children?: ReactNode
   editingMode?: EditingMode
   cellPaddingSize?: "none" | "tiny" | "xsmall" | "small" | "medium"
+  /** Row height. "default" is the standard compact row; "large" doubles the row height (e.g. for bigger avatars/logos). */
+  rowHeight?: "default" | "large"
   textSize?: DataTableTextSize
   /** Enable truncation of column header names with ellipsis. Text wraps up to 2 lines and overflows with "..." after that. Full title shown on hover. */
   ellipsisColumnNames?: boolean

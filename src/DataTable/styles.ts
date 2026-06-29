@@ -32,6 +32,9 @@ const getFirstLastCellPadding = (size?: "none" | "tiny" | "xsmall" | "small" | "
   }
 }
 
+const getCellHeight = (rowHeight?: "default" | "large") =>
+  rowHeight === "large" ? "calc(var(--BU) * 20)" : "calc(var(--BU) * 10)"
+
 export const createDataTableStyles = (
   cssScope: string,
   fill?: ColorWithLightness,
@@ -39,6 +42,7 @@ export const createDataTableStyles = (
   cellPaddingSize?: "none" | "tiny" | "xsmall" | "small" | "medium",
   noColumnLines?: boolean,
   borderless?: boolean,
+  rowHeight?: "default" | "large",
 ) => `
   .${cssScope} .ka {
     background-color: unset;
@@ -111,13 +115,14 @@ export const createDataTableStyles = (
 
   .${cssScope} .ka-cell {
     padding: ${getCellPadding(cellPaddingSize)};
-    height: calc(var(--BU) * 10);
+    height: ${getCellHeight(rowHeight)};
     line-height: unset;
     color: unset;
   }
 
   .${cssScope} .ka-cell-text {
     display: flex;
+    align-items: ${rowHeight === "large" ? "center" : "stretch"};
     overflow: hidden;
     width: 100%;
     height: 100%;
