@@ -74,6 +74,32 @@ export type Column = {
   alwaysHidden?: boolean
   maxWidth?: `${number}${"px"}` | `${number}${"%"}`
   minWidth?: `${number}${"px"}` | `${number}${"%"}`
+  /**
+   * How the column reacts to the table's leftover horizontal space.
+   *
+   * - "fit"  — hug content: the column collapses to the widest of its header/cells
+   *            (single line) and does NOT absorb leftover space; the slack goes to a
+   *            grow/fill sibling. Pair with `maxWidth` to cap long content (then
+   *            ellipsis) and `minWidth` for a floor.
+   * - "grow" — share the table's leftover space evenly with other grow columns
+   *            (CSS `width: auto`). The legacy default behaviour.
+   * - "fill" — greedily take ALL leftover space, squeezing grow columns to content
+   *            (CSS `width: 100%`). Equivalent to the deprecated `explodeWidth`.
+   *
+   * When omitted, the mode is resolved by data type (see `resolveColumnSizing` in
+   * ./utils.ts): Boolean, Date, Number, Status and Icon default to "fit"; every
+   * other data type defaults to "grow". `minWidth`/`maxWidth` apply as clamps in
+   * all three modes. Resolution precedence (highest first):
+   *   1. `minWidth === maxWidth` (both set) → fixed exact width.
+   *   2. explicit `sizing`.
+   *   3. `explodeWidth: true` → "fill".
+   *   4. data-type default.
+   */
+  sizing?: "fit" | "grow" | "fill"
+  /**
+   * @deprecated Use `sizing: "fill"` instead. Kept as an alias: when `true` and
+   * `sizing` is not set, the column resolves to "fill" (takes all leftover width).
+   */
   explodeWidth?: boolean
   sort?: (sortDirection: SortDirection) => (a: any, b: any) => number
   avatar?: string | ((rowData: ICellTextProps["rowData"]) => string | ReactElement | undefined)

@@ -21,11 +21,11 @@ import { Tooltip } from "@new/Tooltip/Tooltip"
 
 // Import from our new modular structure
 import { DataTableProps, DataType, Column } from "./types"
-import { formatValue, calculateColumnWidth, computeTotalPages } from "./utils"
+import { formatValue, calculateColumnWidth, computeTotalPages, resolveColumnSizing } from "./utils"
 import { createDataTableStyles } from "./styles"
 import { CellInputTextSingle, CellInputTextDate, CellInputCheckbox, CellInputCombobox } from "./internal/CellEditors"
 import { CellProgressIndicator, CellStatus, CellIcon } from "./internal/CellRenderers"
-import { KEY_ROW_NUMBER, KEY_ACTIONS, TABLE_CELL_EMPTY_STRING } from "./internal/constants"
+import { KEY_ROW_NUMBER, KEY_ACTIONS, KEY_FLEX_FILLER, TABLE_CELL_EMPTY_STRING } from "./internal/constants"
 import { OptimizedCell } from "./internal/OptimizedCellComponents"
 import { DataTablePagination } from "./internal/DataTablePagination"
 import { CsvExportButton } from "./internal/CsvExportButton"
@@ -275,6 +275,7 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
         minWidth: column.minWidth,
         maxWidth: column.maxWidth,
         explodeWidth: column.explodeWidth,
+        sizing: column.sizing,
         // Flatten per-row callbacks to `true` so ka-table treats the column as editable;
         // per-row gating happens in the onDispatch interceptor and cell elementAttributes below.
         isEditable: typeof column.isEditable === "function" ? true : column.isEditable,
@@ -307,6 +308,24 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
     if (p.rowActions) {
       columns.push({
         key: KEY_ACTIONS,
+        title: "",
+        dataType: DataType.Internal,
+        sortDirection: undefined,
+      } as any)
+    }
+
+    // Flex filler: when a table has NO grow/fill column (and no actions column,
+    // which is itself grow), the "fit" columns would still be stretched by the
+    // width:100% table. Inject one inert column that absorbs the leftover so the
+    // fit columns truly hug. This is NOT @new/Spacer — inside an HTML table only a
+    // real <td>/<th> participates in width distribution.
+    const hasFlexibleColumn = columns.some(c => {
+      const sizing = resolveColumnSizing(c as Column)
+      return sizing === "grow" || sizing === "fill"
+    })
+    if (!hasFlexibleColumn) {
+      columns.push({
+        key: KEY_FLEX_FILLER,
         title: "",
         dataType: DataType.Internal,
         sortDirection: undefined,
@@ -354,6 +373,12 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
   // on `column.isEditable`. Used to block ka-table from opening an editor on locked rows.
   const isCellEditable = useCallback(
     (columnKey: string, rowKeyValue: string | number): boolean => {
+      // The injected flex filler is an inert spacer column, not in p.columns; keep it
+      // non-editable so it never gets the editable hover affordance and a click on it
+      // never dispatches OpenEditor (which would close an open editor) in edit mode.
+      if (columnKey === KEY_FLEX_FILLER) {
+        return false
+      }
       const column = p.columns.find(c => c.key === columnKey) as Column | undefined
       if (!column) {
         return true
@@ -605,6 +630,10 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
                             return <></>
                           }
 
+                          if (headCellContent.column.key === KEY_FLEX_FILLER) {
+                            return <></>
+                          }
+
                           if (headCellContent.column.key === KEY_ROW_NUMBER) {
                             return (
                               <span
@@ -698,12 +727,25 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
                         elementAttributes: headCellElementAttributes => {
                           const column = headCellElementAttributes.column as Column
 
+                          const classNames: string[] = []
                           if (p.fixedKeyField === column.key) {
-                            return { className: "override-ka-fixed-left" }
+                            classNames.push("override-ka-fixed-left")
+                          }
+                          if (column.key === KEY_ACTIONS) {
+                            classNames.push("override-ka-fixed-right")
+                          }
+                          if (resolveColumnSizing(column) === "fit") {
+                            classNames.push("ka-cell-fit")
+                          }
+                          if (column.key === KEY_FLEX_FILLER) {
+                            classNames.push("ka-cell-flex-filler")
                           }
 
-                          if (column.key === KEY_ACTIONS) {
-                            return { className: "override-ka-fixed-right" }
+                          const { width, minWidth, maxWidth } = calculateColumnWidth(column)
+
+                          return {
+                            className: classNames.join(" ") || undefined,
+                            style: { width, minWidth, maxWidth },
                           }
                         },
                       },
@@ -721,6 +763,10 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
                           return {}
                         },
                         content: cellTextContent => {
+                          if (cellTextContent.column.key === KEY_FLEX_FILLER) {
+                            return <span className="tw block" />
+                          }
+
                           if (cellTextContent.column.key === KEY_ROW_NUMBER) {
                             const sortedData = kaPropsUtils.getData(table.props)
                             const rowIndex = sortedData.findIndex(
@@ -912,6 +958,14 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
 
                           if (column.dataType === DataType.Icon) {
                             classNames.push("ka-cell-icon")
+                          }
+
+                          if (resolveColumnSizing(column) === "fit") {
+                            classNames.push("ka-cell-fit")
+                          }
+
+                          if (column.key === KEY_FLEX_FILLER) {
+                            classNames.push("ka-cell-flex-filler")
                           }
 
                           const rowKeyValue = (cellElementAttributes?.rowData as any)?.[p.rowKeyField] as

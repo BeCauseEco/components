@@ -158,6 +158,20 @@ export const createDataTableStyles = (
     border-right: ${noColumnLines ? "none" : `dotted 1px ${computeColor(stroke || [Color.Neutral, 100])}`};
   }
 
+  .${cssScope} .ka-cell-fit,
+  .${cssScope} .ka-thead-cell.ka-cell-fit {
+    white-space: nowrap;
+  }
+
+  /* Flex filler column (injected when a table has no grow/fill column) absorbs the
+     table's leftover width so "fit" columns truly hug. It is inert — not @new/Spacer —
+     and must read as empty space, so suppress its own divider and its left
+     neighbour's trailing divider. */
+  .${cssScope} .ka-cell.ka-cell-flex-filler,
+  .${cssScope} .ka-cell:not(:last-child):has(+ .ka-cell.ka-cell-flex-filler) {
+    border-right: none;
+  }
+
   .${cssScope}[data-mode="edit"] .ka-cell.ka-cell-editable:hover {
     background-color: ${computeColor([Color.Neutral, 100])};
     cursor: pointer;
