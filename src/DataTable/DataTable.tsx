@@ -424,7 +424,8 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
   })
 
   const css = useMemo(
-    () => createDataTableStyles(cssScope, p.fill, p.stroke, p.cellPaddingSize, p.noColumnLines, p.borderless, p.rowHeight),
+    () =>
+      createDataTableStyles(cssScope, p.fill, p.stroke, p.cellPaddingSize, p.noColumnLines, p.borderless, p.rowHeight),
     [cssScope, p.fill, p.stroke, p.cellPaddingSize, p.noColumnLines, p.borderless, p.rowHeight],
   )
 
