@@ -39,6 +39,7 @@ export const createDataTableStyles = (
   cellPaddingSize?: "none" | "tiny" | "xsmall" | "small" | "medium",
   noColumnLines?: boolean,
   borderless?: boolean,
+  rowHeight?: "default" | "large",
 ) => `
   .${cssScope} .ka {
     background-color: unset;
@@ -111,7 +112,7 @@ export const createDataTableStyles = (
 
   .${cssScope} .ka-cell {
     padding: ${getCellPadding(cellPaddingSize)};
-    height: calc(var(--BU) * 10);
+    height: ${rowHeight === "large" ? "calc(var(--BU) * 20)" : "calc(var(--BU) * 10)"};
     line-height: unset;
     color: unset;
   }
