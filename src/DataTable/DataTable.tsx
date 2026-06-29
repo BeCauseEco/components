@@ -373,6 +373,12 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
   // on `column.isEditable`. Used to block ka-table from opening an editor on locked rows.
   const isCellEditable = useCallback(
     (columnKey: string, rowKeyValue: string | number): boolean => {
+      // The injected flex filler is an inert spacer column, not in p.columns; keep it
+      // non-editable so it never gets the editable hover affordance and a click on it
+      // never dispatches OpenEditor (which would close an open editor) in edit mode.
+      if (columnKey === KEY_FLEX_FILLER) {
+        return false
+      }
       const column = p.columns.find(c => c.key === columnKey) as Column | undefined
       if (!column) {
         return true
