@@ -320,6 +320,19 @@ export type DataTableProps<TData = any> = PlaywrightProps & {
   textSize?: DataTableTextSize
   /** Enable truncation of column header names with ellipsis. Text wraps up to 2 lines and overflows with "..." after that. Full title shown on hover. */
   ellipsisColumnNames?: boolean
+  /**
+   * Opt-in: stretch the columns to fill the table's width instead of leaving leftover
+   * space in an inert filler column. By default, a table with no "grow"/"fill" column
+   * gets an injected flex-filler that absorbs the leftover width so "fit" columns hug
+   * their content. Set this `true` when every column is an explicit fixed width (no
+   * "fit"/grow/fill) and you want the browser to proportionally stretch those columns to
+   * fill the available width — e.g. the monthly data-grid tables, where the leftover
+   * space should widen the real columns rather than sit as dead space.
+   *
+   * Do NOT use on tables that have "fit" (content-hugging) columns: it would stretch
+   * those columns and defeat their purpose.
+   */
+  stretchColumns?: boolean
 
   /**
    * Before using this, see the DataType enum and/or Column enum for available alternatives - tooltips, links, progress indicators, etc. are all possible using these.
