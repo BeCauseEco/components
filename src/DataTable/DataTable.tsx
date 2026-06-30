@@ -319,11 +319,13 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
     // width:100% table. Inject one inert column that absorbs the leftover so the
     // fit columns truly hug. This is NOT @new/Spacer — inside an HTML table only a
     // real <td>/<th> participates in width distribution.
+    // Opt-out via `stretchColumns`: an all-fixed-width table can instead let the
+    // browser proportionally stretch its real columns to fill the leftover width.
     const hasFlexibleColumn = columns.some(c => {
       const sizing = resolveColumnSizing(c as Column)
       return sizing === "grow" || sizing === "fill"
     })
-    if (!hasFlexibleColumn) {
+    if (!hasFlexibleColumn && !p.stretchColumns) {
       columns.push({
         key: KEY_FLEX_FILLER,
         title: "",
@@ -333,7 +335,7 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
     }
 
     return columns
-  }, [tableColumns, mode, p.rowActions, activeSort, p.showRowNumbers])
+  }, [tableColumns, mode, p.rowActions, activeSort, p.showRowNumbers, p.stretchColumns])
 
   const firstDataColumnKey = useMemo(() => {
     return nativeColumns.find(c => c.key !== KEY_ROW_NUMBER)?.key
