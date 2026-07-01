@@ -2,16 +2,10 @@ import { CSSProperties, ReactElement, ReactNode } from "react"
 import { SortDirection } from "ka-table"
 import { ICellTextProps } from "ka-table/props"
 import { Color, ColorWithLightness } from "@new/Color"
-import { InputButtonPrimaryProps } from "@new/InputButton/InputButtonPrimary"
-import { InputButtonTertiaryProps } from "@new/InputButton/InputButtonTertiary"
-import { InputButtonIconPrimaryProps } from "@new/InputButton/InputButtonIconPrimary"
-import { InputButtonSecondaryProps } from "@new/InputButton/InputButtonSecondary"
-import { InputButtonIconSecondaryProps } from "@new/InputButton/InputButtonIconSecondary"
 import { InputCheckboxProps } from "@new/InputCheckbox/InputCheckbox"
 import { InputComboboxProps } from "@new/InputCombobox/InputCombobox"
 import { InputTextSingleProps } from "@new/InputText/InputTextSingle"
 import { InputTextDateProps } from "@new/InputText/InputTextDate"
-import { PopoverProps } from "@new/Popover/Popover"
 import { EditingMode } from "ka-table"
 import { PlaywrightProps } from "@new/Playwright"
 
@@ -281,15 +275,15 @@ type Children =
   | boolean
   | null
 
-type RowActionsElement =
-  | ReactElement<InputButtonPrimaryProps>
-  | ReactElement<InputButtonIconPrimaryProps>
-  | ReactElement<InputButtonSecondaryProps>
-  | ReactElement<InputButtonIconSecondaryProps>
-  | ReactElement<InputButtonTertiaryProps>
-  | ReactElement<InputButtonIconPrimaryProps>
-  | ReactElement<InputButtonIconPrimaryProps>
-  | ReactElement<PopoverProps>
+/**
+ * An element rendered in a row's action cell. Any React element is accepted:
+ * historically this was restricted to the @new InputButton variants, but it is
+ * widened to `ReactElement` so consumers can pass Tailwind buttons
+ * (`src/components/tw/Button`) per the prefer-tailwind-styling guideline. The
+ * DataTable only renders these via `Children.toArray`, so no button-specific
+ * props are required.
+ */
+type RowActionsElement = ReactElement
 
 export type DataTableProps<TData = any> = PlaywrightProps & {
   mode?: "simple" | "filter" | "edit"
