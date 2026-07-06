@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from "react"
+import React, { ComponentProps, Ref, useCallback, useMemo, useRef, useState } from "react"
 import { Editable, ReactEditor, RenderElementProps, RenderLeafProps, Slate, useSlate, withReact } from "slate-react"
 import { createEditor, Descendant, Editor, Element as SlateElement, Path, Range, Transforms } from "slate"
 import { withHistory } from "slate-history"
@@ -55,9 +55,10 @@ type LinkPopoverProps = {
   trigger: React.ReactElement
   open: boolean
   onOpenChange: (open: boolean) => void
+  container?: HTMLElement
 }
 
-const LinkPopover = ({ onSubmit, onCancel, trigger, open, onOpenChange }: LinkPopoverProps) => {
+const LinkPopover = ({ onSubmit, onCancel, trigger, open, onOpenChange, container }: LinkPopoverProps) => {
   const [url, setUrl] = useState("")
   const [title, setTitle] = useState("")
 
@@ -73,9 +74,15 @@ const LinkPopover = ({ onSubmit, onCancel, trigger, open, onOpenChange }: LinkPo
     <Popover
       trigger={trigger}
       alignment="start"
+      container={container}
       open={open}
       onOpenChange={next => {
-        if (!next) {
+        if (next) {
+          // LinkPopover stays mounted across open/close cycles (the trigger is always in the
+          // toolbar), so stale values from the previous link would linger — clear them on open.
+          setUrl("")
+          setTitle("")
+        } else {
           onCancel()
         }
         onOpenChange(next)
@@ -126,22 +133,29 @@ const LinkPopover = ({ onSubmit, onCancel, trigger, open, onOpenChange }: LinkPo
   )
 }
 
-const LinkToolbarButton = ({ onOpen }: { onOpen: () => void }) => {
+type LinkToolbarButtonProps = ComponentProps<"button"> & {
+  ref?: Ref<HTMLButtonElement>
+}
+
+// Used as the `asChild` child of Radix Popover.Trigger, which injects props onto this element:
+// `ref` (the popper anchor) and `onClick` (open/close toggle). Both MUST reach the DOM button —
+// without the anchor ref, Radix cannot position the popover and parks it off-screen
+// (`translate(0, -200%)`), which reads as "the button does nothing".
+const LinkToolbarButton = ({ ref, ...props }: LinkToolbarButtonProps) => {
   const editor = useSlate()
   const disabled = !editor.selection || Range.isCollapsed(editor.selection)
   const title = disabled ? "Link (select text first)" : TOOLBAR_ITEMS.link.label
   return (
     <LinkToolbarButtonEl
+      {...props}
+      ref={ref}
       type="button"
       disabled={disabled}
       title={title}
       aria-label={TOOLBAR_ITEMS.link.label}
-      onMouseDown={event => {
-        event.preventDefault()
-        if (!disabled) {
-          onOpen()
-        }
-      }}
+      // preventDefault keeps focus — and thereby the Slate text selection being linked — in the
+      // editor. Opening is left to Radix's injected click handler above.
+      onMouseDown={event => event.preventDefault()}
     >
       <Icon name="link" fill={disabled ? [Color.Neutral, 300] : [Color.Neutral, 900]} small />
     </LinkToolbarButtonEl>
@@ -213,6 +227,8 @@ export const RichTextEditor = React.forwardRef<HTMLDivElement, RichTextEditorPro
     const editor = useMemo(() => createEditorWithPlugins(createEditor()), [])
     const [currentCounter, setCurrentCounter] = useState(countCharactersInNode(value))
     const [isLinkDialogOpen, setLinkDialogOpen] = useState(false)
+    const wrapperRef = useRef<HTMLDivElement | null>(null)
+    const [linkDialogContainer, setLinkDialogContainer] = useState<HTMLElement | undefined>(undefined)
 
     const handleAddLink = ({ url, title }: LinkValues) => {
       if (!url) {
@@ -248,11 +264,23 @@ export const RichTextEditor = React.forwardRef<HTMLDivElement, RichTextEditorPro
       }
     }
 
-    const openLinkDialog = () => setLinkDialogOpen(true)
     const closeLinkDialog = () => setLinkDialogOpen(false)
     const submitLinkDialog = (values: LinkValues) => {
       closeLinkDialog()
       handleAddLink(values)
+    }
+
+    // A native <dialog> opened with showModal() renders in the browser's top layer, above
+    // anything portaled to document.body — the popover's default portal target. When the editor
+    // sits inside such a dialog, portal the link popover INTO it so it stays visible (same fix
+    // as TooltipPopper; see the detailed comment there). Resolved at open time because the
+    // ancestry can change between opens; outside a modal dialog this stays undefined and the
+    // default body portal is kept.
+    const handleLinkDialogOpenChange = (next: boolean) => {
+      if (next) {
+        setLinkDialogContainer(wrapperRef.current?.closest("dialog") ?? undefined)
+      }
+      setLinkDialogOpen(next)
     }
 
     const handleChange = (val: Descendant[]) => {
@@ -274,7 +302,7 @@ export const RichTextEditor = React.forwardRef<HTMLDivElement, RichTextEditorPro
     }
 
     return (
-      <Wrapper>
+      <Wrapper ref={wrapperRef}>
         {label && <Label>{label}</Label>}
         <EditorBox
           ref={ref}
@@ -310,10 +338,11 @@ export const RichTextEditor = React.forwardRef<HTMLDivElement, RichTextEditorPro
                   <LinkPopover
                     key="link"
                     open={isLinkDialogOpen}
-                    onOpenChange={setLinkDialogOpen}
+                    onOpenChange={handleLinkDialogOpenChange}
                     onSubmit={submitLinkDialog}
                     onCancel={closeLinkDialog}
-                    trigger={<LinkToolbarButton onOpen={openLinkDialog} />}
+                    container={linkDialogContainer}
+                    trigger={<LinkToolbarButton />}
                   />
                   {!disableTooltips && (
                     <TooltipButton key="tooltip" label={TOOLBAR_ITEMS.tooltip.label}>
