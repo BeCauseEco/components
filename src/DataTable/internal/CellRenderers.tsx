@@ -13,7 +13,16 @@ type CellRendererProps = (ICellTextProps | ICellEditorProps) & {
 
 export const CellProgressIndicator = (cellTextProps: CellRendererProps) => {
   const progressIndicator = cellTextProps.column["progressIndicator"] as Column["progressIndicator"]
-  const { value, color } = progressIndicator?.configure(cellTextProps.rowData) || { value: 0, color: Color.Neutral }
+  const configured = progressIndicator?.configure(cellTextProps.rowData)
+
+  // configure returning undefined means "no value for this row" — show the column
+  // placeholder like the text renderers do instead of an empty 0% bar.
+  if (!configured) {
+    const placeholder = (cellTextProps.column["placeholder"] as Column["placeholder"]) || TABLE_CELL_EMPTY_STRING
+    return <span className="font-mono text-sm text-neutral-700">{placeholder}</span>
+  }
+
+  const { value, color } = configured
   const startAdornment = cellTextProps.column["startAdornment"] as Column["startAdornment"]
   const endAdornment = cellTextProps.column["endAdornment"] as Column["endAdornment"]
 
