@@ -619,7 +619,9 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
                     data={displayData}
                     rowKeyField={String(p.rowKeyField)}
                     selectedRows={p.selectedRows || []}
-                    sortingMode={p.disableSorting ? SortingMode.None : SortingMode.Single}
+                    sortingMode={
+                      p.disableSorting ? SortingMode.None : isServerMode ? SortingMode.SingleRemote : SortingMode.Single
+                    }
                     editingMode={p.editingMode}
                     noData={{ text: p.noDataText || "Nothing found" }}
                     searchText={filter}
