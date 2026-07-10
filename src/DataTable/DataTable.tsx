@@ -690,7 +690,8 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
                           const headerJustify = alignmentRight ? "justify-end" : "justify-start"
                           const headerContent = (
                             <div className={`tw flex items-center min-w-0 ${headerJustify}`}>
-                              {allowSort || headCellContentAsColumn.sort ? (
+                              {(allowSort || headCellContentAsColumn.sort) &&
+                              headCellContentAsColumn.disableSort !== true ? (
                                 <a
                                   className="tw flex min-w-0 cursor-pointer items-center gap-0.5 select-none"
                                   onClick={() => table.updateSortDirection(headCellContent.column.key)}
