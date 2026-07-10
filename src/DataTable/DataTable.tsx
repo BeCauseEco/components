@@ -115,6 +115,15 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
     direction: p.defaultSortDirection,
   })
 
+  // The sort transition is computed here (not in a functional setState updater) because
+  // onSortChange needs the resulting value synchronously, and side effects inside a
+  // setState updater are unsafe — StrictMode may invoke updaters twice. The ref keeps
+  // this callback reading the latest committed sort state.
+  const activeSortRef = useRef(activeSort)
+  useEffect(() => {
+    activeSortRef.current = activeSort
+  }, [activeSort])
+
   // alwaysHidden columns are stripped from ka-table's input so they have zero render cost.
   // CsvExportButton still receives the full p.columns so it can include them in the export.
   const tableColumns = useMemo(() => p.columns.filter(c => !c.alwaysHidden), [p.columns])
@@ -402,15 +411,16 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
       // Track sort state changes so nativeColumns stays in sync with ka-table's internal state.
       // For SortingMode.Single: Ascend ↔ Descend, clicking a new column starts at Ascend.
       if (d.type === "UpdateSortDirection") {
-        setActiveSort(prev => {
-          if (d.columnKey === prev.column) {
-            return {
-              column: d.columnKey,
-              direction: prev.direction === SortDirection.Ascend ? SortDirection.Descend : SortDirection.Ascend,
-            }
-          }
-          return { column: d.columnKey, direction: SortDirection.Ascend }
-        })
+        const prev = activeSortRef.current
+        const next =
+          d.columnKey === prev.column
+            ? {
+                column: d.columnKey,
+                direction: prev.direction === SortDirection.Ascend ? SortDirection.Descend : SortDirection.Ascend,
+              }
+            : { column: d.columnKey, direction: SortDirection.Ascend }
+        setActiveSort(next)
+        p.onSortChange?.(next.column, next.direction)
       }
 
       const rowKeyValue = d.rowKeyValue
@@ -609,7 +619,12 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
                     data={displayData}
                     rowKeyField={String(p.rowKeyField)}
                     selectedRows={p.selectedRows || []}
-                    sortingMode={p.disableSorting ? SortingMode.None : SortingMode.Single}
+                    // SingleRemote makes ka-table skip its client-side sortData for server pages while
+                    // header clicks still dispatch UpdateSortDirection — verified against ka-table 12.0.3;
+                    // re-check this contract on ka-table upgrades.
+                    sortingMode={
+                      p.disableSorting ? SortingMode.None : isServerMode ? SortingMode.SingleRemote : SortingMode.Single
+                    }
                     editingMode={p.editingMode}
                     noData={{ text: p.noDataText || "Nothing found" }}
                     searchText={filter}
@@ -661,8 +676,15 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
                           const firstColumn = headCellContent.column.key === firstDataColumnKey
 
                           const headCellContentAsColumn = headCellContent.column as Column
+                          // In server pagination the table never sorts data itself, so header clicks only have
+                          // an effect through onSortChange — without it a clickable header would be an inert no-op.
+                          const serverSortInert = isServerMode && !p.onSortChange
                           const allowSort =
-                            !p.disableSorting && mode !== "edit" && headCellContentAsColumn.dataType !== DataType.Status
+                            !p.disableSorting &&
+                            mode !== "edit" &&
+                            headCellContentAsColumn.dataType !== DataType.Status &&
+                            headCellContentAsColumn.disableSort !== true &&
+                            !serverSortInert
 
                           const fullTitle = headCellContent.column.title
                           const titleSizeCls = sizeClass(textSize, "xsmall")
@@ -679,7 +701,10 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
                           const headerJustify = alignmentRight ? "justify-end" : "justify-start"
                           const headerContent = (
                             <div className={`tw flex items-center min-w-0 ${headerJustify}`}>
-                              {allowSort || headCellContentAsColumn.sort ? (
+                              {allowSort ||
+                              (headCellContentAsColumn.sort &&
+                                headCellContentAsColumn.disableSort !== true &&
+                                !serverSortInert) ? (
                                 <a
                                   className="tw flex min-w-0 cursor-pointer items-center gap-0.5 select-none"
                                   onClick={() => table.updateSortDirection(headCellContent.column.key)}

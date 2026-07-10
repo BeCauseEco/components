@@ -96,6 +96,8 @@ export type Column = {
    */
   explodeWidth?: boolean
   sort?: (sortDirection: SortDirection) => (a: any, b: any) => number
+  /** When true, this column's header is not clickable for sorting. */
+  disableSort?: boolean
   avatar?: string | ((rowData: ICellTextProps["rowData"]) => string | ReactElement | undefined)
   link?: (rowData: ICellTextProps["rowData"]) => string | (() => void) | undefined
   tooltip?: ((rowData: ICellTextProps["rowData"]) => ReactElement | string | undefined) | boolean
@@ -299,6 +301,13 @@ export type DataTableProps<TData = any> = PlaywrightProps & {
   loading?: boolean
   loadingElement?: ReactElement
   disableSorting?: boolean
+  /**
+   * Called when the user clicks a sortable header, with the column key and the sort
+   * direction the table is switching to. In server pagination mode the table never
+   * sorts the data itself — supply this to refetch with server-side sort params. The
+   * header arrow reflects the new sort immediately.
+   */
+  onSortChange?: (columnKey: string, direction: SortDirection) => void
   rowActions?: (rowData: TData) => RowActionsElement[]
   onChange?: (value: TData[]) => void
   onChangeRow?: (value: TData) => void
