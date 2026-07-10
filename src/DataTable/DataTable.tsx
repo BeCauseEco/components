@@ -115,8 +115,10 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
     direction: p.defaultSortDirection,
   })
 
-  // ka-table stores onDispatch once; the ref keeps the sort transition based on the
-  // latest state rather than a stale closure.
+  // The sort transition is computed here (not in a functional setState updater) because
+  // onSortChange needs the resulting value synchronously, and side effects inside a
+  // setState updater are unsafe — StrictMode may invoke updaters twice. The ref keeps
+  // this callback reading the latest committed sort state.
   const activeSortRef = useRef(activeSort)
   useEffect(() => {
     activeSortRef.current = activeSort
