@@ -619,6 +619,9 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
                     data={displayData}
                     rowKeyField={String(p.rowKeyField)}
                     selectedRows={p.selectedRows || []}
+                    // SingleRemote makes ka-table skip its client-side sortData for server pages while
+                    // header clicks still dispatch UpdateSortDirection — verified against ka-table 12.0.3;
+                    // re-check this contract on ka-table upgrades.
                     sortingMode={
                       p.disableSorting ? SortingMode.None : isServerMode ? SortingMode.SingleRemote : SortingMode.Single
                     }
@@ -673,11 +676,15 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
                           const firstColumn = headCellContent.column.key === firstDataColumnKey
 
                           const headCellContentAsColumn = headCellContent.column as Column
+                          // In server pagination the table never sorts data itself, so header clicks only have
+                          // an effect through onSortChange — without it a clickable header would be an inert no-op.
+                          const serverSortInert = isServerMode && !p.onSortChange
                           const allowSort =
                             !p.disableSorting &&
                             mode !== "edit" &&
                             headCellContentAsColumn.dataType !== DataType.Status &&
-                            headCellContentAsColumn.disableSort !== true
+                            headCellContentAsColumn.disableSort !== true &&
+                            !serverSortInert
 
                           const fullTitle = headCellContent.column.title
                           const titleSizeCls = sizeClass(textSize, "xsmall")
@@ -694,8 +701,10 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
                           const headerJustify = alignmentRight ? "justify-end" : "justify-start"
                           const headerContent = (
                             <div className={`tw flex items-center min-w-0 ${headerJustify}`}>
-                              {(allowSort || headCellContentAsColumn.sort) &&
-                              headCellContentAsColumn.disableSort !== true ? (
+                              {allowSort ||
+                              (headCellContentAsColumn.sort &&
+                                headCellContentAsColumn.disableSort !== true &&
+                                !serverSortInert) ? (
                                 <a
                                   className="tw flex min-w-0 cursor-pointer items-center gap-0.5 select-none"
                                   onClick={() => table.updateSortDirection(headCellContent.column.key)}
