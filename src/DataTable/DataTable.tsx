@@ -115,6 +115,13 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
     direction: p.defaultSortDirection,
   })
 
+  // ka-table stores onDispatch once; the ref keeps the sort transition based on the
+  // latest state rather than a stale closure.
+  const activeSortRef = useRef(activeSort)
+  useEffect(() => {
+    activeSortRef.current = activeSort
+  }, [activeSort])
+
   // alwaysHidden columns are stripped from ka-table's input so they have zero render cost.
   // CsvExportButton still receives the full p.columns so it can include them in the export.
   const tableColumns = useMemo(() => p.columns.filter(c => !c.alwaysHidden), [p.columns])
@@ -402,15 +409,16 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
       // Track sort state changes so nativeColumns stays in sync with ka-table's internal state.
       // For SortingMode.Single: Ascend ↔ Descend, clicking a new column starts at Ascend.
       if (d.type === "UpdateSortDirection") {
-        setActiveSort(prev => {
-          if (d.columnKey === prev.column) {
-            return {
-              column: d.columnKey,
-              direction: prev.direction === SortDirection.Ascend ? SortDirection.Descend : SortDirection.Ascend,
-            }
-          }
-          return { column: d.columnKey, direction: SortDirection.Ascend }
-        })
+        const prev = activeSortRef.current
+        const next =
+          d.columnKey === prev.column
+            ? {
+                column: d.columnKey,
+                direction: prev.direction === SortDirection.Ascend ? SortDirection.Descend : SortDirection.Ascend,
+              }
+            : { column: d.columnKey, direction: SortDirection.Ascend }
+        setActiveSort(next)
+        p.onSortChange?.(next.column, next.direction)
       }
 
       const rowKeyValue = d.rowKeyValue
@@ -662,7 +670,10 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
 
                           const headCellContentAsColumn = headCellContent.column as Column
                           const allowSort =
-                            !p.disableSorting && mode !== "edit" && headCellContentAsColumn.dataType !== DataType.Status
+                            !p.disableSorting &&
+                            mode !== "edit" &&
+                            headCellContentAsColumn.dataType !== DataType.Status &&
+                            headCellContentAsColumn.disableSort !== true
 
                           const fullTitle = headCellContent.column.title
                           const titleSizeCls = sizeClass(textSize, "xsmall")
