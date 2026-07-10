@@ -154,10 +154,15 @@ export const buildCsv = (columns: Column[], rows: any[]): string => {
   return BOM + [headerLine, ...dataLines].join("\r\n")
 }
 
-/** Builds the filename: `<filename>.csv` or `<filename> <yyyyMMddHHmmss>.csv` (timestamp in UTC). */
-export const buildCsvFilename = (filenameBase: string, appendTimestamp: boolean, now: Date = new Date()): string => {
+/** Builds the filename: `<filename>.<extension>` or `<filename> <yyyyMMddHHmmss>.<extension>` (timestamp in UTC). */
+export const buildTimestampedFilename = (
+  filenameBase: string,
+  extension: string,
+  appendTimestamp: boolean,
+  now: Date = new Date(),
+): string => {
   if (!appendTimestamp) {
-    return `${filenameBase}.csv`
+    return `${filenameBase}.${extension}`
   }
   const yyyy = now.getUTCFullYear()
   const MM = padTwo(now.getUTCMonth() + 1)
@@ -166,8 +171,12 @@ export const buildCsvFilename = (filenameBase: string, appendTimestamp: boolean,
   const mm = padTwo(now.getUTCMinutes())
   const ss = padTwo(now.getUTCSeconds())
   const timestamp = `${yyyy}${MM}${dd}${HH}${mm}${ss}`
-  return `${filenameBase} ${timestamp}.csv`
+  return `${filenameBase} ${timestamp}.${extension}`
 }
+
+/** Builds the filename: `<filename>.csv` or `<filename> <yyyyMMddHHmmss>.csv` (timestamp in UTC). */
+export const buildCsvFilename = (filenameBase: string, appendTimestamp: boolean, now: Date = new Date()): string =>
+  buildTimestampedFilename(filenameBase, "csv", appendTimestamp, now)
 
 /** Triggers a browser download of the given CSV string. */
 export const triggerCsvDownload = (csv: string, filename: string): void => {
