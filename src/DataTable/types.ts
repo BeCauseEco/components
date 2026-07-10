@@ -45,13 +45,15 @@ export type ServerPagination = {
 export type PaginationConfig = ClientPagination | ServerPagination
 
 export type DataTableExportConfig = {
-  /** When true, renders a CSV-download button in the filter row, top-right. */
+  /** When true, renders an export button in the filter row, top-right, downloading an
+   *  .xlsx with typed cells (numbers stored as numbers — locale-proof in Excel).
+   *  The name predates the .xlsx format; it means "allow export". */
   allowCsv: boolean
   /** Base filename, without extension. Example: "Application progress". */
   filename: string
-  /** When true, appends a UTC timestamp (`yyyyMMddHHmmss`) before the `.csv` extension. */
+  /** When true, appends a UTC timestamp (`yyyyMMddHHmmss`) before the file extension. */
   appendTimestampToFilename?: boolean
-  /** Optional callback invoked after a successful CSV download. Use for analytics. */
+  /** Optional callback invoked after a successful export download. Use for analytics. */
   onExport?: () => void
 }
 
@@ -261,11 +263,12 @@ export type Column = {
 
   fill?: ((rowData: ICellTextProps["rowData"]) => Color | undefined) | Color | undefined
 
-  /** When present, this column emits N CSV columns instead of 1. Used when a single
-   *  display column shows joined fields ("12.345, -67.890") but the CSV needs them
+  /** When present, this column emits N export columns instead of 1. Used when a single
+   *  display column shows joined fields ("12.345, -67.890") but the export needs them
    *  split for downstream import workflows. The function must return the same number
    *  of entries in the same order for every row, or columns will misalign. Headers
-   *  come from each entry's `title` (the column's own `title` is ignored for CSV). */
+   *  come from each entry's `title` (the column's own `title` is ignored for exports).
+   *  The name predates the .xlsx export format. */
   csvExpand?: (rowData: ICellTextProps["rowData"]) => { title: string; value: string }[]
 }
 
@@ -348,12 +351,12 @@ export type DataTableProps<TData = any> = PlaywrightProps & {
   noDataText?: string
   /** When true, prepends a "#" column showing the 1-indexed row number for each row. */
   showRowNumbers?: boolean
-  /** When set with `allowCsv: true`, renders a CSV-download button in the filter row.
+  /** When set with `allowCsv: true`, renders an .xlsx-export button in the filter row.
    *  Exports every row in `data` (or, when `onSelectionChange` is set and at least one
    *  row is selected, just the selected rows) — ignoring search/sort/pagination — and
    *  every column except `DataType.Internal` and `DataType.Object`. Columns with
-   *  `alwaysHidden: true` are always included in the CSV even though they never render
-   *  in the table; columns with `csvExpand` produce N CSV columns each. */
+   *  `alwaysHidden: true` are always included in the export even though they never render
+   *  in the table; columns with `csvExpand` produce N export columns each. */
   enableExports?: DataTableExportConfig
   /** When provided and it returns true for a row, that row's cells are rendered dimmed
    *  (reduced opacity) to signal a disabled/inactive state. Purely cosmetic — independent

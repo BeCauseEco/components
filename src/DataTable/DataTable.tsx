@@ -28,7 +28,7 @@ import { CellProgressIndicator, CellStatus, CellIcon } from "./internal/CellRend
 import { KEY_ROW_NUMBER, KEY_ACTIONS, KEY_FLEX_FILLER, TABLE_CELL_EMPTY_STRING } from "./internal/constants"
 import { OptimizedCell } from "./internal/OptimizedCellComponents"
 import { DataTablePagination } from "./internal/DataTablePagination"
-import { CsvExportButton } from "./internal/CsvExportButton"
+import { ExportButton } from "./internal/ExportButton"
 import { getDisplayableColumns } from "./internal/exportToCsv"
 import { sizeClass } from "./internal/textSize"
 
@@ -125,7 +125,7 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
   }, [activeSort])
 
   // alwaysHidden columns are stripped from ka-table's input so they have zero render cost.
-  // CsvExportButton still receives the full p.columns so it can include them in the export.
+  // ExportButton still receives the full p.columns so it can include them in the export.
   const tableColumns = useMemo(() => p.columns.filter(c => !c.alwaysHidden), [p.columns])
 
   // Apply the search filter to the full dataset BEFORE pagination slicing.
@@ -492,8 +492,8 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
     }
   }, [editRowId, p.editingMode, table])
 
-  const showCsvExportButton = p.enableExports?.allowCsv === true
-  const hasFilters = mode === "filter" || Children.toArray(p.children).length > 0 || showCsvExportButton
+  const showExportButton = p.enableExports?.allowCsv === true
+  const hasFilters = mode === "filter" || Children.toArray(p.children).length > 0 || showExportButton
 
   // Add keyboard navigation support for edit mode
   useEffect(() => {
@@ -581,8 +581,8 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
               {mode === "filter" ? <SearchInput onDebouncedChange={handleSearchChange} /> : null}
               {Children.toArray(p.children)}
             </div>
-            {showCsvExportButton && p.enableExports && (
-              <CsvExportButton
+            {showExportButton && p.enableExports && (
+              <ExportButton
                 config={p.enableExports}
                 columns={p.columns}
                 data={exportData}
