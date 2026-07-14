@@ -35,6 +35,9 @@ import { sizeClass } from "./internal/textSize"
 
 const DIMMED_ROW_OPACITY = 0.55
 
+// Module constant so the Table receives a referentially stable virtualScrolling prop.
+const VIRTUAL_SCROLLING_ENABLED = { enabled: true }
+
 // Re-export for backward compatibility
 export { SortDirection } from "ka-table"
 export { DataType } from "./types"
@@ -93,10 +96,11 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
   // the internal scroll wrapper's scrollTop — without maxHeight that wrapper never scrolls
   // (the page does) and rows that are actually visible would be windowed out. ka-table reads
   // this prop at mount only (it is not among its controlled-prop keys); scroll state then
-  // lives in its internal reducer, so our re-renders never reset the scroll position.
+  // lives in its internal reducer, so our re-renders never reset the scroll position —
+  // verified against ka-table 12.0.3; re-check this contract on ka-table upgrades.
   const virtualScrolling =
     p.pagination?.mode === "off" && unpaginatedMaxHeight && p.pagination.virtualize !== false
-      ? { enabled: true }
+      ? VIRTUAL_SCROLLING_ENABLED
       : undefined
 
   const DEFAULT_PAGE_SIZE = 25
