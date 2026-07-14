@@ -34,10 +34,16 @@ export type ClientPagination = {
 
 /**
  * Disables pagination entirely: every row renders and the pagination footer never shows.
- * For long datasets, pair with a bounded scroll container around the table.
+ * The header row sticks to the top of the table's internal scroll wrapper while scrolling.
  */
 export type PaginationOff = {
   mode: "off"
+  /**
+   * Bounds the table body (the internal scroll wrapper) so rows scroll inside it under the
+   * sticky header. Any CSS length, e.g. "400px" or "calc(80vh - 320px)". Without it the
+   * table grows to its content and scrolling falls to the page/container instead.
+   */
+  maxHeight?: string
 }
 
 export type ServerPagination = {
