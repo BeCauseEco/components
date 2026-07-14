@@ -32,6 +32,14 @@ export type ClientPagination = {
   pageSizeOptions?: number[]
 }
 
+/**
+ * Disables pagination entirely: every row renders and the pagination footer never shows.
+ * For long datasets, pair with a bounded scroll container around the table.
+ */
+export type PaginationOff = {
+  mode: "off"
+}
+
 export type ServerPagination = {
   mode: "server"
   pageIndex: number
@@ -42,7 +50,7 @@ export type ServerPagination = {
   pageSizeOptions?: number[]
 }
 
-export type PaginationConfig = ClientPagination | ServerPagination
+export type PaginationConfig = ClientPagination | ServerPagination | PaginationOff
 
 export type DataTableExportConfig = {
   /** When true, renders an export button in the filter row, top-right, downloading an

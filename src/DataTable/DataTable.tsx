@@ -84,16 +84,18 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
 
   const textSize = p.textSize
   const isServerMode = p.pagination?.mode === "server"
+  const isPaginationOff = p.pagination?.mode === "off"
 
   const DEFAULT_PAGE_SIZE = 25
+  const configuredPageSize = p.pagination && p.pagination.mode !== "off" ? p.pagination.pageSize : undefined
 
   const [filter, setFilter] = useState("")
   const [clientPageIndex, setClientPageIndex] = useState(0)
-  const [clientPageSize, setClientPageSize] = useState(p.pagination?.pageSize ?? DEFAULT_PAGE_SIZE)
+  const [clientPageSize, setClientPageSize] = useState(configuredPageSize ?? DEFAULT_PAGE_SIZE)
   // Captured once: the page size the table started with. Used to keep the
   // pagination footer (and its page-size selector) visible after the user
   // enlarges the page size past the row count, so they can change it back.
-  const initialClientPageSize = useRef(p.pagination?.pageSize ?? DEFAULT_PAGE_SIZE)
+  const initialClientPageSize = useRef(configuredPageSize ?? DEFAULT_PAGE_SIZE)
   const pageResetKey = `${filter}|${p.pagination?.mode ?? ""}`
   const [lastPageResetKey, setLastPageResetKey] = useState(pageResetKey)
   if (pageResetKey !== lastPageResetKey) {
@@ -225,7 +227,9 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
         setClientPageSize(newSize)
         setClientPageIndex(0)
       },
-      pageSizeOptions: p.pagination?.pageSizeOptions ?? [10, 25, 50, 100],
+      pageSizeOptions: (p.pagination?.mode === "client" ? p.pagination.pageSizeOptions : undefined) ?? [
+        10, 25, 50, 100,
+      ],
     }
   }, [p.pagination, searchedData.length, clientPageIndex, clientPageSize])
 
@@ -233,9 +237,12 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
     if (isServerMode) {
       return p.data
     }
+    if (isPaginationOff) {
+      return sortedData
+    }
     const start = paginationConfig.pageIndex * paginationConfig.pageSize
     return sortedData.slice(start, start + paginationConfig.pageSize)
-  }, [p.data, sortedData, paginationConfig, isServerMode])
+  }, [p.data, sortedData, paginationConfig, isServerMode, isPaginationOff])
 
   // Show the pagination footer when there is more than one page, OR when the
   // user has changed the (client) page size away from its initial value. The
@@ -243,7 +250,7 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
   // page size past the row count can still change it back. Server-mode page
   // size is parent-controlled, so the user-changed check only applies client side.
   const userChangedClientPageSize = !isServerMode && clientPageSize !== initialClientPageSize.current
-  const showPagination = paginationConfig.totalPages > 1 || userChangedClientPageSize
+  const showPagination = !isPaginationOff && (paginationConfig.totalPages > 1 || userChangedClientPageSize)
 
   const selectedFields = useMemo(() => {
     if (!p.selectedRows) {
