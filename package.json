@@ -29,7 +29,7 @@
     "ka-table": "^12.0.3",
     "lucide-react": "^1.14.0",
     "next": "^16.2.4",
-    "react": "^19.2.5",
+    "react": "19.2.6",
     "react-is": "^19.2.5",
     "react-virtuoso": "^4.18.6",
     "react-window": "2.2.7",
@@ -60,6 +60,7 @@
     "eslint-plugin-react": "^7.37.5",
     "globals": "^17.5.0",
     "prettier": "^3.8.3",
+    "react-dom": "19.2.6",
     "typescript": "^6.0.3"
   },
   "//resolutions": "Force @typescript-eslint/utils >= 8.59 everywhere. eslint-config-next bundles typescript-eslint@8.48 whose @typescript-eslint/utils still does `class FlatESLint extends use_at_your_own_risk.FlatESLint` directly, which crashes under ESLint 10 (FlatESLint was removed). 8.59+ falls back to ESLint when FlatESLint is undefined. Remove this resolution once eslint-config-next ships with typescript-eslint >= 8.49.",
