@@ -613,7 +613,12 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
                       get properly reset when editingMode prop changes dynamically after initial render.
                       Without this key, cells remain editable even after switching from EditingMode.Cell to None.
                     */}
-                  <ScrollEdgeFades suppressLeft={Boolean(p.fixedKeyField)} suppressRight={Boolean(p.rowActions)}>
+                  {/* Same remount key as the Table below: a remount replaces the scroll wrapper's DOM, so the fades' observers must re-attach to the new nodes. */}
+                  <ScrollEdgeFades
+                    key={p.editingMode === EditingMode.Cell ? "cell-edit" : "readonly"}
+                    suppressLeft={Boolean(p.fixedKeyField)}
+                    suppressRight={Boolean(p.rowActions)}
+                  >
                     <Table
                       key={p.editingMode === EditingMode.Cell ? "cell-edit" : "readonly"}
                       table={table}
