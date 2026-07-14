@@ -301,6 +301,24 @@ export const createDataTableStyles = (
     height: inherit;
   }
 
+  .${cssScope} .scroll-edge-fade {
+    position: absolute;
+    top: 0;
+    width: calc(var(--BU) * 10);
+    pointer-events: none;
+    z-index: 4; /* above the sticky header cells (z-index 3) so clipped header text fades too */
+  }
+
+  .${cssScope} .scroll-edge-fade-left {
+    left: 0;
+    background: linear-gradient(to right, ${computeColor(fill || [Color.White])}, transparent);
+  }
+
+  .${cssScope} .scroll-edge-fade-right {
+    right: 0;
+    background: linear-gradient(to left, ${computeColor(fill || [Color.White])}, transparent);
+  }
+
   @media print {
     .ka {
       zoom: 0.5 !important;
@@ -322,6 +340,10 @@ export const createDataTableStyles = (
       width: auto !important;
       min-width: auto !important;
       background-color: unset !important;
+    }
+
+    .${cssScope} .scroll-edge-fade {
+      display: none !important;
     }
   }
 `
