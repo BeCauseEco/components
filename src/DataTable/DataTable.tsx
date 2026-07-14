@@ -86,6 +86,18 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
   const isServerMode = p.pagination?.mode === "server"
   const isPaginationOff = p.pagination?.mode === "off"
 
+  // With pagination off every row lives in the table, so windowing keeps large datasets
+  // cheap: ka-table mounts only the rows near the viewport and measures row height and
+  // viewport from the first rendered row. Gated on maxHeight because the windowing follows
+  // the internal scroll wrapper's scrollTop — without maxHeight that wrapper never scrolls
+  // (the page does) and rows that are actually visible would be windowed out. ka-table reads
+  // this prop at mount only (it is not among its controlled-prop keys); scroll state then
+  // lives in its internal reducer, so our re-renders never reset the scroll position.
+  const virtualScrolling =
+    p.pagination?.mode === "off" && p.pagination.maxHeight && p.pagination.virtualize !== false
+      ? { enabled: true }
+      : undefined
+
   const DEFAULT_PAGE_SIZE = 25
   const configuredPageSize = p.pagination && p.pagination.mode !== "off" ? p.pagination.pageSize : undefined
 
@@ -653,6 +665,7 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
                             : SortingMode.Single
                       }
                       editingMode={p.editingMode}
+                      virtualScrolling={virtualScrolling}
                       noData={{ text: p.noDataText || "Nothing found" }}
                       searchText={filter}
                       search={({ searchText: searchTextValue, rowData, column }) => {
