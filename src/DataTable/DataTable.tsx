@@ -85,6 +85,7 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
   const textSize = p.textSize
   const isServerMode = p.pagination?.mode === "server"
   const isPaginationOff = p.pagination?.mode === "off"
+  const unpaginatedMaxHeight = p.pagination?.mode === "off" ? p.pagination.maxHeight : undefined
 
   // With pagination off every row lives in the table, so windowing keeps large datasets
   // cheap: ka-table mounts only the rows near the viewport and measures row height and
@@ -94,7 +95,7 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
   // this prop at mount only (it is not among its controlled-prop keys); scroll state then
   // lives in its internal reducer, so our re-renders never reset the scroll position.
   const virtualScrolling =
-    p.pagination?.mode === "off" && p.pagination.maxHeight && p.pagination.virtualize !== false
+    p.pagination?.mode === "off" && unpaginatedMaxHeight && p.pagination.virtualize !== false
       ? { enabled: true }
       : undefined
 
@@ -490,9 +491,21 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
         p.noColumnLines,
         p.borderless,
         p.rowHeight,
-        p.pagination?.mode === "off" ? { maxHeight: p.pagination.maxHeight } : undefined,
+        isPaginationOff ? { maxHeight: unpaginatedMaxHeight } : undefined,
       ),
-    [cssScope, p.fill, p.stroke, p.cellPaddingSize, p.noColumnLines, p.borderless, p.rowHeight, p.pagination],
+    // Derived primitives, not p.pagination itself: an inline pagination literal is a new
+    // object every render and would defeat the memo.
+    [
+      cssScope,
+      p.fill,
+      p.stroke,
+      p.cellPaddingSize,
+      p.noColumnLines,
+      p.borderless,
+      p.rowHeight,
+      isPaginationOff,
+      unpaginatedMaxHeight,
+    ],
   )
 
   useEffect(() => {
