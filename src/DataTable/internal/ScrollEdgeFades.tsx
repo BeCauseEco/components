@@ -38,14 +38,13 @@ export const ScrollEdgeFades = ({ suppressLeft, suppressRight, children }: Scrol
       return
     }
 
-    measure()
-
     // Scroll events don't bubble but can be captured, so one listener here keeps
     // working even when ka-table remounts its scroll wrapper (editing-mode key change).
     container.addEventListener("scroll", measure, { capture: true, passive: true })
 
     // The container resizes with the viewport; the inner table resizes when data or
     // column widths change, which alters scrollWidth without resizing the container.
+    // observe() also delivers an initial observation, which performs the first measurement.
     const resizeObserver = new ResizeObserver(measure)
     resizeObserver.observe(container)
     const table = container.querySelector(".ka-table-wrapper table")
