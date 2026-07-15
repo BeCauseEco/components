@@ -35,6 +35,9 @@ import { sizeClass } from "./internal/textSize"
 
 const DIMMED_ROW_OPACITY = 0.55
 
+// Module constant so the Table receives a referentially stable virtualScrolling prop.
+const VIRTUAL_SCROLLING_ENABLED = { enabled: true }
+
 // Re-export for backward compatibility
 export { SortDirection } from "ka-table"
 export { DataType } from "./types"
@@ -84,16 +87,32 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
 
   const textSize = p.textSize
   const isServerMode = p.pagination?.mode === "server"
+  const isPaginationOff = p.pagination?.mode === "off"
+  const unpaginatedMaxHeight = p.pagination?.mode === "off" ? p.pagination.maxHeight : undefined
+
+  // With pagination off every row lives in the table, so windowing keeps large datasets
+  // cheap: ka-table mounts only the rows near the viewport and measures row height and
+  // viewport from the first rendered row. Gated on maxHeight because the windowing follows
+  // the internal scroll wrapper's scrollTop — without maxHeight that wrapper never scrolls
+  // (the page does) and rows that are actually visible would be windowed out. ka-table reads
+  // this prop at mount only (it is not among its controlled-prop keys); scroll state then
+  // lives in its internal reducer, so our re-renders never reset the scroll position —
+  // verified against ka-table 12.0.3; re-check this contract on ka-table upgrades.
+  const virtualScrolling =
+    p.pagination?.mode === "off" && unpaginatedMaxHeight && p.pagination.virtualize !== false
+      ? VIRTUAL_SCROLLING_ENABLED
+      : undefined
 
   const DEFAULT_PAGE_SIZE = 25
+  const configuredPageSize = p.pagination && p.pagination.mode !== "off" ? p.pagination.pageSize : undefined
 
   const [filter, setFilter] = useState("")
   const [clientPageIndex, setClientPageIndex] = useState(0)
-  const [clientPageSize, setClientPageSize] = useState(p.pagination?.pageSize ?? DEFAULT_PAGE_SIZE)
+  const [clientPageSize, setClientPageSize] = useState(configuredPageSize ?? DEFAULT_PAGE_SIZE)
   // Captured once: the page size the table started with. Used to keep the
   // pagination footer (and its page-size selector) visible after the user
   // enlarges the page size past the row count, so they can change it back.
-  const initialClientPageSize = useRef(p.pagination?.pageSize ?? DEFAULT_PAGE_SIZE)
+  const initialClientPageSize = useRef(configuredPageSize ?? DEFAULT_PAGE_SIZE)
   const pageResetKey = `${filter}|${p.pagination?.mode ?? ""}`
   const [lastPageResetKey, setLastPageResetKey] = useState(pageResetKey)
   if (pageResetKey !== lastPageResetKey) {
@@ -225,7 +244,9 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
         setClientPageSize(newSize)
         setClientPageIndex(0)
       },
-      pageSizeOptions: p.pagination?.pageSizeOptions ?? [10, 25, 50, 100],
+      pageSizeOptions: (p.pagination?.mode === "client" ? p.pagination.pageSizeOptions : undefined) ?? [
+        10, 25, 50, 100,
+      ],
     }
   }, [p.pagination, searchedData.length, clientPageIndex, clientPageSize])
 
@@ -233,9 +254,12 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
     if (isServerMode) {
       return p.data
     }
+    if (isPaginationOff) {
+      return sortedData
+    }
     const start = paginationConfig.pageIndex * paginationConfig.pageSize
     return sortedData.slice(start, start + paginationConfig.pageSize)
-  }, [p.data, sortedData, paginationConfig, isServerMode])
+  }, [p.data, sortedData, paginationConfig, isServerMode, isPaginationOff])
 
   // Show the pagination footer when there is more than one page, OR when the
   // user has changed the (client) page size away from its initial value. The
@@ -243,7 +267,7 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
   // page size past the row count can still change it back. Server-mode page
   // size is parent-controlled, so the user-changed check only applies client side.
   const userChangedClientPageSize = !isServerMode && clientPageSize !== initialClientPageSize.current
-  const showPagination = paginationConfig.totalPages > 1 || userChangedClientPageSize
+  const showPagination = !isPaginationOff && (paginationConfig.totalPages > 1 || userChangedClientPageSize)
 
   const selectedFields = useMemo(() => {
     if (!p.selectedRows) {
@@ -463,8 +487,29 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
 
   const css = useMemo(
     () =>
-      createDataTableStyles(cssScope, p.fill, p.stroke, p.cellPaddingSize, p.noColumnLines, p.borderless, p.rowHeight),
-    [cssScope, p.fill, p.stroke, p.cellPaddingSize, p.noColumnLines, p.borderless, p.rowHeight],
+      createDataTableStyles(
+        cssScope,
+        p.fill,
+        p.stroke,
+        p.cellPaddingSize,
+        p.noColumnLines,
+        p.borderless,
+        p.rowHeight,
+        isPaginationOff ? { maxHeight: unpaginatedMaxHeight } : undefined,
+      ),
+    // Derived primitives, not p.pagination itself: an inline pagination literal is a new
+    // object every render and would defeat the memo.
+    [
+      cssScope,
+      p.fill,
+      p.stroke,
+      p.cellPaddingSize,
+      p.noColumnLines,
+      p.borderless,
+      p.rowHeight,
+      isPaginationOff,
+      unpaginatedMaxHeight,
+    ],
   )
 
   useEffect(() => {
@@ -637,6 +682,7 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
                             : SortingMode.Single
                       }
                       editingMode={p.editingMode}
+                      virtualScrolling={virtualScrolling}
                       noData={{ text: p.noDataText || "Nothing found" }}
                       searchText={filter}
                       search={({ searchText: searchTextValue, rowData, column }) => {

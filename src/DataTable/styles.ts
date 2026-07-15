@@ -43,6 +43,7 @@ export const createDataTableStyles = (
   noColumnLines?: boolean,
   borderless?: boolean,
   rowHeight?: "default" | "large",
+  unpaginated?: { maxHeight?: string },
 ) => `
   .${cssScope} .ka {
     background-color: unset;
@@ -287,6 +288,29 @@ export const createDataTableStyles = (
     line-height: 24px;
     height: calc(var(--BU) * 16);
     border-bottom: dotted 1px ${computeColor(stroke || [Color.Neutral, 100])};
+  }
+
+  ${
+    !unpaginated
+      ? ""
+      : `
+  /* Pagination off: every row renders and the .ka-table-wrapper is the scrollport, so keep the
+     header readable while scrolling. Above the sticky fixed-column body cells (z-index 4),
+     which would otherwise paint over the header. Opaque background: rows scroll beneath it. */
+  ${unpaginated.maxHeight ? `.${cssScope} .ka .ka-table-wrapper { max-height: ${unpaginated.maxHeight}; }` : ""}
+  .${cssScope} .ka-thead-cell {
+    position: sticky;
+    top: 0;
+    background-color: ${computeColor(fill || [Color.White])};
+    z-index: 5;
+  }
+  /* A fixed column's header cell sticks on both axes (top from the rule above, left/right from
+     the override-ka-fixed rules) and must paint above its sibling header cells sliding past it. */
+  .${cssScope} .ka-thead-cell.override-ka-fixed-left,
+  .${cssScope} .ka-thead-cell.override-ka-fixed-right {
+    z-index: 6;
+  }
+  `
   }
 
   .${cssScope} .ka-thead-cell-resize {

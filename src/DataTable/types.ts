@@ -32,6 +32,34 @@ export type ClientPagination = {
   pageSizeOptions?: number[]
 }
 
+/**
+ * Disables pagination entirely: all rows live in the table (no pagination footer) and scroll
+ * in place. The header row sticks to the top of the table's internal scroll wrapper while
+ * scrolling. When `maxHeight` is set, rows are virtualized by default (see `virtualize`).
+ */
+export type PaginationOff = {
+  mode: "off"
+  /**
+   * Bounds the table body (the internal scroll wrapper) so rows scroll inside it under the
+   * sticky header. Any CSS length, e.g. "400px" or "calc(80vh - 320px)". Without it the
+   * table grows to its content and scrolling falls to the page/container instead.
+   */
+  maxHeight?: string
+  /**
+   * Virtualize rows: only the rows near the viewport are mounted, so row count stops
+   * mattering for render cost. Defaults to `true`; set `false` to always mount every row.
+   *
+   * Only takes effect when `maxHeight` is set — virtualization is driven by the internal
+   * scroll wrapper's scroll position, and without `maxHeight` that wrapper never scrolls
+   * (the page does), which would window out rows that are actually visible.
+   *
+   * Rows are assumed uniform height (measured from the first rendered row). Opt out for
+   * tables whose rows differ in height — e.g. per-row cell `footer`s that only some rows
+   * have — or when the full table must be printable: printing only includes mounted rows.
+   */
+  virtualize?: boolean
+}
+
 export type ServerPagination = {
   mode: "server"
   pageIndex: number
@@ -42,7 +70,7 @@ export type ServerPagination = {
   pageSizeOptions?: number[]
 }
 
-export type PaginationConfig = ClientPagination | ServerPagination
+export type PaginationConfig = ClientPagination | ServerPagination | PaginationOff
 
 export type DataTableExportConfig = {
   /** When true, renders an export button in the filter row, top-right, downloading an
