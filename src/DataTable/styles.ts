@@ -304,6 +304,12 @@ export const createDataTableStyles = (
     background-color: ${computeColor(fill || [Color.White])};
     z-index: 5;
   }
+  /* A fixed column's header cell sticks on both axes (top from the rule above, left/right from
+     the override-ka-fixed rules) and must paint above its sibling header cells sliding past it. */
+  .${cssScope} .ka-thead-cell.override-ka-fixed-left,
+  .${cssScope} .ka-thead-cell.override-ka-fixed-right {
+    z-index: 6;
+  }
   `
   }
 
