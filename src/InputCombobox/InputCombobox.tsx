@@ -9,7 +9,7 @@ import React, {
   useState,
 } from "react"
 import { InputComboboxItemProps } from "./InputComboboxItem"
-import { Text } from "@new/Text/Text"
+import { StyleBodySmall, StyleBodyTiny, StyleBodyXsmall, Text } from "@new/Text/Text"
 import { Color, ColorWithLightness } from "@new/Color"
 import { Popover } from "@new/Popover/Popover"
 import { InputButton } from "@new/InputButton/internal/InputButton"
@@ -17,7 +17,7 @@ import { Spacer } from "@new/Stack/Spacer"
 import { ComponentBaseProps } from "@new/ComponentBaseProps"
 import { Align } from "@new/Stack/Align"
 import { Container } from "./internal/InputCombobox.styles"
-import { debounce } from "./internal/utils"
+import { debounce, measureWidestTextPx } from "./internal/utils"
 import { ComboboxLabel } from "./internal/ComboboxLabel"
 import { ComboboxTriggerContent } from "./internal/ComboboxTriggerContent"
 import { ComboboxItem } from "./internal/ComboboxItem"
@@ -261,6 +261,31 @@ export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<InputC
 
   const filterWithDebounce = useMemo(() => debounce(filterResults, 300), [filterResults])
 
+  // The virtualized list cannot size itself from its items (Virtuoso's viewport is absolutely
+  // positioned, so item content contributes no intrinsic width, collapsing the list to the
+  // trigger width and ellipsizing long labels). Measure the widest label/sublabel across ALL
+  // items — not just the filtered ones — so the popover width stays stable while searching.
+  const virtuosoContentWidthPx = useMemo(() => {
+    if (!p.enableVirtuoso) {
+      return undefined
+    }
+
+    const allItems = Object.values(items)
+    const labelFontSizePx = parseFloat(p.size === "small" ? StyleBodyXsmall.fontSize : StyleBodySmall.fontSize)
+    const sublabelFontSizePx = parseFloat(StyleBodyTiny.fontSize)
+
+    return Math.max(
+      measureWidestTextPx(
+        allItems.map(item => item.label),
+        labelFontSizePx,
+      ),
+      measureWidestTextPx(
+        allItems.flatMap(item => (item.sublabel ? [item.sublabel] : [])),
+        sublabelFontSizePx,
+      ),
+    )
+  }, [items, p.enableVirtuoso, p.size])
+
   let strokeColor: ColorWithLightness = [p.color, 300]
   if (p.disabled) {
     strokeColor = [p.color, 100]
@@ -279,6 +304,7 @@ export const InputCombobox = forwardRef<HTMLDivElement, PropsWithChildren<InputC
       size={p.size}
       width={p.width}
       containerWidthPx={containerWidth}
+      contentWidthPx={virtuosoContentWidthPx}
       renderItem={(index, item) => (
         <ComboboxItem
           key={index}

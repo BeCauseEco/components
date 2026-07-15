@@ -21,8 +21,16 @@ export interface ComboboxItemListProps {
   size: "small" | "large"
   width: "fixed" | "auto"
   containerWidthPx?: number
+  /** Width in px of the widest item text, used to size the virtualized list to its content. */
+  contentWidthPx?: number
   renderItem: (index: number, item: InputComboboxItemProps) => React.ReactNode
 }
+
+/**
+ * Horizontal space an item needs around its text: checkbox icon (24) + spacer (8) +
+ * item padding (8) + scrollbar (16).
+ */
+const VIRTUOSO_ITEM_CHROME_WIDTH_PX = 56
 
 /**
  * Renders the list of combobox items, handling virtualization, grouping, and flat rendering
@@ -35,19 +43,27 @@ export const ComboboxItemList: React.FC<ComboboxItemListProps> = ({
   size,
   width,
   containerWidthPx,
+  contentWidthPx,
   renderItem,
 }) => {
   if (enableVirtuoso) {
     // For virtuoso, we need to use flat rendering even with groups
     // TODO: Future enhancement could add virtuoso support for groups
     const minWidth = containerWidthPx ? `${containerWidthPx}px` : calculateContainerWidth(size, width)
+    const maxWidth = "calc(var(--radix-popover-content-available-width) - var(--BU) * 4)"
 
     return (
       <Virtuoso
         style={{
           height: "calc(var(--radix-popover-content-available-height) / 2)",
+          // Virtuoso's viewport is absolutely positioned, so item content contributes no
+          // intrinsic width — without an explicit width the list collapses to minWidth and
+          // long labels get ellipsized.
+          width: contentWidthPx
+            ? `max(${minWidth}, min(${contentWidthPx + VIRTUOSO_ITEM_CHROME_WIDTH_PX}px, ${maxWidth}))`
+            : undefined,
           minWidth,
-          maxWidth: "calc(var(--radix-popover-content-available-width) - var(--BU) * 4)",
+          maxWidth,
 
           overflowX: "hidden",
         }}
