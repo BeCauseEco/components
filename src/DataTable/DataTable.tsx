@@ -519,6 +519,11 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
   // back, leaving blank space below the rendered rows. Re-measure on every root resize: the data
   // crossing the scrollport boundary and maxHeight changes both surface as a root resize.
   // offsetHeight of the .ka root is ka-table's own measurement source, kept for consistency.
+  //
+  // The .ka node is not stable: it does not exist while loadingElement is shown, and the
+  // editingMode key on the Table replaces it on mode switches — both must re-run this effect so
+  // the observer re-attaches to the current node instead of a missing or detached one.
+  const isLoadingElementShown = Boolean(p.loadingElement)
   useEffect(() => {
     if (!virtualScrolling) {
       return
@@ -543,7 +548,7 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
     })
     observer.observe(root)
     return () => observer.disconnect()
-  }, [virtualScrolling, table])
+  }, [virtualScrolling, table, p.editingMode, isLoadingElementShown])
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
