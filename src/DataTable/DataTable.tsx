@@ -1,5 +1,5 @@
 "use client"
-import { EditingMode, SortDirection, SortingMode, Table, useTable } from "ka-table"
+import { ActionType, EditingMode, SortDirection, SortingMode, Table, useTable } from "ka-table"
 import {
   closeEditor,
   closeRowEditors,
@@ -511,6 +511,44 @@ export const DataTable = <TData = any,>(p: DataTableProps<TData>) => {
       unpaginatedMaxHeight,
     ],
   )
+
+  // ka-table measures its windowing viewport (virtualScrolling.tbodyHeight) once, on the first
+  // rendered row, and never re-measures — only scrollTop updates afterwards. If that measurement
+  // lands while the table is shorter than its scrollport (e.g. filters trimmed the data below
+  // maxHeight), the stale value windows out rows that are actually visible once the table grows
+  // back, leaving blank space below the rendered rows. Re-measure on every root resize: the data
+  // crossing the scrollport boundary and maxHeight changes both surface as a root resize.
+  // offsetHeight of the .ka root is ka-table's own measurement source, kept for consistency.
+  //
+  // The .ka node is not stable: it does not exist while loadingElement is shown, and the
+  // editingMode key on the Table replaces it on mode switches — both must re-run this effect so
+  // the observer re-attaches to the current node instead of a missing or detached one.
+  const isLoadingElementShown = Boolean(p.loadingElement)
+  useEffect(() => {
+    if (!virtualScrolling) {
+      return
+    }
+    const root = referenceContainer.current?.querySelector<HTMLElement>(".ka")
+    if (!root) {
+      return
+    }
+    const observer = new ResizeObserver(() => {
+      const current = table.props.virtualScrolling
+      const tbodyHeight = root.offsetHeight
+      // The scrollport clamps scrollTop when its content shrinks; read it back so the window
+      // is computed from the real scroll position.
+      const scrollTop = root.querySelector(".ka-table-wrapper")?.scrollTop ?? current?.scrollTop
+      if (current?.tbodyHeight === tbodyHeight && current?.scrollTop === scrollTop) {
+        return
+      }
+      table.dispatch({
+        type: ActionType.UpdateVirtualScrolling,
+        virtualScrolling: { ...current, enabled: true, tbodyHeight, scrollTop },
+      })
+    })
+    observer.observe(root)
+    return () => observer.disconnect()
+  }, [virtualScrolling, table, p.editingMode, isLoadingElementShown])
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
